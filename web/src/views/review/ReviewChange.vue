@@ -325,7 +325,12 @@ onKeyStroke('k', e => !typing(e) && step(-1))
             </AFlex>
             <div class="text-3 op-65 mt-1">
               {{ name }} <span class="mono">{{ change.pluginId }}</span>,
-              {{ $gettext('submitted by @%{login} %{time}', { login: detail.author?.login ?? '', time: fromNow(change.createdAt) }) }}
+              <template v-if="detail.author">
+                {{ $gettext('submitted by @%{login} %{time}', { login: detail.author.login, time: fromNow(change.createdAt) }) }}
+              </template>
+              <template v-else>
+                {{ $gettext('found in a new release %{time}', { time: fromNow(change.createdAt) }) }}
+              </template>
             </div>
           </div>
           <AFlex v-if="isOpen" gap="small" wrap>
@@ -485,7 +490,7 @@ onKeyStroke('k', e => !typing(e) && step(-1))
             </dl>
           </ACard>
 
-          <ACard :title="$gettext('Identity')">
+          <ACard v-if="detail.author" :title="$gettext('Identity')">
             <ul class="checklist">
               <li>
                 <span class="i-tabler-circle-check-filled ok" />
