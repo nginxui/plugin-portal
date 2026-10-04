@@ -200,6 +200,10 @@ describe('plugin page', () => {
     expect(body.plugin.description).toEqual({ en: 'Fresh plugin.', zh_CN: '新插件。' })
     expect(body.plugin.version).toBe('0.2.0')
     expect(body.releases.map(r => r.version)).toEqual(['0.2.0'])
+
+    // My plugins shows the same version and release date.
+    const mine = await (await call('/api/plugins/mine', { cookie })).json() as { plugins: { id: string, version: string | null, releasedAt: string | null }[] }
+    expect(mine.plugins.find(p => p.id === 'io.github.octo-author.fresh')).toMatchObject({ version: '0.2.0', releasedAt: '2026-10-01T00:00:00Z' })
   })
 
   it('is not found for an unknown id', async () => {
