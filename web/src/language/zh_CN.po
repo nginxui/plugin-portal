@@ -1,0 +1,87 @@
+msgid ""
+msgstr ""
+"Content-Type: text/plain; charset=utf-8\n"
+"Project-Id-Version: PACKAGE VERSION\n"
+"Last-Translator: Automatically generated\n"
+"Language-Team: none\n"
+"Language: zh_CN\n"
+"MIME-Version: 1.0\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+msgid "My plugins"
+msgstr "我的插件"
+
+msgid "GitHub profile"
+msgstr "GitHub 个人主页"
+
+msgid "Sign out"
+msgstr "退出登录"
+
+msgid "Developer Center"
+msgstr "开发者中心"
+
+msgid "Developer docs"
+msgstr "开发者文档"
+
+msgid "Plugin catalog"
+msgstr "插件目录"
+
+msgid "Toggle dark mode"
+msgstr "切换深色模式"
+
+msgid "Account menu"
+msgstr "账户菜单"
+
+msgid "Manage the plugins you list in the catalog and follow changes under review."
+msgstr "管理你在插件目录中上架的插件，跟进审核中的变更。"
+
+msgid "You have no plugins yet."
+msgstr "你还没有插件。"
+
+msgid "Page not found"
+msgstr "页面不存在"
+
+msgid "The page you are looking for does not exist."
+msgstr "你访问的页面不存在。"
+
+msgid "Back to my plugins"
+msgstr "返回我的插件"
+
+msgid "Sign in was cancelled on GitHub."
+msgstr "已在 GitHub 上取消登录。"
+
+msgid "The sign in request has expired. Please try again."
+msgstr "登录请求已过期，请重试。"
+
+msgid "GitHub could not complete the sign in. Please try again later."
+msgstr "GitHub 未能完成登录，请稍后重试。"
+
+msgid "Submit plugins"
+msgstr "提交插件"
+
+msgid "Choose a repository and the release and plugin details are read for you. Preview the listing before you submit."
+msgstr "选择仓库后自动读取版本与插件信息，提交前即可预览上架效果。"
+
+msgid "Manage on your own"
+msgstr "自助管理"
+
+msgid "Yank versions, revoke signers and change categories. Saved changes take effect immediately."
+msgstr "撤回版本、撤销签名者、调整分类，保存后立即生效。"
+
+msgid "Public review"
+msgstr "公开审核"
+
+msgid "New listings and key changes are reviewed by maintainers, and every review is public."
+msgstr "新上架与关键信息变更由维护者审核，审核记录公开可查。"
+
+msgid "Nginx UI Developer Center"
+msgstr "Nginx UI 开发者中心"
+
+msgid "Submit plugins, manage your listings and follow their review."
+msgstr "提交插件，管理上架内容，查看审核进度。"
+
+msgid "Sign in with GitHub"
+msgstr "使用 GitHub 登录"
+
+msgid "Signing in only confirms your GitHub identity. It grants no write access to your repositories."
+msgstr "登录仅用于确认你的 GitHub 身份，不会获得你仓库的写入权限。"

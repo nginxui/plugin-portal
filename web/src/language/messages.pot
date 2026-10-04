@@ -1,0 +1,110 @@
+msgid ""
+msgstr ""
+"Content-Type: text/plain; charset=UTF-8\n"
+
+#: web/src/layouts/PortalLayout.vue:23
+#: web/src/views/MyPlugins.vue:9
+msgid "My plugins"
+msgstr ""
+
+#: web/src/layouts/PortalLayout.vue:42
+msgid "GitHub profile"
+msgstr ""
+
+#: web/src/layouts/PortalLayout.vue:44
+msgid "Sign out"
+msgstr ""
+
+#: web/src/layouts/PortalLayout.vue:75
+msgid "Developer Center"
+msgstr ""
+
+#: web/src/layouts/PortalLayout.vue:87
+#: web/src/views/SignIn.vue:81
+msgid "Developer docs"
+msgstr ""
+
+#: web/src/layouts/PortalLayout.vue:88
+#: web/src/views/SignIn.vue:82
+msgid "Plugin catalog"
+msgstr ""
+
+#: web/src/layouts/PortalLayout.vue:99
+msgid "Toggle dark mode"
+msgstr ""
+
+#: web/src/layouts/PortalLayout.vue:103
+msgid "Account menu"
+msgstr ""
+
+#: web/src/views/MyPlugins.vue:12
+msgid "Manage the plugins you list in the catalog and follow changes under review."
+msgstr ""
+
+#: web/src/views/MyPlugins.vue:16
+msgid "You have no plugins yet."
+msgstr ""
+
+#: web/src/views/NotFound.vue:6
+msgid "Page not found"
+msgstr ""
+
+#: web/src/views/NotFound.vue:6
+msgid "The page you are looking for does not exist."
+msgstr ""
+
+#: web/src/views/NotFound.vue:10
+msgid "Back to my plugins"
+msgstr ""
+
+#: web/src/views/SignIn.vue:15
+msgid "Sign in was cancelled on GitHub."
+msgstr ""
+
+#: web/src/views/SignIn.vue:17
+msgid "The sign in request has expired. Please try again."
+msgstr ""
+
+#: web/src/views/SignIn.vue:19
+msgid "GitHub could not complete the sign in. Please try again later."
+msgstr ""
+
+#: web/src/views/SignIn.vue:28
+msgid "Submit plugins"
+msgstr ""
+
+#: web/src/views/SignIn.vue:29
+msgid "Choose a repository and the release and plugin details are read for you. Preview the listing before you submit."
+msgstr ""
+
+#: web/src/views/SignIn.vue:33
+msgid "Manage on your own"
+msgstr ""
+
+#: web/src/views/SignIn.vue:34
+msgid "Yank versions, revoke signers and change categories. Saved changes take effect immediately."
+msgstr ""
+
+#: web/src/views/SignIn.vue:38
+msgid "Public review"
+msgstr ""
+
+#: web/src/views/SignIn.vue:39
+msgid "New listings and key changes are reviewed by maintainers, and every review is public."
+msgstr ""
+
+#: web/src/views/SignIn.vue:51
+msgid "Nginx UI Developer Center"
+msgstr ""
+
+#: web/src/views/SignIn.vue:54
+msgid "Submit plugins, manage your listings and follow their review."
+msgstr ""
+
+#: web/src/views/SignIn.vue:60
+msgid "Sign in with GitHub"
+msgstr ""
+
+#: web/src/views/SignIn.vue:63
+msgid "Signing in only confirms your GitHub identity. It grants no write access to your repositories."
+msgstr ""

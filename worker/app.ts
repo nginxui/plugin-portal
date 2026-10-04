@@ -1,0 +1,24 @@
+import type { AppEnv } from './env'
+import { Hono } from 'hono'
+import { GitHubError } from './lib/github'
+import { SessionExpired } from './lib/session'
+import { security } from './middleware/security'
+import { auth } from './routes/auth'
+import { me } from './routes/me'
+
+export const app = new Hono<AppEnv>().basePath('/api')
+
+app.use('*', security)
+app.route('/auth', auth)
+app.route('/me', me)
+
+app.notFound(c => c.json({ error: 'not_found' }, 404))
+
+app.onError((error, c) => {
+  if (error instanceof SessionExpired)
+    return c.json({ error: 'unauthenticated' }, 401)
+  if (error instanceof GitHubError)
+    return c.json({ error: 'github', status: error.status }, 502)
+  console.error(error)
+  return c.json({ error: 'internal' }, 500)
+})

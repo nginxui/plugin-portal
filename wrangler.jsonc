@@ -1,0 +1,34 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "nginxui-plugin-portal",
+  // The account of the catalog Pages project and the release webhook.
+  "account_id": "9b281dd2ab36041a82b8b35a7a14c5de",
+  "main": "worker/index.ts",
+  "compatibility_date": "2026-10-01",
+  "compatibility_flags": ["nodejs_compat"],
+  "workers_dev": false,
+  "preview_urls": false,
+  "routes": [{ "pattern": "portal.nginxui.com", "custom_domain": true }],
+  "assets": {
+    "not_found_handling": "single-page-application",
+    "run_worker_first": ["/api/*"]
+  },
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "portal",
+      // Replace with the id printed by `wrangler d1 create portal`.
+      "database_id": "00000000-0000-0000-0000-000000000000",
+      "migrations_dir": "migrations"
+    }
+  ],
+  "vars": {
+    "PORTAL_ORIGIN": "https://portal.nginxui.com",
+    "CATALOG_URL": "https://plugins.nginxui.com",
+    "CATALOG_REPO": "nginxui/plugins",
+    "GITHUB_CLIENT_ID": ""
+  }
+  // Secrets, set with `wrangler secret put <NAME>`:
+  //   GITHUB_CLIENT_SECRET  client secret of the Portal GitHub App
+  //   SESSION_KEY           32 random bytes, base64, encrypts GitHub tokens
+}
