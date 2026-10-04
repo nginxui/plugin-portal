@@ -5,6 +5,7 @@ import { Hono } from 'hono'
 import { mapLimit, repoAccess } from '../lib/access'
 import { catalogEntry, latestRelease, loadCatalog, repoOf } from '../lib/catalog'
 import { github, GitHubError } from '../lib/github'
+import { insightsOf } from '../lib/insights'
 import { userToken } from '../lib/session'
 import { repoReleases } from '../lib/submission'
 import { checkMaintainer, requireSession } from '../middleware/auth'
@@ -187,6 +188,17 @@ plugins.get('/mine', async (c) => {
   return c.json({ plugins, installable, installUrl: `https://github.com/apps/${c.env.CATALOG_APP_SLUG}/installations/new` })
 })
 
+// Downloads, completeness and repository activity of the listed plugins the
+// user manages, loaded after the list so it stays fast.
+plugins.get('/insights', async (c) => {
+  const session = c.get('session')
+  const token = await userToken(c.env, session.id)
+  const [{ plugins: mine }, catalog] = await Promise.all([collectMine(c.env, session), loadCatalog(c.env)])
+  const ids = new Set(mine.filter(p => p.state === 'listed').map(p => p.id))
+  const listed = catalog.plugins.filter(p => ids.has(p.id))
+  return c.json({ insights: await mapLimit(listed, 4, plugin => insightsOf(c.env, token, plugin)) })
+})
+
 plugins.get('/:id', async (c) => {
   const session = c.get('session')
   const id = c.req.param('id')
@@ -222,11 +234,15 @@ plugins.get('/:id', async (c) => {
   }
   if (!summary.role && !await checkMaintainer(c.env, session.id))
     return c.json({ error: 'no_access' }, 403)
-  const [entry, pending] = await Promise.all([
+  const [entry, pending, open] = await Promise.all([
     catalogEntry(c.env, id),
     c.env.DB.prepare(`SELECT id, kind FROM changes WHERE plugin_id = ? AND class = 'self_service' AND state IN ('open', 'merged') ORDER BY created_at DESC LIMIT 1`)
       .bind(id)
       .first<{ id: string, kind: string }>(),
+    c.env.DB.prepare(`SELECT id, kind, class, stage, waiting_on, pr_number, payload_json, created_at, updated_at FROM changes
+      WHERE plugin_id = ? AND state IN ('open', 'merged') ORDER BY created_at DESC LIMIT 5`)
+      .bind(id)
+      .all<{ id: string, kind: string, class: string, stage: string, waiting_on: string | null, pr_number: number | null, payload_json: string | null, created_at: number, updated_at: number }>(),
   ])
   const yanked = new Set(entry?.yanked ?? [])
   const revoked = new Set((entry?.revoked_signers ?? []).map(s => s.toUpperCase()))
@@ -247,6 +263,18 @@ plugins.get('/:id', async (c) => {
     })),
     revokedSigners: [...revoked],
     pending,
+    // Changes still on their way, for the strip under the plugin header.
+    openChanges: open.results.map(row => ({
+      id: row.id,
+      kind: row.kind,
+      class: row.class,
+      stage: row.stage,
+      waitingOn: row.waiting_on,
+      prNumber: row.pr_number,
+      createdAt: row.created_at,
+      updatedAt: row.updated_at,
+    })),
+    store: entry?.store ?? null,
     listed: !!entry,
     access: {
       role: summary.role,

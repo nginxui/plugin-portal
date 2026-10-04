@@ -64,6 +64,24 @@ async function signedIn() {
 }
 
 describe('my plugins', () => {
+  it('reports downloads, completeness and activity of listed plugins', async () => {
+    const cookie = await signedIn()
+    await caches.default.delete(`https://portal.cache/${encodeURIComponent('gh:octo-author/geoip')}`)
+    await caches.default.delete(`https://portal.cache/${encodeURIComponent('gh:acme-labs/waf')}`)
+    catalogAndRepos(url => url.pathname === '/repos/octo-author/geoip/releases'
+      ? json([
+          { tag_name: 'v0.3.0', published_at: '2026-10-02T00:00:00Z', prerelease: false, draft: false, assets: [{ name: 'p-0.3.0.tar.gz', download_count: 7 }, { name: 'p-0.3.0.tar.gz.sha256', download_count: 90 }] },
+          { tag_name: 'v0.2.0', published_at: '2026-09-02T00:00:00Z', prerelease: false, draft: false, assets: [{ name: 'p-0.2.0.tar.gz', download_count: 3 }] },
+          { tag_name: 'v0.4.0', published_at: null, prerelease: false, draft: true, assets: [] },
+        ])
+      : undefined)
+    const body = await (await call('/api/plugins/insights', { cookie })).json() as { insights: { id: string, downloads: { version: string, count: number }[], untranslated: string[], storeSource: string }[] }
+    const geoip = body.insights.find(i => i.id === 'io.github.octo.geoip')!
+    expect(geoip.downloads).toEqual([{ version: '0.2.0', count: 3 }, { version: '0.3.0', count: 7 }])
+    expect(geoip.untranslated).toHaveLength(13)
+    expect(geoip.storeSource).toBe('release')
+  })
+
   it('lists the plugins whose repository the user has a role on', async () => {
     const cookie = await signedIn()
     catalogAndRepos()

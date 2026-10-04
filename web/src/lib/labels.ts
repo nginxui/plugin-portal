@@ -55,3 +55,16 @@ export function stateTag(state: PluginSummary['state']): { label: string, color:
       return { label: $gettext('Delisted'), color: 'error' }
   }
 }
+
+export function storeSourceLabel(source: string): string {
+  switch (source) {
+    case 'repo-branch':
+      return $gettext('Repository, following the default branch')
+    case 'repo-release':
+      return $gettext('Repository, following releases')
+    case 'catalog':
+      return $gettext('Hosted by the catalog')
+    default:
+      return $gettext('The manifest of the newest release')
+  }
+}

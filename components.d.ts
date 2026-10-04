@@ -48,15 +48,18 @@ declare module 'vue' {
     CategoryPicker: typeof import('./web/src/components/CategoryPicker.vue')['default']
     CheckList: typeof import('./web/src/components/CheckList.vue')['default']
     CommandPalette: typeof import('./web/src/components/CommandPalette.vue')['default']
+    CoverageMeter: typeof import('./web/src/components/CoverageMeter.vue')['default']
     KeyChain: typeof import('./web/src/components/KeyChain.vue')['default']
     KeyGuide: typeof import('./web/src/components/KeyGuide.vue')['default']
     ListingCard: typeof import('./web/src/components/ListingCard.vue')['default']
     PendingChange: typeof import('./web/src/components/PendingChange.vue')['default']
+    PluginCard: typeof import('./web/src/components/PluginCard.vue')['default']
     PluginIcon: typeof import('./web/src/components/PluginIcon.vue')['default']
     PluginRow: typeof import('./web/src/components/PluginRow.vue')['default']
     RepoPicker: typeof import('./web/src/components/RepoPicker.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
     SiderNav: typeof import('./web/src/components/SiderNav.vue')['default']
+    SparkLine: typeof import('./web/src/components/SparkLine.vue')['default']
   }
 }
