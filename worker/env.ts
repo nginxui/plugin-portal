@@ -22,6 +22,10 @@ export interface Env {
   MEDIA_URL?: string
   // Key for AI provider keys at rest, apart from the session key.
   AI_KEY?: string
+  // Mail for the tracker; off until all three are set.
+  EMAIL_API_URL?: string
+  EMAIL_API_KEY?: string
+  EMAIL_FROM?: string
 }
 
 export interface SessionUser {

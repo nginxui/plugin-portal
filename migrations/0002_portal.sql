@@ -5,6 +5,9 @@ ALTER TABLE changes ADD COLUMN payload_json TEXT;
 ALTER TABLE changes ADD COLUMN dispatched_at INTEGER;
 ALTER TABLE changes ADD COLUMN outcome_json TEXT;
 
+-- When a user last read their notifications.
+ALTER TABLE notify_prefs ADD COLUMN read_at INTEGER;
+
 -- Partner applications and key requests, decided by maintainers. An approved
 -- one becomes a pull request on partners/<name>.json in the catalog.
 CREATE TABLE partner_requests (
@@ -23,3 +26,9 @@ CREATE TABLE partner_requests (
   created_at INTEGER NOT NULL
 );
 CREATE INDEX partner_requests_state ON partner_requests (state, created_at);
+
+-- Where background jobs left off.
+CREATE TABLE job_state (
+  name TEXT PRIMARY KEY,
+  value TEXT NOT NULL
+);
