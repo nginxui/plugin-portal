@@ -11,5 +11,8 @@ beforeEach(async () => {
   const { results } = await env.DB.prepare(
     `SELECT name FROM sqlite_master WHERE type = 'table' AND name NOT LIKE 'sqlite_%' AND name NOT LIKE '_cf_%' AND name != 'd1_migrations'`,
   ).all<{ name: string }>()
-  await env.DB.batch(results.map(({ name }) => env.DB.prepare(`DELETE FROM "${name}"`)))
+  // Tables that reference others go first.
+  const first = ['vendor_members', 'change_events', 'sessions', 'plugins']
+  const names = results.map(r => r.name).sort((a, b) => Number(first.includes(b)) - Number(first.includes(a)))
+  await env.DB.batch(names.map(name => env.DB.prepare(`DELETE FROM "${name}"`)))
 })

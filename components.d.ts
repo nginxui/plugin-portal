@@ -38,6 +38,7 @@ declare module 'vue' {
     ALayoutSider: typeof import('antdv-next')['LayoutSider']
     AMenu: typeof import('antdv-next')['Menu']
     AModal: typeof import('antdv-next')['Modal']
+    APagination: typeof import('antdv-next')['Pagination']
     APopover: typeof import('antdv-next')['Popover']
     ARadio: typeof import('antdv-next')['Radio']
     AResult: typeof import('antdv-next')['Result']

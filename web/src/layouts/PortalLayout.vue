@@ -58,6 +58,8 @@ const menuItems = computed<MenuProps['items']>(() => {
       label: $gettext('Maintenance'),
       children: [
         { key: '/review', icon: icon('i-tabler-inbox'), label: withBadge($gettext('Review queue'), reviewStore.pending) },
+        { key: '/maintain/plugins', icon: icon('i-tabler-apps'), label: $gettext('All plugins') },
+        { key: '/maintain/partners', icon: icon('i-tabler-building-store'), label: $gettext('Partners') },
         { key: '/audit', icon: icon('i-tabler-history'), label: $gettext('Audit log') },
         { key: '/ai', icon: icon('i-tabler-sparkles'), label: $gettext('AI models') },
       ],
@@ -76,7 +78,7 @@ const selectedKeys = computed(() => {
       keys.push(String(item.key))
   }
   // A change page belongs to the plugins of its author.
-  const path = route.path.startsWith('/changes/') ? '/plugins' : route.path
+  const path = route.path.startsWith('/changes/') ? '/plugins' : route.path.startsWith('/vendors/') ? '/owners' : route.path
   const match = keys.filter(key => path.startsWith(key)).sort((a, b) => b.length - a.length)[0]
   return match ? [match] : []
 })

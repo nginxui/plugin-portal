@@ -215,11 +215,16 @@ describe('owners', () => {
     ])
   })
 
-  it('shows an organization page without admin rights for a publisher', async () => {
+  it('shows an organization page without the partner application for a publisher', async () => {
     const cookie = await signedIn()
-    catalogAndRepos()
-    const body = await (await call('/api/owners/acme-labs', { cookie })).json() as { isAdmin: boolean, accessUrl: string }
-    expect(body.isAdmin).toBe(false)
+    await caches.default.delete(`https://portal.cache/${encodeURIComponent('owner:acme-labs')}`)
+    catalogAndRepos(
+      url => url.href === 'https://api.github.com/users/acme-labs' ? json({ id: 900, login: 'acme-labs', name: null, avatar_url: '', type: 'Organization', html_url: '' }) : undefined,
+      url => url.pathname === `/repos/${env.CATALOG_REPO}/contents/partners` ? json([]) : undefined,
+    )
+    const body = await (await call('/api/owners/acme-labs', { cookie })).json() as { canApply: boolean, accessUrl: string, plugins: { role: string }[] }
+    expect(body.plugins.map(p => p.role)).toEqual(['publisher'])
+    expect(body.canApply).toBe(false)
     expect(body.accessUrl).toBe('https://github.com/orgs/acme-labs/people')
   })
 })
