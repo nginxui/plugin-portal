@@ -45,18 +45,22 @@ interface UserRepo {
   permissions?: { admin?: boolean }
 }
 
-// Public repositories the user may submit: the ones they installed the
-// Catalog App on, as the release webhook recorded, and the ones they
-// administer, read with their own token. Listed repositories are left out.
-async function submittable(env: Env, session: Session, token: string, taken: Set<string>): Promise<Installable[]> {
-  const out = new Map<string, Installable>()
+// Repositories the user installed the Catalog App on, as the release webhook
+// recorded. Listed repositories are left out.
+async function installedRepos(env: Env, session: Session, taken: Set<string>): Promise<Installable[]> {
   const installed = await env.DB.prepare(
     `SELECT repo_full_name AS repo, max(added_at) AS at FROM installations
      WHERE installed_by = ? AND removed_at IS NULL GROUP BY repo_id ORDER BY at DESC`,
   ).bind(session.user.id).all<{ repo: string, at: number }>()
-  for (const row of installed.results)
-    out.set(row.repo.toLowerCase(), { repo: row.repo, description: null, source: 'installation', at: row.at })
+  return installed.results
+    .filter(row => !taken.has(row.repo.toLowerCase()))
+    .map(row => ({ repo: row.repo, description: null, source: 'installation' as const, at: row.at }))
+}
 
+// Other public repositories the user administers, read with their own token
+// only when asked for, since listing them takes GitHub requests.
+async function adminRepos(session: Session, token: string, skip: Set<string>): Promise<Installable[]> {
+  const out = new Map<string, Installable>()
   // A GitHub App user token may list only repositories the app is installed
   // on, so the user's own public repositories are read as well; owning one
   // makes them its admin.
@@ -72,15 +76,11 @@ async function submittable(env: Env, session: Session, token: string, taken: Set
   const repos = [...listed, ...owned.map(r => ({ ...r, permissions: { admin: true } }))]
   for (const r of repos) {
     const key = r.full_name.toLowerCase()
-    if (r.private || r.archived || r.fork || !r.permissions?.admin)
+    if (r.private || r.archived || r.fork || !r.permissions?.admin || skip.has(key) || out.has(key))
       continue
-    const existing = out.get(key)
-    if (existing)
-      existing.description = r.description
-    else
-      out.set(key, { repo: r.full_name, description: r.description, source: 'admin', at: r.pushed_at ? Math.floor(Date.parse(r.pushed_at) / 1000) : null })
+    out.set(key, { repo: r.full_name, description: r.description, source: 'admin', at: r.pushed_at ? Math.floor(Date.parse(r.pushed_at) / 1000) : null })
   }
-  return [...out.values()].filter(item => !taken.has(item.repo.toLowerCase()))
+  return [...out.values()].sort((a, b) => (b.at ?? 0) - (a.at ?? 0))
 }
 
 interface PluginRow {
@@ -175,7 +175,7 @@ export async function collectMine(env: Env, session: Session) {
       plugins.push(summarizeDraft(row, a))
   }
 
-  const installable = await submittable(env, session, token, repos)
+  const installable = await installedRepos(env, session, repos)
 
   return { plugins, installable }
 }
@@ -187,6 +187,26 @@ plugins.use('*', requireSession)
 plugins.get('/mine', async (c) => {
   const { plugins, installable } = await collectMine(c.env, c.get('session'))
   return c.json({ plugins, installable, installUrl: `https://github.com/apps/${c.env.CATALOG_APP_SLUG}/installations/new` })
+})
+
+// The other public repositories the user administers, for "Load more".
+plugins.get('/repositories', async (c) => {
+  const session = c.get('session')
+  const token = await userToken(c.env, session.id)
+  const [catalog, rows] = await Promise.all([
+    loadCatalog(c.env),
+    c.env.DB.prepare('SELECT repo_full_name FROM plugins WHERE repo_full_name IS NOT NULL').all<{ repo_full_name: string }>(),
+  ])
+  const taken = new Set<string>(rows.results.map(r => r.repo_full_name.toLowerCase()))
+  for (const plugin of catalog.plugins) {
+    const repo = repoOf(plugin.repository_url)
+    if (repo)
+      taken.add(repo.toLowerCase())
+  }
+  const installed = await installedRepos(c.env, session, new Set())
+  for (const item of installed)
+    taken.add(item.repo.toLowerCase())
+  return c.json({ repos: await adminRepos(session, token, taken) })
 })
 
 // Downloads, completeness and repository activity of the listed plugins the

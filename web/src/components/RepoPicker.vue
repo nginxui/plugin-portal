@@ -3,6 +3,7 @@ import type { Installable } from '@/api/plugins'
 import { computed, ref } from 'vue'
 import { $gettext } from '@/lib/gettext'
 import { fromNow } from '@/lib/time'
+import { useMoreRepos } from '@/lib/useMoreRepos'
 
 const props = defineProps<{ repos: Installable[], loading: boolean, installUrl: string, checking: string | null }>()
 const emit = defineEmits<{ pick: [repo: string] }>()
@@ -10,9 +11,13 @@ const emit = defineEmits<{ pick: [repo: string] }>()
 const query = ref('')
 const other = ref('')
 
+// Repositories with the app installed come first; the others load on request.
+const more = useMoreRepos()
+const listed = computed(() => [...props.repos, ...more.shown.value])
+
 const shown = computed(() => {
   const q = query.value.trim().toLowerCase()
-  return q ? props.repos.filter(r => r.repo.toLowerCase().includes(q) || r.description?.toLowerCase().includes(q)) : props.repos
+  return q ? listed.value.filter(r => r.repo.toLowerCase().includes(q) || r.description?.toLowerCase().includes(q)) : listed.value
 })
 
 function pickOther() {
@@ -24,7 +29,7 @@ function pickOther() {
 
 <template>
   <div class="picker">
-    <AInput v-if="repos.length > 5" v-model:value="query" allow-clear :placeholder="$gettext('Search repositories')">
+    <AInput v-if="listed.length > 5" v-model:value="query" allow-clear :placeholder="$gettext('Search repositories')">
       <template #prefix>
         <span class="i-tabler-search op-50" />
       </template>
@@ -54,7 +59,13 @@ function pickOther() {
         <span v-else class="i-tabler-chevron-right repo-go" />
       </button>
     </div>
-    <AEmpty v-else :description="query ? $gettext('No repository matches the search.') : $gettext('No repository is waiting to be submitted.')" />
+    <AEmpty v-else :description="query ? $gettext('No repository matches the search.') : $gettext('No repository with the app installed is waiting to be submitted.')" />
+    <div v-if="!loading && more.hasMore.value">
+      <AButton type="link" class="px-0" :loading="more.loading.value" @click="more.loadMore">
+        {{ more.left.value === null ? $gettext('Load other repositories you administer') : $gettext('Load more, %{n} left', { n: String(more.left.value) }) }}
+      </AButton>
+    </div>
+    <AAlert v-if="more.failed.value" type="error" show-icon :title="$gettext('The repositories could not be loaded. Please try again.')" />
 
     <div class="other">
       <div class="text-3 op-65 mb-2">

@@ -69,9 +69,12 @@ const kindOptions = computed(() => [
 
 // Three levels for the eye: high risk, a change that needs a careful look,
 // and a low risk one that may be approved with others.
-const LOW_RISK = ['names', 'translations', 'store', 'categories']
+const HIGH_RISK = ['key', 'trust', 'block', 'delisting']
+const LOW_RISK = ['repository', 'translations', 'store', 'categories']
 function riskLevel(item: QueueItem): 'high' | 'medium' | 'low' {
-  return item.risk === 'high' ? 'high' : LOW_RISK.includes(item.kind) ? 'low' : 'medium'
+  if (HIGH_RISK.includes(item.kind) || (item.risk === 'high' && item.kind !== 'new_listing'))
+    return 'high'
+  return LOW_RISK.includes(item.kind) ? 'low' : 'medium'
 }
 const RISK_ORDER = { high: 0, medium: 1, low: 2 }
 
@@ -97,12 +100,21 @@ watch(shown, () => {
 const batchableShown = computed(() => shown.value.filter(batchable))
 const allSelected = computed(() => batchableShown.value.length > 0 && batchableShown.value.every(i => selected.value.includes(i.id)))
 
+// Changes that need the closest look stand out in the queue.
+function kindColor(kind: string): string {
+  if (kind === 'key' || kind === 'block' || kind === 'delisting')
+    return 'gold'
+  return kind === 'new_listing' ? 'blue' : 'default'
+}
+
+const checkIcon: Record<string, string> = { ok: 'i-tabler-circle-check', fail: 'i-tabler-circle-x', run: 'i-tabler-clock' }
+
 function checkState(item: QueueItem): { tone: string, text: string } {
   if (item.stage === 'checks' && item.waitingOn === 'system' && !item.outcome)
     return { tone: 'run', text: $gettext('Running') }
   if (item.stage === 'checks')
     return { tone: 'fail', text: $gettext('Failed') }
-  return { tone: 'ok', text: $gettext('Passed') }
+  return { tone: 'ok', text: $gettext('Passed check') }
 }
 
 function open(item: QueueItem | undefined, newTab = false) {
@@ -306,7 +318,7 @@ onKeyStroke('/', (e) => {
           <span class="text-3 op-65">{{ $gettext('All low risk with their checks passed') }}</span>
           <span class="flex-1" />
           <AButton size="small" @click="selected = []">
-            {{ $gettext('Clear') }}
+            {{ $gettext('Clear selection') }}
           </AButton>
           <AButton size="small" type="primary" @click="approveSelected">
             <span class="i-tabler-check" />
@@ -345,7 +357,7 @@ onKeyStroke('/', (e) => {
               >
                 <td class="check-col">
                   <ACheckbox
-                    v-if="batchable(item)"
+                    :disabled="!batchable(item)"
                     :checked="selected.includes(item.id)"
                     :aria-label="$gettext('Select %{name}', { name: localized(item.entry?.name) || item.pluginId || '' })"
                     @click.stop
@@ -356,7 +368,7 @@ onKeyStroke('/', (e) => {
                   <span class="risk" :class="riskLevel(item)"><i />{{ riskLevel(item) === 'high' ? $gettext('High') : riskLevel(item) === 'medium' ? $gettext('Medium') : $gettext('Low') }}</span>
                 </td>
                 <td class="nowrap">
-                  <ATag :color="item.kind === 'new_listing' ? 'blue' : 'default'" class="m-0">
+                  <ATag :color="kindColor(item.kind)" variant="outlined" class="m-0">
                     {{ kindLabel(item.kind) }}
                   </ATag>
                 </td>
@@ -377,7 +389,7 @@ onKeyStroke('/', (e) => {
                   @{{ item.author }}
                 </td>
                 <td class="nowrap">
-                  <span class="check" :class="checkState(item).tone">{{ checkState(item).text }}</span>
+                  <span class="check" :class="checkState(item).tone"><span :class="checkIcon[checkState(item).tone]" />{{ checkState(item).text }}</span>
                 </td>
                 <td class="nowrap">
                   <span class="op-75">{{ waited(item.updatedAt) }}</span>
@@ -651,6 +663,12 @@ onKeyStroke('/', (e) => {
 
 .risk.low i {
   background: #389e0d;
+}
+
+.check {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
 }
 
 .check.ok {

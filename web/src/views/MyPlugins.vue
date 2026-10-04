@@ -8,15 +8,17 @@ import { getInsights, getMyPlugins } from '@/api/plugins'
 import { announcements } from '@/lib/announcements'
 import { kindLabel } from '@/lib/changeKinds'
 import { $gettext } from '@/lib/gettext'
-import { localized } from '@/lib/labels'
+import { joinList, localized } from '@/lib/labels'
 import { localeName } from '@/lib/locales'
 import { loadDrafts } from '@/lib/submitDrafts'
-import { formatDate, fromNow, waited } from '@/lib/time'
+import { formatDay, formatTime, fromNow, waited } from '@/lib/time'
+import { useMoreRepos } from '@/lib/useMoreRepos'
 
 const plugins = ref<PluginSummary[]>([])
 const changes = ref<Change[]>([])
 const insights = ref<Record<string, Insights>>({})
 const installable = ref<Installable[]>([])
+const more = useMoreRepos()
 const installUrl = ref('')
 const loading = ref(true)
 const failed = ref(false)
@@ -98,7 +100,10 @@ const todos = computed<Todo[]>(() => {
       continue
     const name = nameOf(change.pluginId) || localized(change.entry?.name)
     if (change.stage === 'review' && change.class !== 'self_service') {
-      out.push({ key: change.id, plugin: name, title: $gettext('Answer the review'), sub: $gettext('%{name}, a maintainer asked for changes %{time}', { name, time: fromNow(change.updatedAt) }), action: $gettext('View'), to: `/changes/${change.id}`, primary: true })
+      const sub = change.askedBy && change.askedFor
+        ? $gettext('%{name}, @%{login} asked %{time}: %{text}', { name, login: change.askedBy, time: formatTime(change.askedAt ?? change.updatedAt), text: change.askedFor.length > 40 ? `${change.askedFor.slice(0, 40)}…` : change.askedFor })
+        : $gettext('%{name}, a maintainer asked for changes %{time}', { name, time: fromNow(change.updatedAt) })
+      out.push({ key: change.id, plugin: name, title: $gettext('Answer the review'), sub, action: $gettext('View'), to: `/changes/${change.id}`, primary: true })
     }
     else if (change.stage === 'review') {
       out.push({ key: change.id, plugin: name, title: $gettext('Merge the store change'), sub: $gettext('%{name}, pull request #%{n} waiting %{time}', { name, n: String(change.prNumber ?? ''), time: waited(change.updatedAt) }), action: $gettext('Follow the change'), to: `/changes/${change.id}` })
@@ -117,13 +122,13 @@ const todos = computed<Todo[]>(() => {
       out.push({ key: `${plugin.id}:dark`, plugin: name, title: $gettext('Add dark screenshots'), sub: $gettext('%{name}, %{n} screenshots have only a light version', { name, n: String(missing) }), action: $gettext('Screenshot studio'), to: `/plugins/${plugin.id}/screenshots` })
     }
     if (i.untranslated.length) {
-      const names = i.untranslated.slice(0, 5).map(localeName).join(', ')
+      const names = joinList(i.untranslated.slice(0, 5).map(localeName))
       out.push({
         key: `${plugin.id}:i18n`,
         plugin: name,
         title: $gettext('Translate into %{n} more languages', { n: String(i.untranslated.length) }),
         sub: i.untranslated.length > 5 ? $gettext('%{name}, %{list} and more', { name, list: names }) : $gettext('%{name}, %{list}', { name, list: names }),
-        action: $gettext('Translations'),
+        action: $gettext('Translation workbench'),
         to: `/plugins/${plugin.id}/translations`,
       })
     }
@@ -219,10 +224,10 @@ const activity = computed(() => plugins.value
             </a>
           </template>
           <ATypographyParagraph type="secondary" class="text-3">
-            {{ $gettext('Public repositories you administer or installed the Nginx UI Plugin Catalog app on. With the app installed, new releases reach the catalog within minutes.') }}
+            {{ $gettext('Repositories you installed the Nginx UI Plugin Catalog app on. With the app installed, new releases reach the catalog within minutes.') }}
           </ATypographyParagraph>
-          <AEmpty v-if="installable.length === 0" :image-style="{ height: '40px' }" :description="$gettext('No repository is waiting to be submitted.')" />
-          <AFlex v-for="repo in installable" :key="repo.repo" align="center" gap="middle" class="py-2">
+          <AEmpty v-if="installable.length === 0 && more.shown.value.length === 0" :image-style="{ height: '40px' }" :description="$gettext('No repository with the app installed is waiting to be submitted.')" />
+          <AFlex v-for="repo in [...installable, ...more.shown.value]" :key="repo.repo" align="center" gap="middle" class="py-2">
             <span class="i-tabler-brand-github text-6 op-65" />
             <div class="flex-1 min-w-0">
               <a :href="`https://github.com/${repo.repo}`" target="_blank" rel="noopener" class="font-600">{{ repo.repo }}</a>
@@ -242,6 +247,15 @@ const activity = computed(() => plugins.value
               <AButton>{{ $gettext('Submit as plugin') }}</AButton>
             </RouterLink>
           </AFlex>
+          <div v-if="more.hasMore.value" class="mt-2">
+            <AButton type="link" class="px-0" :loading="more.loading.value" @click="more.loadMore">
+              {{ more.left.value === null ? $gettext('Load other repositories you administer') : $gettext('Load more, %{n} left', { n: String(more.left.value) }) }}
+            </AButton>
+          </div>
+          <div v-else-if="more.left.value === 0 && more.shown.value.length === 0" class="text-3 op-65 mt-2">
+            {{ $gettext('No other public repository you administer.') }}
+          </div>
+          <AAlert v-if="more.failed.value" type="error" show-icon class="mt-2" :title="$gettext('The repositories could not be loaded. Please try again.')" />
         </ACard>
       </AFlex>
 
@@ -294,7 +308,7 @@ const activity = computed(() => plugins.value
                 {{ item.title }}
               </div>
               <div class="text-3 op-65">
-                {{ item.text }} {{ formatDate(item.date) }}
+                {{ item.text }} {{ formatDay(item.date) }}
               </div>
             </div>
           </AFlex>

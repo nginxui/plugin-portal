@@ -1,7 +1,8 @@
 <script setup lang="ts">
 import type { PreviewDoc, PreviewManifest } from './MarketPreview.vue'
 import { computed, ref } from 'vue'
-import { $gettext } from '@/lib/gettext'
+import gettext, { $gettext, $ngettext } from '@/lib/gettext'
+import { joinList } from '@/lib/labels'
 
 // What users will see before and after a change, side by side, as an overlay
 // with a slider, or with the changed parts only (spec 11.5).
@@ -23,19 +24,40 @@ const props = defineProps<{
 const mode = defineModel<'side' | 'slider' | 'changes'>('mode', { default: 'side' })
 const position = ref(50)
 
+const nameChanged = computed(() => JSON.stringify(props.before?.name ?? {}) !== JSON.stringify(props.after.name ?? {}))
+
+// What users see change, each screenshot by its place in the new listing.
 const changes = computed(() => {
   const out: string[] = []
   const b = props.before ?? {}
   const a = props.after
-  if (JSON.stringify(b.name ?? {}) !== JSON.stringify(a.name ?? {}))
+  if (nameChanged.value)
     out.push($gettext('Name'))
   if (JSON.stringify(b.description ?? {}) !== JSON.stringify(a.description ?? {}))
     out.push($gettext('Description'))
   if ((b.homepage_url ?? '') !== (a.homepage_url ?? ''))
     out.push($gettext('Homepage'))
-  if (JSON.stringify(b.screenshots ?? []) !== JSON.stringify(a.screenshots ?? []))
-    out.push($gettext('Screenshots'))
+  const old = new Map((b.screenshots ?? []).map(s => [s.id, s]))
+  ;(a.screenshots ?? []).forEach((shot, i) => {
+    const was = old.get(shot.id)
+    if (!was || was.path !== shot.path || (was.dark_path ?? '') !== (shot.dark_path ?? ''))
+      out.push($gettext('Screenshot %{n}', { n: String(i + 1) }))
+  })
+  const kept = new Set((a.screenshots ?? []).map(s => s.id))
+  if ((b.screenshots ?? []).some(s => !kept.has(s.id)))
+    out.push($gettext('Screenshots removed'))
   return out
+})
+
+const summary = computed(() => {
+  if (!changes.value.length)
+    return $gettext('Nothing users see changes.')
+  const parts = [$ngettext('%{n} change: %{list}.', '%{n} changes: %{list}.', changes.value.length, { n: String(changes.value.length), list: joinList(changes.value) })]
+  if (nameChanged.value && changes.value.length > 1)
+    parts.push($gettext('Only the names need review this time, the other changes are for reference.'))
+  if (mode.value === 'side' && props.before)
+    parts.push($gettext('Switch to the slider to overlay the same spot.'))
+  return parts.join(gettext.current.startsWith('zh') ? '' : ' ')
 })
 
 // The parts that changed only, with everything else dropped.
@@ -122,7 +144,7 @@ const common = computed(() => ({
     </div>
 
     <p class="text-3 op-65 mt-3 mb-0">
-      {{ changes.length ? $gettext('Changes: %{list}.', { list: changes.join(', ') }) : $gettext('Nothing users see changes.') }}
+      {{ summary }}
     </p>
   </div>
 </template>

@@ -27,6 +27,8 @@ export interface Change {
   // changes a maintainer asked for last.
   comments?: number | null
   askedFor?: string | null
+  askedBy?: string | null
+  askedAt?: number | null
   createdAt: number
   updatedAt: number
 }
@@ -35,7 +37,7 @@ export interface ChangeEvent {
   stage: string
   actor: string | null
   at: number
-  detail: { outcome?: string, prNumber?: number, retry?: boolean, commit?: string, runUrl?: string | null, comment?: string, hours?: number } | null
+  detail: { outcome?: string, prNumber?: number, retry?: boolean, commit?: string, runUrl?: string | null, comment?: string, hours?: number, items?: number } | null
 }
 
 export function getChanges() {

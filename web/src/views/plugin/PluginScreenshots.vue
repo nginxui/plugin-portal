@@ -294,7 +294,7 @@ const changedIds = computed(() => new Set(items.value.filter(i => i.field === 's
                 <img v-if="imageOf(shot.path)" :src="imageOf(shot.path)!" alt="" referrerpolicy="no-referrer">
                 <img v-if="imageOf(shot.dark_path)" :src="imageOf(shot.dark_path)!" alt="" referrerpolicy="no-referrer">
                 <div v-else class="missing" :class="{ clickable: canEdit && S.uploads }" @click.stop="canEdit && S.uploads && (selectedId = shot.id, side = 'dark', pick('dark'))">
-                  {{ $gettext('No dark version') }}
+                  {{ $gettext('No dark screenshot') }}
                   <span v-if="canEdit && S.uploads" class="block text-3">{{ $gettext('Click to upload') }}</span>
                 </div>
               </div>
@@ -352,7 +352,7 @@ const changedIds = computed(() => new Set(items.value.filter(i => i.field === 's
               <ImageCropper v-if="liveUrl && canEdit && S.uploads && !liveFailed" ref="live" :key="liveUrl" :src="liveUrl" @adjusted="adjusted = $event" @failed="liveFailed = true" />
               <img v-else-if="liveUrl" :src="liveUrl" alt="" referrerpolicy="no-referrer">
               <div v-else class="missing big" :class="{ clickable: canEdit && S.uploads }" @click="canEdit && S.uploads && pick(side)">
-                {{ $gettext('No dark version') }}
+                {{ $gettext('No dark screenshot') }}
                 <span v-if="canEdit && S.uploads" class="block text-3">{{ $gettext('Click to upload') }}</span>
               </div>
             </div>

@@ -25,6 +25,7 @@ const themeConfig = computed(() => ({
     :theme="themeConfig"
     :locale="locale"
     :button="{ autoInsertSpace: false }"
+    :avatar="{ style: { color: 'var(--portal-primary-text)', background: 'var(--portal-primary-bg)' } }"
   >
     <AApp>
       <RouterView />

@@ -78,18 +78,29 @@ const stepStatus = computed<'process' | 'error' | 'finish'>(() => {
   return c.stage === 'live' ? 'finish' : 'process'
 })
 
+const STAGE_ICONS: Record<string, string> = {
+  submitted: 'i-tabler-send',
+  checks: 'i-tabler-list-check',
+  review: 'i-tabler-eye',
+  pull: 'i-tabler-git-pull-request',
+  merged: 'i-tabler-refresh',
+  live: 'i-tabler-world',
+}
+
 const steps = computed(() => {
   const titles = repoStore.value
-    ? [$gettext('Submitted'), $gettext('Automatic checks'), $gettext('Merge the pull request'), $gettext('Catalog updated'), $gettext('Visible to users')]
+    ? [$gettext('Submit'), $gettext('Automatic checks'), $gettext('Merge the pull request'), $gettext('Catalog updated'), $gettext('Visible to users')]
     : selfService.value
-      ? [$gettext('Submitted'), $gettext('Checks'), $gettext('Committed to the catalog'), $gettext('Live in the catalog')]
-      : [$gettext('Submitted'), $gettext('Checks'), $gettext('Maintainer review'), $gettext('Merged'), $gettext('Live in the catalog')]
+      ? [$gettext('Submit'), $gettext('Checks'), $gettext('Committed to the catalog'), $gettext('Live in the catalog')]
+      : [$gettext('Submit'), $gettext('Checks'), $gettext('Maintainer review'), $gettext('Merged'), $gettext('Live in the catalog')]
   return titles.map((title, index) => {
     const status = index < current.value ? 'finish' as const : index === current.value ? stepStatus.value : 'wait' as const
-    // The steps component draws a check for an error too, so draw a cross.
-    const icon = status === 'error' ? h('span', { class: 'i-tabler-circle-x-filled step-error' }) : undefined
     // When each stage was reached and by whom, from the history.
     const stage = stages.value[index]
+    // Done steps get a check, the current one its stage in amber while it waits, a cross on failure.
+    const tone = status === 'finish' ? 'done' : status === 'error' ? 'failed' : status === 'process' ? 'current' : 'ahead'
+    const glyph = tone === 'done' ? 'i-tabler-check' : tone === 'failed' ? 'i-tabler-x' : STAGE_ICONS[stage === 'review' && repoStore.value ? 'pull' : stage]
+    const icon = h('span', { class: ['step-dot', tone] }, [h('span', { class: glyph })])
     const reached = [...(data.value?.events ?? [])].reverse().find(e => e.stage === stage)
     const lines: string[] = []
     if (reached)
@@ -112,7 +123,7 @@ const steps = computed(() => {
         lines.push($gettext('Once Nginx UI refreshes its marketplace'))
     }
     const description = lines.length ? h('div', { class: 'step-lines' }, lines.map(line => h('div', line))) : undefined
-    return { title, status, icon, description }
+    return { title: h('span', { class: tone === 'ahead' ? '' : 'font-600' }, title), status, icon, description }
   })
 })
 
@@ -217,7 +228,10 @@ const problems = computed(() => (change.value?.outcome?.problems ?? '').split('\
 
 function eventText(e: ChangeEvent): string {
   switch (e.stage) {
-    case 'submitted': return e.detail?.retry ? $gettext('Checks started again') : $gettext('Submitted')
+    case 'submitted':
+      if (e.detail?.retry)
+        return $gettext('Checks started again')
+      return typeof (e.detail as { items?: number } | null)?.items === 'number' ? $gettext('Submitted %{n} changes', { n: String((e.detail as { items: number }).items) }) : $gettext('Submitted')
     case 'checks':
       if (e.detail?.outcome === 'dispatch_failed')
         return $gettext('The checks could not be started')
@@ -392,7 +406,7 @@ async function retry() {
               <thead>
                 <tr>
                   <th>{{ $gettext('Item') }}</th>
-                  <th>{{ $gettext('Review') }}</th>
+                  <th>{{ $gettext('Needs review') }}</th>
                   <th>{{ $gettext('Progress') }}</th>
                   <th>{{ $gettext('Current state') }}</th>
                 </tr>
@@ -640,9 +654,37 @@ async function retry() {
   border-top: 1px solid var(--portal-border);
 }
 
-:deep(.step-error) {
-  font-size: 32px;
-  color: #ff4d4f;
+.change-steps :deep(.step-dot) {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  font-size: 16px;
+  border: 1.5px solid var(--portal-border-strong);
+  background: var(--portal-card);
+}
+
+.change-steps :deep(.step-dot.ahead) {
+  color: var(--portal-icon-muted);
+}
+
+.change-steps :deep(.step-dot.done) {
+  border-color: var(--portal-primary);
+  color: #fff;
+  background: var(--portal-primary);
+}
+
+.change-steps :deep(.step-dot.current) {
+  border-color: #faad14;
+  color: #d48806;
+}
+
+.change-steps :deep(.step-dot.failed) {
+  border-color: #ff4d4f;
+  color: #fff;
+  background: #ff4d4f;
 }
 
 .op {

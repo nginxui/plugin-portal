@@ -130,10 +130,15 @@ describe('my plugins', () => {
     const body = await (await call('/api/plugins/mine', { cookie })).json() as { installable: { repo: string, source: string }[], installUrl: string }
     expect(body.installable.map(i => [i.repo, i.source])).toEqual([
       ['octo-author/new-plugin', 'installation'],
+    ])
+    expect(body.installUrl).toBe('https://github.com/apps/nginx-ui-plugin-catalog/installations/new')
+
+    // Other administered repositories load on request, without installed or listed ones.
+    const more = await (await call('/api/plugins/repositories', { cookie })).json() as { repos: { repo: string, source: string }[] }
+    expect(more.repos.map(i => [i.repo, i.source])).toEqual([
       ['octo-author/admin-only', 'admin'],
       ['octo-author/owned-only', 'admin'],
     ])
-    expect(body.installUrl).toBe('https://github.com/apps/nginx-ui-plugin-catalog/installations/new')
   })
 
   it('keeps a plugin the published index does not list yet, with the name of its newest change', async () => {

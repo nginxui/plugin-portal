@@ -7,7 +7,7 @@ import { addMember, addVendorPlugin, getVendor, keyRequest, removeMember, setCom
 import { getCategories } from '@/api/submit'
 import { $gettext } from '@/lib/gettext'
 import { HOST_LOCALES } from '@/lib/hostLocales'
-import { localized, roleLabel } from '@/lib/labels'
+import { initials, localized, roleLabel } from '@/lib/labels'
 import { localeName } from '@/lib/locales'
 import { formatDate, fromNow } from '@/lib/time'
 import { useCrumbs } from '@/stores/crumbs'
@@ -158,7 +158,7 @@ const ROLES: Role[] = ['admin', 'publisher', 'translator']
       <ACard>
         <AFlex align="center" gap="middle" wrap>
           <AAvatar :size="56" shape="square">
-            {{ (D.vendor.name ?? '?').slice(0, 2).toUpperCase() }}
+            {{ initials(D.vendor.name) }}
           </AAvatar>
           <div class="flex-1 min-w-0">
             <AFlex align="center" gap="small" wrap>

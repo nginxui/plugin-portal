@@ -6,7 +6,7 @@ import { applyPartner, getOrg, getVendors } from '@/api/partners'
 import { getOwners } from '@/api/plugins'
 import { kindLabel } from '@/lib/changeKinds'
 import { $gettext } from '@/lib/gettext'
-import { localized, roleLabel, trustLabel } from '@/lib/labels'
+import { initials, joinClauses, localized, roleLabel, trustLabel } from '@/lib/labels'
 import { fromNow } from '@/lib/time'
 import { useCrumbs } from '@/stores/crumbs'
 
@@ -55,7 +55,7 @@ function noteOf(plugin: OrgPage['plugins'][number]) {
     parts.push($gettext('community translation on'))
   if (!plugin.role)
     parts.push($gettext('you have no permission on its repository and can only view it'))
-  return parts.join(', ')
+  return joinClauses(parts)
 }
 
 // Where the mapping of repository permissions to roles is shown.
@@ -102,7 +102,7 @@ async function sendApply() {
       <ACard>
         <AFlex align="center" gap="middle" wrap>
           <AAvatar :src="D.owner.avatarUrl ?? undefined" :size="56" shape="square">
-            {{ D.owner.login.slice(0, 2).toUpperCase() }}
+            {{ initials(D.owner.login) }}
           </AAvatar>
           <div class="flex-1 min-w-0">
             <AFlex align="center" gap="small" wrap>
@@ -224,7 +224,7 @@ async function sendApply() {
           <ACard :title="$gettext('My organizations')">
             <div v-for="o in mine.owners" :key="o.login" class="mini-row">
               <AAvatar :size="28" shape="square">
-                {{ o.login.slice(0, 2).toUpperCase() }}
+                {{ initials(o.login) }}
               </AAvatar>
               <div class="min-w-0 flex-1">
                 <RouterLink :to="`/owners/${o.login}`" class="font-500">
@@ -237,7 +237,7 @@ async function sendApply() {
             </div>
             <div v-for="v in mine.vendors" :key="v.id" class="mini-row">
               <AAvatar :size="28" shape="square">
-                {{ (v.name ?? '?').slice(0, 2).toUpperCase() }}
+                {{ initials(v.name) }}
               </AAvatar>
               <div class="min-w-0 flex-1">
                 <RouterLink :to="`/vendors/${v.id}`" class="font-500">

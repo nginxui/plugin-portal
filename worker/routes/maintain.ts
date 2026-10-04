@@ -59,6 +59,8 @@ maintain.get('/plugins', async (c) => {
   ])
   const openBy = new Map(open.results.map(r => [r.plugin_id, r.n]))
   const entries = await mapLimit(catalog.plugins, 6, p => catalogEntry(c.env, p.id))
+  // Whether a GitHub owner is an organization or a person, as seen at sign in.
+  const kinds = new Map((await c.env.DB.prepare(`SELECT lower(github_login) AS login, kind FROM owners WHERE github_login IS NOT NULL`).all<{ login: string, kind: string }>()).results.map(r => [r.login, r.kind]))
   const listed = catalog.plugins.map((p, i) => {
     const entry = entries[i]
     const newest = p.releases?.[0]
@@ -69,6 +71,7 @@ maintain.get('/plugins', async (c) => {
       iconUrl: p.icon_url ?? null,
       owner: repo?.split('/')[0] ?? (p.author ?? null),
       ownerKind: (entry?.distribution as { type?: string } | undefined)?.type === 'vendor' ? 'vendor' : 'github',
+      ownerType: kinds.get((repo?.split('/')[0] ?? '').toLowerCase()) ?? null,
       repo,
       trust: p.trust ?? 'community',
       version: newest?.version ?? null,

@@ -128,7 +128,7 @@ const people = computed(() => store.detail?.access.people ?? [])
       <ACard :title="$gettext('Community translation')">
         <template #extra>
           <ATag :color="store.detail?.community ? 'success' : 'default'" class="m-0">
-            {{ store.detail?.community ? $gettext('On') : $gettext('Off') }}
+            {{ store.detail?.community ? $gettext('Turned on') : $gettext('Not turned on') }}
           </ATag>
         </template>
         <div class="text-3">

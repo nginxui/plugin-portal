@@ -5,7 +5,7 @@ import { onMounted, ref } from 'vue'
 import { getVendors } from '@/api/partners'
 import { getOwners } from '@/api/plugins'
 import { $gettext, $ngettext } from '@/lib/gettext'
-import { roleLabel } from '@/lib/labels'
+import { initials, roleLabel } from '@/lib/labels'
 
 const owners = ref<OwnerSummary[]>([])
 const vendors = ref<VendorSummary[]>([])
@@ -60,7 +60,7 @@ onMounted(async () => {
       </AFlex>
       <AFlex v-for="vendor in vendors" :key="vendor.id" align="center" gap="middle" class="py-3">
         <AAvatar :size="40" shape="square">
-          {{ (vendor.name ?? '?').slice(0, 2).toUpperCase() }}
+          {{ initials(vendor.name) }}
         </AAvatar>
         <div class="flex-1 min-w-0">
           <div class="font-600">

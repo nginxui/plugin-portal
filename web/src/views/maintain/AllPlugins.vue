@@ -4,7 +4,8 @@ import { computed, onMounted, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { addBlock, delist, getAllPlugins, setTrust } from '@/api/maintain'
 import { $gettext } from '@/lib/gettext'
-import { localized, storeSourceShort, trustLabel } from '@/lib/labels'
+import { joinClauses, localized, storeSourceShort, trustLabel } from '@/lib/labels'
+import { fromNow } from '@/lib/time'
 import { usePaletteStore } from '@/stores/palette'
 
 // Every plugin of the catalog and what a maintainer may do to it (spec
@@ -161,7 +162,7 @@ const title = computed(() => {
         <div class="stat">
           <span class="text-3 op-65">{{ $gettext('New this week') }}</span>
           <span class="num">{{ data.counts.newThisWeek }}</span>
-          <span class="text-3 op-65">{{ data.counts.reviewHours === null ? $gettext('No review this week') : $gettext('Reviewed in %{h} hours on average', { h: String(data.counts.reviewHours) }) }}</span>
+          <span class="text-3 op-65">{{ data.counts.reviewHours === null ? $gettext('No review this week') : $gettext('Reviewed in %{d} days on average', { d: (data.counts.reviewHours / 24).toFixed(1) }) }}</span>
         </div>
         <div class="stat">
           <span class="text-3 op-65">{{ $gettext('Newest version yanked') }}</span>
@@ -171,7 +172,7 @@ const title = computed(() => {
         <div class="stat">
           <span class="text-3 op-65">{{ $gettext('Block list') }}</span>
           <span class="num">{{ data.counts.blocked }}</span>
-          <span class="text-3 op-65">{{ lastBlocked ? $gettext('Last added %{date}', { date: lastBlocked }) : $gettext('Plugin ids and repositories') }}</span>
+          <span class="text-3 op-65">{{ lastBlocked ? $gettext('Last added %{date}', { date: fromNow(lastBlocked) }) : $gettext('Plugin ids and repositories') }}</span>
         </div>
       </div>
 
@@ -193,9 +194,9 @@ const title = computed(() => {
                   <th>{{ $gettext('Owner') }}</th>
                   <th>{{ $gettext('Trust') }}</th>
                   <th>{{ $gettext('Version') }}</th>
-                  <th>{{ $gettext('Store texts') }}</th>
+                  <th>{{ $gettext('Store source') }}</th>
                   <th>{{ $gettext('State') }}</th>
-                  <th>{{ $gettext('In review') }}</th>
+                  <th>{{ $gettext('Pending review') }}</th>
                   <th />
                 </tr>
               </thead>
@@ -217,7 +218,7 @@ const title = computed(() => {
                   <td class="nowrap">
                     {{ p.owner }}
                     <div class="text-3 op-65">
-                      {{ p.ownerKind === 'vendor' ? $gettext('Vendor') : $gettext('GitHub') }}
+                      {{ p.ownerKind === 'vendor' ? $gettext('Vendor') : p.ownerType === 'organization' ? $gettext('GitHub organization') : p.ownerType === 'user' ? $gettext('Personal') : $gettext('GitHub') }}
                     </div>
                   </td>
                   <td>
@@ -247,7 +248,7 @@ const title = computed(() => {
                       :menu="{
                         items: [
                           { key: 'audit', label: $gettext('Audit records') },
-                          { key: 'catalog', label: $gettext('Catalog page'), disabled: p.state !== 'listed' && p.state !== 'yanked' },
+                          { key: 'catalog', label: $gettext('View in catalog'), disabled: p.state !== 'listed' && p.state !== 'yanked' },
                           { key: 'trust', label: $gettext('Change the trust'), disabled: !p.trust },
                           { type: 'divider' },
                           { key: 'delist', label: $gettext('Delist, with a reason'), danger: true, disabled: p.state === 'delisted' || p.state === 'review' },
@@ -267,8 +268,15 @@ const title = computed(() => {
             </table>
           </div>
           <AFlex justify="space-between" align="center" class="foot">
-            <span class="text-3 op-65">{{ $gettext('%{n} plugins', { n: String(shown.length) }) }}</span>
-            <APagination v-model:current="page" size="small" :total="shown.length" :page-size="PAGE" :show-size-changer="false" hide-on-single-page />
+            <span class="text-3 op-65">{{ shown.length ? $gettext('%{n} in all, showing %{a} to %{b}', { n: String(shown.length), a: String((page - 1) * PAGE + 1), b: String(Math.min(page * PAGE, shown.length)) }) : $gettext('%{n} plugins', { n: '0' }) }}</span>
+            <AFlex gap="small">
+              <AButton size="small" :disabled="page <= 1" @click="page--">
+                {{ $gettext('Previous page') }}
+              </AButton>
+              <AButton size="small" :disabled="page * PAGE >= shown.length" @click="page++">
+                {{ $gettext('Next page') }}
+              </AButton>
+            </AFlex>
           </AFlex>
         </ACard>
 
@@ -287,7 +295,7 @@ const title = computed(() => {
                   {{ b.value }}
                 </div>
                 <div class="text-3 op-65">
-                  {{ b.kind === 'plugin' ? $gettext('Plugin') : $gettext('Repository') }}{{ b.reason ? `, ${b.reason}` : '' }}{{ b.added_by ? $gettext(', added by @%{login}', { login: b.added_by }) : '' }}{{ b.added_at ? ` ${b.added_at}` : '' }}
+                  {{ joinClauses([b.kind === 'plugin' ? $gettext('Plugin') : $gettext('Repository'), b.reason ?? '', b.added_by ? $gettext('%{time} added by @%{login}', { time: b.added_at ? fromNow(b.added_at) : '', login: b.added_by }) : ''].filter(Boolean)) }}
                 </div>
               </div>
             </div>
@@ -376,7 +384,7 @@ const title = computed(() => {
 
 .table {
   width: 100%;
-  min-width: 860px;
+  min-width: 760px;
   border-collapse: collapse;
   font-size: 13px;
 }
@@ -401,7 +409,7 @@ const title = computed(() => {
 }
 
 .ellipsis {
-  max-width: 220px;
+  max-width: 150px;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
