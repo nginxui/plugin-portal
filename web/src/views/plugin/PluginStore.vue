@@ -92,11 +92,13 @@ const pageTexts = computed(() => {
     const state = draft.ai.value.includes(`${key}.${locale.value}`) ? 'ai' : changedName ? 'review' : own ? 'ok' : 'miss'
     return { key, label: keyLabel(key), state, runtime: false }
   })
-  // Permission notes come from the manifest and ship with a release.
+  // Permission notes are translated in the workbench, next to the others.
   const manifest = S.value.manifest
   for (const permission of Object.keys(manifest?.permission_reasons ?? {})) {
-    const translated = !!manifest?.i18n?.[locale.value]?.permission_reasons?.[permission]
-    rows.push({ key: `reason:${permission}`, label: $gettext('Permission note: %{name}', { name: permissionText(locale.value, permission).label }), state: translated ? 'ok' : 'runtime', runtime: true })
+    const key = `reason:${permission}`
+    const translated = !!(doc.value.permission_reasons?.[permission]?.[locale.value] || manifest?.i18n?.[locale.value]?.permission_reasons?.[permission])
+    const state = draft.ai.value.includes(`${key}.${locale.value}`) ? 'ai' : translated ? 'ok' : 'miss'
+    rows.push({ key, label: $gettext('Permission note: %{name}', { name: permissionText(locale.value, permission).label }), state, runtime: true })
   }
   return rows
 })
@@ -109,7 +111,6 @@ const STATE_ICON: Record<string, string> = {
   miss: 'i-tabler-alert-triangle c-warn',
   review: 'i-tabler-shield-check c-info',
   ai: 'i-tabler-sparkles c-ai',
-  runtime: 'i-tabler-package c-warn',
 }
 
 function stateText(state: string): string {
@@ -117,7 +118,6 @@ function stateText(state: string): string {
     case 'miss': return $gettext('Not translated, shows English')
     case 'review': return $gettext('Goes to review, English shows until it is approved')
     case 'ai': return $gettext('AI draft waiting for confirmation')
-    case 'runtime': return $gettext('Translated in the translation workbench, ships with the next release')
     default: return ''
   }
 }
@@ -202,11 +202,7 @@ async function submit() {
         ? $gettext('Some texts cannot be listed. Check the names for words such as official.')
         : code === 'missing_media'
           ? $gettext('An uploaded screenshot is missing. Upload it again in the screenshot studio.')
-          : code === 'runtime_needs_repository'
-            ? $gettext('Runtime strings ship with the packages, so they go to the repository. Pick a repository as the store source, or export them for the author.')
-            : code === 'no_manifest'
-              ? $gettext('The repository has no plugin.json at its root. Export the runtime strings and translate them in the source code.')
-              : $gettext('The change could not be sent. Please try again.')
+          : $gettext('The change could not be sent. Please try again.')
   }
   finally {
     submitting.value = false
@@ -329,7 +325,7 @@ const name = computed(() => localized(doc.value.name) || localized(plugin.value.
                 <div class="min-w-0">
                   <div>{{ itemLabel(item, doc) }}</div>
                   <div class="text-3 op-65">
-                    {{ item.review ? $gettext('Goes to name review after the merge') : item.field === 'runtime' ? $gettext('Ships with the next release') : $gettext('Live after the merge') }}
+                    {{ item.review ? $gettext('Goes to name review after the merge') : $gettext('Live after the merge') }}
                   </div>
                 </div>
               </div>

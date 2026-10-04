@@ -3,7 +3,7 @@ import type { PreviewDoc } from '@/components/MarketPreview.vue'
 import { useDebounceFn } from '@vueuse/core'
 import { computed, ref } from 'vue'
 import { discardDraft, getStore, saveDraft } from '@/api/store'
-import { diffDoc, diffRuntime } from './storeDiff'
+import { diffDoc } from './storeDiff'
 
 // The user's draft of a plugin's store texts, shared by the store editor, the
 // screenshot studio and the translation workbench. Every edit is saved as a
@@ -20,8 +20,6 @@ export function useStoreDraft(pluginId: () => string) {
   const saving = ref(false)
   // Texts an AI drafted that no one confirmed yet, as key.locale.
   const ai = ref<string[]>([])
-  // Translations of the runtime strings of plugin.json, by locale and permission.
-  const runtime = ref<Record<string, Record<string, string>>>({})
 
   async function load() {
     try {
@@ -33,7 +31,6 @@ export function useStoreDraft(pluginId: () => string) {
       source.value = s.draft?.source ?? (s.source === 'release' ? 'repo-branch' : s.source)
       savedAt.value = s.draft?.updatedAt ?? null
       ai.value = s.draft?.ai ?? []
-      runtime.value = structuredClone(s.draft?.runtime ?? {})
       failed.value = false
     }
     catch {
@@ -42,8 +39,7 @@ export function useStoreDraft(pluginId: () => string) {
   }
 
   const sourceChanged = computed(() => !!state.value && source.value !== state.value.source)
-  const runtimeItems = computed(() => state.value ? diffRuntime(state.value.manifest as never, runtime.value) : [])
-  const items = computed(() => state.value ? [...diffDoc(state.value.doc, doc.value), ...runtimeItems.value] : [])
+  const items = computed(() => state.value ? diffDoc(state.value.doc, doc.value) : [])
   const dirty = computed(() => items.value.length > 0 || readmeChanged.value || sourceChanged.value)
 
   const persist = useDebounceFn(async () => {
@@ -56,7 +52,6 @@ export function useStoreDraft(pluginId: () => string) {
         ...(readmeChanged.value ? { readme: readme.value } : {}),
         ...(sourceChanged.value ? { source: source.value } : {}),
         ...(ai.value.length ? { ai: ai.value } : {}),
-        ...(Object.keys(runtime.value).length ? { runtime: runtime.value } : {}),
       })
       problems.value = result.problems
       savedAt.value = Math.floor(Date.now() / 1000)
@@ -87,30 +82,26 @@ export function useStoreDraft(pluginId: () => string) {
         delete out[locale]
       return Object.keys(out).length ? out : undefined
     }
-    if (key === 'name' || key === 'description')
+    if (key === 'name' || key === 'description') {
       next[key] = set(next[key])
-    else if (key === 'homepage_url')
+    }
+    else if (key === 'homepage_url') {
       next.homepage_url = value || undefined
-    else if (key.startsWith('caption:'))
+    }
+    else if (key.startsWith('caption:')) {
       next.screenshots = next.screenshots?.map(s => s.id === key.slice(8) ? { ...s, caption: set(s.caption) } : s)
+    }
+    else if (key.startsWith('reason:')) {
+      const permission = key.slice(7)
+      const reasons = { ...next.permission_reasons }
+      const texts = set(reasons[permission])
+      if (texts)
+        reasons[permission] = texts
+      else
+        delete reasons[permission]
+      next.permission_reasons = Object.keys(reasons).length ? reasons : undefined
+    }
     update(next)
-  }
-
-  /** Sets the translation of a runtime string; an empty value keeps the manifest's. */
-  function setRuntime(permission: string, locale: string, value: string, drafted = false) {
-    const id = `runtime:${permission}.${locale}`
-    ai.value = drafted && value ? [...new Set([...ai.value, id])] : ai.value.filter(k => k !== id)
-    const next = structuredClone(runtime.value)
-    const current = (state.value?.manifest as { i18n?: Record<string, { permission_reasons?: Record<string, string> }> } | null)?.i18n?.[locale]?.permission_reasons?.[permission] ?? ''
-    next[locale] = { ...(next[locale] ?? {}) }
-    if (value === current)
-      delete next[locale][permission]
-    else
-      next[locale][permission] = value
-    if (!Object.keys(next[locale]).length)
-      delete next[locale]
-    runtime.value = next
-    persist()
   }
 
   function setReadme(value: string) {
@@ -130,5 +121,5 @@ export function useStoreDraft(pluginId: () => string) {
     persist()
   }
 
-  return { ai, confirm, state, failed, doc, readme, readmeChanged, source, sourceChanged, items, runtime, runtimeItems, dirty, savedAt, saving, problems, load, persist, update, setText, setRuntime, setReadme, discard }
+  return { ai, confirm, state, failed, doc, readme, readmeChanged, source, sourceChanged, items, dirty, savedAt, saving, problems, load, persist, update, setText, setReadme, discard }
 }

@@ -660,6 +660,9 @@ msgstr "提交流程已完成 %{n} / 4 步，上次编辑于 %{time}"
 msgid "Continue the submission"
 msgstr "继续填写"
 
+msgid "Discard"
+msgstr "丢弃"
+
 msgid "Contribute translations"
 msgstr "参与翻译"
 
@@ -2870,14 +2873,14 @@ msgstr "添加截图"
 msgid "Use this crop"
 msgstr "使用此裁剪"
 
+msgid "Undo the crop"
+msgstr "还原裁剪"
+
 msgid "Upload the dark version"
 msgstr "上传深色版本"
 
 msgid "Replace the image"
 msgstr "替换图片"
-
-msgid "Crop again"
-msgstr "重新裁剪"
 
 msgid "Remove the dark version"
 msgstr "移除深色版本"
@@ -2911,9 +2914,6 @@ msgstr "需审核，通过前显示英文"
 
 msgid "AI draft waiting for confirmation"
 msgstr "AI 草稿，等待确认"
-
-msgid "Translated in the translation workbench, ships with the next release"
-msgstr "在翻译工作台中翻译，随下一个版本发布"
 
 msgid "Set in the catalog entry"
 msgstr "在目录条目中设置"
@@ -2979,12 +2979,6 @@ msgid ""
 "An uploaded screenshot is missing. Upload it again in the screenshot studio."
 msgstr "缺少一张已上传的截图，请在截图工作室中重新上传。"
 
-msgid "Runtime strings ship with the packages, so they go to the repository. Pick a repository as the store source, or export them for the author."
-msgstr "运行时文案随安装包发布，需要提交到仓库。请把商店来源设为仓库，或导出后交给作者。"
-
-msgid "The repository has no plugin.json at its root. Export the runtime strings and translate them in the source code."
-msgstr "仓库根目录没有 plugin.json，请导出运行时文案并在源代码中翻译。"
-
 msgid "A store change of this plugin is in progress."
 msgstr "此插件有一项商店改动正在进行中。"
 
@@ -3031,9 +3025,6 @@ msgstr "待发布的改动"
 
 msgid "Goes to name review after the merge"
 msgstr "合并后进行名称审核"
-
-msgid "Ships with the next release"
-msgstr "随下一个版本发布"
 
 msgid "Live after the merge"
 msgstr "合并后生效"
@@ -3143,14 +3134,11 @@ msgstr "%{n} 条建议"
 msgid "Fill in"
 msgstr "填写"
 
-msgid "Runtime strings, ship with the next release"
-msgstr "运行时文案，随下一个版本发布"
+msgid "Permission notes, live after the merge"
+msgstr "权限说明，合并后生效"
 
-msgid "Runtime strings go to the repository as a pull request and take effect once the next version is released. For a plugin.json generated from code, use export and import."
-msgstr "运行时文案会作为拉取请求提交到仓库，在下一个版本发布后生效。由代码生成的 plugin.json 请使用导出与导入。"
-
-msgid "Runtime strings ship with the packages of the plugin. Export them for its author to translate in the source code."
-msgstr "运行时文案随插件安装包发布，请导出后交给作者在源代码中翻译。"
+msgid "Translated permission notes go to the store document with the other texts and show once it is merged. Their English stays in plugin.json. Export and import move them as JSON shaped like the i18n of plugin.json."
+msgstr "权限说明的译文和其他商店文本一起保存在 plugin.store.json 中，合并后生效；英文仍取自 plugin.json。导出与导入使用和 plugin.json 的 i18n 相同结构的 JSON。"
 
 msgid "Export"
 msgstr "导出"
@@ -3169,9 +3157,6 @@ msgstr "译文"
 
 msgid "Terms as the Nginx UI interface translates them: %{terms}"
 msgstr "术语与 Nginx UI 界面保持一致：%{terms}"
-
-msgid "Goes to plugin.json in the repository and ships with the next release."
-msgstr "将写入仓库的 plugin.json，随下一个版本发布。"
 
 msgid "Confirm the translation"
 msgstr "确认译文"
@@ -3964,6 +3949,47 @@ msgstr "名称建议"
 
 msgid "An accepted name still goes to a maintainer before it is listed."
 msgstr "被接受的名称在上架前仍需经维护者审核。"
+
+#~ msgid "Crop again"
+#~ msgstr "重新裁剪"
+
+#~ msgid "Translated in the translation workbench, ships with the next release"
+#~ msgstr "在翻译工作台中翻译，随下一个版本发布"
+
+#~ msgid ""
+#~ "Runtime strings ship with the packages, so they go to the repository. "
+#~ "Pick a repository as the store source, or export them for the author."
+#~ msgstr ""
+#~ "运行时文案随安装包发布，需要提交到仓库。请把商店来源设为仓库，或导出后交给"
+#~ "作者。"
+
+#~ msgid ""
+#~ "The repository has no plugin.json at its root. Export the runtime strings "
+#~ "and translate them in the source code."
+#~ msgstr "仓库根目录没有 plugin.json，请导出运行时文案并在源代码中翻译。"
+
+#~ msgid "Ships with the next release"
+#~ msgstr "随下一个版本发布"
+
+#~ msgid "Runtime strings, ship with the next release"
+#~ msgstr "运行时文案，随下一个版本发布"
+
+#~ msgid ""
+#~ "Runtime strings go to the repository as a pull request and take effect "
+#~ "once the next version is released. For a plugin.json generated from code, "
+#~ "use export and import."
+#~ msgstr ""
+#~ "运行时文案会作为拉取请求提交到仓库，在下一个版本发布后生效。由代码生成的 "
+#~ "plugin.json 请使用导出与导入。"
+
+#~ msgid ""
+#~ "Runtime strings ship with the packages of the plugin. Export them for its "
+#~ "author to translate in the source code."
+#~ msgstr "运行时文案随插件安装包发布，请导出后交给作者在源代码中翻译。"
+
+#~ msgid ""
+#~ "Goes to plugin.json in the repository and ships with the next release."
+#~ msgstr "将写入仓库的 plugin.json，随下一个版本发布。"
 
 #~ msgid "Comes from the manifest and ships with the next release"
 #~ msgstr "来自清单，随下个发布版本生效"

@@ -38,6 +38,14 @@ export function diffDoc(before: PreviewDoc, after: PreviewDoc): StoreItem[] {
     if (!now.some(s => s.id === id))
       items.push({ field: 'screenshots', label: `screenshots.${id}.removed`, review: false })
   }
+  for (const permission of new Set([...Object.keys(before.permission_reasons ?? {}), ...Object.keys(after.permission_reasons ?? {})])) {
+    const a = before.permission_reasons?.[permission] ?? {}
+    const b = after.permission_reasons?.[permission] ?? {}
+    for (const locale of new Set([...Object.keys(a), ...Object.keys(b)])) {
+      if ((a[locale] ?? '') !== (b[locale] ?? ''))
+        items.push({ field: 'permission_reasons', locale, label: `reason.${locale}.${permission}`, review: false })
+    }
+  }
   return items
 }
 
@@ -51,7 +59,7 @@ export function itemLabel(item: StoreItem, doc: PreviewDoc): string {
     case 'description': return $gettext('Description in %{lang}', { lang })
     case 'homepage_url': return $gettext('Homepage')
     case 'caption': return $gettext('Caption of screenshot %{n} in %{lang}', { n: index(parts[1]), lang })
-    case 'runtime': return $gettext('Permission note %{name} in %{lang}', { name: permissionText(gettext.current, parts.slice(2).join('.')).label, lang })
+    case 'permission_reasons': return $gettext('Permission note %{name} in %{lang}', { name: permissionText(gettext.current, parts.slice(2).join('.')).label, lang })
     default:
       if (parts[1] === 'order')
         return $gettext('Order of the screenshots')
@@ -61,18 +69,6 @@ export function itemLabel(item: StoreItem, doc: PreviewDoc): string {
         return $gettext('Removed screenshot %{id}', { id: parts[1] })
       return $gettext('Image of screenshot %{n}', { n: index(parts[1]) })
   }
-}
-
-/** What a draft of runtime strings changes against the manifest. */
-export function diffRuntime(manifest: { i18n?: Record<string, { permission_reasons?: Record<string, string> }> } | null | undefined, runtime: Record<string, Record<string, string>>): StoreItem[] {
-  const items: StoreItem[] = []
-  for (const [locale, texts] of Object.entries(runtime)) {
-    for (const [permission, text] of Object.entries(texts)) {
-      if (text !== (manifest?.i18n?.[locale]?.permission_reasons?.[permission] ?? ''))
-        items.push({ field: 'runtime', locale, label: `runtime.${locale}.${permission}`, review: false })
-    }
-  }
-  return items
 }
 
 /** How much of the store texts each language holds, from 0 to 1. */

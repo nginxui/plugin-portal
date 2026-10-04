@@ -15,6 +15,60 @@ submit.use('*', requireSession)
 
 submit.get('/categories', async c => c.json({ categories: await knownCategories(c.env) }))
 
+// Submissions started and not sent yet, kept with the account.
+const REPO = /^[A-Z0-9][A-Z0-9-]{0,38}\/(?!\.{1,2}$)[\w.-]{1,100}$/i
+
+interface DraftRow {
+  repo_full_name: string
+  plugin_id: string | null
+  name_json: string | null
+  step: number
+  problem_json: string | null
+  public_key: string | null
+  categories_json: string | null
+  updated_at: number
+}
+
+submit.get('/drafts', async (c) => {
+  const { results } = await c.env.DB.prepare('SELECT * FROM submit_drafts WHERE user_id = ? ORDER BY updated_at DESC LIMIT 10')
+    .bind(c.get('session').user.id)
+    .all<DraftRow>()
+  return c.json({
+    drafts: results.map(row => ({
+      repo: row.repo_full_name,
+      id: row.plugin_id,
+      name: row.name_json ? JSON.parse(row.name_json) : {},
+      step: row.step,
+      at: row.updated_at,
+      problem: row.problem_json ? JSON.parse(row.problem_json) : null,
+      publicKey: row.public_key ?? '',
+      categories: row.categories_json ? JSON.parse(row.categories_json) : [],
+    })),
+  })
+})
+
+submit.put('/drafts', async (c) => {
+  const body = await c.req.json<{ repo?: string, id?: string | null, name?: unknown, step?: number, problem?: unknown, publicKey?: string, categories?: unknown }>().catch(() => ({} as Record<string, never>))
+  const repo = String(body.repo ?? '')
+  if (!REPO.test(repo))
+    return c.json({ error: 'invalid' }, 422)
+  const name = body.name && typeof body.name === 'object' ? JSON.stringify(body.name).slice(0, 4000) : null
+  const problem = body.problem && typeof body.problem === 'object' ? JSON.stringify(body.problem).slice(0, 2000) : null
+  const categories = Array.isArray(body.categories) ? JSON.stringify(body.categories.map(String).slice(0, 3)) : null
+  const step = Math.max(1, Math.min(4, Math.floor(Number(body.step) || 1)))
+  await c.env.DB.prepare(
+    `INSERT INTO submit_drafts (user_id, repo_full_name, plugin_id, name_json, step, problem_json, public_key, categories_json, updated_at)
+     VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9)
+     ON CONFLICT (user_id, repo_full_name) DO UPDATE SET plugin_id = ?3, name_json = ?4, step = ?5, problem_json = ?6, public_key = coalesce(?7, public_key), categories_json = coalesce(?8, categories_json), updated_at = ?9`,
+  ).bind(c.get('session').user.id, repo, typeof body.id === 'string' ? body.id.slice(0, 64) : null, name, step, problem, typeof body.publicKey === 'string' ? body.publicKey.slice(0, 400) : null, categories, now()).run()
+  return c.json({ ok: true })
+})
+
+submit.delete('/drafts', async (c) => {
+  await c.env.DB.prepare('DELETE FROM submit_drafts WHERE user_id = ? AND repo_full_name = ?').bind(c.get('session').user.id, c.req.query('repo') ?? '').run()
+  return c.json({ ok: true })
+})
+
 submit.post('/check', async (c) => {
   const { repo } = await c.req.json<{ repo?: string }>()
   const session = c.get('session')
@@ -58,6 +112,7 @@ submit.post('/', async (c) => {
        VALUES (?, ?, ?, 'new_listing', 'reviewed', ?, 'open', 'checks', 'system', ?, ?, ?, ?)`,
     ).bind(id, draft.id, session.user.id, JSON.stringify(draft), JSON.stringify(payload), t, t, t),
     event(c.env, id, 'submitted', session.user.id, { repo: draft.repo, version: draft.version }),
+    c.env.DB.prepare('DELETE FROM submit_drafts WHERE user_id = ? AND repo_full_name = ?').bind(session.user.id, draft.repo),
   ])
   try {
     await dispatchApply(c.env, id, payload)

@@ -19,7 +19,6 @@ function routes(): Route[] {
     url => url.href === `${RAW}/octo-author/geoip/v1.0.0/plugin.json` ? json(manifest) : undefined,
     url => url.href === `${RAW}/octo-author/geoip/v1.0.0/README.md` ? new Response('# GeoIP') : undefined,
     url => url.href === 'https://api.github.com/repos/octo-author/geoip' ? json(repo) : undefined,
-    url => url.pathname === '/repos/octo-author/geoip/contents/plugin.json' ? json({ encoding: 'base64', content: btoa(String.fromCharCode(...new TextEncoder().encode(JSON.stringify(manifest, null, 4)))) }) : undefined,
     url => url.pathname === `/repos/${env.CATALOG_REPO}/installation` ? json({ id: 9 }) : undefined,
     url => url.pathname === '/app/installations/9/access_tokens' ? json({ token: 'ghs_actions' }) : undefined,
     async (url, init) => {
@@ -127,29 +126,20 @@ describe('store editor', () => {
     expect(text).toContain('"Better."')
   })
 
-  it('writes runtime strings into plugin.json of the repository', async () => {
+  it('keeps translated permission notes in the store document', async () => {
     const cookie = await signedIn()
-    const { doc } = await (await call(`/api/plugins/${ID}/store`, { cookie })).json() as { doc: unknown }
-    await call(`/api/plugins/${ID}/store/draft`, { method: 'PUT', mutate: true, cookie, json: { doc, runtime: { ja_JP: { network: 'アドレスの国を調べます。', unknown: 'x' }, en: { network: 'No.' } } } })
+    const { doc } = await (await call(`/api/plugins/${ID}/store`, { cookie })).json() as { doc: Record<string, unknown> }
+    const next = { ...doc, permission_reasons: { network: { en: 'Ignored.', ja_JP: 'アドレスの国を調べます。' }, unknown: { ja_JP: 'x' } } }
+    await call(`/api/plugins/${ID}/store/draft`, { method: 'PUT', mutate: true, cookie, json: { doc: next, source: 'repo-branch' } })
     const state = await (await call(`/api/plugins/${ID}/store`, { cookie })).json() as { items: { field: string, label: string }[] }
-    expect(state.items.filter(i => i.field === 'runtime')).toEqual([{ field: 'runtime', locale: 'ja_JP', label: 'runtime.ja_JP.network', review: false }])
-    const result = await (await call(`/api/plugins/${ID}/store/submit`, { method: 'POST', mutate: true, cookie, json: {} })).json() as { change: string, moveChange: string | null, delivery: string }
-    expect(result.delivery).toBe('patch')
-    expect(result.moveChange).toBeNull()
+    expect(state.items.filter(i => i.field === 'permission_reasons')).toEqual([
+      { field: 'permission_reasons', locale: 'ja_JP', label: 'reason.ja_JP.network', review: false },
+      { field: 'permission_reasons', locale: 'ja_JP', label: 'reason.ja_JP.unknown', review: false },
+    ])
+    const result = await (await call(`/api/plugins/${ID}/store/submit`, { method: 'POST', mutate: true, cookie, json: {} })).json() as { change: string }
     const zip = new TextDecoder().decode(await (await call(`/api/changes/${result.change}/patch`, { cookie })).arrayBuffer())
-    expect(zip).toContain('plugin.json')
-    expect(zip).not.toContain('plugin.store.json')
-    expect(zip).toContain('"ja_JP": {\n            "permission_reasons": {\n                "network": "アドレスの国を調べます。"')
-  })
-
-  it('keeps runtime strings out of a store hosted by the catalog', async () => {
-    const cookie = await signedIn()
-    entry = { ...entry, store: { source: 'catalog' } }
-    const { doc } = await (await call(`/api/plugins/${ID}/store`, { cookie })).json() as { doc: unknown }
-    await call(`/api/plugins/${ID}/store/draft`, { method: 'PUT', mutate: true, cookie, json: { doc, runtime: { ja_JP: { network: 'アドレスの国を調べます。' } } } })
-    const response = await call(`/api/plugins/${ID}/store/submit`, { method: 'POST', mutate: true, cookie, json: {} })
-    expect(response.status).toBe(409)
-    expect(await response.json()).toEqual({ error: 'runtime_needs_repository' })
+    expect(zip).toContain('"permission_reasons": {\n    "network": {\n      "ja_JP": "アドレスの国を調べます。"')
+    expect(zip).not.toContain('Ignored.')
   })
 
   it('takes screenshots as 16:10 WebP only', async () => {

@@ -112,6 +112,17 @@ describe('submit', () => {
     expect(row).toEqual({ stage: 'checks', waiting_on: 'system', state: 'open' })
   })
 
+  it('keeps a started submission with the account until it is sent', async () => {
+    const cookie = await signedIn()
+    const draft = { repo: 'octo-author/geoip', id: 'io.github.octo-author.geoip', name: { en: 'GeoIP' }, step: 2, problem: null, publicKey, categories: ['security'] }
+    expect((await call('/api/submit/drafts', { method: 'PUT', mutate: true, cookie, json: draft })).status).toBe(200)
+    const listed = await (await call('/api/submit/drafts', { cookie })).json() as { drafts: { repo: string, step: number, publicKey: string, categories: string[] }[] }
+    expect(listed.drafts).toMatchObject([{ repo: 'octo-author/geoip', step: 2, publicKey, categories: ['security'] }])
+    expect((await call('/api/submit/drafts', { method: 'PUT', mutate: true, cookie, json: { repo: '../etc' } })).status).toBe(422)
+    await call('/api/submit', { method: 'POST', mutate: true, cookie, json: { repo: 'octo-author/geoip', authorPublicKey: publicKey, categories: ['security'] } })
+    expect((await (await call('/api/submit/drafts', { cookie })).json() as { drafts: unknown[] }).drafts).toEqual([])
+  })
+
   it('refuses a key that is not a minisign key', async () => {
     const cookie = await signedIn()
     const response = await call('/api/submit', { method: 'POST', mutate: true, cookie, json: { repo: 'octo-author/geoip', authorPublicKey: 'nope', categories: [] } })

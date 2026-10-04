@@ -16,7 +16,7 @@ import { usePluginStore } from '@/stores/plugin'
 const pluginStore = usePluginStore()
 const plugin = computed(() => pluginStore.detail!.plugin)
 const draft = useStoreDraft(() => plugin.value.id)
-const { state, failed, doc, savedAt, saving, runtime: runtimeDraft } = draft
+const { state, failed, doc, savedAt, saving } = draft
 const S = computed(() => state.value as StoreState)
 
 const community = ref<CommunityState | null>(null)
@@ -53,29 +53,25 @@ const rows = computed<Row[]>(() => [
   ...(doc.value.screenshots ?? []).map((s, i) => ({ key: `caption:${s.id}`, label: $gettext('Caption of screenshot %{n}', { n: String(i + 1) }) })),
 ])
 
-// Runtime strings of the manifest, so far the notes on each permission.
-// They go to plugin.json of the repository and ship with the next release.
+// The notes on each permission. English comes from plugin.json, next to the
+// permissions; the translations are store texts like the others.
 interface Manifest {
   permission_reasons?: Record<string, string>
-  i18n?: Record<string, { permission_reasons?: Record<string, string> }>
 }
 const manifest = computed(() => S.value?.manifest as Manifest | null)
 const runtime = computed<Row[]>(() => Object.keys(manifest.value?.permission_reasons ?? {}).map(permission => ({
-  key: `runtime:${permission}`,
+  key: `reason:${permission}`,
   label: $gettext('Permission note: %{name}', { name: permissionText(gettext.current, permission).label }),
 })))
-// The repository receives them; a store kept in the catalog has none.
-const runtimeEditable = computed(() => !!plugin.value.repo && draft.source.value !== 'catalog' && !!S.value?.canEdit.texts)
+const runtimeEditable = computed(() => !!S.value?.canEdit.texts)
 const allRows = computed(() => [...rows.value, ...runtime.value])
 
 function textIn(key: string, lang: string): string {
   if (key === 'name' || key === 'description')
     return doc.value[key]?.[lang] ?? ''
-  if (key.startsWith('runtime:')) {
-    const permission = key.slice(8)
-    if (lang === 'en')
-      return manifest.value?.permission_reasons?.[permission] ?? ''
-    return runtimeDraft.value[lang]?.[permission] ?? manifest.value?.i18n?.[lang]?.permission_reasons?.[permission] ?? ''
+  if (key.startsWith('reason:')) {
+    const permission = key.slice(7)
+    return lang === 'en' ? manifest.value?.permission_reasons?.[permission] ?? '' : doc.value.permission_reasons?.[permission]?.[lang] ?? ''
   }
   return doc.value.screenshots?.find(s => `caption:${s.id}` === key)?.caption?.[lang] ?? ''
 }
@@ -125,7 +121,7 @@ const shownRuntime = computed(() => runtime.value.filter(rowShown))
 // Export and import, for a plugin.json generated from source code: the
 // texts leave as JSON shaped like the i18n of plugin.json and come back so.
 function exportRuntime() {
-  const data = Object.fromEntries(HOST_LOCALES.map(l => [l, { permission_reasons: Object.fromEntries(runtime.value.map(r => [r.key.slice(8), textIn(r.key, l)]).filter(([, v]) => v)) }]))
+  const data = Object.fromEntries(HOST_LOCALES.map(l => [l, { permission_reasons: Object.fromEntries(runtime.value.map(r => [r.key.slice(7), textIn(r.key, l)]).filter(([, v]) => v)) }]))
   const blob = new Blob([`${JSON.stringify(data, null, 2)}\n`], { type: 'application/json' })
   const a = document.createElement('a')
   a.href = URL.createObjectURL(blob)
@@ -150,8 +146,8 @@ async function importRuntime(e: Event) {
       if (locale === 'en' || !HOST_LOCALES.includes(locale as never))
         continue
       for (const [permission, text] of Object.entries(entry?.permission_reasons ?? {})) {
-        if (typeof text === 'string' && manifest.value?.permission_reasons?.[permission] !== undefined && text.trim() !== textIn(`runtime:${permission}`, locale)) {
-          draft.setRuntime(permission, locale, text.trim().slice(0, 300))
+        if (typeof text === 'string' && manifest.value?.permission_reasons?.[permission] !== undefined && text.trim() !== textIn(`reason:${permission}`, locale)) {
+          draft.setText(`reason:${permission}`, locale, text.trim().slice(0, 300))
           n++
         }
       }
@@ -173,8 +169,8 @@ const aiError = ref('')
 function pick(key: string, locale: string) {
   if (locale === 'en' && !S.value.canEdit.texts)
     return
-  // English runtime strings live in the source of the plugin.
-  if (key.startsWith('runtime:') && locale === 'en')
+  // English permission notes live in plugin.json, next to the permissions.
+  if (key.startsWith('reason:') && locale === 'en')
     return
   cell.value = { key, locale }
   value.value = textIn(key, locale)
@@ -193,14 +189,10 @@ watch(() => gettext.current, async (value) => {
 const source = computed(() => cell.value ? textIn(cell.value.key, 'en') : '')
 const usedTerms = computed(() => Object.entries(terms.value).filter(([en]) => new RegExp(`\\b${en.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}`, 'i').test(source.value)))
 const cellLabel = computed(() => cell.value ? `${localeName(cell.value.locale)}: ${allRows.value.find(r => r.key === cell.value!.key)?.label ?? ''}` : '')
-const cellEditable = computed(() => !!cell.value && (cell.value.key.startsWith('runtime:') ? runtimeEditable.value : S.value.canEdit.texts))
+const cellEditable = computed(() => !!cell.value && S.value.canEdit.texts)
 
-// Sets a text, a store text or a runtime string alike.
 function setCell(key: string, locale: string, text: string, drafted: boolean) {
-  if (key.startsWith('runtime:'))
-    draft.setRuntime(key.slice(8), locale, text, drafted)
-  else
-    draft.setText(key, locale, text, drafted)
+  draft.setText(key, locale, text, drafted)
 }
 
 function save() {
@@ -340,7 +332,7 @@ async function draftMissing() {
                 <template v-if="runtime.length">
                   <tr class="group">
                     <td :colspan="columns.length + 1">
-                      {{ $gettext('Runtime strings, ship with the next release') }}
+                      {{ $gettext('Permission notes, live after the merge') }}
                     </td>
                   </tr>
                   <tr v-for="row in shownRuntime" :key="row.key">
@@ -375,7 +367,7 @@ async function draftMissing() {
             </table>
           </div>
           <AFlex justify="space-between" align="center" gap="middle" wrap class="foot">
-            <span class="text-3 op-65">{{ runtimeEditable ? $gettext('Runtime strings go to the repository as a pull request and take effect once the next version is released. For a plugin.json generated from code, use export and import.') : $gettext('Runtime strings ship with the packages of the plugin. Export them for its author to translate in the source code.') }}</span>
+            <span class="text-3 op-65">{{ $gettext('Translated permission notes go to the store document with the other texts and show once it is merged. Their English stays in plugin.json. Export and import move them as JSON shaped like the i18n of plugin.json.') }}</span>
             <AFlex v-if="runtime.length" gap="small">
               <AButton size="small" @click="exportRuntime">
                 <span class="i-tabler-download" />{{ $gettext('Export') }}
@@ -413,12 +405,9 @@ async function draftMissing() {
             <div class="text-3 op-65 mb-1">
               {{ $gettext('Translation') }}
             </div>
-            <ATextarea v-model:value="value" :rows="cell.key === 'description' || cell.key.startsWith('runtime:') ? 4 : 2" :dir="RTL_LOCALES.includes(cell.locale) ? 'rtl' : 'auto'" :disabled="!cellEditable" @blur="save" />
+            <ATextarea v-model:value="value" :rows="cell.key === 'description' || cell.key.startsWith('reason:') ? 4 : 2" :dir="RTL_LOCALES.includes(cell.locale) ? 'rtl' : 'auto'" :disabled="!cellEditable" @blur="save" />
             <div v-if="usedTerms.length" class="text-3 op-65 mt-2">
               {{ $gettext('Terms as the Nginx UI interface translates them: %{terms}', { terms: usedTerms.map(([en, tr]) => `${uiTerms[en] ?? en} → ${tr}`).join(', ') }) }}
-            </div>
-            <div v-if="cell.key.startsWith('runtime:')" class="text-3 op-65 mt-2">
-              {{ runtimeEditable ? $gettext('Goes to plugin.json in the repository and ships with the next release.') : $gettext('Runtime strings ship with the packages of the plugin. Export them for its author to translate in the source code.') }}
             </div>
             <AFlex gap="small" wrap class="mt-3">
               <AButton v-if="isAi(cell.key, cell.locale)" type="primary" @click="draft.confirm(cell.key, cell.locale)">
