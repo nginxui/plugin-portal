@@ -18,6 +18,16 @@ export const router = createRouter({
       component: () => import('@/layouts/PortalLayout.vue'),
       children: [
         { path: 'plugins', name: 'plugins', component: () => import('@/views/MyPlugins.vue') },
+        {
+          path: 'plugins/:id',
+          component: () => import('@/views/plugin/PluginLayout.vue'),
+          children: [
+            { path: '', name: 'plugin', component: () => import('@/views/plugin/PluginOverview.vue') },
+            { path: 'access', name: 'plugin-access', component: () => import('@/views/plugin/PluginAccess.vue') },
+          ],
+        },
+        { path: 'owners', name: 'owners', component: () => import('@/views/owners/OwnerList.vue') },
+        { path: 'owners/:login', name: 'owner', component: () => import('@/views/owners/OwnerPage.vue') },
       ],
     },
     { path: '/:path(.*)*', name: 'not-found', component: () => import('@/views/NotFound.vue'), meta: { public: true } },

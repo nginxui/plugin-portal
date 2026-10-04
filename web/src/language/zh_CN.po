@@ -1,21 +1,15 @@
 msgid ""
 msgstr ""
-"Content-Type: text/plain; charset=utf-8\n"
 "Project-Id-Version: PACKAGE VERSION\n"
 "Last-Translator: Automatically generated\n"
 "Language-Team: none\n"
 "Language: zh_CN\n"
 "MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-msgid "My plugins"
-msgstr "我的插件"
-
-msgid "GitHub profile"
-msgstr "GitHub 个人主页"
-
-msgid "Sign out"
-msgstr "退出登录"
+msgid "Manage"
+msgstr "管理"
 
 msgid "Developer Center"
 msgstr "开发者中心"
@@ -26,17 +20,107 @@ msgstr "开发者文档"
 msgid "Plugin catalog"
 msgstr "插件目录"
 
+msgid "My plugins"
+msgstr "我的插件"
+
+msgid "Organizations"
+msgstr "组织"
+
+msgid "GitHub profile"
+msgstr "GitHub 个人主页"
+
+msgid "Sign out"
+msgstr "退出登录"
+
+msgid "Open menu"
+msgstr "打开菜单"
+
+msgid "Language"
+msgstr "语言"
+
 msgid "Toggle dark mode"
 msgstr "切换深色模式"
 
 msgid "Account menu"
 msgstr "账户菜单"
 
+msgid "Admin"
+msgstr "管理员"
+
+msgid "Publisher"
+msgstr "发布者"
+
+msgid "Translator"
+msgstr "翻译者"
+
+msgid "No access"
+msgstr "无权限"
+
+msgid "Everything a publisher can do, plus organization actions such as the partner application and turning community translation on or off."
+msgstr "发布者的全部操作，以及组织层面的操作，例如申请成为合作伙伴、开启或关闭社区翻译。"
+
+msgid "Edit store data, manage versions and signers, and run preflight checks."
+msgstr "编辑商店资料，管理版本与签名者，运行发布前检查。"
+
+msgid "Edit store texts in every language and review community suggestions."
+msgstr "编辑各语言的商店文字，审核社区翻译建议。"
+
+msgid "Official"
+msgstr "官方"
+
+msgid "Partner"
+msgstr "合作伙伴"
+
+msgid "Community"
+msgstr "社区"
+
+msgid "Listed"
+msgstr "已上架"
+
+msgid "Draft"
+msgstr "草稿"
+
+msgid "Delisted"
+msgstr "已下架"
+
+msgid "All"
+msgstr "全部"
+
 msgid "Manage the plugins you list in the catalog and follow changes under review."
 msgstr "管理你在插件目录中上架的插件，跟进审核中的变更。"
 
-msgid "You have no plugins yet."
-msgstr "你还没有插件。"
+msgid "Your plugins could not be loaded."
+msgstr "无法加载你的插件。"
+
+msgid "Retry"
+msgstr "重试"
+
+msgid "Plugins"
+msgstr "插件"
+
+msgid "Filter by owner"
+msgstr "按所有者筛选"
+
+msgid "You have no role on any listed plugin yet."
+msgstr "你还没有任何已上架插件的角色。"
+
+msgid "Plugins appear here when you have admin, maintain, write or triage permission on their repository."
+msgstr "你在插件仓库上拥有 admin、maintain、write 或 triage 权限时，插件会显示在这里。"
+
+msgid "Repositories you can submit"
+msgstr "可提交的仓库"
+
+msgid "These repositories have the Nginx UI Plugin Catalog app installed by you. With the app installed, new releases reach the catalog within minutes."
+msgstr "以下仓库由你安装了 Nginx UI 插件目录应用。安装应用后，新版本会在几分钟内同步到目录。"
+
+msgid "No repository is waiting to be submitted."
+msgstr "暂无可提交的仓库。"
+
+msgid "App installed %{time}"
+msgstr "%{time}安装应用"
+
+msgid "Install the app on another repository"
+msgstr "在其他仓库上安装应用"
 
 msgid "Page not found"
 msgstr "页面不存在"
@@ -46,6 +130,145 @@ msgstr "你访问的页面不存在。"
 
 msgid "Back to my plugins"
 msgstr "返回我的插件"
+
+msgid "The accounts and organizations that own the plugins you work on. Names, avatars and members come from GitHub."
+msgstr "你参与的插件所属的个人账号与组织。名称、头像与成员均来自 GitHub。"
+
+msgid "The organizations could not be loaded."
+msgstr "无法加载组织。"
+
+msgid "GitHub organization"
+msgstr "GitHub 组织"
+
+msgid "Personal account"
+msgstr "个人账号"
+
+msgid "%{n} plugin"
+msgid_plural "%{n} plugins"
+msgstr[0] "%{n} 个插件"
+
+msgid "Open"
+msgstr "打开"
+
+msgid "Organization not found"
+msgstr "未找到该组织"
+
+msgid "You have no role on any plugin of this account."
+msgstr "你在该账号的插件上没有任何角色。"
+
+msgid "Name, avatar and members come from GitHub"
+msgstr "名称、头像与成员均来自 GitHub"
+
+msgid "View organization on GitHub"
+msgstr "在 GitHub 上查看组织"
+
+msgid "View account on GitHub"
+msgstr "在 GitHub 上查看账号"
+
+msgid "Plugins of this account you have a role on. Each role follows your permission on that repository."
+msgstr "该账号下你拥有角色的插件，角色按你在各仓库上的权限显示。"
+
+msgid "Members and access"
+msgstr "成员与权限"
+
+msgid "Members and permissions are managed on GitHub. The Developer Center decides what each person may do from their repository permission."
+msgstr "成员与权限在 GitHub 上管理，开发者中心按仓库权限决定每个人能做什么。"
+
+msgid "Manage teams and repository access on GitHub"
+msgstr "在 GitHub 上管理团队与仓库权限"
+
+msgid "Your access"
+msgstr "你的权限"
+
+msgid "Read from GitHub %{time}"
+msgstr "%{time}从 GitHub 读取"
+
+msgid "From your %{permission} permission on %{repo}"
+msgstr "来自你在 %{repo} 上的 %{permission} 权限"
+
+msgid "You can view this plugin as a maintainer."
+msgstr "你以维护者身份查看此插件。"
+
+msgid "Manage access on GitHub"
+msgstr "在 GitHub 上管理访问权限"
+
+msgid "Roles"
+msgstr "角色对应"
+
+msgid "The Developer Center keeps no separate members or roles"
+msgstr "开发者中心不单独设置成员与角色"
+
+msgid "Repository permission on GitHub"
+msgstr "GitHub 仓库权限"
+
+msgid "Role"
+msgstr "开发者中心角色"
+
+msgid "What it allows"
+msgstr "可以做的事"
+
+msgid "When someone loses their permission on GitHub, their role in the Developer Center ends with it."
+msgstr "在 GitHub 上移除某人的权限后，对方在开发者中心的角色随即失效。"
+
+msgid "Owner"
+msgstr "所有者"
+
+msgid "The owner is the owner of the repository. When the repository moves to another owner on GitHub, the plugin moves with it after review."
+msgstr "所有者就是仓库的所有者。仓库在 GitHub 上转移给其他所有者后，插件会在审核后随之转移。"
+
+msgid "Overview"
+msgstr "概览"
+
+msgid "Access"
+msgstr "访问权限"
+
+msgid "You have no access to this plugin"
+msgstr "你没有此插件的访问权限"
+
+msgid "Access follows your permission on the plugin repository on GitHub."
+msgstr "访问权限取决于你在 GitHub 插件仓库上的权限。"
+
+msgid "Plugin not found"
+msgstr "未找到插件"
+
+msgid "No listing or draft has this plugin ID."
+msgstr "没有使用此插件 ID 的上架内容或草稿。"
+
+msgid "View in catalog"
+msgstr "在目录中查看"
+
+msgid "Repository"
+msgstr "仓库"
+
+msgid "Plugin sections"
+msgstr "插件页面"
+
+msgid "Version"
+msgstr "版本"
+
+msgid "Released"
+msgstr "发布日期"
+
+msgid "Requires Nginx UI"
+msgstr "所需 Nginx UI 版本"
+
+msgid "Release notes"
+msgstr "发布说明"
+
+msgid "Listing"
+msgstr "上架信息"
+
+msgid "Description"
+msgstr "描述"
+
+msgid "Categories"
+msgstr "分类"
+
+msgid "Latest version"
+msgstr "最新版本"
+
+msgid "Versions"
+msgstr "版本"
 
 msgid "Sign in was cancelled on GitHub."
 msgstr "已在 GitHub 上取消登录。"
@@ -85,3 +308,6 @@ msgstr "使用 GitHub 登录"
 
 msgid "Signing in only confirms your GitHub identity. It grants no write access to your repositories."
 msgstr "登录仅用于确认你的 GitHub 身份，不会获得你仓库的写入权限。"
+
+#~ msgid "You have no plugins yet."
+#~ msgstr "你还没有插件。"

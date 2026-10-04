@@ -5,12 +5,16 @@ import { SessionExpired } from './lib/session'
 import { security } from './middleware/security'
 import { auth } from './routes/auth'
 import { me } from './routes/me'
+import { owners } from './routes/owners'
+import { plugins } from './routes/plugins'
 
 export const app = new Hono<AppEnv>().basePath('/api')
 
 app.use('*', security)
 app.route('/auth', auth)
 app.route('/me', me)
+app.route('/plugins', plugins)
+app.route('/owners', owners)
 
 app.notFound(c => c.json({ error: 'not_found' }, 404))
 

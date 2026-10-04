@@ -118,12 +118,7 @@ const features = computed(() => [
   padding: 10px;
   box-sizing: border-box;
   border-radius: 8px;
-  color: #1677ff;
-  background: #e6f4ff;
-}
-
-:global(html.dark) .feature-icon {
-  color: #65a9f3;
-  background: #111a2c;
+  color: var(--portal-primary-text);
+  background: var(--portal-primary-bg);
 }
 </style>

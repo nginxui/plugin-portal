@@ -56,10 +56,12 @@ CREATE TABLE owners (
 -- Cache of a user's permission on a plugin repository, kept a few minutes.
 CREATE TABLE repo_permissions (
   user_id INTEGER NOT NULL,
-  repo_id INTEGER NOT NULL,
+  repo_full_name TEXT NOT NULL COLLATE NOCASE,
+  repo_id INTEGER, -- null when the repository could not be read
+  owner_login TEXT,
   permission TEXT NOT NULL CHECK (permission IN ('admin', 'maintain', 'write', 'triage', 'other')),
   checked_at INTEGER NOT NULL,
-  PRIMARY KEY (user_id, repo_id)
+  PRIMARY KEY (user_id, repo_full_name)
 );
 
 -- Members of vendors without a repository, the only members the portal manages.

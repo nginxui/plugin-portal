@@ -2,47 +2,164 @@ msgid ""
 msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 
-#: web/src/layouts/PortalLayout.vue:23
-#: web/src/views/MyPlugins.vue:9
-msgid "My plugins"
+#: web/src/components/PluginRow.vue:37
+msgid "Manage"
 msgstr ""
 
-#: web/src/layouts/PortalLayout.vue:42
-msgid "GitHub profile"
-msgstr ""
-
-#: web/src/layouts/PortalLayout.vue:44
-msgid "Sign out"
-msgstr ""
-
-#: web/src/layouts/PortalLayout.vue:75
+#: web/src/components/SiderNav.vue:19
 msgid "Developer Center"
 msgstr ""
 
-#: web/src/layouts/PortalLayout.vue:87
+#: web/src/components/SiderNav.vue:31
 #: web/src/views/SignIn.vue:81
 msgid "Developer docs"
 msgstr ""
 
-#: web/src/layouts/PortalLayout.vue:88
+#: web/src/components/SiderNav.vue:32
 #: web/src/views/SignIn.vue:82
 msgid "Plugin catalog"
 msgstr ""
 
-#: web/src/layouts/PortalLayout.vue:99
+#: web/src/layouts/PortalLayout.vue:28
+#: web/src/views/MyPlugins.vue:56
+#: web/src/views/plugin/PluginLayout.vue:20
+msgid "My plugins"
+msgstr ""
+
+#: web/src/layouts/PortalLayout.vue:29
+#: web/src/views/owners/OwnerList.vue:29
+#: web/src/views/owners/OwnerPage.vue:19
+msgid "Organizations"
+msgstr ""
+
+#: web/src/layouts/PortalLayout.vue:48
+msgid "GitHub profile"
+msgstr ""
+
+#: web/src/layouts/PortalLayout.vue:50
+msgid "Sign out"
+msgstr ""
+
+#: web/src/layouts/PortalLayout.vue:78
+msgid "Open menu"
+msgstr ""
+
+#: web/src/layouts/PortalLayout.vue:82
+msgid "Language"
+msgstr ""
+
+#: web/src/layouts/PortalLayout.vue:87
 msgid "Toggle dark mode"
 msgstr ""
 
-#: web/src/layouts/PortalLayout.vue:103
+#: web/src/layouts/PortalLayout.vue:91
 msgid "Account menu"
 msgstr ""
 
-#: web/src/views/MyPlugins.vue:12
+#: web/src/lib/labels.ts:14
+msgid "Admin"
+msgstr ""
+
+#: web/src/lib/labels.ts:16
+msgid "Publisher"
+msgstr ""
+
+#: web/src/lib/labels.ts:18
+msgid "Translator"
+msgstr ""
+
+#: web/src/lib/labels.ts:20
+msgid "No access"
+msgstr ""
+
+#: web/src/lib/labels.ts:27
+msgid "Everything a publisher can do, plus organization actions such as the partner application and turning community translation on or off."
+msgstr ""
+
+#: web/src/lib/labels.ts:29
+msgid "Edit store data, manage versions and signers, and run preflight checks."
+msgstr ""
+
+#: web/src/lib/labels.ts:31
+msgid "Edit store texts in every language and review community suggestions."
+msgstr ""
+
+#: web/src/lib/labels.ts:38
+msgid "Official"
+msgstr ""
+
+#: web/src/lib/labels.ts:40
+msgid "Partner"
+msgstr ""
+
+#: web/src/lib/labels.ts:42
+msgid "Community"
+msgstr ""
+
+#: web/src/lib/labels.ts:51
+msgid "Listed"
+msgstr ""
+
+#: web/src/lib/labels.ts:53
+msgid "Draft"
+msgstr ""
+
+#: web/src/lib/labels.ts:55
+msgid "Delisted"
+msgstr ""
+
+#: web/src/views/MyPlugins.vue:42
+msgid "All"
+msgstr ""
+
+#: web/src/views/MyPlugins.vue:59
 msgid "Manage the plugins you list in the catalog and follow changes under review."
 msgstr ""
 
-#: web/src/views/MyPlugins.vue:16
-msgid "You have no plugins yet."
+#: web/src/views/MyPlugins.vue:67
+msgid "Your plugins could not be loaded."
+msgstr ""
+
+#: web/src/views/MyPlugins.vue:71
+msgid "Retry"
+msgstr ""
+
+#: web/src/views/MyPlugins.vue:76
+#: web/src/views/owners/OwnerPage.vue:67
+msgid "Plugins"
+msgstr ""
+
+#: web/src/views/MyPlugins.vue:78
+msgid "Filter by owner"
+msgstr ""
+
+#: web/src/views/MyPlugins.vue:80
+#: web/src/views/owners/OwnerList.vue:37
+msgid "You have no role on any listed plugin yet."
+msgstr ""
+
+#: web/src/views/MyPlugins.vue:82
+msgid "Plugins appear here when you have admin, maintain, write or triage permission on their repository."
+msgstr ""
+
+#: web/src/views/MyPlugins.vue:88
+msgid "Repositories you can submit"
+msgstr ""
+
+#: web/src/views/MyPlugins.vue:90
+msgid "These repositories have the Nginx UI Plugin Catalog app installed by you. With the app installed, new releases reach the catalog within minutes."
+msgstr ""
+
+#: web/src/views/MyPlugins.vue:92
+msgid "No repository is waiting to be submitted."
+msgstr ""
+
+#: web/src/views/MyPlugins.vue:98
+msgid "App installed %{time}"
+msgstr ""
+
+#: web/src/views/MyPlugins.vue:103
+msgid "Install the app on another repository"
 msgstr ""
 
 #: web/src/views/NotFound.vue:6
@@ -55,6 +172,196 @@ msgstr ""
 
 #: web/src/views/NotFound.vue:10
 msgid "Back to my plugins"
+msgstr ""
+
+#: web/src/views/owners/OwnerList.vue:32
+msgid "The accounts and organizations that own the plugins you work on. Names, avatars and members come from GitHub."
+msgstr ""
+
+#: web/src/views/owners/OwnerList.vue:35
+msgid "The organizations could not be loaded."
+msgstr ""
+
+#: web/src/views/owners/OwnerList.vue:45
+#: web/src/views/plugin/PluginAccess.vue:97
+msgid "GitHub organization"
+msgstr ""
+
+#: web/src/views/owners/OwnerList.vue:45
+#: web/src/views/plugin/PluginAccess.vue:97
+msgid "Personal account"
+msgstr ""
+
+#: web/src/views/owners/OwnerList.vue:46
+msgid "%{n} plugin"
+msgid_plural "%{n} plugins"
+msgstr[0] ""
+msgstr[1] ""
+
+#: web/src/views/owners/OwnerList.vue:51
+msgid "Open"
+msgstr ""
+
+#: web/src/views/owners/OwnerPage.vue:46
+msgid "Organization not found"
+msgstr ""
+
+#: web/src/views/owners/OwnerPage.vue:47
+msgid "You have no role on any plugin of this account."
+msgstr ""
+
+#: web/src/views/owners/OwnerPage.vue:58
+msgid "Name, avatar and members come from GitHub"
+msgstr ""
+
+#: web/src/views/owners/OwnerPage.vue:63
+msgid "View organization on GitHub"
+msgstr ""
+
+#: web/src/views/owners/OwnerPage.vue:63
+msgid "View account on GitHub"
+msgstr ""
+
+#: web/src/views/owners/OwnerPage.vue:69
+msgid "Plugins of this account you have a role on. Each role follows your permission on that repository."
+msgstr ""
+
+#: web/src/views/owners/OwnerPage.vue:73
+msgid "Members and access"
+msgstr ""
+
+#: web/src/views/owners/OwnerPage.vue:75
+msgid "Members and permissions are managed on GitHub. The Developer Center decides what each person may do from their repository permission."
+msgstr ""
+
+#: web/src/views/owners/OwnerPage.vue:78
+msgid "Manage teams and repository access on GitHub"
+msgstr ""
+
+#: web/src/views/plugin/PluginAccess.vue:25
+msgid "Your access"
+msgstr ""
+
+#: web/src/views/plugin/PluginAccess.vue:28
+msgid "Read from GitHub %{time}"
+msgstr ""
+
+#: web/src/views/plugin/PluginAccess.vue:43
+msgid "From your %{permission} permission on %{repo}"
+msgstr ""
+
+#: web/src/views/plugin/PluginAccess.vue:46
+msgid "You can view this plugin as a maintainer."
+msgstr ""
+
+#: web/src/views/plugin/PluginAccess.vue:50
+msgid "Manage access on GitHub"
+msgstr ""
+
+#: web/src/views/plugin/PluginAccess.vue:55
+msgid "Roles"
+msgstr ""
+
+#: web/src/views/plugin/PluginAccess.vue:58
+msgid "The Developer Center keeps no separate members or roles"
+msgstr ""
+
+#: web/src/views/plugin/PluginAccess.vue:65
+msgid "Repository permission on GitHub"
+msgstr ""
+
+#: web/src/views/plugin/PluginAccess.vue:66
+msgid "Role"
+msgstr ""
+
+#: web/src/views/plugin/PluginAccess.vue:67
+msgid "What it allows"
+msgstr ""
+
+#: web/src/views/plugin/PluginAccess.vue:84
+msgid "When someone loses their permission on GitHub, their role in the Developer Center ends with it."
+msgstr ""
+
+#: web/src/views/plugin/PluginAccess.vue:89
+#: web/src/views/plugin/PluginOverview.vue:37
+msgid "Owner"
+msgstr ""
+
+#: web/src/views/plugin/PluginAccess.vue:102
+msgid "The owner is the owner of the repository. When the repository moves to another owner on GitHub, the plugin moves with it after review."
+msgstr ""
+
+#: web/src/views/plugin/PluginLayout.vue:31
+msgid "Overview"
+msgstr ""
+
+#: web/src/views/plugin/PluginLayout.vue:32
+msgid "Access"
+msgstr ""
+
+#: web/src/views/plugin/PluginLayout.vue:41
+msgid "You have no access to this plugin"
+msgstr ""
+
+#: web/src/views/plugin/PluginLayout.vue:42
+msgid "Access follows your permission on the plugin repository on GitHub."
+msgstr ""
+
+#: web/src/views/plugin/PluginLayout.vue:47
+msgid "Plugin not found"
+msgstr ""
+
+#: web/src/views/plugin/PluginLayout.vue:48
+msgid "No listing or draft has this plugin ID."
+msgstr ""
+
+#: web/src/views/plugin/PluginLayout.vue:75
+msgid "View in catalog"
+msgstr ""
+
+#: web/src/views/plugin/PluginLayout.vue:79
+#: web/src/views/plugin/PluginOverview.vue:34
+msgid "Repository"
+msgstr ""
+
+#: web/src/views/plugin/PluginLayout.vue:83
+msgid "Plugin sections"
+msgstr ""
+
+#: web/src/views/plugin/PluginOverview.vue:14
+msgid "Version"
+msgstr ""
+
+#: web/src/views/plugin/PluginOverview.vue:15
+msgid "Released"
+msgstr ""
+
+#: web/src/views/plugin/PluginOverview.vue:16
+msgid "Requires Nginx UI"
+msgstr ""
+
+#: web/src/views/plugin/PluginOverview.vue:21
+msgid "Release notes"
+msgstr ""
+
+#: web/src/views/plugin/PluginOverview.vue:29
+msgid "Listing"
+msgstr ""
+
+#: web/src/views/plugin/PluginOverview.vue:31
+msgid "Description"
+msgstr ""
+
+#: web/src/views/plugin/PluginOverview.vue:42
+msgid "Categories"
+msgstr ""
+
+#: web/src/views/plugin/PluginOverview.vue:47
+msgid "Latest version"
+msgstr ""
+
+#: web/src/views/plugin/PluginOverview.vue:54
+msgid "Versions"
 msgstr ""
 
 #: web/src/views/SignIn.vue:15

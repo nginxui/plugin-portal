@@ -1,3 +1,19 @@
+:root {
+  --portal-border: rgba(5, 5, 5, 0.06);
+  --portal-faint: rgba(0, 0, 0, 0.02);
+  --portal-primary: #1677ff;
+  --portal-primary-bg: #e6f4ff;
+  --portal-primary-text: #0958d9;
+}
+
+html.dark {
+  --portal-border: #303030;
+  --portal-faint: rgba(255, 255, 255, 0.04);
+  --portal-primary: #1668dc;
+  --portal-primary-bg: #111a2c;
+  --portal-primary-text: #65a9f3;
+}
+
 html,
 body,
 #app {
@@ -36,4 +52,25 @@ html.dark body {
   .page {
     padding: 16px;
   }
+}
+
+.mono {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+}
+
+.cols {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  align-items: flex-start;
+}
+
+.col-main {
+  flex: 999 1 560px;
+  min-width: 0;
+}
+
+.col-side {
+  flex: 1 1 320px;
+  min-width: 0;
 }

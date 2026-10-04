@@ -5,6 +5,7 @@ export interface Env {
   CATALOG_URL: string
   CATALOG_REPO: string
   GITHUB_CLIENT_ID: string
+  CATALOG_APP_SLUG: string
   GITHUB_CLIENT_SECRET: string
   SESSION_KEY: string
 }

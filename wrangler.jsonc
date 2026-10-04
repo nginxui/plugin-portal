@@ -26,6 +26,7 @@
     "PORTAL_ORIGIN": "https://portal.nginxui.com",
     "CATALOG_URL": "https://plugins.nginxui.com",
     "CATALOG_REPO": "nginxui/plugins",
+    "CATALOG_APP_SLUG": "nginx-ui-plugin-catalog",
     "GITHUB_CLIENT_ID": ""
   }
   // Secrets, set with `wrangler secret put <NAME>`:

@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import type { MenuProps } from 'antdv-next'
-import { computed, h, ref } from 'vue'
+import { breakpointsAntDesign, useBreakpoints } from '@vueuse/core'
+import { computed, h, ref, watch } from 'vue'
 import { useGettext } from 'vue3-gettext'
 import { useRoute, useRouter } from 'vue-router'
-import logo from '@/assets/logo.svg'
 import { $gettext, languages, setLanguage } from '@/lib/gettext'
 import { isDark, toggleTheme } from '@/lib/theme'
 import { useSessionStore } from '@/stores/session'
@@ -12,7 +12,12 @@ const route = useRoute()
 const router = useRouter()
 const session = useSessionStore()
 const gettext = useGettext()
-const collapsed = ref(false)
+const isMobile = useBreakpoints(breakpointsAntDesign).smaller('lg')
+const drawerOpen = ref(false)
+
+watch(() => route.fullPath, () => {
+  drawerOpen.value = false
+})
 
 function icon(name: string) {
   return h('span', { class: `${name} text-4` })
@@ -21,6 +26,7 @@ function icon(name: string) {
 const menuItems = computed<MenuProps['items']>(() => {
   const items: MenuProps['items'] = [
     { key: '/plugins', icon: icon('i-tabler-layout-grid'), label: $gettext('My plugins') },
+    { key: '/owners', icon: icon('i-tabler-building'), label: $gettext('Organizations') },
   ]
   return items
 })
@@ -30,8 +36,8 @@ const selectedKeys = computed(() => {
   return match && 'key' in match ? [String(match.key)] : []
 })
 
-function onMenuClick({ key }: { key: string | number }) {
-  router.push(String(key))
+function onNavigate(key: string) {
+  router.push(key)
 }
 
 const languageItems = computed<MenuProps['items']>(() =>
@@ -61,43 +67,21 @@ async function onUserMenu({ key }: { key: string | number }) {
 
 <template>
   <ALayout class="min-h-screen">
-    <ALayoutSider
-      v-model:collapsed="collapsed"
-      :width="220"
-      breakpoint="lg"
-      :collapsed-width="0"
-      theme="light"
-      class="sider"
-    >
-      <div class="logo">
-        <img :src="logo" alt="" width="32" height="32">
-        <div>
-          <div class="logo-name">
-            Nginx UI
-          </div>
-          <div class="logo-sub">
-            {{ $gettext('Developer Center') }}
-          </div>
-        </div>
-      </div>
-      <AMenu
-        mode="inline"
-        :items="menuItems"
-        :selected-keys="selectedKeys"
-        :styles="{ root: { borderInlineEnd: 'none' } }"
-        @click="onMenuClick"
-      />
-      <div class="sider-foot">
-        <a href="https://nginxui.com/guide/plugins.html" target="_blank" rel="noopener">{{ $gettext('Developer docs') }}</a>
-        <a href="https://plugins.nginxui.com" target="_blank" rel="noopener">{{ $gettext('Plugin catalog') }}</a>
-      </div>
+    <ALayoutSider v-if="!isMobile" :width="220" theme="light" class="sider">
+      <SiderNav :items="menuItems" :selected-keys="selectedKeys" @navigate="onNavigate" />
     </ALayoutSider>
+    <ADrawer v-else v-model:open="drawerOpen" placement="left" :size="260" :closable="false" :styles="{ body: { padding: 0 } }">
+      <SiderNav :items="menuItems" :selected-keys="selectedKeys" @navigate="onNavigate" />
+    </ADrawer>
     <ALayout>
       <ALayoutHeader class="header">
+        <AButton v-if="isMobile" type="text" class="mr-auto" :aria-label="$gettext('Open menu')" @click="drawerOpen = true">
+          <span class="i-tabler-menu-2 text-5" />
+        </AButton>
         <ADropdown :menu="{ items: languageItems, selectable: true, selectedKeys: [gettext.current], onClick: onLanguageMenu }">
-          <AButton type="text">
+          <AButton type="text" :aria-label="$gettext('Language')">
             <span class="i-tabler-world text-4" />
-            {{ languages[gettext.current] }}
+            <span v-if="!isMobile">{{ languages[gettext.current] }}</span>
           </AButton>
         </ADropdown>
         <AButton type="text" :aria-label="$gettext('Toggle dark mode')" @click="toggleTheme">
@@ -108,7 +92,7 @@ async function onUserMenu({ key }: { key: string | number }) {
             <AAvatar :src="session.user.avatarUrl ?? undefined" :size="24">
               {{ session.user.login.slice(0, 1).toUpperCase() }}
             </AAvatar>
-            {{ session.user.login }}
+            <span v-if="!isMobile">{{ session.user.login }}</span>
             <span class="i-tabler-chevron-down text-3" />
           </AButton>
         </ADropdown>
@@ -122,44 +106,7 @@ async function onUserMenu({ key }: { key: string | number }) {
 
 <style scoped>
 .sider {
-  border-inline-end: 1px solid rgba(5, 5, 5, 0.06);
-}
-
-.sider :deep(.ant-layout-sider-children) {
-  display: flex;
-  flex-direction: column;
-  position: sticky;
-  top: 0;
-  height: 100vh;
-}
-
-.logo {
-  height: 64px;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 0 20px;
-}
-
-.logo-name {
-  font-weight: 600;
-  font-size: 16px;
-  line-height: 20px;
-}
-
-.logo-sub {
-  font-size: 12px;
-  line-height: 16px;
-  opacity: 0.65;
-}
-
-.sider-foot {
-  margin-top: auto;
-  padding: 16px 24px;
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  font-size: 13px;
+  border-inline-end: 1px solid var(--portal-border);
 }
 
 .header {
@@ -171,5 +118,6 @@ async function onUserMenu({ key }: { key: string | number }) {
   position: sticky;
   top: 0;
   z-index: 10;
+  border-bottom: 1px solid var(--portal-border);
 }
 </style>
