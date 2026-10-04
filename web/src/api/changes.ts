@@ -21,8 +21,12 @@ export interface Change {
   // A store change: where it went and what it holds.
   delivery?: 'catalog' | 'bot' | 'patch' | null
   repo?: string | null
-  items?: { field: string, locale?: string, label: string, review: boolean }[]
+  items?: { field: string, locale?: string, label: string, review: boolean, value?: string }[]
   patchUrl?: string
+  // In the list of the user's changes: comments on the pull request and the
+  // changes a maintainer asked for last.
+  comments?: number | null
+  askedFor?: string | null
   createdAt: number
   updatedAt: number
 }

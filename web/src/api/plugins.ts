@@ -66,7 +66,9 @@ export interface PluginDetail {
     checkedAt: number | null
     source: 'repository'
     manageUrl: string | null
+    people?: { login: string, avatarUrl: string | null, permission: string, role: Role | null, checkedAt: number }[]
   }
+  community?: boolean
 }
 
 export interface OpenChange {
@@ -93,7 +95,7 @@ export interface Insights {
   storeSource: StoreSource
   minHostVersion: string | null
   openIssues: number | null
-  releases: { version: string, publishedAt: string | null, yanked: boolean, prerelease: boolean }[]
+  releases: { version: string, publishedAt: string | null, yanked: boolean, prerelease: boolean, listed?: boolean, yankReason?: string | null }[]
 }
 
 export interface OwnerSummary {

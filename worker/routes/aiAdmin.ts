@@ -3,6 +3,7 @@ import type { ProviderRow } from '../lib/ai'
 import { Hono } from 'hono'
 import { AiError, draft, presentProvider, sealKey, today } from '../lib/ai'
 import { audit } from '../lib/audit'
+import { glossaryState, syncGlossary } from '../lib/glossary'
 import { now } from '../lib/time'
 import { requireMaintainer, requireSession } from '../middleware/auth'
 
@@ -70,15 +71,24 @@ function clean(input: ProviderInput, creating: boolean): { error: string } | Par
 }
 
 aiAdmin.get('/providers', async (c) => {
-  const [providers, usage] = await Promise.all([
+  const [providers, usage, glossary] = await Promise.all([
     c.env.DB.prepare('SELECT * FROM ai_providers ORDER BY is_default DESC, id').all<ProviderRow>(),
     c.env.DB.prepare('SELECT count(*) AS authors, sum(requests) AS requests, sum(input_tokens) AS input, sum(output_tokens) AS output FROM ai_usage WHERE day = ?').bind(today()).first<{ authors: number, requests: number | null, input: number | null, output: number | null }>(),
+    glossaryState(c.env),
   ])
   return c.json({
+    glossary,
     keyConfigured: !!c.env.AI_KEY,
     providers: providers.results.map(presentProvider),
     today: { authors: usage?.authors ?? 0, requests: usage?.requests ?? 0, inputTokens: usage?.input ?? 0, outputTokens: usage?.output ?? 0 },
   })
+})
+
+aiAdmin.post('/glossary/sync', async (c) => {
+  const session = c.get('session')
+  const result = await syncGlossary(c.env)
+  await audit(c.env.DB, { actorId: session.user.id, action: 'ai.glossary_sync', detail: { locales: result.locales } })
+  return c.json(result)
 })
 
 aiAdmin.post('/providers', async (c) => {

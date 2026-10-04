@@ -17,9 +17,11 @@ const reviewStore = useReviewStore()
 const palette = usePaletteStore()
 const items = ref<QueueItem[]>([])
 const recent = ref<RecentChange[]>([])
+const done = ref<QueueItem[]>([])
+const kindFilter = ref<string>('')
 const loading = ref(true)
 const failed = ref(false)
-const filter = ref<'maintainer' | 'author' | 'all'>('maintainer')
+const filter = ref<'maintainer' | 'author' | 'done' | 'all'>('maintainer')
 const search = ref('')
 const focus = ref(0)
 const searchInput = ref<{ focus: () => void } | null>(null)
@@ -37,6 +39,7 @@ async function load() {
     const queue = await getQueue()
     items.value = queue.changes
     recent.value = queue.recent
+    done.value = queue.done ?? []
     reviewStore.count(items.value)
     selected.value = selected.value.filter(id => items.value.some(i => i.id === id && batchable(i)))
   }
@@ -55,16 +58,36 @@ const count = (waitingOn: string) => items.value.filter(i => i.waitingOn === wai
 const filters = computed(() => [
   { value: 'maintainer', label: `${$gettext('Waiting for review')} ${count('maintainer')}` },
   { value: 'author', label: `${$gettext('Waiting for the author')} ${count('author')}` },
+  { value: 'done', label: $gettext('Finished') },
   { value: 'all', label: $gettext('All in progress') },
 ])
+
+const kindOptions = computed(() => [
+  { value: '', label: $gettext('All kinds') },
+  ...[...new Set([...items.value, ...done.value].map(i => i.kind))].map(kind => ({ value: kind, label: kindLabel(kind) })),
+])
+
+// Three levels for the eye: high risk, a change that needs a careful look,
+// and a low risk one that may be approved with others.
+const LOW_RISK = ['names', 'translations', 'store', 'categories']
+function riskLevel(item: QueueItem): 'high' | 'medium' | 'low' {
+  return item.risk === 'high' ? 'high' : LOW_RISK.includes(item.kind) ? 'low' : 'medium'
+}
+const RISK_ORDER = { high: 0, medium: 1, low: 2 }
 
 // High risk first, then the longest waiting.
 const shown = computed(() => {
   const q = search.value.trim().toLowerCase()
+  if (filter.value === 'done') {
+    return done.value
+      .filter(i => !kindFilter.value || i.kind === kindFilter.value)
+      .filter(i => !q || i.pluginId?.toLowerCase().includes(q) || i.author?.toLowerCase().includes(q) || localized(i.entry?.name).toLowerCase().includes(q))
+  }
   return items.value
     .filter(i => filter.value === 'all' || i.waitingOn === filter.value)
+    .filter(i => !kindFilter.value || i.kind === kindFilter.value)
     .filter(i => !q || i.pluginId?.toLowerCase().includes(q) || i.author?.toLowerCase().includes(q) || localized(i.entry?.name).toLowerCase().includes(q))
-    .sort((a, b) => Number(b.risk === 'high') - Number(a.risk === 'high') || a.updatedAt - b.updatedAt)
+    .sort((a, b) => RISK_ORDER[riskLevel(a)] - RISK_ORDER[riskLevel(b)] || a.updatedAt - b.updatedAt)
 })
 
 watch(shown, () => {
@@ -270,6 +293,8 @@ onKeyStroke('/', (e) => {
       <ACard :loading="loading" class="col-main" :styles="{ body: { padding: 0 } }">
         <div class="toolbar">
           <ASegmented v-model:value="filter" :options="filters" />
+          <span class="flex-1" />
+          <ASelect v-model:value="kindFilter" :options="kindOptions" class="w-36" :aria-label="$gettext('Kind of change')" />
           <AInput ref="searchInput" v-model:value="search" class="search" allow-clear :placeholder="$gettext('Plugin ID or author')" :aria-label="$gettext('Search')">
             <template #prefix>
               <span class="i-tabler-search op-50" />
@@ -307,7 +332,7 @@ onKeyStroke('/', (e) => {
                 <th>{{ $gettext('Author') }}</th>
                 <th>{{ $gettext('Checks') }}</th>
                 <th>{{ $gettext('Waiting') }}</th>
-                <th />
+                <th>{{ $gettext('Actions') }}</th>
               </tr>
             </thead>
             <tbody>
@@ -328,7 +353,7 @@ onKeyStroke('/', (e) => {
                   />
                 </td>
                 <td class="nowrap">
-                  <span class="risk" :class="item.risk"><i />{{ item.risk === 'high' ? $gettext('High') : $gettext('Normal') }}</span>
+                  <span class="risk" :class="riskLevel(item)"><i />{{ riskLevel(item) === 'high' ? $gettext('High') : riskLevel(item) === 'medium' ? $gettext('Medium') : $gettext('Low') }}</span>
                 </td>
                 <td class="nowrap">
                   <ATag :color="item.kind === 'new_listing' ? 'blue' : 'default'" class="m-0">
@@ -617,7 +642,15 @@ onKeyStroke('/', (e) => {
 }
 
 .risk.high i {
-  background: #fa541c;
+  background: #cf1322;
+}
+
+.risk.medium i {
+  background: #d48806;
+}
+
+.risk.low i {
+  background: #389e0d;
 }
 
 .check.ok {

@@ -25,7 +25,7 @@ export interface RecentChange extends Change {
 }
 
 export function getQueue() {
-  return api<{ changes: QueueItem[], recent: RecentChange[] }>('/review/queue')
+  return api<{ changes: QueueItem[], recent: RecentChange[], done?: QueueItem[] }>('/review/queue')
 }
 
 export function approveBatch(ids: string[]) {

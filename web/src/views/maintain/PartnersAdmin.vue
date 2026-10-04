@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { PartnerRequest, PartnersAdmin } from '@/api/maintain'
-import { computed, onMounted, ref } from 'vue'
+import { computed, onMounted, ref, useTemplateRef } from 'vue'
 import { useRouter } from 'vue-router'
 import { approveRequest, createVendor, declineRequest, getPartnersAdmin, revokePartner } from '@/api/maintain'
 import { $gettext } from '@/lib/gettext'
@@ -85,11 +85,21 @@ async function revoke() {
   router.push(`/changes/${change}`)
 }
 
+const vendorName = useTemplateRef<{ focus: () => void }>('vendorName')
+const profileUrl = (login: string) => `https://github.com/${login}`
+
+function focusVendor() {
+  vendorName.value?.focus()
+}
+
 function stateTag(state: string, expires: string | null) {
   switch (state) {
     case 'revoked': return { color: 'error', text: $gettext('Revoked') }
     case 'expired': return { color: 'error', text: $gettext('Expired') }
-    case 'expiring': return { color: 'warning', text: $gettext('Expires %{date}', { date: expires ?? '' }) }
+    case 'expiring': {
+      const days = expires ? Math.max(0, Math.ceil((Date.parse(`${expires}T00:00:00Z`) - Date.now()) / 86400000)) : null
+      return { color: 'warning', text: days === null ? $gettext('Expires %{date}', { date: expires ?? '' }) : $gettext('Key expires in %{n} days', { n: String(days) }) }
+    }
     default: return { color: 'success', text: $gettext('Valid') }
   }
 }
@@ -97,14 +107,19 @@ function stateTag(state: string, expires: string | null) {
 
 <template>
   <div class="page">
-    <div>
-      <h1 class="page-title">
-        {{ $gettext('Partners') }}
-      </h1>
-      <ATypographyText type="secondary">
-        {{ $gettext('Partners sign with a partner key and may list commercial plugins. Their profiles and keys live in the partners folder of the catalog repository.') }}
-      </ATypographyText>
-    </div>
+    <AFlex justify="space-between" align="flex-start" gap="middle" wrap>
+      <div>
+        <h1 class="page-title">
+          {{ $gettext('Partner management') }}
+        </h1>
+        <ATypographyText type="secondary">
+          {{ $gettext('Partners sign with a partner key and may list commercial plugins. Their profiles and keys live in the partners folder of the catalog repository.') }}
+        </ATypographyText>
+      </div>
+      <AButton type="primary" @click="focusVendor">
+        <span class="i-tabler-plus" />{{ $gettext('New vendor') }}
+      </AButton>
+    </AFlex>
     <AAlert v-if="failed" type="error" show-icon :title="$gettext('The partners could not be loaded.')" />
     <ASkeleton v-if="!data && !failed" active />
 
@@ -145,6 +160,10 @@ function stateTag(state: string, expires: string | null) {
                   <span :class="r.checks.listedPlugins ? 'i-tabler-check' : 'i-tabler-alert-triangle'" />
                   {{ $gettext('%{n} plugins listed', { n: String(r.checks.listedPlugins) }) }}
                 </span>
+                <span v-if="r.checks.createdYear" class="c-ok">
+                  <span class="i-tabler-check" />
+                  {{ $gettext('Organization created in %{year}', { year: String(r.checks.createdYear) }) }}
+                </span>
                 <span :class="r.checks.hasKey ? 'c-ok' : 'c-warn'">
                   <span :class="r.checks.hasKey ? 'i-tabler-check' : 'i-tabler-alert-triangle'" />
                   {{ r.checks.hasKey ? $gettext('Partner key given') : $gettext('No partner key yet') }}
@@ -152,6 +171,11 @@ function stateTag(state: string, expires: string | null) {
               </AFlex>
             </div>
             <AFlex gap="small">
+              <a v-if="r.by" :href="profileUrl(r.by)" target="_blank" rel="noopener">
+                <AButton size="small">
+                  {{ $gettext('Contact the applicant') }}
+                </AButton>
+              </a>
               <AButton size="small" @click="declining = r">
                 {{ $gettext('Decline') }}
               </AButton>
@@ -207,7 +231,7 @@ function stateTag(state: string, expires: string | null) {
                 </tr>
               </tbody>
             </table>
-            <AEmpty v-if="!data.partners.length" class="py-6" :description="$gettext('No partner yet.')" />
+            <AEmpty v-if="!data?.partners.length" class="py-6" :description="$gettext('No partner yet.')" />
           </div>
         </ACard>
       </AFlex>
@@ -216,7 +240,7 @@ function stateTag(state: string, expires: string | null) {
         <ACard :title="$gettext('New vendor')">
           <AForm layout="vertical">
             <AFormItem :label="$gettext('Name')" required>
-              <AInput v-model:value="vendor.name" :placeholder="$gettext('For example Orbit Labs')" />
+              <AInput ref="vendorName" v-model:value="vendor.name" :placeholder="$gettext('For example Orbit Labs')" />
             </AFormItem>
             <AFormItem :label="$gettext('Partner name')" :extra="$gettext('The name in partners/, once its key is added.')">
               <AInput v-model:value="vendor.partner" class="mono" :placeholder="slugFromName" />
@@ -233,7 +257,7 @@ function stateTag(state: string, expires: string | null) {
           </AButton>
           <AAlert v-if="vendorError" type="error" show-icon class="mt-3" :title="vendorError" />
           <AAlert v-if="vendorDone" type="success" show-icon class="mt-3" :title="vendorDone" />
-          <div v-for="v in data.vendors" :key="v.id" class="text-3 mt-2">
+          <div v-for="v in data?.vendors ?? []" :key="v.id" class="text-3 mt-2">
             <RouterLink :to="`/vendors/${v.id}`">
               {{ v.name }}
             </RouterLink>
@@ -247,7 +271,7 @@ function stateTag(state: string, expires: string | null) {
           <ATypographyParagraph class="text-3">
             {{ $gettext('Once revoked, every version signed with the key stops installing. A revocation needs no review and is committed to the catalog repository at once.') }}
           </ATypographyParagraph>
-          <AButton danger size="small" :disabled="!data.partners.some(p => p.state !== 'revoked')" @click="revoking = true">
+          <AButton danger size="small" :disabled="!(data?.partners ?? []).some(p => p.state !== 'revoked')" @click="revoking = true">
             {{ $gettext('Choose the key to revoke') }}
           </AButton>
         </ACard>

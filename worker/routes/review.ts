@@ -81,6 +81,13 @@ review.get('/queue', async (c) => {
      WHERE c.state IN ('open', 'merged')
      ORDER BY CASE WHEN c.waiting_on = 'maintainer' THEN 0 ELSE 1 END, c.updated_at ASC LIMIT 200`,
   ).all<QueueRow>()
+  // Reviewed changes that reached an end lately.
+  const done = await c.env.DB.prepare(
+    `SELECT c.*, u.login AS author_login, p.repo_full_name FROM changes c
+     LEFT JOIN users u ON u.id = c.author_id
+     LEFT JOIN plugins p ON p.plugin_id = c.plugin_id
+     WHERE c.class != 'self_service' AND c.state IN ('live', 'rejected', 'withdrawn') ORDER BY c.updated_at DESC LIMIT 50`,
+  ).all<QueueRow>()
   return c.json({
     changes: results.map(row => ({
       ...present(c.env, row),
@@ -89,6 +96,7 @@ review.get('/queue', async (c) => {
       risk: risk(row),
     })),
     recent: (await recent).results.map(row => ({ ...present(c.env, row), author: row.author_login })),
+    done: done.results.map(row => ({ ...present(c.env, row), author: row.author_login, repo: row.repo_full_name, risk: risk(row) })),
   })
 })
 

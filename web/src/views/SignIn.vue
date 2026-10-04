@@ -55,7 +55,7 @@ const features = computed(() => [
           </ATypographyText>
         </AFlex>
         <AAlert v-if="error" type="warning" :title="error" show-icon class="w-full" />
-        <AButton type="primary" size="large" block :href="signInUrl(next)">
+        <AButton color="default" variant="solid" size="large" block :href="signInUrl(next)">
           <span class="i-tabler-brand-github text-5" />
           {{ $gettext('Sign in with GitHub') }}
         </AButton>
@@ -66,7 +66,7 @@ const features = computed(() => [
     </ACard>
     <div class="features">
       <AFlex v-for="feature in features" :key="feature.title" gap="middle" class="feature">
-        <span :class="feature.icon" class="feature-icon" />
+        <span class="feature-icon"><span :class="feature.icon" /></span>
         <div>
           <div class="font-600">
             {{ feature.title }}
@@ -112,11 +112,12 @@ const features = computed(() => [
 
 .feature-icon {
   flex: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   font-size: 20px;
   width: 40px;
   height: 40px;
-  padding: 10px;
-  box-sizing: border-box;
   border-radius: 8px;
   color: var(--portal-primary-text);
   background: var(--portal-primary-bg);

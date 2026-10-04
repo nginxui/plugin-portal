@@ -49,7 +49,7 @@ export interface PartnerRequest {
   keyId: string | null
   reason: string | null
   note: string | null
-  checks: { listedPlugins: number, hasKey: boolean } | null
+  checks: { listedPlugins: number, hasKey: boolean, createdYear?: number | null } | null
 }
 
 export interface PartnersAdmin {

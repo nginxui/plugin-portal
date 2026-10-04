@@ -5,7 +5,7 @@ import dayjs from 'dayjs'
 import { computed, ref, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import { auditExportUrl, getAudit } from '@/api/audit'
-import { AUDIT_KIND_COLORS, auditKindLabel, auditLines, auditNote } from '@/lib/audit'
+import { AUDIT_KIND_COLORS, auditDetailLines, auditKindLabel, auditLines, auditNote } from '@/lib/audit'
 import { $gettext } from '@/lib/gettext'
 
 const route = useRoute()
@@ -105,7 +105,7 @@ function actorName(entry: AuditEntry) {
 }
 
 const isExternal = (url: string) => url.startsWith('https://')
-const detailText = computed(() => selected.value?.detail ? JSON.stringify(selected.value.detail, null, 2) : '')
+const detailText = computed(() => selected.value ? auditDetailLines(selected.value).join('\n') : '')
 </script>
 
 <template>
@@ -232,7 +232,7 @@ const detailText = computed(() => selected.value?.detail ? JSON.stringify(select
               </template>
               <template v-if="selected.record">
                 <dt>{{ $gettext('Record') }}</dt>
-                <dd>
+                <dd class="break-all">
                   <a v-if="isExternal(selected.record.url)" :href="selected.record.url" target="_blank" rel="noopener">{{ selected.record.url.replace('https://github.com/', '') }}</a>
                   <RouterLink v-else :to="selected.record.url">
                     {{ $gettext('Change %{id}', { id: selected.record.label }) }}
@@ -251,7 +251,7 @@ const detailText = computed(() => selected.value?.detail ? JSON.stringify(select
             {{ $gettext('The catalog follows its git history. Should this log be lost, every catalog change can still be traced from its commits and pull requests.') }}
           </ATypographyParagraph>
           <ATypographyParagraph type="secondary" class="text-3 mb-0">
-            {{ $gettext('Sign ins and other portal actions are recorded only here.') }}
+            {{ $gettext('Sign ins, settings and AI use are recorded only here and kept for one year.') }}
           </ATypographyParagraph>
         </ACard>
       </AFlex>

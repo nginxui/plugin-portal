@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { StoreState } from '@/api/store'
+import type { StressResults } from '@/components/StressCards.vue'
 import type { Stress } from '@/lib/market'
 import { computed, onMounted, ref, useTemplateRef, watch } from 'vue'
 import { useRouter } from 'vue-router'
@@ -101,6 +102,7 @@ const pageTexts = computed(() => {
 })
 
 const cut = ref<Record<string, boolean>>({})
+const stressResults = ref<StressResults | null>(null)
 
 const STATE_ICON: Record<string, string> = {
   ok: 'i-tabler-check c-ok',
@@ -230,7 +232,7 @@ const name = computed(() => localized(doc.value.name) || localized(plugin.value.
           <AFlex align="center" gap="middle" wrap>
             <LanguagePicker v-model="locale" :coverage="coverage" />
             <span v-if="locale === 'en'" class="text-3 op-65">{{ $gettext('Translated into %{n} of %{total} languages, the others show English', { n: String(translated), total: String(HOST_LOCALES.length) }) }}</span>
-            <span v-else class="text-3 op-65">{{ $gettext('Click any text in the preview to translate it. Tab goes to the next untranslated text.') }}</span>
+            <span v-else class="text-3 op-65">{{ $gettext('Click any text in the preview to translate it,') }} <kbd class="key">Tab</kbd> {{ $gettext('goes to the next untranslated text') }}</span>
           </AFlex>
           <AFlex align="center" gap="small" wrap>
             <span class="text-3 op-65">{{ $gettext('Stress test') }}</span>
@@ -281,58 +283,11 @@ const name = computed(() => localized(doc.value.name) || localized(plugin.value.
             @studio="router.push(`/plugins/${plugin.id}/screenshots`)"
             @categories="categoriesOpen = true"
           />
+          <StressCards v-if="stress !== 'off'" class="mt-4" :doc="doc" :trust="plugin.trust" :theme="theme" :author="plugin.owner?.login ?? null" @results="stressResults = $event" />
           <ListCardRow v-if="stress !== 'off'" class="mt-4" :doc="doc" :locale="locale" :stress="stress" :trust="plugin.trust" :theme="theme" @results="cut = $event" />
         </div>
 
         <AFlex vertical gap="middle" class="col-side">
-          <ACard v-if="locale !== 'en'" :title="$gettext('Texts of this page, %{lang}', { lang: localeName(locale) })">
-            <template #extra>
-              <ATag class="m-0">
-                {{ keys.length - missing.length }} / {{ keys.length }}
-              </ATag>
-            </template>
-            <div class="items">
-              <button v-for="row in pageTexts" :key="row.key" type="button" class="text-row" :disabled="row.runtime" @click="preview?.edit(row.key)">
-                <span :class="STATE_ICON[row.state]" />
-                <span class="min-w-0">
-                  <span class="block">{{ row.label }}</span>
-                  <span v-if="row.state !== 'ok'" class="block text-3 op-65">{{ stateText(row.state) }}</span>
-                </span>
-              </button>
-            </div>
-            <div v-if="ai.enabled && ai.remaining !== undefined" class="text-3 op-65 mt-3">
-              {{ $gettext('AI drafts left today: %{n}', { n: String(ai.remaining) }) }}
-            </div>
-          </ACard>
-
-          <ACard v-if="stress !== 'off'" :title="$gettext('Stress test results')">
-            <div class="items">
-              <template v-for="(isCut, lang) in cut" :key="lang">
-                <div v-if="isCut" class="item">
-                  <span class="i-tabler-cut c-warn" />
-                  <div>{{ $gettext('The name in %{lang} is cut short in the list card', { lang: localeName(String(lang)) }) }}</div>
-                </div>
-              </template>
-              <div v-if="!Object.values(cut).some(Boolean)" class="item">
-                <span class="i-tabler-check c-ok" />
-                <div>{{ $gettext('Every name fits the list card') }}</div>
-              </div>
-              <div v-if="stress === 'rtl'" class="item">
-                <span class="i-tabler-text-direction-rtl c-info" />
-                <div>{{ $gettext('Check that the page reads right to left without overlapping text') }}</div>
-              </div>
-              <div v-if="stress === 'pseudo' && pageTexts.some(r => r.runtime)" class="item">
-                <span class="i-tabler-alert-triangle c-warn" />
-                <div>
-                  <div>{{ $gettext('Permission notes are not translated here') }}</div>
-                  <div class="text-3 op-65">
-                    {{ $gettext('They come from the manifest and are translated in the repository') }}
-                  </div>
-                </div>
-              </div>
-            </div>
-          </ACard>
-
           <ACard :title="$gettext('Store source')">
             <div class="radios" role="radiogroup" :aria-label="$gettext('Store source')">
               <button
@@ -409,6 +364,66 @@ const name = computed(() => localized(doc.value.name) || localized(plugin.value.
               </div>
             </div>
           </ACard>
+          <ACard v-if="locale !== 'en'" :class="{ lead: stress !== 'off' }" :title="$gettext('Texts of this page, %{lang}', { lang: localeName(locale) })">
+            <template #extra>
+              <ATag class="m-0">
+                {{ keys.length - missing.length }} / {{ keys.length }}
+              </ATag>
+            </template>
+            <div class="items">
+              <button v-for="row in pageTexts" :key="row.key" type="button" class="text-row" :disabled="row.runtime" @click="preview?.edit(row.key)">
+                <span :class="STATE_ICON[row.state]" />
+                <span class="min-w-0">
+                  <span class="block">{{ row.label }}</span>
+                  <span v-if="row.state !== 'ok'" class="block text-3 op-65">{{ stateText(row.state) }}</span>
+                </span>
+              </button>
+            </div>
+            <div v-if="ai.enabled && ai.remaining !== undefined" class="text-3 op-65 mt-3">
+              {{ $gettext('AI drafts left today: %{n}', { n: String(ai.remaining) }) }}
+            </div>
+          </ACard>
+
+          <ACard v-if="stress !== 'off'" class="lead" :title="$gettext('Stress test results')">
+            <div class="items">
+              <template v-if="stressResults">
+                <div class="item">
+                  <span :class="stressResults.longest.cut ? 'i-tabler-alert-triangle c-warn' : 'i-tabler-circle-check c-ok'" />
+                  <div>
+                    <div>{{ stressResults.longest.cut ? $gettext('Longest language: the name in %{lang} is cut short in the card', { lang: localeName(stressResults.longest.locale) }) : $gettext('Longest language: the name in %{lang} fits the card', { lang: localeName(stressResults.longest.locale) }) }}</div>
+                    <a v-if="stressResults.longest.cut" role="button" tabindex="0" class="text-3" @click="preview?.edit('name')" @keydown.enter="preview?.edit('name')">{{ $gettext('Go to the name') }}</a>
+                  </div>
+                </div>
+                <div class="item">
+                  <span :class="stressResults.rtl.translated ? 'i-tabler-circle-check c-ok' : 'i-tabler-info-circle c-info'" />
+                  <div>{{ stressResults.rtl.translated ? $gettext('Right to left: the Arabic name reads correctly') : $gettext('Right to left: there is no Arabic name yet, English shows') }}</div>
+                </div>
+              </template>
+              <template v-for="(isCut, lang) in cut" :key="lang">
+                <div v-if="isCut" class="item">
+                  <span class="i-tabler-cut c-warn" />
+                  <div>{{ $gettext('The name in %{lang} is cut short in the list card', { lang: localeName(String(lang)) }) }}</div>
+                </div>
+              </template>
+              <div v-if="!Object.values(cut).some(Boolean)" class="item">
+                <span class="i-tabler-check c-ok" />
+                <div>{{ $gettext('Every name fits the list card') }}</div>
+              </div>
+              <div v-if="stress === 'rtl'" class="item">
+                <span class="i-tabler-text-direction-rtl c-info" />
+                <div>{{ $gettext('Check that the page reads right to left without overlapping text') }}</div>
+              </div>
+              <div v-if="stress === 'pseudo' && pageTexts.some(r => r.runtime)" class="item">
+                <span class="i-tabler-alert-triangle c-warn" />
+                <div>
+                  <div>{{ $gettext('Permission notes are not translated here') }}</div>
+                  <div class="text-3 op-65">
+                    {{ $gettext('They come from the manifest and are translated in the repository') }}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </ACard>
         </AFlex>
       </div>
 
@@ -433,6 +448,18 @@ const name = computed(() => localized(doc.value.name) || localized(plugin.value.
 </template>
 
 <style scoped>
+.lead {
+  order: -1;
+}
+
+.key {
+  display: inline-block;
+  padding: 0 5px;
+  border: 1px solid var(--portal-border-strong);
+  border-radius: 4px;
+  font: 11px/16px ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+}
+
 .radios {
   display: flex;
   flex-direction: column;

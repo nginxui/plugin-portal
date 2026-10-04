@@ -1,11 +1,13 @@
 <script setup lang="ts">
 import type { MenuProps } from 'antdv-next'
+import type { Crumb } from '@/stores/crumbs'
 import { breakpointsAntDesign, onKeyStroke, useBreakpoints } from '@vueuse/core'
 import { computed, h, ref, watch } from 'vue'
 import { useGettext } from 'vue3-gettext'
 import { useRoute, useRouter } from 'vue-router'
 import { $gettext, languages, setLanguage } from '@/lib/gettext'
 import { isDark, toggleTheme } from '@/lib/theme'
+import { useCrumbStore } from '@/stores/crumbs'
 import { usePaletteStore } from '@/stores/palette'
 import { useReviewStore } from '@/stores/review'
 import { useSessionStore } from '@/stores/session'
@@ -49,7 +51,7 @@ const menuItems = computed<MenuProps['items']>(() => {
   const items: MenuProps['items'] = [
     { key: '/plugins', icon: icon('i-tabler-layout-grid'), label: $gettext('My plugins') },
     { key: '/submit', icon: icon('i-tabler-plus'), label: $gettext('Submit a plugin') },
-    { key: '/translate', icon: icon('i-tabler-language'), label: $gettext('Translate') },
+    { key: '/translate', icon: icon('i-tabler-language'), label: $gettext('Contribute translations') },
     { key: '/owners', icon: icon('i-tabler-building'), label: $gettext('Organizations') },
   ]
   if (session.isMaintainer) {
@@ -59,7 +61,7 @@ const menuItems = computed<MenuProps['items']>(() => {
       children: [
         { key: '/review', icon: icon('i-tabler-inbox'), label: withBadge($gettext('Review queue'), reviewStore.pending) },
         { key: '/maintain/plugins', icon: icon('i-tabler-apps'), label: $gettext('All plugins') },
-        { key: '/maintain/partners', icon: icon('i-tabler-building-store'), label: $gettext('Partners') },
+        { key: '/maintain/partners', icon: icon('i-tabler-building-store'), label: $gettext('Partner management') },
         { key: '/audit', icon: icon('i-tabler-history'), label: $gettext('Audit log') },
         { key: '/ai', icon: icon('i-tabler-sparkles'), label: $gettext('AI models') },
       ],
@@ -82,6 +84,36 @@ const selectedKeys = computed(() => {
   const match = keys.filter(key => path.startsWith(key)).sort((a, b) => b.length - a.length)[0]
   return match ? [match] : []
 })
+
+// The header breadcrumb: a page's own, or one named after its route.
+const crumbStore = useCrumbStore()
+const crumbs = computed<Crumb[]>(() => {
+  if (crumbStore.items)
+    return crumbStore.items
+  const maintenance = { title: $gettext('Maintenance') }
+  switch (route.name) {
+    case 'plugins': return [{ title: $gettext('My plugins') }]
+    case 'submit': return [{ title: $gettext('Submit a plugin') }]
+    case 'translate': return [{ title: $gettext('Contribute translations') }]
+    case 'owners': return [{ title: $gettext('Organizations') }]
+    case 'review': return [maintenance, { title: $gettext('Review queue') }]
+    case 'all-plugins': return [maintenance, { title: $gettext('All plugins') }]
+    case 'partners-admin': return [maintenance, { title: $gettext('Partner management') }]
+    case 'audit': return [maintenance, { title: $gettext('Audit log') }]
+    case 'ai': return [maintenance, { title: $gettext('AI models') }]
+    default: return []
+  }
+})
+const crumbItems = computed(() => crumbs.value.map(crumb => crumb.to
+  ? {
+      title: crumb.title,
+      href: crumb.to,
+      onClick: (e: MouseEvent) => {
+        e.preventDefault()
+        router.push(crumb.to!)
+      },
+    }
+  : { title: crumb.title }))
 
 function onNavigate(key: string) {
   router.push(key)
@@ -122,9 +154,13 @@ async function onUserMenu({ key }: { key: string | number }) {
     </ADrawer>
     <ALayout>
       <ALayoutHeader class="header">
-        <AButton v-if="isMobile" type="text" class="mr-auto" :aria-label="$gettext('Open menu')" @click="drawerOpen = true">
+        <AButton v-if="isMobile" type="text" :aria-label="$gettext('Open menu')" @click="drawerOpen = true">
           <span class="i-tabler-menu-2 text-5" />
         </AButton>
+        <div class="crumbs">
+          <span v-if="isMobile && crumbs.length" class="truncate">{{ crumbs[crumbs.length - 1].title }}</span>
+          <ABreadcrumb v-else-if="crumbs.length" :items="crumbItems" />
+        </div>
         <AButton type="text" :aria-label="$gettext('Search and commands')" @click="palette.show()">
           <span class="i-tabler-search text-4" />
           <span v-if="!isMobile" class="search-hint"><kbd>{{ palette.modifier }}</kbd><kbd>K</kbd></span>
@@ -187,7 +223,6 @@ async function onUserMenu({ key }: { key: string | number }) {
 .header {
   display: flex;
   align-items: center;
-  justify-content: flex-end;
   gap: 4px;
   padding: 0 16px;
   position: sticky;
@@ -195,6 +230,15 @@ async function onUserMenu({ key }: { key: string | number }) {
   z-index: 10;
   border-bottom: 1px solid var(--portal-border);
 }
+.crumbs {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  overflow: hidden;
+  white-space: nowrap;
+}
+
 .search-hint {
   display: inline-flex;
   gap: 2px;

@@ -22,8 +22,6 @@ declare module 'vue' {
     ACheckboxGroup: typeof import('antdv-next')['CheckboxGroup']
     ACol: typeof import('antdv-next')['Col']
     AConfigProvider: typeof import('antdv-next')['ConfigProvider']
-    ADescriptions: typeof import('antdv-next')['Descriptions']
-    ADescriptionsItem: typeof import('antdv-next')['DescriptionsItem']
     ADrawer: typeof import('antdv-next')['Drawer']
     ADropdown: typeof import('antdv-next')['Dropdown']
     AEmpty: typeof import('antdv-next')['Empty']
@@ -72,6 +70,7 @@ declare module 'vue' {
     NotificationBell: typeof import('./web/src/components/NotificationBell.vue')['default']
     PendingChange: typeof import('./web/src/components/PendingChange.vue')['default']
     PluginCard: typeof import('./web/src/components/PluginCard.vue')['default']
+    PluginHeader: typeof import('./web/src/components/PluginHeader.vue')['default']
     PluginIcon: typeof import('./web/src/components/PluginIcon.vue')['default']
     PluginRow: typeof import('./web/src/components/PluginRow.vue')['default']
     RepoPicker: typeof import('./web/src/components/RepoPicker.vue')['default']
@@ -80,5 +79,7 @@ declare module 'vue' {
     RouterView: typeof import('vue-router')['RouterView']
     SiderNav: typeof import('./web/src/components/SiderNav.vue')['default']
     SparkLine: typeof import('./web/src/components/SparkLine.vue')['default']
+    StressCards: typeof import('./web/src/components/StressCards.vue')['default']
+    SubmitDraftCard: typeof import('./web/src/components/SubmitDraftCard.vue')['default']
   }
 }

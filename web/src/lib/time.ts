@@ -29,3 +29,11 @@ export function waited(value: number | null | undefined): string {
     return ''
   return dayjs.unix(value).locale(locale()).fromNow(true)
 }
+
+/** A short date and time, such as "Oct 3 14:20". */
+export function formatTime(value: string | number | null | undefined): string {
+  if (value === null || value === undefined)
+    return ''
+  const time = typeof value === 'number' ? dayjs.unix(value) : dayjs(value)
+  return time.locale(locale()).format(locale() === 'zh-cn' ? 'M月D日 HH:mm' : 'MMM D HH:mm')
+}

@@ -40,6 +40,8 @@ function toggleColumn(locale: string) {
   picked.value = picked.value.includes(locale) ? picked.value.filter(l => l !== locale) : [...picked.value, locale]
 }
 const coverage = computed(() => coverageOf(doc.value))
+// English first, then the most complete languages.
+const tilesOrder = computed(() => [...HOST_LOCALES].sort((a, b) => Number(b === 'en') - Number(a === 'en') || (coverage.value[b] ?? 0) - (coverage.value[a] ?? 0)))
 
 interface Row {
   key: string
@@ -203,7 +205,7 @@ async function draftMissing() {
         </template>
         <div class="tiles">
           <button
-            v-for="l in HOST_LOCALES"
+            v-for="l in tilesOrder"
             :key="l"
             type="button"
             class="tile"
@@ -218,15 +220,17 @@ async function draftMissing() {
         <AAlert v-if="aiError" type="warning" show-icon class="mt-3" :title="aiError" />
       </ACard>
 
-      <AFlex justify="space-between" align="center" gap="middle" wrap>
-        <ASegmented v-model:value="filter" :options="filters" />
-        <span class="text-3 op-65">{{ $gettext('A text left out in a language shows in English there') }}</span>
-      </AFlex>
+      <ACard :styles="{ body: { padding: '12px 16px' } }">
+        <AFlex justify="space-between" align="center" gap="middle" wrap>
+          <ASegmented v-model:value="filter" :options="filters" />
+          <span class="text-3 op-65">{{ $gettext('A text left out in a language shows in English there') }}</span>
+        </AFlex>
+      </ACard>
 
       <div class="cols">
         <ACard class="col-main" :styles="{ body: { padding: 0 } }">
           <div class="overflow-x-auto">
-            <table class="grid">
+            <table class="wb-table">
               <thead>
                 <tr>
                   <th class="field-col">
@@ -299,7 +303,7 @@ async function draftMissing() {
           <div v-if="savedAt" class="foot text-3 op-65">
             {{ saving ? $gettext('Saving the draft') : $gettext('Draft saved %{time}. Submit it from the store page.', { time: fromNow(savedAt) }) }}
             <RouterLink :to="`/plugins/${plugin.id}`">
-              {{ $gettext('Store') }}
+              {{ $gettext('Store details') }}
             </RouterLink>
           </div>
         </ACard>
@@ -401,7 +405,7 @@ async function draftMissing() {
   background: var(--portal-primary);
 }
 
-.grid {
+.wb-table {
   width: 100%;
   min-width: 720px;
   border-collapse: collapse;
@@ -409,7 +413,7 @@ async function draftMissing() {
   table-layout: fixed;
 }
 
-.grid th {
+.wb-table th {
   text-align: start;
   font-weight: 500;
   padding: 10px 12px;
@@ -417,7 +421,7 @@ async function draftMissing() {
   border-bottom: 1px solid var(--portal-border);
 }
 
-.grid td {
+.wb-table td {
   padding: 10px 12px;
   border-bottom: 1px solid var(--portal-border);
   vertical-align: top;

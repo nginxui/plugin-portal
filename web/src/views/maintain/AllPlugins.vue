@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { AdminPlugin, AdminPlugins } from '@/api/maintain'
 import { computed, onMounted, ref } from 'vue'
-import { useRouter } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import { addBlock, delist, getAllPlugins, setTrust } from '@/api/maintain'
 import { $gettext } from '@/lib/gettext'
 import { localized, storeSourceShort, trustLabel } from '@/lib/labels'
@@ -11,6 +11,7 @@ import { usePaletteStore } from '@/stores/palette'
 // 11.5). Changing trust, delisting and blocking each open a pull request.
 
 const router = useRouter()
+const route = useRoute()
 const palette = usePaletteStore()
 const data = ref<AdminPlugins | null>(null)
 const failed = ref(false)
@@ -22,7 +23,7 @@ async function load() {
     failed.value = true
   }
 }
-onMounted(load)
+const lastBlocked = computed(() => (data.value?.blocked ?? []).map(b => b.added_at ?? '').filter(Boolean).sort().at(-1) ?? null)
 
 const state = ref<'all' | 'listed' | 'review' | 'delisted'>('all')
 const trust = ref<string>('all')
@@ -69,6 +70,16 @@ function start(next: Action) {
   }
 }
 
+onMounted(async () => {
+  await load()
+  // The command palette opens the block list form with a plugin id.
+  if (typeof route.query.block === 'string') {
+    start({ kind: 'block-new' })
+    form.value.pluginId = route.query.block
+  }
+})
+
+// When the block list last grew.
 function onMenu(p: AdminPlugin, key: string) {
   if (key === 'audit')
     router.push({ path: '/audit', query: { q: p.id } })
@@ -160,7 +171,7 @@ const title = computed(() => {
         <div class="stat">
           <span class="text-3 op-65">{{ $gettext('Block list') }}</span>
           <span class="num">{{ data.counts.blocked }}</span>
-          <span class="text-3 op-65">{{ $gettext('Plugin ids and repositories') }}</span>
+          <span class="text-3 op-65">{{ lastBlocked ? $gettext('Last added %{date}', { date: lastBlocked }) : $gettext('Plugin ids and repositories') }}</span>
         </div>
       </div>
 

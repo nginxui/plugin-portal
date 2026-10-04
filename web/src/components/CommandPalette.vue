@@ -159,6 +159,15 @@ const shown = computed<Item[]>(() => {
         icon: 'i-tabler-history',
         search: '',
       })
+      out.push({
+        key: 'block',
+        group,
+        title: $gettext('Add a plugin to the block list'),
+        sub: $gettext('A reason is required'),
+        to: `/maintain/plugins?block=${encodeURIComponent(query.value.trim())}`,
+        icon: 'i-tabler-ban',
+        search: '',
+      })
     }
   }
   return out

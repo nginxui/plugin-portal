@@ -52,7 +52,9 @@ export interface TranslatorOverview {
   langs: string[]
   counts: Record<string, number>
   suggestions: { id: number, pluginId: string, field: string, locale: string, text: string, state: string, reason: string | null, decidedAt: number | null, createdAt: number, change: string | null, changeState: string | null, changeStage: string | null }[]
-  open: { pluginId: string, name: Record<string, string>, owner: string | null, iconUrl: string | null, locales: string[] | null, missing: number, updatedAt: number, reviewHours: number | null }[]
+  decisions: { pluginId: string, name: Record<string, string>, state: 'accepted' | 'declined', count: number, decider: string | null, reason: string | null, at: number }[]
+  progress: { pluginId: string, name: Record<string, string>, iconUrl: string | null, count: number, state: 'pending' | 'accepted' | 'merged' | 'live', prNumber: number | null }[]
+  open: { pluginId: string, name: Record<string, string>, owner: string | null, iconUrl: string | null, locales: string[] | null, missing: number, updatedAt: number, installs: number, reviewHours: number | null }[]
 }
 
 export function getTranslator() {

@@ -9,7 +9,8 @@ import { $gettext } from '@/lib/gettext'
 import { HOST_LOCALES } from '@/lib/hostLocales'
 import { localized, roleLabel } from '@/lib/labels'
 import { localeName } from '@/lib/locales'
-import { formatDate } from '@/lib/time'
+import { formatDate, fromNow } from '@/lib/time'
+import { useCrumbs } from '@/stores/crumbs'
 
 // A vendor without a public repository (spec 11.4): its commercial plugins,
 // their release feeds, the partner key and the members, the only members the
@@ -19,6 +20,7 @@ const route = useRoute()
 const router = useRouter()
 const id = computed(() => Number(route.params.id))
 const data = ref<VendorPage | null>(null)
+useCrumbs(() => [{ title: $gettext('Organizations'), to: '/owners' }, ...(data.value ? [{ title: data.value.vendor.name ?? '' }] : [])])
 const detail = computed(() => data.value)
 const missing = ref(false)
 const selectedId = ref<string | null>(null)
@@ -174,6 +176,10 @@ const ROLES: Role[] = ['admin', 'publisher', 'translator']
               {{ $gettext('A vendor whose plugins have no public repository. Its members are managed here.') }}
             </ATypographyText>
           </div>
+          <AButton v-if="D.plugins.find(p => p.catalogUrl)" :href="D.plugins.find(p => p.catalogUrl)?.catalogUrl ?? undefined" target="_blank">
+            <span class="i-tabler-external-link" />
+            {{ $gettext('View in catalog') }}
+          </AButton>
         </AFlex>
       </ACard>
 
@@ -202,12 +208,12 @@ const ROLES: Role[] = ['admin', 'publisher', 'translator']
                   {{ p.id }}
                 </div>
                 <div class="text-3 op-65">
-                  {{ p.version ? $gettext('v%{version}, from the vendor feed, store texts hosted by the catalog', { version: p.version }) : $gettext('Waiting for its review') }}
+                  {{ p.version ? $gettext('v%{version}, from the vendor feed, store texts hosted by the catalog', { version: p.version }) : p.releasesUrl ? $gettext('Release feed set, waiting to be submitted for review') : $gettext('Waiting for its review') }}
                 </div>
               </div>
               <RouterLink :to="`/plugins/${p.id}`" @click.stop>
                 <AButton size="small">
-                  {{ $gettext('Manage') }}
+                  {{ p.state === 'listed' ? $gettext('Manage') : $gettext('Continue') }}
                 </AButton>
               </RouterLink>
             </div>
@@ -259,10 +265,16 @@ const ROLES: Role[] = ['admin', 'publisher', 'translator']
               {{ selected.releasesUrl ?? $gettext('No feed yet') }}
             </div>
             <dl v-if="selected.feed" class="kv mt-3">
+              <template v-if="selected.feed.checkedAt">
+                <dt>{{ $gettext('Last read') }}</dt>
+                <dd>{{ fromNow(selected.feed.checkedAt) }}</dd>
+              </template>
               <dt>{{ $gettext('Newest in the feed') }}</dt>
               <dd>{{ selected.feed.latest ? `v${selected.feed.latest}` : '—' }}, {{ $gettext('%{n} releases', { n: String(selected.feed.releases) }) }}</dd>
               <dt>{{ $gettext('Listed') }}</dt>
               <dd>{{ selected.listedVersions.length ? selected.listedVersions.map(v => `v${v}`).join(', ') : $gettext('Nothing yet') }}</dd>
+              <dt>{{ $gettext('Verification') }}</dt>
+              <dd>{{ selected.feed.latest && selected.listedVersions.includes(selected.feed.latest) ? $gettext('Signatures and digests valid') : $gettext('The newest release is not verified yet') }}</dd>
               <template v-if="selected.feed.error">
                 <dt>{{ $gettext('Error') }}</dt>
                 <dd>{{ selected.feed.error }}</dd>
@@ -275,7 +287,7 @@ const ROLES: Role[] = ['admin', 'publisher', 'translator']
 
           <ACard>
             <template #title>
-              <span class="i-tabler-key mr-2 op-65" />{{ $gettext('Partner key') }}
+              <span class="i-tabler-key mr-2 op-65" />{{ $gettext('Signing key') }}
             </template>
             <template #extra>
               <ATag v-if="D.partner" :color="D.partner.revoked ? 'error' : 'success'" class="m-0">

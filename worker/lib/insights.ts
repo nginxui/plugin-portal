@@ -23,7 +23,7 @@ export interface Insights {
   storeSource: StoreSource
   minHostVersion: string | null
   openIssues: number | null
-  releases: { version: string, publishedAt: string | null, yanked: boolean, prerelease: boolean }[]
+  releases: { version: string, publishedAt: string | null, yanked: boolean, prerelease: boolean, listed: boolean, yankReason: string | null }[]
 }
 
 interface GitHubRelease {
@@ -84,6 +84,21 @@ export async function insightsOf(env: Env, token: string, plugin: CatalogPlugin 
     catalogEntry(env, plugin.id),
   ])
   const yanked = new Set(plugin.releases?.filter(r => r.yanked).map(r => r.version))
+  const listed = new Set(plugin.releases?.map(r => r.version))
+  // The reasons authors gave when they yanked a version.
+  const reasons = new Map<string, string>()
+  if (yanked.size) {
+    const { results } = await env.DB.prepare(`SELECT payload_json FROM changes WHERE plugin_id = ? AND class = 'self_service' AND state IN ('merged', 'live') ORDER BY created_at DESC LIMIT 20`)
+      .bind(plugin.id)
+      .all<{ payload_json: string | null }>()
+    for (const row of results) {
+      const payload = row.payload_json ? JSON.parse(row.payload_json) as { operations?: { yank?: string[] }, reason?: string } : {}
+      for (const version of payload.operations?.yank ?? []) {
+        if (payload.reason && !reasons.has(version))
+          reasons.set(version, payload.reason)
+      }
+    }
+  }
   const newest = plugin.releases?.find(r => !r.yanked) ?? plugin.releases?.[0]
   const shots = plugin.screenshots ?? []
   return {
@@ -96,6 +111,6 @@ export async function insightsOf(env: Env, token: string, plugin: CatalogPlugin 
     storeSource: storeSourceOf(entry?.store),
     minHostVersion: newest?.min_nginx_ui_version ?? null,
     openIssues: gh.openIssues,
-    releases: gh.releases.slice(0, 5).map(r => ({ version: r.version, publishedAt: r.publishedAt, prerelease: r.prerelease, yanked: yanked.has(r.version) })),
+    releases: gh.releases.slice(0, 5).map(r => ({ version: r.version, publishedAt: r.publishedAt, prerelease: r.prerelease, yanked: yanked.has(r.version), listed: listed.has(r.version), yankReason: reasons.get(r.version)?.slice(0, 120) ?? null })),
   }
 }

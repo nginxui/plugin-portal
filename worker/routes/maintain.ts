@@ -176,7 +176,19 @@ maintain.get('/partners', async (c) => {
         keyId: payload.public_key ? keyIdOf(payload.public_key) : null,
         reason: payload.reason ?? null,
         note: payload.note ?? null,
-        checks: r.kind === 'application' ? { listedPlugins: pluginsOf(owner ?? undefined), hasKey: !!payload.public_key } : null,
+        checks: r.kind === 'application'
+          ? {
+              listedPlugins: pluginsOf(owner ?? undefined),
+              hasKey: !!payload.public_key,
+              // How long the organization has existed, read from GitHub.
+              createdYear: owner
+                ? await cached(`owner-created:${owner.toLowerCase()}`, 86400, async () => {
+                    const info = await github<{ created_at?: string }>(`/users/${owner}`, token).catch(() => null)
+                    return info?.created_at ? Number(info.created_at.slice(0, 4)) : null
+                  })
+                : null,
+            }
+          : null,
       }
     })),
     partners: files.map(p => ({

@@ -1,8 +1,9 @@
 <script setup lang="ts">
 import type { Provider, ProviderInput } from '@/api/ai'
 import { computed, onMounted, ref } from 'vue'
-import { addProvider, getProviders, removeProvider, testProvider, updateProvider } from '@/api/ai'
+import { addProvider, getProviders, removeProvider, syncGlossary, testProvider, updateProvider } from '@/api/ai'
 import { $gettext } from '@/lib/gettext'
+import { formatTime } from '@/lib/time'
 
 // AI providers for drafts in the translation workbench (spec 9). Authors can
 // neither see nor change anything here.
@@ -11,6 +12,17 @@ const providers = ref<Provider[]>([])
 const keyConfigured = ref(true)
 const usage = ref({ authors: 0, requests: 0, inputTokens: 0, outputTokens: 0 })
 const loading = ref(true)
+const glossary = ref<{ locales: number, syncedAt: number | null }>({ locales: 0, syncedAt: null })
+const syncing = ref(false)
+async function syncNow() {
+  syncing.value = true
+  try {
+    glossary.value = await syncGlossary()
+  }
+  finally {
+    syncing.value = false
+  }
+}
 const selectedId = ref<number | 'new' | null>(null)
 
 async function load() {
@@ -20,6 +32,8 @@ async function load() {
     providers.value = data.providers
     keyConfigured.value = data.keyConfigured
     usage.value = data.today
+    if (data.glossary)
+      glossary.value = data.glossary
     if (selectedId.value === null && data.providers.length)
       select(data.providers[0])
   }
@@ -155,7 +169,7 @@ const host = (url: string | null, kind: string) => url ? url.replace(/^https:\/\
                   </td>
                   <td>
                     <ATag :color="p.enabled ? 'success' : 'default'" class="m-0">
-                      {{ p.enabled ? $gettext('On') : $gettext('Off') }}
+                      {{ p.enabled ? $gettext('Working') : $gettext('Turned off') }}
                     </ATag>
                   </td>
                   <td>
@@ -234,9 +248,18 @@ const host = (url: string | null, kind: string) => url ? url.replace(/^https:\/\
           </dl>
         </ACard>
         <ACard :title="$gettext('Glossary')">
-          <ATypographyParagraph class="text-3 mb-0">
+          <ATypographyParagraph class="text-3">
             {{ $gettext('Taken from the translations of the Nginx UI interface every day, so plugin texts use the words of the host.') }}
           </ATypographyParagraph>
+          <dl class="kv">
+            <dt>{{ $gettext('Languages') }}</dt>
+            <dd>{{ glossary.locales }}</dd>
+            <dt>{{ $gettext('Last read') }}</dt>
+            <dd>{{ glossary.syncedAt ? formatTime(glossary.syncedAt) : $gettext('Not yet') }}</dd>
+          </dl>
+          <AButton size="small" class="mt-3" :loading="syncing" @click="syncNow">
+            <span class="i-tabler-refresh" />{{ $gettext('Read again now') }}
+          </AButton>
         </ACard>
         <ACard :title="$gettext('Rules')">
           <AFlex vertical gap="8" class="text-3">

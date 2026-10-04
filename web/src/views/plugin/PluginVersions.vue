@@ -155,7 +155,9 @@ async function confirm() {
               <th>{{ $gettext('Released') }}</th>
               <th>{{ $gettext('Signer') }}</th>
               <th>{{ $gettext('Status') }}</th>
-              <th />
+              <th class="text-right">
+                {{ $gettext('Actions') }}
+              </th>
             </tr>
           </thead>
           <tbody>

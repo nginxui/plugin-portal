@@ -61,6 +61,7 @@ export function auditLines(entry: AuditEntry): string[] {
     case 'ai.provider_add': return [$gettext('Added the AI model %{name}', { name: entry.subject ?? '' })]
     case 'ai.provider_change': return [d.quota ? $gettext('Changed the AI model %{name}: drafts per author per day %{from} to %{to}', { name: entry.subject ?? '', from: String(d.quota.from), to: String(d.quota.to) }) : $gettext('Changed the AI model %{name}', { name: entry.subject ?? '' })]
     case 'ai.provider_remove': return [$gettext('Removed the AI model %{name}', { name: entry.subject ?? '' })]
+    case 'ai.glossary_sync': return [$gettext('Read the glossary again, %{n} languages', { n: String(d.locales ?? 0) })]
     case 'change.self_service': {
       const ops = (d.operations ?? {}) as { yank?: string[], unyank?: string[], revoke_signers?: string[], categories?: string[] }
       const lines: string[] = []
@@ -82,4 +83,47 @@ export function auditLines(entry: AuditEntry): string[] {
 export function auditNote(entry: AuditEntry): string {
   const d = entry.detail ?? {}
   return typeof d.reason === 'string' ? d.reason : ''
+}
+
+/** The details of a record as readable lines, the known fields named. */
+export function auditDetailLines(entry: AuditEntry): string[] {
+  const d = (entry.detail ?? {}) as Record<string, unknown>
+  const lines: string[] = []
+  for (const [key, value] of Object.entries(d)) {
+    if (value === null || value === undefined || value === '')
+      continue
+    switch (key) {
+      case 'change':
+        lines.push($gettext('Change: %{id}', { id: String(value) }))
+        break
+      case 'pr':
+        lines.push($gettext('Pull request: #%{n}', { n: String(value) }))
+        break
+      case 'commit':
+        lines.push($gettext('Commit: %{sha}', { sha: String(value).slice(0, 12) }))
+        break
+      case 'run':
+        lines.push($gettext('Workflow run: %{id}', { id: String(value) }))
+        break
+      case 'reason':
+        lines.push($gettext('Reason: %{reason}', { reason: String(value) }))
+        break
+      case 'outcome':
+        lines.push(outcomeText(value, d.pr))
+        break
+      case 'live':
+        lines.push($gettext('Went live: %{list}', { list: Array.isArray(value) && value.length ? value.join(', ') : $gettext('none') }))
+        break
+      case 'names':
+        for (const [locale, name] of Object.entries(value as Record<string, string>))
+          lines.push($gettext('Name in %{lang}: %{name}', { lang: locale, name }))
+        break
+      case 'operations':
+        lines.push(...auditLines({ ...entry, action: 'change.self_service' }))
+        break
+      default:
+        lines.push(`${key}: ${typeof value === 'object' ? JSON.stringify(value) : String(value)}`)
+    }
+  }
+  return lines
 }

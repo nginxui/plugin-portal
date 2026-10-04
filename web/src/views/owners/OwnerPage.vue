@@ -1,18 +1,19 @@
 <script setup lang="ts">
 import type { OrgPage, VendorSummary } from '@/api/partners'
 import { computed, onMounted, ref, watch } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
+import { useRoute } from 'vue-router'
 import { applyPartner, getOrg, getVendors } from '@/api/partners'
 import { getOwners } from '@/api/plugins'
+import { kindLabel } from '@/lib/changeKinds'
 import { $gettext } from '@/lib/gettext'
 import { localized, roleLabel, trustLabel } from '@/lib/labels'
 import { fromNow } from '@/lib/time'
+import { useCrumbs } from '@/stores/crumbs'
 
 // A GitHub organization or account: its plugins in the catalog with the
 // user's role on each, and its partner application (spec 11.4).
 
 const route = useRoute()
-const router = useRouter()
 const data = ref<OrgPage | null>(null)
 const detail = computed(() => data.value)
 // The loaded page, for slots where the template cannot narrow it.
@@ -38,17 +39,27 @@ onMounted(async () => {
   mine.value = { owners: owners.owners, vendors: vendors.vendors }
 })
 
-const crumbs = computed(() => [
-  {
-    title: $gettext('Organizations'),
-    href: '/owners',
-    onClick: (e: MouseEvent) => {
-      e.preventDefault()
-      router.push('/owners')
-    },
-  },
+useCrumbs(() => [
+  { title: $gettext('Organizations'), to: '/owners' },
   { title: detail.value?.owner.login ?? login.value },
 ])
+
+// One line on what is going on with a plugin.
+function noteOf(plugin: OrgPage['plugins'][number]) {
+  const parts: string[] = []
+  if (plugin.version)
+    parts.push(`v${plugin.version}`)
+  if (plugin.openKind)
+    parts.push($gettext('%{kind} in review', { kind: kindLabel(plugin.openKind) }))
+  else if (plugin.community)
+    parts.push($gettext('community translation on'))
+  if (!plugin.role)
+    parts.push($gettext('you have no permission on its repository and can only view it'))
+  return parts.join(', ')
+}
+
+// Where the mapping of repository permissions to roles is shown.
+const accessPage = computed(() => D.value?.plugins.find(p => p.role)?.id ?? null)
 
 function stateTag(state: string) {
   return state === 'listed' ? { color: 'success', text: $gettext('Listed') } : state === 'delisted' ? { color: 'error', text: $gettext('Delisted') } : { color: 'processing', text: $gettext('In review') }
@@ -88,7 +99,6 @@ async function sendApply() {
   <div class="page">
     <AResult v-if="missing" status="404" :title="$gettext('Organization not found')" :sub-title="$gettext('There is no GitHub account with this name.')" />
     <template v-else-if="detail">
-      <ABreadcrumb :items="crumbs" />
       <ACard>
         <AFlex align="center" gap="middle" wrap>
           <AAvatar :src="D.owner.avatarUrl ?? undefined" :size="56" shape="square">
@@ -140,17 +150,20 @@ async function sendApply() {
                   {{ plugin.id }}
                 </div>
                 <div class="text-3 op-65">
-                  {{ plugin.version ? `v${plugin.version}` : '' }}{{ plugin.role ? '' : (plugin.version ? ', ' : '') + $gettext('you have no permission on its repository and can only view it') }}
+                  {{ noteOf(plugin) }}
                 </div>
               </div>
               <ATag :color="plugin.role ? 'blue' : 'default'" class="m-0">
                 {{ $gettext('Your role: %{role}', { role: plugin.role ? roleLabel(plugin.role) : $gettext('none') }) }}
               </ATag>
-              <RouterLink :to="`/plugins/${plugin.id}`">
-                <AButton size="small" :disabled="!plugin.role">
+              <RouterLink v-if="plugin.role" :to="`/plugins/${plugin.id}`">
+                <AButton size="small">
                   {{ $gettext('Open') }}
                 </AButton>
               </RouterLink>
+              <AButton v-else size="small" :href="plugin.catalogUrl ?? undefined" :disabled="!plugin.catalogUrl" target="_blank">
+                {{ $gettext('Open') }}
+              </AButton>
             </div>
           </ACard>
 
@@ -203,6 +216,9 @@ async function sendApply() {
                 {{ $gettext('Manage teams and repository access on GitHub') }}
                 <span class="i-tabler-external-link" />
               </a>
+              <RouterLink v-if="accessPage" :to="`/plugins/${accessPage}/access`">
+                {{ $gettext('See how permissions map to roles') }}
+              </RouterLink>
             </AFlex>
           </ACard>
           <ACard :title="$gettext('My organizations')">
@@ -215,7 +231,7 @@ async function sendApply() {
                   {{ o.login }}
                 </RouterLink>
                 <div class="text-3 op-65">
-                  {{ o.kind === 'organization' ? $gettext('GitHub organization') : $gettext('Personal account') }}
+                  {{ $gettext('%{kind}, %{n} plugins', { kind: o.kind === 'organization' ? $gettext('GitHub organization') : $gettext('Personal account'), n: String(o.plugins) }) }}
                 </div>
               </div>
             </div>
@@ -231,6 +247,11 @@ async function sendApply() {
                   {{ $gettext('Vendor without a public repository') }}
                 </div>
               </div>
+              <RouterLink :to="`/vendors/${v.id}`">
+                <AButton size="small">
+                  {{ $gettext('Open') }}
+                </AButton>
+              </RouterLink>
             </div>
           </ACard>
         </AFlex>

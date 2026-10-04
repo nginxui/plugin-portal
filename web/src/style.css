@@ -7,6 +7,8 @@
   --portal-bar: rgba(255, 255, 255, 0.88);
   --portal-border-strong: #d9d9d9;
   --portal-card: #ffffff;
+  --portal-warn-bg: #fffbe6;
+  --portal-warn-border: #ffe58f;
 }
 
 html.dark {
@@ -18,6 +20,8 @@ html.dark {
   --portal-bar: rgba(20, 20, 20, 0.88);
   --portal-border-strong: #424242;
   --portal-card: #141414;
+  --portal-warn-bg: #2b2111;
+  --portal-warn-border: #594214;
 }
 
 html,
