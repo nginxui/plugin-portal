@@ -20,6 +20,7 @@ export interface CatalogPlugin {
   repository_url?: string
   icon_url?: string
   categories?: string[]
+  capabilities?: string[]
   license?: string
   trust?: string
   releases?: CatalogRelease[]
