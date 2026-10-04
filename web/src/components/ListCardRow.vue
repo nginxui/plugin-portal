@@ -9,6 +9,7 @@ import { resolve, trustText } from '@/lib/market'
 // Marketplace list cards at the width Nginx UI gives them, one per language,
 // so a name cut short shows before it is listed.
 const props = defineProps<{ doc: PreviewDoc, locale: string, stress: Stress, trust: string | null, theme: 'light' | 'dark' }>()
+const emit = defineEmits<{ results: [cut: Record<string, boolean>] }>()
 
 const CARD_WIDTH = 320
 const names = ref<HTMLElement[]>([])
@@ -22,6 +23,7 @@ async function measure() {
   for (const el of names.value)
     out[el.dataset.locale!] = el.scrollWidth > el.clientWidth + 1
   cut.value = out
+  emit('results', out)
 }
 
 onMounted(measure)

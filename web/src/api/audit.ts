@@ -1,6 +1,6 @@
 import { api } from './client'
 
-export type AuditKind = 'review' | 'self_service' | 'submission' | 'system' | 'account'
+export type AuditKind = 'review' | 'self_service' | 'submission' | 'maintainer' | 'ai' | 'settings' | 'system' | 'account'
 
 export interface AuditEntry {
   id: number

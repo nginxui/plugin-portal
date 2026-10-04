@@ -14,6 +14,7 @@ export interface StoreDraft {
   doc: PreviewDoc
   readme?: string | null
   source?: Exclude<StoreSourceKind, 'release'>
+  ai?: string[]
   updatedAt: number
 }
 
@@ -40,7 +41,7 @@ export function getStore(id: string) {
   return api<StoreState>(`/plugins/${encodeURIComponent(id)}/store`)
 }
 
-export function saveDraft(id: string, draft: { doc: PreviewDoc, readme?: string | null, source?: string }) {
+export function saveDraft(id: string, draft: { doc: PreviewDoc, readme?: string | null, source?: string, ai?: string[] }) {
   return api<{ ok: boolean, problems: string[] }>(`/plugins/${encodeURIComponent(id)}/store/draft`, { method: 'PUT', json: draft })
 }
 

@@ -24,6 +24,7 @@ export const router = createRouter({
           children: [
             { path: '', name: 'plugin', component: () => import('@/views/plugin/PluginStore.vue') },
             { path: 'screenshots', name: 'plugin-screenshots', component: () => import('@/views/plugin/PluginScreenshots.vue') },
+            { path: 'translations', name: 'plugin-translations', component: () => import('@/views/plugin/PluginTranslations.vue') },
             { path: 'versions', name: 'plugin-versions', component: () => import('@/views/plugin/PluginVersions.vue') },
             { path: 'signers', name: 'plugin-signers', component: () => import('@/views/plugin/PluginVersions.vue'), props: { section: 'signers' } },
             { path: 'access', name: 'plugin-access', component: () => import('@/views/plugin/PluginAccess.vue') },
@@ -33,6 +34,8 @@ export const router = createRouter({
         { path: 'changes/:id', name: 'change', component: () => import('@/views/ChangeView.vue') },
         { path: 'review', name: 'review', component: () => import('@/views/review/ReviewQueue.vue'), meta: { maintainer: true } },
         { path: 'review/:id', name: 'review-change', component: () => import('@/views/review/ReviewChange.vue'), meta: { maintainer: true } },
+        { path: 'translate', name: 'translate', component: () => import('@/views/translate/TranslatePage.vue') },
+        { path: 'ai', name: 'ai', component: () => import('@/views/maintain/AiModels.vue'), meta: { maintainer: true } },
         { path: 'audit', name: 'audit', component: () => import('@/views/maintain/AuditLog.vue'), meta: { maintainer: true } },
         { path: 'owners', name: 'owners', component: () => import('@/views/owners/OwnerList.vue') },
         { path: 'owners/:login', name: 'owner', component: () => import('@/views/owners/OwnerPage.vue') },

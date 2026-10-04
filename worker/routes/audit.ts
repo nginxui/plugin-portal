@@ -8,8 +8,11 @@ import { requireMaintainer, requireSession } from '../middleware/auth'
 
 const KINDS = {
   review: `a.action LIKE 'review.%'`,
-  self_service: `a.action = 'change.self_service'`,
+  self_service: `a.action IN ('change.self_service', 'store.submit', 'community.decide')`,
   submission: `a.action = 'change.submit'`,
+  maintainer: `a.action LIKE 'maintain.%'`,
+  ai: `a.action = 'ai.draft'`,
+  settings: `(a.action LIKE 'ai.provider_%' OR a.action LIKE 'community.enable' OR a.action LIKE 'community.disable')`,
   system: `a.actor_id IS NULL`,
   account: `a.action LIKE 'auth.%'`,
 } as const
@@ -36,10 +39,16 @@ export function kindOf(action: string, actorId: number | null): Kind {
     return 'system'
   if (action.startsWith('review.'))
     return 'review'
-  if (action === 'change.self_service')
+  if (action === 'change.self_service' || action === 'store.submit' || action === 'community.decide')
     return 'self_service'
   if (action === 'change.submit')
     return 'submission'
+  if (action.startsWith('maintain.'))
+    return 'maintainer'
+  if (action === 'ai.draft')
+    return 'ai'
+  if (action.startsWith('ai.provider_') || action === 'community.enable' || action === 'community.disable')
+    return 'settings'
   return 'account'
 }
 

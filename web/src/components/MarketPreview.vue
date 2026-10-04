@@ -49,6 +49,10 @@ const props = withDefaults(defineProps<{
   // Fields an author cannot change here, with why.
   locked?: Record<string, string>
   draft?: ((key: string, locale: string) => Promise<string>) | null
+  // How far the preview language is translated, shown while editing.
+  progress?: string
+  // Unconfirmed AI drafts, as key.locale.
+  aiKeys?: string[]
 }>(), {
   theme: 'light',
   device: 'desktop',
@@ -69,10 +73,13 @@ const props = withDefaults(defineProps<{
   outline: false,
   locked: () => ({}),
   draft: null,
+  progress: '',
+  aiKeys: () => [],
 })
 
 const emit = defineEmits<{
-  change: [key: string, locale: string, value: string]
+  change: [key: string, locale: string, value: string, drafted: boolean]
+  next: [key: string]
   readme: [value: string]
   studio: []
   categories: []
@@ -112,7 +119,7 @@ const facts = computed(() => {
 const readmeHtml = computed(() => renderMarkdown(props.readme, props.readmeBase))
 
 // Editing in place.
-const editing = ref<{ key: string, value: string, source: string } | null>(null)
+const editing = ref<{ key: string, value: string, source: string, drafted: boolean } | null>(null)
 const drafting = ref(false)
 const field = useTemplateRef<{ focus: () => void }>('field')
 
@@ -135,24 +142,30 @@ async function edit(key: string) {
   if (!props.editable || props.locked[key] || (key === 'readme' && !props.readmeEditable))
     return
   const { own, source } = valueOf(key)
-  editing.value = { key, value: own, source: props.locale === 'en' || key === 'homepage_url' || key === 'readme' ? '' : source }
+  editing.value = { key, value: own, source: props.locale === 'en' || key === 'homepage_url' || key === 'readme' ? '' : source, drafted: props.aiKeys.includes(`${key}.${props.locale}`) }
   await nextTick()
-  field.value?.focus()
+  // Inside the screenshot list the ref holds an array.
+  const target = field.value as unknown as { focus: () => void } | { focus: () => void }[] | null
+  ;(Array.isArray(target) ? target[0] : target)?.focus()
 }
 
 function limitOf(key: string) {
   return LIMITS[key.startsWith('caption:') ? 'caption' : key] ?? 200
 }
 
-function done() {
+// Done confirms what is in the field, an AI draft included, since the
+// author has read it.
+function done(next = false) {
   const e = editing.value
   if (!e)
     return
   if (e.key === 'readme')
     emit('readme', e.value)
   else
-    emit('change', e.key, props.locale, e.value.trim())
+    emit('change', e.key, props.locale, e.value.trim(), false)
   editing.value = null
+  if (next)
+    emit('next', e.key)
 }
 
 async function aiDraft() {
@@ -162,6 +175,7 @@ async function aiDraft() {
   drafting.value = true
   try {
     e.value = await props.draft(e.key, props.locale)
+    e.drafted = true
   }
   finally {
     drafting.value = false
@@ -169,11 +183,19 @@ async function aiDraft() {
 }
 
 function onKey(event: KeyboardEvent) {
-  if (event.key === 'Escape')
+  if (event.key === 'Escape') {
     editing.value = null
-  else if (event.key === 'Enter' && (event.metaKey || event.ctrlKey))
+  }
+  else if (event.key === 'Enter' && (event.metaKey || event.ctrlKey)) {
     done()
+  }
+  else if (event.key === 'Tab' && !event.shiftKey && editing.value?.source) {
+    event.preventDefault()
+    done(true)
+  }
 }
+
+defineExpose({ edit })
 
 const isEditing = (key: string) => editing.value?.key === key
 function editableClass(key: string, missing = false) {
@@ -215,12 +237,16 @@ function editableClass(key: string, missing = false) {
       </div>
 
       <div v-if="isEditing('name')" class="editor" @keydown="onKey">
+        <div v-if="progress && editing!.source" class="progress">
+          {{ progress }}
+        </div>
         <div v-if="editing!.source" class="source">
           <span>English</span>{{ editing!.source }}
         </div>
         <input ref="field" v-model="editing!.value" class="input" :maxlength="limitOf('name')" :aria-label="$gettext('Name')">
         <div class="editor-foot">
           <span class="count">{{ editing!.value.length }} / {{ limitOf('name') }}</span>
+          <span v-if="editing!.drafted" class="ai-tag">{{ $gettext('AI draft') }}</span>
           <span class="flex-1" />
           <button v-if="draft && editing!.source" type="button" class="btn" :disabled="drafting" @click="aiDraft">
             <span class="i-tabler-sparkles" />{{ $gettext('AI draft') }}
@@ -228,8 +254,8 @@ function editableClass(key: string, missing = false) {
           <button type="button" class="btn" @click="editing = null">
             {{ $gettext('Cancel') }}
           </button>
-          <button type="button" class="btn primary" @click="done">
-            {{ $gettext('Done') }}
+          <button type="button" class="btn primary" @click="done(!!editing!.source)">
+            {{ editing!.source ? $gettext('Save and go to the next') : $gettext('Done') }}
           </button>
         </div>
       </div>
@@ -238,12 +264,16 @@ function editableClass(key: string, missing = false) {
         {{ description.text || (editable ? $gettext('Add a description') : '') }}
       </p>
       <div v-else class="editor" @keydown="onKey">
+        <div v-if="progress && editing!.source" class="progress">
+          {{ progress }}
+        </div>
         <div v-if="editing!.source" class="source">
           <span>English</span>{{ editing!.source }}
         </div>
         <textarea ref="field" v-model="editing!.value" class="input" rows="4" :maxlength="limitOf('description')" :aria-label="$gettext('Description')" />
         <div class="editor-foot">
           <span class="count">{{ editing!.value.length }} / {{ limitOf('description') }}</span>
+          <span v-if="editing!.drafted" class="ai-tag">{{ $gettext('AI draft') }}</span>
           <span class="flex-1" />
           <button v-if="draft && editing!.source" type="button" class="btn" :disabled="drafting" @click="aiDraft">
             <span class="i-tabler-sparkles" />{{ $gettext('AI draft') }}
@@ -251,8 +281,8 @@ function editableClass(key: string, missing = false) {
           <button type="button" class="btn" @click="editing = null">
             {{ $gettext('Cancel') }}
           </button>
-          <button type="button" class="btn primary" @click="done">
-            {{ $gettext('Done') }}
+          <button type="button" class="btn primary" @click="done(!!editing!.source)">
+            {{ editing!.source ? $gettext('Save and go to the next') : $gettext('Done') }}
           </button>
         </div>
       </div>
@@ -284,7 +314,7 @@ function editableClass(key: string, missing = false) {
                 <button type="button" class="btn" @click="editing = null">
                   {{ $gettext('Cancel') }}
                 </button>
-                <button type="button" class="btn primary" @click="done">
+                <button type="button" class="btn primary" @click="done()">
                   {{ $gettext('Done') }}
                 </button>
               </div>
@@ -312,26 +342,33 @@ function editableClass(key: string, missing = false) {
             <div v-else class="shot-missing">
               {{ shot.path }}
             </div>
-            <figcaption v-if="!isEditing(`caption:${shot.id}`)" :class="editableClass(`caption:${shot.id}`, shot.caption.fallback)" role="button" :tabindex="editable ? 0 : -1" @click="edit(`caption:${shot.id}`)" @keydown.enter="edit(`caption:${shot.id}`)">
+            <figcaption :class="editableClass(`caption:${shot.id}`, shot.caption.fallback)" role="button" :tabindex="editable ? 0 : -1" @click="edit(`caption:${shot.id}`)" @keydown.enter="edit(`caption:${shot.id}`)">
               {{ shot.caption.text || (editable ? $gettext('Add a caption') : '') }}
             </figcaption>
-            <div v-else class="editor" @keydown="onKey">
-              <div v-if="editing!.source" class="source">
-                <span>English</span>{{ editing!.source }}
-              </div>
-              <input ref="field" v-model="editing!.value" class="input" :maxlength="limitOf('caption')" :aria-label="$gettext('Caption')">
-              <div class="editor-foot">
-                <span class="count">{{ editing!.value.length }} / {{ limitOf('caption') }}</span>
-                <span class="flex-1" />
-                <button v-if="draft && editing!.source" type="button" class="btn" :disabled="drafting" @click="aiDraft">
-                  <span class="i-tabler-sparkles" />
-                </button>
-                <button type="button" class="btn primary" @click="done">
-                  {{ $gettext('Done') }}
-                </button>
-              </div>
-            </div>
           </figure>
+        </div>
+        <div v-if="editing?.key.startsWith('caption:')" class="editor" @keydown="onKey">
+          <div v-if="progress && editing.source" class="progress">
+            {{ progress }}
+          </div>
+          <div v-if="editing.source" class="source">
+            <span>English</span>{{ editing.source }}
+          </div>
+          <input ref="field" v-model="editing.value" class="input" :maxlength="limitOf('caption')" :aria-label="$gettext('Caption')">
+          <div class="editor-foot">
+            <span class="count">{{ editing.value.length }} / {{ limitOf('caption') }}</span>
+            <span v-if="editing.drafted" class="ai-tag">{{ $gettext('AI draft') }}</span>
+            <span class="flex-1" />
+            <button v-if="draft && editing.source" type="button" class="btn" :disabled="drafting" @click="aiDraft">
+              <span class="i-tabler-sparkles" />{{ $gettext('AI draft') }}
+            </button>
+            <button type="button" class="btn" @click="editing = null">
+              {{ $gettext('Cancel') }}
+            </button>
+            <button type="button" class="btn primary" @click="done(!!editing.source)">
+              {{ editing.source ? $gettext('Save and go to the next') : $gettext('Done') }}
+            </button>
+          </div>
         </div>
       </section>
 
@@ -381,7 +418,7 @@ function editableClass(key: string, missing = false) {
             <button type="button" class="btn" @click="editing = null">
               {{ $gettext('Cancel') }}
             </button>
-            <button type="button" class="btn primary" @click="done">
+            <button type="button" class="btn primary" @click="done()">
               {{ $gettext('Done') }}
             </button>
           </div>
@@ -822,6 +859,22 @@ function editableClass(key: string, missing = false) {
 .count {
   font-size: 12px;
   color: var(--p-muted);
+}
+
+.progress {
+  margin-bottom: 6px;
+  font-size: 12px;
+  color: var(--p-muted);
+  text-align: end;
+}
+
+.ai-tag {
+  padding: 0 6px;
+  border-radius: 4px;
+  font-size: 11px;
+  line-height: 18px;
+  color: #722ed1;
+  background: #f9f0ff;
 }
 
 .btn {
