@@ -1,53 +1,95 @@
 <script setup lang="ts">
 import type { Installable } from '@/api/plugins'
 import type { Preview } from '@/api/submit'
-import { computed, onMounted, ref } from 'vue'
+import { useMediaQuery } from '@vueuse/core'
+import { computed, onMounted, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { ApiError } from '@/api/client'
 import { getMyPlugins } from '@/api/plugins'
 import { checkRepository, getCategories, submitPlugin } from '@/api/submit'
+import { categoryLabel } from '@/lib/categories'
 import { $gettext } from '@/lib/gettext'
-import { localized } from '@/lib/labels'
+import { keyState } from '@/lib/keys'
 import { localeName } from '@/lib/locales'
 
 const route = useRoute()
 const router = useRouter()
 
-const installable = ref<Installable[]>([])
+const step = ref(0)
+const repos = ref<Installable[]>([])
+const installUrl = ref('')
+const loadingRepos = ref(true)
 const categories = ref<string[]>([])
-const repo = ref(typeof route.query.repo === 'string' ? route.query.repo : '')
-const preview = ref<Preview | null>(null)
-const checking = ref(false)
+
+const checking = ref<string | null>(null)
 const checkFailed = ref(false)
+const preview = ref<Preview | null>(null)
+
 const publicKey = ref('')
+const guideOpen = ref(false)
+const checksOpen = ref(false)
 const chosen = ref<string[]>([])
 const submitting = ref(false)
 const submitError = ref('')
 
-const repoOptions = computed(() => installable.value
-  .filter(item => item.repo.toLowerCase().includes(repo.value.trim().toLowerCase()))
-  .map(item => ({ value: item.repo, label: item.description ? `${item.repo}  ${item.description}` : item.repo })))
 const draft = computed(() => preview.value?.draft ?? null)
 const translations = computed(() => Object.entries(draft.value?.name ?? {}).filter(([locale]) => locale !== 'en'))
-const canSubmit = computed(() => preview.value?.ok && publicKey.value.trim() !== '' && chosen.value.length <= 3)
+const keyLine = computed(() => publicKey.value.split(/\r?\n/).map(l => l.trim()).filter(l => l && !l.startsWith('untrusted comment:')).at(-1) ?? '')
+const key = computed(() => keyState(publicKey.value, draft.value?.signer ?? null))
+// A key that did not issue the release's certificate would fail the checks
+// of the catalog, so it stops here.
+const keyLooksValid = computed(() => key.value.state === 'match' || key.value.state === 'unchecked')
+// A release without a certificate means the keys were never made.
+const keyReady = computed(() => key.value.state === 'match' && draft.value?.signer?.pluginId === draft.value?.id)
+// Warnings first, so the ones worth a look lead the list.
+const sortedChecks = computed(() => [...(preview.value?.checks ?? [])].sort((a, b) => Number(b.status === 'warn') - Number(a.status === 'warn')))
+const warnings = computed(() => preview.value?.checks.filter(c => c.status === 'warn').length ?? 0)
+const checkTone = computed(() => warnings.value ? 'warn' : 'ok')
+const checkSummary = computed(() => {
+  const total = String(preview.value?.checks.length ?? 0)
+  return warnings.value
+    ? $gettext('%{total} checks passed, %{n} with a warning', { total, n: String(warnings.value) })
+    : $gettext('All %{total} checks passed', { total })
+})
+// A warning is worth a look before submitting, so the list opens for it.
+watch(step, (value) => {
+  if (value === 2)
+    checksOpen.value = warnings.value > 0
+})
+const missingCertificate = computed(() => !draft.value?.signer?.signingKeyId || !draft.value?.signer?.primaryKeyId)
 
-async function check() {
-  if (!repo.value.trim())
-    return
-  checking.value = true
+const isNarrow = useMediaQuery('(max-width: 720px)')
+const drawerSize = computed(() => isNarrow.value ? '100%' : 640)
+
+const steps = computed(() => [
+  { title: $gettext('Choose a repository') },
+  { title: $gettext('Fill in the details') },
+  { title: $gettext('Check and submit') },
+])
+
+async function pick(repo: string) {
+  checking.value = repo
   checkFailed.value = false
   submitError.value = ''
   try {
-    preview.value = await checkRepository(repo.value.trim().replace(/^https:\/\/github\.com\//, '').replace(/\/$/, ''))
+    preview.value = await checkRepository(repo)
     chosen.value = [...(preview.value.draft?.categories ?? [])]
-    router.replace({ query: { repo: preview.value.draft?.repo ?? repo.value.trim() } })
+    router.replace({ query: { repo: preview.value.draft?.repo ?? repo } })
+    if (preview.value.ok)
+      step.value = 1
   }
   catch {
     checkFailed.value = true
   }
   finally {
-    checking.value = false
+    checking.value = null
   }
+}
+
+function restart() {
+  preview.value = null
+  step.value = 0
+  router.replace({ query: {} })
 }
 
 async function submit() {
@@ -61,11 +103,15 @@ async function submit() {
   }
   catch (e) {
     const code = e instanceof ApiError ? e.code : ''
-    submitError.value = code === 'invalid_key'
-      ? $gettext('The primary public key is not a minisign public key. Paste the content of primary.pub.')
-      : code === 'checks_failed'
+    if (code === 'invalid_key') {
+      submitError.value = $gettext('The primary public key is not a minisign public key. Paste the content of primary.pub.')
+      step.value = 1
+    }
+    else {
+      submitError.value = code === 'checks_failed'
         ? $gettext('The checks no longer pass. Check the repository again.')
         : $gettext('The submission could not be sent. Please try again.')
+    }
   }
   finally {
     submitting.value = false
@@ -74,10 +120,12 @@ async function submit() {
 
 onMounted(async () => {
   const [mine, known] = await Promise.all([getMyPlugins().catch(() => null), getCategories().catch(() => null)])
-  installable.value = mine?.installable ?? []
+  repos.value = mine?.installable ?? []
+  installUrl.value = mine?.installUrl ?? ''
   categories.value = known?.categories ?? []
-  if (repo.value)
-    check()
+  loadingRepos.value = false
+  if (typeof route.query.repo === 'string' && route.query.repo)
+    pick(route.query.repo)
 })
 </script>
 
@@ -92,90 +140,355 @@ onMounted(async () => {
       </ATypographyText>
     </div>
 
-    <ACard :title="$gettext('Repository')">
-      <AFlex gap="small" wrap>
-        <AAutoComplete
-          v-model:value="repo"
-          :options="repoOptions"
-          :placeholder="$gettext('owner/repository')"
-          class="flex-1 min-w-60"
-          @keydown.enter="check"
-        />
-        <AButton type="primary" :loading="checking" :disabled="!repo.trim()" @click="check">
-          {{ $gettext('Check') }}
-        </AButton>
-      </AFlex>
-      <ATypographyParagraph type="secondary" class="mt-3 mb-0 text-3">
-        {{ $gettext('You need admin permission on the repository. The newest release, its plugin.json and its packages are read from GitHub.') }}
-      </ATypographyParagraph>
-      <AAlert v-if="checkFailed" type="error" show-icon class="mt-3" :title="$gettext('The repository could not be checked. Please try again.')" />
+    <ACard>
+      <ASteps :current="step" :items="steps" :responsive="false" label-placement="vertical" size="small" />
     </ACard>
 
-    <div v-if="preview" class="cols">
-      <AFlex vertical gap="middle" class="col-main">
-        <ACard v-if="draft" :title="$gettext('Listing')">
-          <AFlex gap="middle" align="center" class="mb-4">
-            <PluginIcon :name="draft.name.en || draft.id" :size="48" />
-            <div class="min-w-0">
-              <div class="text-4 font-600">
-                {{ localized(draft.name) }}
-              </div>
-              <div class="mono text-3 op-65">
-                {{ draft.id }}
-              </div>
-            </div>
-          </AFlex>
-          <ADescriptions :column="1" size="small">
-            <ADescriptionsItem :label="$gettext('Description')">
-              {{ draft.description }}
-            </ADescriptionsItem>
-            <ADescriptionsItem :label="$gettext('Version')">
-              <a :href="draft.releaseUrl" target="_blank" rel="noopener">v{{ draft.version }}</a>
-            </ADescriptionsItem>
-            <ADescriptionsItem v-if="translations.length" :label="$gettext('Name translations')">
-              <AFlex vertical>
-                <span v-for="[locale, text] in translations" :key="locale">{{ localeName(locale) }}: {{ text }}</span>
-              </AFlex>
-            </ADescriptionsItem>
-            <ADescriptionsItem v-if="draft.license" :label="$gettext('License')">
-              {{ draft.license }}
-            </ADescriptionsItem>
-          </ADescriptions>
-          <ATypographyParagraph type="secondary" class="mt-3 mb-0 text-3">
-            {{ $gettext('Names in every language are reviewed with the submission.') }}
-          </ATypographyParagraph>
-        </ACard>
-
-        <ACard v-if="draft" :title="$gettext('Details')">
-          <AForm layout="vertical" :required-mark="true">
-            <AFormItem :label="$gettext('Primary public key')" required :extra="$gettext('The content of primary.pub, created with nginx-ui plugin key init. It verifies the signer certificates of your releases.')">
-              <ATextarea v-model:value="publicKey" :rows="3" class="mono" placeholder="untrusted comment: minisign public key ..." />
-            </AFormItem>
-            <AFormItem :label="$gettext('Categories')" :extra="$gettext('Up to three. Suggested from the capabilities of the plugin.')">
-              <ASelect v-model:value="chosen" mode="multiple" :max-count="3" :options="categories.map(c => ({ value: c, label: c }))" />
-            </AFormItem>
-          </AForm>
-          <AAlert v-if="submitError" type="error" show-icon class="mb-4" :title="submitError" />
-          <AButton type="primary" size="large" :disabled="!canSubmit" :loading="submitting" @click="submit">
-            {{ $gettext('Submit for review') }}
-          </AButton>
-        </ACard>
-      </AFlex>
-
-      <ACard :title="$gettext('Checks')" class="col-side">
+    <!-- 1. Repository -->
+    <div v-if="step === 0" class="cols">
+      <ACard :title="$gettext('Choose a repository')" class="col-main">
+        <RepoPicker :repos="repos" :loading="loadingRepos" :install-url="installUrl" :checking="checking" @pick="pick" />
+        <AAlert v-if="checkFailed" type="error" show-icon class="mt-4" :title="$gettext('The repository could not be checked. Please try again.')" />
+      </ACard>
+      <ACard v-if="preview && !preview.ok" :title="$gettext('Checks')" class="col-side">
         <template #extra>
-          <ATag v-if="preview.ok" color="success" class="m-0">
-            {{ $gettext('Passed') }}
-          </ATag>
-          <ATag v-else color="error" class="m-0">
+          <ATag color="error" class="m-0">
             {{ $gettext('Needs changes') }}
           </ATag>
         </template>
+        <div class="mono text-3 op-65 mb-4">
+          {{ preview.draft?.repo ?? route.query.repo }}
+        </div>
         <CheckList :checks="preview.checks" />
         <ATypographyParagraph type="secondary" class="mt-4 mb-0 text-3">
-          {{ $gettext('After you submit, the packages, their signatures and the signer certificate are verified in the catalog repository.') }}
+          {{ $gettext('Fix the problems in the repository or a new release, then choose the repository again.') }}
         </ATypographyParagraph>
       </ACard>
+      <ACard v-else :title="$gettext('Before you start')" class="col-side">
+        <ul class="tips">
+          <li>{{ $gettext('The repository is public and you are its admin.') }}</li>
+          <li>{{ $gettext('A GitHub Release with a version tag holds the signed packages of the plugin.') }}</li>
+          <li>{{ $gettext('The primary public key from nginx-ui plugin key init is at hand.') }}</li>
+        </ul>
+        <a href="https://nginxui.com/plugin/signing" target="_blank" rel="noopener" class="text-3">
+          {{ $gettext('Signing and trust') }}
+          <span class="i-tabler-external-link" />
+        </a>
+      </ACard>
     </div>
+
+    <!-- 2. Details -->
+    <template v-else-if="step === 1 && draft">
+      <div class="cols">
+        <ACard :title="$gettext('Fill in the details')" class="col-main">
+          <div class="chosen">
+            <span class="i-tabler-brand-github text-5 op-60" />
+            <div class="min-w-0 flex-1">
+              <div class="font-600">
+                {{ draft.repo }}
+              </div>
+              <div class="mono text-3 op-65">
+                {{ draft.id }}  v{{ draft.version }}
+              </div>
+            </div>
+            <AButton type="link" size="small" @click="restart">
+              {{ $gettext('Change') }}
+            </AButton>
+          </div>
+          <AForm layout="vertical" class="mt-6">
+            <AFormItem required :extra="$gettext('The content of primary.pub, created with nginx-ui plugin key init. It verifies the signer certificates of your releases.')">
+              <template #label>
+                <span>{{ $gettext('Primary public key') }}</span>
+                <a class="guide-link" role="button" tabindex="0" @click.prevent="guideOpen = true" @keydown.enter.prevent="guideOpen = true">
+                  {{ $gettext('How to create the keys') }}
+                </a>
+              </template>
+              <AAlert v-if="missingCertificate" type="warning" show-icon class="mb-3" :title="$gettext('%{tag} has no signer certificate, so the keys of this plugin have not been created yet.', { tag: draft.tag })">
+                <template #action>
+                  <AButton size="small" @click="guideOpen = true">
+                    {{ $gettext('Show the steps') }}
+                  </AButton>
+                </template>
+              </AAlert>
+              <ATextarea v-model:value="publicKey" :rows="3" class="mono" placeholder="untrusted comment: minisign public key ...&#10;RW..." :status="key.state === 'empty' || keyLooksValid ? undefined : 'error'" />
+            </AFormItem>
+            <KeyChain :draft="draft" :public-key="publicKey" />
+            <AFormItem :label="$gettext('Categories')">
+              <CategoryPicker v-model="chosen" :options="categories" :suggested="draft.categories" />
+            </AFormItem>
+          </AForm>
+          <AAlert v-if="submitError" type="error" show-icon class="mb-4" :title="submitError" />
+          <AFlex justify="flex-end" gap="small">
+            <AButton @click="restart">
+              {{ $gettext('Back') }}
+            </AButton>
+            <AButton type="primary" :disabled="!keyLooksValid" @click="step = 2">
+              {{ $gettext('Next') }}
+            </AButton>
+          </AFlex>
+        </ACard>
+        <ACard :title="$gettext('Catalog preview')" class="col-side">
+          <ListingCard :draft="draft" :categories="chosen" />
+        </ACard>
+      </div>
+      <ADrawer v-model:open="guideOpen" :title="$gettext('How to create the keys')" placement="right" :size="drawerSize">
+        <KeyGuide :draft="draft" :public-key="publicKey" stacked />
+      </ADrawer>
+    </template>
+
+    <!-- 3. Review -->
+    <template v-else-if="step === 2 && draft && preview">
+      <div class="checks-banner" :class="checkTone">
+        <button type="button" class="checks-summary" :aria-expanded="checksOpen" @click="checksOpen = !checksOpen">
+          <span :class="checkTone === 'warn' ? 'i-tabler-alert-triangle-filled' : 'i-tabler-circle-check-filled'" class="summary-icon" />
+          <span class="flex-1 min-w-0 text-left">
+            <span class="font-500">{{ checkSummary }}</span>
+            <span class="block text-3 op-75">{{ $gettext('The packages, their signatures and the signer certificate are verified again in the catalog repository after you submit.') }}</span>
+          </span>
+          <span class="details-link">
+            {{ checksOpen ? $gettext('Hide details') : $gettext('Show details') }}
+            <span :class="checksOpen ? 'i-tabler-chevron-up' : 'i-tabler-chevron-down'" />
+          </span>
+        </button>
+        <div v-if="checksOpen" class="checks-detail">
+          <CheckList :checks="sortedChecks" />
+        </div>
+      </div>
+      <div class="cols">
+        <ACard :title="$gettext('Plugin details')" class="col-main">
+          <template #extra>
+            <AButton type="link" size="small" @click="step = 1">
+              {{ $gettext('Edit') }}
+            </AButton>
+          </template>
+          <dl class="kv">
+            <dt>{{ $gettext('Repository') }}</dt>
+            <dd>
+              <a :href="`https://github.com/${draft.repo}`" target="_blank" rel="noopener">{{ draft.repo }}</a>
+            </dd>
+            <dt>{{ $gettext('Plugin ID') }}</dt>
+            <dd class="mono">
+              {{ draft.id }}
+            </dd>
+            <dt>{{ $gettext('Name') }}</dt>
+            <dd>
+              <div>{{ draft.name.en }}</div>
+              <div v-for="[locale, text] in translations" :key="locale" class="translation">
+                <span class="op-65">{{ localeName(locale) }}</span>
+                <span>{{ text }}</span>
+              </div>
+            </dd>
+            <dt>{{ $gettext('Version') }}</dt>
+            <dd>
+              <a :href="draft.releaseUrl" target="_blank" rel="noopener">v{{ draft.version }}</a>
+              <span class="op-65 text-3 ml-2">{{ $gettext('%{count} packages', { count: String(draft.packages.length) }) }}</span>
+            </dd>
+            <dt>{{ $gettext('Categories') }}</dt>
+            <dd>
+              <AFlex gap="4" wrap>
+                <ATag v-for="id in chosen" :key="id" class="m-0">
+                  {{ categoryLabel(id) }}
+                </ATag>
+              </AFlex>
+            </dd>
+            <template v-if="draft.license">
+              <dt>{{ $gettext('License') }}</dt>
+              <dd>{{ draft.license }}</dd>
+            </template>
+            <dt>{{ $gettext('Primary public key') }}</dt>
+            <dd>
+              <ATooltip :title="keyLine">
+                <span class="mono">{{ key.id?.slice(0, 8) }}</span>
+              </ATooltip>
+              <span v-if="keyReady" class="key-ok"><span class="i-tabler-check" />{{ $gettext('Matches the certificate') }}</span>
+            </dd>
+          </dl>
+        </ACard>
+
+        <AFlex vertical gap="middle" class="col-side">
+          <ACard :title="$gettext('Catalog preview')">
+            <ListingCard :draft="draft" :categories="chosen" />
+            <ATypographyParagraph type="secondary" class="mt-4 mb-0 text-3">
+              {{ $gettext('Names in every language are reviewed with the submission. The description and screenshots come from plugin.json and update with every release.') }}
+            </ATypographyParagraph>
+          </ACard>
+        </AFlex>
+      </div>
+      <AAlert v-if="submitError" type="error" show-icon :title="submitError" />
+      <div class="footer-bar">
+        <ATypographyText type="secondary" class="text-3">
+          {{ $gettext('After you submit, a maintainer reviews the plugin. Follow it on the change page, and GitHub notifies you of the review.') }}
+        </ATypographyText>
+        <AFlex gap="small">
+          <AButton @click="step = 1">
+            {{ $gettext('Back') }}
+          </AButton>
+          <AButton type="primary" :loading="submitting" @click="submit">
+            {{ $gettext('Submit for review') }}
+          </AButton>
+        </AFlex>
+      </div>
+    </template>
   </div>
 </template>
+
+<style scoped>
+.tips {
+  margin: 0 0 16px;
+  padding-left: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  font-size: 13px;
+}
+
+.chosen {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  border-radius: 8px;
+  background: var(--portal-faint);
+  border: 1px solid var(--portal-border);
+}
+
+.guide-link {
+  margin-left: 12px;
+  font-size: 12px;
+  font-weight: 400;
+}
+
+.kv {
+  display: grid;
+  grid-template-columns: minmax(96px, max-content) 1fr;
+  gap: 12px 24px;
+  margin: 0;
+}
+
+.kv dt {
+  opacity: 0.65;
+}
+
+.kv dd {
+  margin: 0;
+  min-width: 0;
+}
+
+.translation {
+  display: flex;
+  gap: 8px;
+  font-size: 13px;
+}
+
+.key-ok {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  margin-left: 10px;
+  font-size: 12px;
+  color: #389e0d;
+}
+
+:global(html.dark) .key-ok {
+  color: #6abe39;
+}
+
+.checks-banner {
+  border-radius: 8px;
+  border: 1px solid #b7eb8f;
+  background: #f6ffed;
+}
+
+.checks-banner.warn {
+  border-color: #ffe58f;
+  background: #fffbe6;
+}
+
+:global(html.dark) .checks-banner {
+  border-color: #274916;
+  background: #162312;
+}
+
+:global(html.dark) .checks-banner.warn {
+  border-color: #594214;
+  background: #2b2111;
+}
+
+.checks-summary {
+  all: unset;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: 14px 18px;
+  cursor: pointer;
+}
+
+.checks-summary:focus-visible {
+  outline: 2px solid var(--portal-primary);
+  outline-offset: -2px;
+  border-radius: 8px;
+}
+
+.summary-icon {
+  flex: none;
+  font-size: 22px;
+  color: #52c41a;
+}
+
+.warn .summary-icon {
+  color: #faad14;
+}
+
+.details-link {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 13px;
+  color: var(--portal-primary);
+}
+
+.checks-detail {
+  padding: 4px 18px 18px 52px;
+}
+
+.checks-detail :deep(.check-list) {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 14px 24px;
+}
+
+.footer-bar {
+  position: sticky;
+  bottom: 0;
+  z-index: 5;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+  padding: 12px 24px;
+  margin: 0 -24px -24px;
+  background: var(--portal-bar);
+  border-top: 1px solid var(--portal-border);
+  backdrop-filter: blur(8px);
+}
+
+@media (max-width: 640px) {
+  .kv {
+    grid-template-columns: 1fr;
+    gap: 4px;
+  }
+
+  .kv dd {
+    margin-bottom: 8px;
+  }
+
+  .footer-bar {
+    margin: 0 -16px -16px;
+    padding: 12px 16px;
+  }
+}
+</style>

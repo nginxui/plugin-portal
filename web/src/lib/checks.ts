@@ -11,13 +11,14 @@ export function checkTitle(check: Check): string {
     case 'name': return $gettext('Name')
     case 'package': return $gettext('Packages')
     case 'license': return $gettext('License')
+    case 'signer': return $gettext('Signer certificate')
     default: return check.key
   }
 }
 
 export function checkDetail(check: Check): string {
   // Every parameter a text may use, so each call has what its text names.
-  const p = { id: '', owner: '', repo: '', version: '', tag: '', word: '', count: '', name: '', license: '', ...check.params }
+  const p = { id: '', owner: '', repo: '', version: '', tag: '', word: '', count: '', name: '', license: '', key: '', ...check.params }
   switch (`${check.key}:${check.reason ?? ''}`) {
     case 'repository:': return $gettext('%{repo} is a public repository.', p)
     case 'repository:not_found': return $gettext('The repository does not exist or is not public.')
@@ -46,6 +47,9 @@ export function checkDetail(check: Check): string {
     case 'package:': return $gettext('%{count} packages in the release.', p)
     case 'package:missing': return $gettext('The release has no package named %{name} or one per platform.', p)
     case 'license:': return p.license
+    case 'signer:': return $gettext('Issued by the primary key %{key}.', p)
+    case 'signer:missing': return $gettext('There is no plugin.signer at %{tag}. Create the keys as described in the next step and publish a new release.', p)
+    case 'signer:other_plugin': return $gettext('The certificate was issued for %{id}, not for this plugin.', p)
     case 'license:missing': return $gettext('GitHub detects no license in the repository. The listing shows none.')
     default: return check.reason ?? ''
   }

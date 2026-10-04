@@ -8,8 +8,143 @@ msgstr ""
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
+msgid "Categories"
+msgstr "分类"
+
+msgid "Suggested"
+msgstr "推荐"
+
+msgid "Up to three. Remove one to choose another."
+msgstr "最多三个。请先取消一个，再选择其他分类。"
+
+msgid "Up to three. Suggested ones come from the capabilities of the plugin."
+msgstr "最多三个。推荐分类根据插件的能力得出。"
+
+msgid "%{n} of %{max} chosen"
+msgstr "已选 %{n}/%{max}"
+
+msgid "This is not a minisign public key. Paste the whole content of primary.pub."
+msgstr "这不是 minisign 公钥，请粘贴 primary.pub 的完整内容。"
+
+msgid "Key %{id}. The release has no certificate to check it against."
+msgstr "密钥 %{id}。发布版本中没有证书，无法核对。"
+
+msgid "Your key"
+msgstr "你的主公钥"
+
+msgid "Certificate signer"
+msgstr "证书签发者"
+
+msgid "Signing key"
+msgstr "签名密钥"
+
+msgid "The chain matches"
+msgstr "链条匹配"
+
+msgid "You pasted the signing key. Paste primary.pub instead."
+msgstr "这是签名公钥，请改为粘贴 primary.pub。"
+
+msgid "This key did not issue the certificate of %{tag}."
+msgstr "该密钥不是 %{tag} 中证书的签发者。"
+
+msgid "Pasted, matches the certificate"
+msgstr "已粘贴，与证书匹配"
+
+msgid "Pasted"
+msgstr "已粘贴"
+
+msgid "Not pasted yet"
+msgstr "尚未粘贴"
+
+msgid "Check the key under the field"
+msgstr "请查看输入框下方的核对结果"
+
+msgid "Not in %{tag}"
+msgstr "%{tag} 中没有"
+
+msgid "Issued for another plugin"
+msgstr "证书属于其他插件"
+
+msgid "Found in %{tag}"
+msgstr "%{tag} 中已有"
+
+msgid "Run once in a terminal with Nginx UI"
+msgstr "在装有 Nginx UI 的终端中运行一次"
+
+msgid "Copied"
+msgstr "已复制"
+
+msgid "Copy"
+msgstr "复制"
+
+msgid "It creates five files. Put each one in its place:"
+msgstr "它会生成五个文件，请分别放到对应的位置："
+
+msgid "This page"
+msgstr "这个页面"
+
+msgid "The primary public key field"
+msgstr "主公钥输入框"
+
+msgid "Plugin repository"
+msgstr "插件仓库"
+
+msgid "The root and the release environment"
+msgstr "根目录和 release 环境"
+
+msgid "Add it as the secret PLUGIN_SIGNING_KEY of the release environment, then delete the local copy."
+msgstr "设为 release 环境的 secret PLUGIN_SIGNING_KEY，然后删除本地副本。"
+
+msgid "Your offline backup"
+msgstr "你的离线备份"
+
+msgid "A password manager or offline storage"
+msgstr "密码管理器或离线存储"
+
+msgid "Without it no new certificate can be issued"
+msgstr "丢失后将无法再签发新证书"
+
+msgid "Then publish every release with nginxui/plugin-release, which signs the packages when a version tag is pushed."
+msgstr "之后用 nginxui/plugin-release 发布每个版本，推送版本标签时它会为安装包签名。"
+
+msgid "Signing and trust"
+msgstr "签名与信任"
+
+msgid "Community"
+msgstr "社区"
+
 msgid "Manage"
 msgstr "管理"
+
+msgid "Search repositories"
+msgstr "搜索仓库"
+
+msgid "App installed"
+msgstr "已安装应用"
+
+msgid "Admin"
+msgstr "管理员"
+
+msgid "Updated %{time}"
+msgstr "%{time}更新"
+
+msgid "No repository matches the search."
+msgstr "没有匹配的仓库。"
+
+msgid "No repository is waiting to be submitted."
+msgstr "暂无可提交的仓库。"
+
+msgid "Another public repository you administer"
+msgstr "你管理的其他公开仓库"
+
+msgid "owner/repository"
+msgstr "所有者/仓库"
+
+msgid "Check"
+msgstr "检查"
+
+msgid "Install the app on another repository"
+msgstr "在其他仓库上安装应用"
 
 msgid "Developer Center"
 msgstr "开发者中心"
@@ -47,6 +182,48 @@ msgstr "切换深色模式"
 msgid "Account menu"
 msgstr "账户菜单"
 
+msgid "Certificates"
+msgstr "证书"
+
+msgid "DNS"
+msgstr "DNS"
+
+msgid "Security"
+msgstr "安全"
+
+msgid "Traffic"
+msgstr "流量"
+
+msgid "Monitoring"
+msgstr "监控"
+
+msgid "Logs"
+msgstr "日志"
+
+msgid "Analytics"
+msgstr "分析"
+
+msgid "Notifications"
+msgstr "通知"
+
+msgid "Backup"
+msgstr "备份"
+
+msgid "AI"
+msgstr "AI"
+
+msgid "Templates"
+msgstr "模板"
+
+msgid "Languages"
+msgstr "语言"
+
+msgid "Integrations"
+msgstr "集成"
+
+msgid "Tools"
+msgstr "工具"
+
 msgid "Repository"
 msgstr "仓库"
 
@@ -70,6 +247,9 @@ msgstr "安装包"
 
 msgid "License"
 msgstr "许可证"
+
+msgid "Signer certificate"
+msgstr "签名者证书"
 
 msgid "%{repo} is a public repository."
 msgstr "%{repo} 是公开仓库。"
@@ -143,11 +323,17 @@ msgstr "发布版本中有 %{count} 个安装包。"
 msgid "The release has no package named %{name} or one per platform."
 msgstr "发布版本中没有名为 %{name} 的安装包，也没有各平台的安装包。"
 
+msgid "Issued by the primary key %{key}."
+msgstr "由主密钥 %{key} 签发。"
+
+msgid "There is no plugin.signer at %{tag}. Create the keys as described in the next step and publish a new release."
+msgstr "%{tag} 中没有 plugin.signer。请按下一步中的说明生成密钥，并发布新版本。"
+
+msgid "The certificate was issued for %{id}, not for this plugin."
+msgstr "该证书是为 %{id} 签发的，不属于此插件。"
+
 msgid "GitHub detects no license in the repository. The listing shows none."
 msgstr "GitHub 未在仓库中识别到许可证，上架页面将不显示许可证。"
-
-msgid "Admin"
-msgstr "管理员"
 
 msgid "Publisher"
 msgstr "发布者"
@@ -172,9 +358,6 @@ msgstr "官方"
 
 msgid "Partner"
 msgstr "合作伙伴"
-
-msgid "Community"
-msgstr "社区"
 
 msgid "Listed"
 msgstr "已上架"
@@ -326,9 +509,6 @@ msgstr "可提交的仓库"
 msgid "Public repositories you administer or installed the Nginx UI Plugin Catalog app on. With the app installed, new releases reach the catalog within minutes."
 msgstr "你管理的公开仓库，以及你安装了 Nginx UI 插件目录应用的仓库。安装应用后，新版本会在几分钟内同步到目录。"
 
-msgid "No repository is waiting to be submitted."
-msgstr "暂无可提交的仓库。"
-
 msgid "App installed %{time}"
 msgstr "%{time}安装应用"
 
@@ -337,9 +517,6 @@ msgstr "你是此仓库的管理员"
 
 msgid "Submit as plugin"
 msgstr "提交为插件"
-
-msgid "Install the app on another repository"
-msgstr "在其他仓库上安装应用"
 
 msgid "Page not found"
 msgstr "页面不存在"
@@ -477,9 +654,6 @@ msgstr "上架信息"
 msgid "Description"
 msgstr "描述"
 
-msgid "Categories"
-msgstr "分类"
-
 msgid "Latest version"
 msgstr "最新版本"
 
@@ -525,6 +699,21 @@ msgstr "使用 GitHub 登录"
 msgid "Signing in only confirms your GitHub identity. It grants no write access to your repositories."
 msgstr "登录仅用于确认你的 GitHub 身份，不会获得你仓库的写入权限。"
 
+msgid "%{total} checks passed, %{n} with a warning"
+msgstr "%{total} 项检查已通过，其中 %{n} 项有警告"
+
+msgid "All %{total} checks passed"
+msgstr "%{total} 项检查全部通过"
+
+msgid "Choose a repository"
+msgstr "选择仓库"
+
+msgid "Fill in the details"
+msgstr "填写信息"
+
+msgid "Check and submit"
+msgstr "检查与提交"
+
 msgid "The primary public key is not a minisign public key. Paste the content of primary.pub."
 msgstr "主公钥不是 minisign 公钥，请粘贴 primary.pub 的内容。"
 
@@ -537,44 +726,209 @@ msgstr "提交失败，请重试。"
 msgid "Once the checks pass, submit the plugin. It is listed after a maintainer approves it."
 msgstr "检查通过后提交，维护者审核通过即在目录中上架。"
 
-msgid "owner/repository"
-msgstr "所有者/仓库"
-
-msgid "Check"
-msgstr "检查"
-
-msgid "You need admin permission on the repository. The newest release, its plugin.json and its packages are read from GitHub."
-msgstr "你需要拥有仓库的 admin 权限。最新版本、其中的 plugin.json 和安装包会从 GitHub 读取。"
-
 msgid "The repository could not be checked. Please try again."
 msgstr "无法检查该仓库，请重试。"
 
-msgid "Name translations"
-msgstr "名称翻译"
+msgid "Fix the problems in the repository or a new release, then choose the repository again."
+msgstr "请在仓库或新版本中修复这些问题，然后重新选择该仓库。"
 
-msgid "Names in every language are reviewed with the submission."
-msgstr "各语言的名称会随提交一起审核。"
+msgid "Before you start"
+msgstr "开始之前"
 
-msgid "Details"
-msgstr "提交信息"
+msgid "The repository is public and you are its admin."
+msgstr "仓库已公开，且你是仓库管理员。"
 
-msgid "Primary public key"
-msgstr "主公钥"
+msgid "A GitHub Release with a version tag holds the signed packages of the plugin."
+msgstr "已有带版本标签的 GitHub Release，其中包含签名的安装包。"
+
+msgid "The primary public key from nginx-ui plugin key init is at hand."
+msgstr "准备好 nginx-ui plugin key init 生成的主公钥。"
+
+msgid "Change"
+msgstr "更换"
 
 msgid "The content of primary.pub, created with nginx-ui plugin key init. It verifies the signer certificates of your releases."
 msgstr "使用 nginx-ui plugin key init 生成的 primary.pub 的内容，用于验证你发布版本的签名者证书。"
 
-msgid "Up to three. Suggested from the capabilities of the plugin."
-msgstr "最多三个，根据插件的能力推荐。"
+msgid "Primary public key"
+msgstr "主公钥"
+
+msgid "How to create the keys"
+msgstr "如何生成密钥"
+
+msgid "%{tag} has no signer certificate, so the keys of this plugin have not been created yet."
+msgstr "%{tag} 中没有签名者证书，说明这个插件还没有生成签名密钥。"
+
+msgid "Show the steps"
+msgstr "查看生成步骤"
+
+msgid "Back"
+msgstr "上一步"
+
+msgid "Next"
+msgstr "下一步"
+
+msgid "Catalog preview"
+msgstr "目录预览"
+
+msgid "The packages, their signatures and the signer certificate are verified again in the catalog repository after you submit."
+msgstr "提交后，插件目录仓库会再次校验安装包、签名和签名者证书。"
+
+msgid "Hide details"
+msgstr "收起明细"
+
+msgid "Show details"
+msgstr "查看明细"
+
+msgid "Plugin details"
+msgstr "插件信息"
+
+msgid "Edit"
+msgstr "修改"
+
+msgid "%{count} packages"
+msgstr "%{count} 个安装包"
+
+msgid "Matches the certificate"
+msgstr "与证书匹配"
+
+msgid "Names in every language are reviewed with the submission. The description and screenshots come from plugin.json and update with every release."
+msgstr "各语言的名称会随本次提交一同审核。描述与截图取自 plugin.json，发布新版本后自动更新。"
+
+msgid "After you submit, a maintainer reviews the plugin. Follow it on the change page, and GitHub notifies you of the review."
+msgstr "提交后由维护者审核，进度可以在变更页面查看，审核结果也会通过 GitHub 通知你。"
 
 msgid "Submit for review"
 msgstr "提交审核"
 
-msgid "Passed"
-msgstr "已通过"
+#~ msgid "Name translations"
+#~ msgstr "名称翻译"
 
-msgid "After you submit, the packages, their signatures and the signer certificate are verified in the catalog repository."
-msgstr "提交后，插件目录仓库会校验安装包、签名和签名者证书。"
+#~ msgid "Passed"
+#~ msgstr "已通过"
+
+#~ msgid "After you submit, the packages, their signatures and the signer certificate are verified in the catalog repository."
+#~ msgstr "提交后，插件目录仓库会校验安装包、签名和签名者证书。"
+
+#~ msgid "GitHub notifies you of the review."
+#~ msgstr "审核结果会通过 GitHub 通知你。"
+
+#~ msgid "Up to three. Suggested from the capabilities of the plugin."
+#~ msgstr "最多三个，根据插件的能力推荐。"
+
+#~ msgid "Keys are ready"
+#~ msgstr "密钥已就绪"
+
+#~ msgid "Hide"
+#~ msgstr "收起"
+
+#~ msgid "Show"
+#~ msgstr "展开"
+
+#~ msgid "Matches the certificate, key %{id}"
+#~ msgstr "与证书匹配，密钥 %{id}"
+
+#~ msgid "This is the signing key. Paste primary.pub instead."
+#~ msgstr "这是签名公钥，请改为粘贴 primary.pub。"
+
+#~ msgid "Did not issue the certificate of the release"
+#~ msgstr "与发布版本中的证书不匹配"
+
+#~ msgid "Key %{id}"
+#~ msgstr "密钥 %{id}"
+
+#~ msgid "Not a minisign public key"
+#~ msgstr "不是 minisign 公钥"
+
+#~ msgid "Waiting for primary.pub"
+#~ msgstr "等待粘贴 primary.pub"
+
+#~ msgid "No certificate in %{tag}"
+#~ msgstr "%{tag} 中没有证书"
+
+#~ msgid "Certificate for another plugin"
+#~ msgstr "证书属于其他插件"
+
+#~ msgid "Certificate in %{tag}, key %{id}"
+#~ msgstr "%{tag} 中已有证书，密钥 %{id}"
+
+#~ msgid "%{tag} with %{count} packages"
+#~ msgstr "%{tag}，%{count} 个安装包"
+
+#~ msgid "No package in %{tag}"
+#~ msgstr "%{tag} 中没有安装包"
+
+#~ msgid "Command"
+#~ msgstr "命令"
+
+#~ msgid "Primary key"
+#~ msgstr "主密钥"
+
+#~ msgid "Offline, with a backup"
+#~ msgstr "离线保存，并做好备份"
+
+#~ msgid "paste it above"
+#~ msgstr "粘贴到上方"
+
+#~ msgid "never in a repository or CI"
+#~ msgstr "切勿放入仓库或 CI"
+
+#~ msgid "certifies"
+#~ msgstr "签发证书"
+
+#~ msgid "CI secret and repository"
+#~ msgstr "CI secret 与仓库"
+
+#~ msgid "secret PLUGIN_SIGNING_KEY of the release environment"
+#~ msgstr "设为 release 环境的 PLUGIN_SIGNING_KEY secret"
+
+#~ msgid "commit to the repository root, with .minisig"
+#~ msgstr "连同 .minisig 一起提交到仓库根目录"
+
+#~ msgid "signs"
+#~ msgstr "签名"
+
+#~ msgid "Releases"
+#~ msgstr "发布版本"
+
+#~ msgid "pushing a version tag signs and publishes the packages"
+#~ msgstr "推送版本标签后，自动签名并发布安装包"
+
+#~ msgid "Create the keys"
+#~ msgstr "生成密钥"
+
+#~ msgid "Run this with Nginx UI installed. It creates a primary key, a signing key and a certificate that links them."
+#~ msgstr "在装有 Nginx UI 的环境中运行以下命令，它会生成主密钥、签名密钥，以及关联两者的证书。"
+
+#~ msgid "Keep each file where it belongs"
+#~ msgstr "妥善放置生成的文件"
+
+#~ msgid "Paste its content above."
+#~ msgstr "将内容粘贴到上方。"
+
+#~ msgid "Store it offline with a backup, never in a repository or CI. Without it no new signing key can be certified."
+#~ msgstr "离线保存并做好备份，切勿放入仓库或 CI。丢失后将无法再为新的签名密钥签发证书。"
+
+#~ msgid "Add it as the PLUGIN_SIGNING_KEY secret of a release environment in the repository, then delete the local copy."
+#~ msgstr "在仓库中创建 release 环境，将其设为该环境的 PLUGIN_SIGNING_KEY secret，然后删除本地副本。"
+
+#~ msgid "Commit them to the root of the repository."
+#~ msgstr "提交到仓库根目录。"
+
+#~ msgid "Sign every release"
+#~ msgstr "为每个版本签名"
+
+#~ msgid "Publish releases with the nginxui/plugin-release action, which signs the packages with the signing key."
+#~ msgstr "使用 nginxui/plugin-release Action 发布版本，它会用签名密钥为安装包签名。"
+
+#~ msgid "You need admin permission on the repository. The newest release, its plugin.json and its packages are read from GitHub."
+#~ msgstr "你需要拥有仓库的 admin 权限。最新版本、其中的 plugin.json 和安装包会从 GitHub 读取。"
+
+#~ msgid "Names in every language are reviewed with the submission."
+#~ msgstr "各语言的名称会随提交一起审核。"
+
+#~ msgid "Details"
+#~ msgstr "提交信息"
 
 #~ msgid "These repositories have the Nginx UI Plugin Catalog app installed by you. With the app installed, new releases reach the catalog within minutes."
 #~ msgstr "以下仓库由你安装了 Nginx UI 插件目录应用。安装应用后，新版本会在几分钟内同步到目录。"

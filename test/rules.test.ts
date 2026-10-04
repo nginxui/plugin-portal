@@ -1,12 +1,17 @@
 import { describe, expect, it } from 'vitest'
-import { packageAssets, parsePublicKey, reservedWord } from '../worker/lib/rules'
-import { publicKey } from './helpers'
+import { packageAssets, parseCertificateSignature, parsePublicKey, reservedWord } from '../worker/lib/rules'
+import { certificateSignature, publicKey } from './helpers'
 
 describe('rules', () => {
   it('reads a minisign public key and its id', () => {
     expect(parsePublicKey(publicKey)).toEqual({ line: publicKey.split('\n')[1], id: '0102030405060708' })
     expect(parsePublicKey('not a key')).toBeNull()
     expect(parsePublicKey(btoa('short'))).toBeNull()
+  })
+
+  it('reads who signed a signer certificate and for which plugin', () => {
+    expect(parseCertificateSignature(certificateSignature('io.x.y'))).toEqual({ primaryKeyId: '0102030405060708', pluginId: 'io.x.y' })
+    expect(parseCertificateSignature('nonsense')).toBeNull()
   })
 
   it('finds reserved words as the catalog does', () => {

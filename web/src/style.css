@@ -4,6 +4,9 @@
   --portal-primary: #1677ff;
   --portal-primary-bg: #e6f4ff;
   --portal-primary-text: #0958d9;
+  --portal-bar: rgba(255, 255, 255, 0.88);
+  --portal-border-strong: #d9d9d9;
+  --portal-card: #ffffff;
 }
 
 html.dark {
@@ -12,6 +15,9 @@ html.dark {
   --portal-primary: #1668dc;
   --portal-primary-bg: #111a2c;
   --portal-primary-text: #65a9f3;
+  --portal-bar: rgba(20, 20, 20, 0.88);
+  --portal-border-strong: #424242;
+  --portal-card: #141414;
 }
 
 html,

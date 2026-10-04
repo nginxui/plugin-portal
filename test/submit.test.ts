@@ -2,7 +2,7 @@ import type { Route } from './helpers'
 import { env } from 'cloudflare:workers'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { base64url } from '../worker/lib/crypto'
-import { call, json, mockFetch, publicKey, signIn } from './helpers'
+import { call, certificateSignature, json, mockFetch, publicKey, signIn } from './helpers'
 
 const RAW = 'https://raw.githubusercontent.com'
 const repo = { id: 77, full_name: 'octo-author/geoip', private: false, archived: false, default_branch: 'main', owner: { id: 4242, login: 'octo-author', type: 'User', avatar_url: '' }, license: { spdx_id: 'MIT' }, permissions: { admin: true, push: true, pull: true } }
@@ -11,6 +11,7 @@ const release = { tag_name: 'v1.0.0', prerelease: false, draft: false, html_url:
 
 let dispatched: { change: string, payload: string }[] = []
 let manifestBody: unknown = manifest
+let signerFor = 'io.github.octo-author.geoip'
 
 function github(): Route[] {
   return [
@@ -20,6 +21,8 @@ function github(): Route[] {
     url => url.href === 'https://api.github.com/repos/octo-author/geoip' ? json(repo) : undefined,
     url => url.href.startsWith('https://api.github.com/repos/octo-author/geoip/releases') ? json([release]) : undefined,
     url => url.href === `${RAW}/octo-author/geoip/v1.0.0/plugin.json` ? new Response(JSON.stringify(manifestBody)) : undefined,
+    url => url.href === `${RAW}/octo-author/geoip/v1.0.0/plugin.signer` ? new Response(publicKey) : undefined,
+    url => url.href === `${RAW}/octo-author/geoip/v1.0.0/plugin.signer.minisig` ? new Response(certificateSignature(signerFor)) : undefined,
     url => url.pathname === `/repos/${env.CATALOG_REPO}/installation` ? json({ id: 9 }) : undefined,
     url => url.pathname === '/app/installations/9/access_tokens' ? json({ token: 'ghs_actions' }) : undefined,
     async (url, init) => {
@@ -42,6 +45,7 @@ async function useDeployKey() {
 beforeEach(async () => {
   dispatched = []
   manifestBody = manifest
+  signerFor = 'io.github.octo-author.geoip'
   for (const url of [`${env.CATALOG_URL}/v1/index.json`, `${RAW}/${env.CATALOG_REPO}/main/blocked.json`, `${RAW}/${env.CATALOG_REPO}/main/schema/entry.schema.json`, 'https://token.actions.githubusercontent.com/.well-known/jwks'])
     await caches.default.delete(url)
   await useDeployKey()
@@ -67,6 +71,15 @@ describe('submission checks', () => {
     expect(body.draft.id).toBe('io.github.octo-author.geoip')
     expect(body.draft.name).toEqual({ en: 'GeoIP Access', zh_CN: 'GeoIP 访问控制' })
     expect(body.draft.categories).toEqual(['security'])
+    expect(body.checks.find(c => c.key === 'signer')).toMatchObject({ status: 'pass' })
+  })
+
+  it('refuses a certificate made for another plugin', async () => {
+    const cookie = await signedIn()
+    signerFor = 'io.github.someone.else'
+    const body = await (await call('/api/submit/check', { method: 'POST', mutate: true, cookie, json: { repo: 'octo-author/geoip' } })).json() as { ok: boolean, checks: { key: string, status: string, reason?: string }[] }
+    expect(body.ok).toBe(false)
+    expect(body.checks.find(c => c.key === 'signer')).toMatchObject({ status: 'fail', reason: 'other_plugin' })
   })
 
   it('reports every problem of a manifest at once', async () => {
@@ -75,7 +88,7 @@ describe('submission checks', () => {
     const body = await (await call('/api/submit/check', { method: 'POST', mutate: true, cookie, json: { repo: 'octo-author/geoip' } })).json() as { ok: boolean, checks: { key: string, status: string, reason?: string }[] }
     expect(body.ok).toBe(false)
     const failed = Object.fromEntries(body.checks.filter(c => c.status === 'fail').map(c => [c.key, c.reason]))
-    expect(failed).toEqual({ plugin_id: 'reserved_namespace', name: 'reserved', package: 'missing' })
+    expect(failed).toEqual({ plugin_id: 'reserved_namespace', name: 'reserved', package: 'missing', signer: 'other_plugin' })
   })
 })
 

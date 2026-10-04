@@ -13,7 +13,7 @@ export interface Draft {
   repo: string
   id: string
   name: Record<string, string>
-  description: string
+  description: Record<string, string>
   version: string
   tag: string
   prerelease: boolean
@@ -22,6 +22,7 @@ export interface Draft {
   license: string | null
   categories: string[]
   readmeUrl: string
+  signer: { signingKeyId: string | null, primaryKeyId: string | null, pluginId: string | null } | null
 }
 
 export interface Preview {
