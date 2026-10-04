@@ -8,7 +8,7 @@ msgid "Another change of this plugin is in progress."
 msgstr ""
 
 #: web/src/components/CategoryEditModal.vue:41
-#: web/src/views/plugin/PluginStore.vue:205
+#: web/src/views/plugin/PluginStore.vue:209
 #: web/src/views/plugin/PluginVersions.vue:118
 msgid "The change could not be sent. Please try again."
 msgstr ""
@@ -22,7 +22,7 @@ msgstr ""
 #: web/src/components/CategoryEditModal.vue:50
 #: web/src/components/CommunityCard.vue:175
 #: web/src/views/maintain/AiModels.vue:223
-#: web/src/views/plugin/PluginTranslations.vue:336
+#: web/src/views/plugin/PluginTranslations.vue:428
 msgid "Save"
 msgstr ""
 
@@ -397,7 +397,7 @@ msgstr ""
 #: web/src/components/CommunityCard.vue:165
 #: web/src/components/PendingChange.vue:16
 #: web/src/views/plugin/PluginLayout.vue:82
-#: web/src/views/plugin/PluginStore.vue:224
+#: web/src/views/plugin/PluginStore.vue:228
 msgid "View progress"
 msgstr ""
 
@@ -586,9 +586,10 @@ msgstr ""
 #: web/src/components/MarketPreview.vue:364
 #: web/src/components/MarketPreview.vue:367
 #: web/src/views/plugin/PluginScreenshots.vue:366
-#: web/src/views/plugin/PluginTranslations.vue:270
-#: web/src/views/plugin/PluginTranslations.vue:314
-#: web/src/views/plugin/PluginTranslations.vue:340
+#: web/src/views/plugin/PluginTranslations.vue:332
+#: web/src/views/plugin/PluginTranslations.vue:366
+#: web/src/views/plugin/PluginTranslations.vue:403
+#: web/src/views/plugin/PluginTranslations.vue:432
 msgid "AI draft"
 msgstr ""
 
@@ -617,7 +618,7 @@ msgstr ""
 #: web/src/components/MarketPreview.vue:315
 #: web/src/components/ReviewCompare.vue:35
 #: web/src/components/ReviewCompare.vue:65
-#: web/src/lib/storeDiff.ts:51
+#: web/src/lib/storeDiff.ts:52
 #: web/src/views/owners/OwnerPage.vue:268
 msgid "Homepage"
 msgstr ""
@@ -790,7 +791,7 @@ msgstr ""
 #: web/src/components/PluginCard.vue:176
 #: web/src/lib/categories.ts:17
 #: web/src/views/maintain/AiModels.vue:255
-#: web/src/views/plugin/PluginTranslations.vue:196
+#: web/src/views/plugin/PluginTranslations.vue:258
 msgid "Languages"
 msgstr ""
 
@@ -830,7 +831,7 @@ msgstr ""
 #: web/src/views/maintain/AllPlugins.vue:181
 #: web/src/views/maintain/AuditLog.vue:84
 #: web/src/views/MyPlugins.vue:62
-#: web/src/views/plugin/PluginTranslations.vue:86
+#: web/src/views/plugin/PluginTranslations.vue:107
 msgid "All"
 msgstr ""
 
@@ -855,8 +856,8 @@ msgid "Provided"
 msgstr ""
 
 #: web/src/components/PluginCard.vue:183
-#: web/src/views/plugin/PluginTranslations.vue:87
-#: web/src/views/plugin/PluginTranslations.vue:290
+#: web/src/views/plugin/PluginTranslations.vue:108
+#: web/src/views/plugin/PluginTranslations.vue:370
 #: web/src/views/translate/TranslatePage.vue:230
 msgid "Missing"
 msgstr ""
@@ -865,7 +866,7 @@ msgstr ""
 #: web/src/components/PluginCard.vue:221
 #: web/src/lib/pluginSections.ts:14
 #: web/src/views/plugin/PluginScreenshots.vue:311
-#: web/src/views/plugin/PluginTranslations.vue:306
+#: web/src/views/plugin/PluginTranslations.vue:395
 msgid "Store details"
 msgstr ""
 
@@ -1025,7 +1026,7 @@ msgid "Right to left: %{lang}"
 msgstr ""
 
 #: web/src/components/StressCards.vue:27
-#: web/src/views/plugin/PluginStore.vue:244
+#: web/src/views/plugin/PluginStore.vue:248
 msgid "Pseudo localized"
 msgstr ""
 
@@ -1687,33 +1688,37 @@ msgstr ""
 msgid "Access"
 msgstr ""
 
-#: web/src/lib/storeDiff.ts:49
+#: web/src/lib/storeDiff.ts:50
 #: web/src/views/plugin/PluginPreflight.vue:87
 msgid "Name in %{lang}"
 msgstr ""
 
-#: web/src/lib/storeDiff.ts:50
+#: web/src/lib/storeDiff.ts:51
 #: web/src/views/plugin/PluginPreflight.vue:88
 msgid "Description in %{lang}"
 msgstr ""
 
-#: web/src/lib/storeDiff.ts:52
+#: web/src/lib/storeDiff.ts:53
 msgid "Caption of screenshot %{n} in %{lang}"
 msgstr ""
 
-#: web/src/lib/storeDiff.ts:55
-msgid "Order of the screenshots"
+#: web/src/lib/storeDiff.ts:54
+msgid "Permission note %{name} in %{lang}"
 msgstr ""
 
 #: web/src/lib/storeDiff.ts:57
-msgid "New screenshot %{n}"
+msgid "Order of the screenshots"
 msgstr ""
 
 #: web/src/lib/storeDiff.ts:59
+msgid "New screenshot %{n}"
+msgstr ""
+
+#: web/src/lib/storeDiff.ts:61
 msgid "Removed screenshot %{id}"
 msgstr ""
 
-#: web/src/lib/storeDiff.ts:60
+#: web/src/lib/storeDiff.ts:62
 msgid "Image of screenshot %{n}"
 msgstr ""
 
@@ -2614,7 +2619,7 @@ msgstr ""
 
 #: web/src/views/maintain/PartnersAdmin.vue:131
 #: web/src/views/MyPlugins.vue:179
-#: web/src/views/plugin/PluginStore.vue:319
+#: web/src/views/plugin/PluginStore.vue:323
 msgid "%{n} items"
 msgstr ""
 
@@ -3320,7 +3325,6 @@ msgid "GitHub username"
 msgstr ""
 
 #: web/src/views/owners/VendorPage.vue:349
-#: web/src/views/plugin/PluginTranslations.vue:275
 #: web/src/views/translate/TranslatePage.vue:168
 msgid "Add"
 msgstr ""
@@ -3424,7 +3428,7 @@ msgid "The owner is the owner of the repository. When the repository moves to an
 msgstr ""
 
 #: web/src/views/plugin/PluginAccess.vue:131
-#: web/src/views/plugin/PluginStore.vue:241
+#: web/src/views/plugin/PluginStore.vue:245
 msgid "Off"
 msgstr ""
 
@@ -3482,14 +3486,14 @@ msgstr ""
 
 #: web/src/views/plugin/PluginBadges.vue:114
 #: web/src/views/plugin/PluginScreenshots.vue:332
-#: web/src/views/plugin/PluginStore.vue:247
+#: web/src/views/plugin/PluginStore.vue:251
 #: web/src/views/review/ReviewChange.vue:385
 msgid "Light"
 msgstr ""
 
 #: web/src/views/plugin/PluginBadges.vue:114
 #: web/src/views/plugin/PluginScreenshots.vue:332
-#: web/src/views/plugin/PluginStore.vue:247
+#: web/src/views/plugin/PluginStore.vue:251
 #: web/src/views/review/ReviewChange.vue:385
 msgid "Dark"
 msgstr ""
@@ -3860,20 +3864,20 @@ msgid "The image could not be uploaded. Please try again."
 msgstr ""
 
 #: web/src/views/plugin/PluginScreenshots.vue:213
-#: web/src/views/plugin/PluginTranslations.vue:162
-#: web/src/views/plugin/PluginTranslations.vue:183
+#: web/src/views/plugin/PluginTranslations.vue:224
+#: web/src/views/plugin/PluginTranslations.vue:245
 msgid "No AI drafts are left for today."
 msgstr ""
 
 #: web/src/views/plugin/PluginScreenshots.vue:213
-#: web/src/views/plugin/PluginTranslations.vue:162
-#: web/src/views/plugin/PluginTranslations.vue:183
+#: web/src/views/plugin/PluginTranslations.vue:224
+#: web/src/views/plugin/PluginTranslations.vue:245
 msgid "The AI draft could not be made. Please try again later."
 msgstr ""
 
 #: web/src/views/plugin/PluginScreenshots.vue:230
-#: web/src/views/plugin/PluginStore.vue:217
-#: web/src/views/plugin/PluginTranslations.vue:193
+#: web/src/views/plugin/PluginStore.vue:221
+#: web/src/views/plugin/PluginTranslations.vue:255
 msgid "The store texts could not be loaded."
 msgstr ""
 
@@ -3933,13 +3937,13 @@ msgid "No screenshots yet."
 msgstr ""
 
 #: web/src/views/plugin/PluginScreenshots.vue:309
-#: web/src/views/plugin/PluginStore.vue:348
-#: web/src/views/plugin/PluginTranslations.vue:304
+#: web/src/views/plugin/PluginStore.vue:352
+#: web/src/views/plugin/PluginTranslations.vue:393
 msgid "Saving the draft"
 msgstr ""
 
 #: web/src/views/plugin/PluginScreenshots.vue:309
-#: web/src/views/plugin/PluginTranslations.vue:304
+#: web/src/views/plugin/PluginTranslations.vue:393
 msgid "Draft saved %{time}. Submit it from the store page."
 msgstr ""
 
@@ -3976,7 +3980,7 @@ msgid "Remove the dark version"
 msgstr ""
 
 #: web/src/views/plugin/PluginScreenshots.vue:366
-#: web/src/views/plugin/PluginTranslations.vue:88
+#: web/src/views/plugin/PluginTranslations.vue:109
 msgid "Waiting for confirmation"
 msgstr ""
 
@@ -3989,7 +3993,7 @@ msgid "The other languages, %{n} of %{total} filled"
 msgstr ""
 
 #: web/src/views/plugin/PluginScreenshots.vue:375
-#: web/src/views/plugin/PluginTranslations.vue:202
+#: web/src/views/plugin/PluginTranslations.vue:264
 msgid "Drafting %{done} of %{total}"
 msgstr ""
 
@@ -4006,7 +4010,7 @@ msgid "%{n} of %{total} untranslated"
 msgstr ""
 
 #: web/src/views/plugin/PluginStore.vue:99
-#: web/src/views/plugin/PluginTranslations.vue:106
+#: web/src/views/plugin/PluginTranslations.vue:65
 msgid "Permission note: %{name}"
 msgstr ""
 
@@ -4019,7 +4023,7 @@ msgid "AI draft waiting for confirmation"
 msgstr ""
 
 #: web/src/views/plugin/PluginStore.vue:120
-msgid "Comes from the manifest and ships with the next release"
+msgid "Translated in the translation workbench, ships with the next release"
 msgstr ""
 
 #: web/src/views/plugin/PluginStore.vue:137
@@ -4097,240 +4101,278 @@ msgstr ""
 msgid "An uploaded screenshot is missing. Upload it again in the screenshot studio."
 msgstr ""
 
-#: web/src/views/plugin/PluginStore.vue:220
+#: web/src/views/plugin/PluginStore.vue:206
+msgid "Runtime strings ship with the packages, so they go to the repository. Pick a repository as the store source, or export them for the author."
+msgstr ""
+
+#: web/src/views/plugin/PluginStore.vue:208
+msgid "The repository has no plugin.json at its root. Export the runtime strings and translate them in the source code."
+msgstr ""
+
+#: web/src/views/plugin/PluginStore.vue:224
 msgid "A store change of this plugin is in progress."
 msgstr ""
 
-#: web/src/views/plugin/PluginStore.vue:234
+#: web/src/views/plugin/PluginStore.vue:238
 msgid "Translated into %{n} of %{total} languages, the others show English"
 msgstr ""
 
-#: web/src/views/plugin/PluginStore.vue:235
+#: web/src/views/plugin/PluginStore.vue:239
 msgid "Click any text in the preview to translate it,"
 msgstr ""
 
-#: web/src/views/plugin/PluginStore.vue:235
+#: web/src/views/plugin/PluginStore.vue:239
 msgid "goes to the next untranslated text"
 msgstr ""
 
-#: web/src/views/plugin/PluginStore.vue:238
+#: web/src/views/plugin/PluginStore.vue:242
 msgid "Stress test"
 msgstr ""
 
-#: web/src/views/plugin/PluginStore.vue:242
+#: web/src/views/plugin/PluginStore.vue:246
 msgid "Longest language"
 msgstr ""
 
-#: web/src/views/plugin/PluginStore.vue:243
+#: web/src/views/plugin/PluginStore.vue:247
 msgid "Right to left"
 msgstr ""
 
-#: web/src/views/plugin/PluginStore.vue:248
+#: web/src/views/plugin/PluginStore.vue:252
 msgid "Desktop"
 msgstr ""
 
-#: web/src/views/plugin/PluginStore.vue:248
+#: web/src/views/plugin/PluginStore.vue:252
 msgid "Phone"
 msgstr ""
 
-#: web/src/views/plugin/PluginStore.vue:291
-#: web/src/views/plugin/PluginStore.vue:292
+#: web/src/views/plugin/PluginStore.vue:295
+#: web/src/views/plugin/PluginStore.vue:296
 msgid "Store source"
 msgstr ""
 
-#: web/src/views/plugin/PluginStore.vue:307
+#: web/src/views/plugin/PluginStore.vue:311
 #: web/src/views/review/ReviewChange.vue:481
 msgid "Current"
 msgstr ""
 
-#: web/src/views/plugin/PluginStore.vue:312
+#: web/src/views/plugin/PluginStore.vue:316
 msgid "The store texts come from the manifest of each release now. Submitting creates the first store document."
 msgstr ""
 
-#: web/src/views/plugin/PluginStore.vue:313
+#: web/src/views/plugin/PluginStore.vue:317
 msgid "Moving the store source is reviewed by a maintainer."
 msgstr ""
 
-#: web/src/views/plugin/PluginStore.vue:316
+#: web/src/views/plugin/PluginStore.vue:320
 msgid "Changes to publish"
 msgstr ""
 
-#: web/src/views/plugin/PluginStore.vue:328
+#: web/src/views/plugin/PluginStore.vue:332
 msgid "Goes to name review after the merge"
 msgstr ""
 
-#: web/src/views/plugin/PluginStore.vue:328
+#: web/src/views/plugin/PluginStore.vue:332
+msgid "Ships with the next release"
+msgstr ""
+
+#: web/src/views/plugin/PluginStore.vue:332
 msgid "Live after the merge"
 msgstr ""
 
-#: web/src/views/plugin/PluginStore.vue:338
+#: web/src/views/plugin/PluginStore.vue:342
 msgid "Click a text in the preview to change it."
 msgstr ""
 
-#: web/src/views/plugin/PluginStore.vue:344
+#: web/src/views/plugin/PluginStore.vue:348
 msgid "Submit changes"
 msgstr ""
 
-#: web/src/views/plugin/PluginStore.vue:348
+#: web/src/views/plugin/PluginStore.vue:352
 msgid "Draft saved %{time}"
 msgstr ""
 
-#: web/src/views/plugin/PluginStore.vue:349
+#: web/src/views/plugin/PluginStore.vue:353
 msgid "Discard the draft"
 msgstr ""
 
-#: web/src/views/plugin/PluginStore.vue:354
-#: web/src/views/plugin/PluginTranslations.vue:89
+#: web/src/views/plugin/PluginStore.vue:358
+#: web/src/views/plugin/PluginTranslations.vue:110
 msgid "Suggestions"
 msgstr ""
 
-#: web/src/views/plugin/PluginStore.vue:361
+#: web/src/views/plugin/PluginStore.vue:365
 msgid "Add them in the translation workbench"
 msgstr ""
 
-#: web/src/views/plugin/PluginStore.vue:361
+#: web/src/views/plugin/PluginStore.vue:365
 msgid "Open the screenshot studio"
 msgstr ""
 
-#: web/src/views/plugin/PluginStore.vue:367
+#: web/src/views/plugin/PluginStore.vue:371
 msgid "Texts of this page, %{lang}"
 msgstr ""
 
-#: web/src/views/plugin/PluginStore.vue:383
-#: web/src/views/plugin/PluginTranslations.vue:344
+#: web/src/views/plugin/PluginStore.vue:387
+#: web/src/views/plugin/PluginTranslations.vue:436
 msgid "AI drafts left today: %{n}"
 msgstr ""
 
-#: web/src/views/plugin/PluginStore.vue:387
+#: web/src/views/plugin/PluginStore.vue:391
 msgid "Stress test results"
 msgstr ""
 
-#: web/src/views/plugin/PluginStore.vue:393
+#: web/src/views/plugin/PluginStore.vue:397
 msgid "Longest language: the name in %{lang} is cut short in the card"
 msgstr ""
 
-#: web/src/views/plugin/PluginStore.vue:393
+#: web/src/views/plugin/PluginStore.vue:397
 msgid "Longest language: the name in %{lang} fits the card"
 msgstr ""
 
-#: web/src/views/plugin/PluginStore.vue:394
+#: web/src/views/plugin/PluginStore.vue:398
 msgid "Go to the name"
 msgstr ""
 
-#: web/src/views/plugin/PluginStore.vue:399
+#: web/src/views/plugin/PluginStore.vue:403
 msgid "Right to left: the Arabic name reads correctly"
 msgstr ""
 
-#: web/src/views/plugin/PluginStore.vue:399
+#: web/src/views/plugin/PluginStore.vue:403
 msgid "Right to left: there is no Arabic name yet, English shows"
 msgstr ""
 
-#: web/src/views/plugin/PluginStore.vue:405
+#: web/src/views/plugin/PluginStore.vue:409
 msgid "The name in %{lang} is cut short in the list card"
 msgstr ""
 
-#: web/src/views/plugin/PluginStore.vue:410
+#: web/src/views/plugin/PluginStore.vue:414
 msgid "Every name fits the list card"
 msgstr ""
 
-#: web/src/views/plugin/PluginStore.vue:414
+#: web/src/views/plugin/PluginStore.vue:418
 msgid "Check that the page reads right to left without overlapping text"
 msgstr ""
 
-#: web/src/views/plugin/PluginStore.vue:419
+#: web/src/views/plugin/PluginStore.vue:423
 msgid "Permission notes are not translated here"
 msgstr ""
 
-#: web/src/views/plugin/PluginStore.vue:421
-msgid "They come from the manifest and are translated in the repository"
-msgstr ""
-
-#: web/src/views/plugin/PluginStore.vue:430
-msgid "Submit the store changes of %{name}"
-msgstr ""
-
-#: web/src/views/plugin/PluginStore.vue:430
-msgid "Create the patch"
-msgstr ""
-
-#: web/src/views/plugin/PluginStore.vue:430
-msgid "Submit"
+#: web/src/views/plugin/PluginStore.vue:425
+msgid "Translate them in the translation workbench"
 msgstr ""
 
 #: web/src/views/plugin/PluginStore.vue:434
+msgid "Submit the store changes of %{name}"
+msgstr ""
+
+#: web/src/views/plugin/PluginStore.vue:434
+msgid "Create the patch"
+msgstr ""
+
+#: web/src/views/plugin/PluginStore.vue:434
+msgid "Submit"
+msgstr ""
+
+#: web/src/views/plugin/PluginStore.vue:438
 msgid ", reviewed"
 msgstr ""
 
-#: web/src/views/plugin/PluginStore.vue:440
+#: web/src/views/plugin/PluginStore.vue:444
 msgid "Store source: %{source}"
 msgstr ""
 
-#: web/src/views/plugin/PluginTranslations.vue:199
+#: web/src/views/plugin/PluginTranslations.vue:159
+msgid "%{n} texts imported."
+msgstr ""
+
+#: web/src/views/plugin/PluginTranslations.vue:162
+msgid "The file could not be read. Use a file exported here."
+msgstr ""
+
+#: web/src/views/plugin/PluginTranslations.vue:261
 msgid "The %{n} interface languages of Nginx UI. Pick the columns to show."
 msgstr ""
 
-#: web/src/views/plugin/PluginTranslations.vue:202
+#: web/src/views/plugin/PluginTranslations.vue:264
 msgid "AI draft the missing texts"
 msgstr ""
 
-#: web/src/views/plugin/PluginTranslations.vue:226
+#: web/src/views/plugin/PluginTranslations.vue:288
 msgid "A text left out in a language shows in English there"
 msgstr ""
 
-#: web/src/views/plugin/PluginTranslations.vue:237
-#: web/src/views/translate/TranslatePage.vue:215
-msgid "Text"
+#: web/src/views/plugin/PluginTranslations.vue:299
+#: web/src/views/review/ReviewChange.vue:479
+msgid "Field"
 msgstr ""
 
-#: web/src/views/plugin/PluginTranslations.vue:247
+#: web/src/views/plugin/PluginTranslations.vue:309
 msgid "Store texts, live after the merge"
 msgstr ""
 
-#: web/src/views/plugin/PluginTranslations.vue:271
+#: web/src/views/plugin/PluginTranslations.vue:333
 msgid "Goes to review"
 msgstr ""
 
-#: web/src/views/plugin/PluginTranslations.vue:272
+#: web/src/views/plugin/PluginTranslations.vue:334
 msgid "%{n} suggestions"
 msgstr ""
 
-#: web/src/views/plugin/PluginTranslations.vue:281
+#: web/src/views/plugin/PluginTranslations.vue:337
+#: web/src/views/plugin/PluginTranslations.vue:369
+msgid "Fill in"
+msgstr ""
+
+#: web/src/views/plugin/PluginTranslations.vue:343
 msgid "Runtime strings, ship with the next release"
 msgstr ""
 
-#: web/src/views/plugin/PluginTranslations.vue:298
-msgid "Runtime strings are translated in plugin.json in the repository. A generated plugin.json takes them from its source code; export them to translate there."
+#: web/src/views/plugin/PluginTranslations.vue:378
+msgid "Runtime strings go to the repository as a pull request and take effect once the next version is released. For a plugin.json generated from code, use export and import."
 msgstr ""
 
-#: web/src/views/plugin/PluginTranslations.vue:300
-msgid "Export runtime strings"
+#: web/src/views/plugin/PluginTranslations.vue:378
+#: web/src/views/plugin/PluginTranslations.vue:421
+msgid "Runtime strings ship with the packages of the plugin. Export them for its author to translate in the source code."
 msgstr ""
 
-#: web/src/views/plugin/PluginTranslations.vue:318
-msgid "English"
+#: web/src/views/plugin/PluginTranslations.vue:381
+msgid "Export"
 msgstr ""
 
-#: web/src/views/plugin/PluginTranslations.vue:321
+#: web/src/views/plugin/PluginTranslations.vue:384
+msgid "Import"
+msgstr ""
+
+#: web/src/views/plugin/PluginTranslations.vue:407
+msgid "Source text"
+msgstr ""
+
+#: web/src/views/plugin/PluginTranslations.vue:410
 msgid "There is no English text yet"
 msgstr ""
 
-#: web/src/views/plugin/PluginTranslations.vue:325
+#: web/src/views/plugin/PluginTranslations.vue:414
 msgid "Translation"
 msgstr ""
 
-#: web/src/views/plugin/PluginTranslations.vue:329
-msgid "Terms as Nginx UI translates them: %{terms}"
+#: web/src/views/plugin/PluginTranslations.vue:418
+msgid "Terms as the Nginx UI interface translates them: %{terms}"
 msgstr ""
 
-#: web/src/views/plugin/PluginTranslations.vue:333
+#: web/src/views/plugin/PluginTranslations.vue:421
+msgid "Goes to plugin.json in the repository and ships with the next release."
+msgstr ""
+
+#: web/src/views/plugin/PluginTranslations.vue:425
 msgid "Confirm the translation"
 msgstr ""
 
-#: web/src/views/plugin/PluginTranslations.vue:340
+#: web/src/views/plugin/PluginTranslations.vue:432
 msgid "Draft again"
 msgstr ""
 
-#: web/src/views/plugin/PluginTranslations.vue:349
+#: web/src/views/plugin/PluginTranslations.vue:441
 msgid "Pick a cell to translate it."
 msgstr ""
 
@@ -4654,10 +4696,6 @@ msgstr ""
 
 #: web/src/views/review/ReviewChange.vue:473
 msgid "Compared with the current listing"
-msgstr ""
-
-#: web/src/views/review/ReviewChange.vue:479
-msgid "Field"
 msgstr ""
 
 #: web/src/views/review/ReviewChange.vue:483
@@ -5220,6 +5258,10 @@ msgstr ""
 
 #: web/src/views/translate/TranslatePage.vue:208
 msgid "Fill in only what you add or change"
+msgstr ""
+
+#: web/src/views/translate/TranslatePage.vue:215
+msgid "Text"
 msgstr ""
 
 #: web/src/views/translate/TranslatePage.vue:218

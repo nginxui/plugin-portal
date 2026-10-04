@@ -117,7 +117,7 @@ function stateText(state: string): string {
     case 'miss': return $gettext('Not translated, shows English')
     case 'review': return $gettext('Goes to review, English shows until it is approved')
     case 'ai': return $gettext('AI draft waiting for confirmation')
-    case 'runtime': return $gettext('Comes from the manifest and ships with the next release')
+    case 'runtime': return $gettext('Translated in the translation workbench, ships with the next release')
     default: return ''
   }
 }
@@ -202,7 +202,11 @@ async function submit() {
         ? $gettext('Some texts cannot be listed. Check the names for words such as official.')
         : code === 'missing_media'
           ? $gettext('An uploaded screenshot is missing. Upload it again in the screenshot studio.')
-          : $gettext('The change could not be sent. Please try again.')
+          : code === 'runtime_needs_repository'
+            ? $gettext('Runtime strings ship with the packages, so they go to the repository. Pick a repository as the store source, or export them for the author.')
+            : code === 'no_manifest'
+              ? $gettext('The repository has no plugin.json at its root. Export the runtime strings and translate them in the source code.')
+              : $gettext('The change could not be sent. Please try again.')
   }
   finally {
     submitting.value = false
@@ -325,7 +329,7 @@ const name = computed(() => localized(doc.value.name) || localized(plugin.value.
                 <div class="min-w-0">
                   <div>{{ itemLabel(item, doc) }}</div>
                   <div class="text-3 op-65">
-                    {{ item.review ? $gettext('Goes to name review after the merge') : $gettext('Live after the merge') }}
+                    {{ item.review ? $gettext('Goes to name review after the merge') : item.field === 'runtime' ? $gettext('Ships with the next release') : $gettext('Live after the merge') }}
                   </div>
                 </div>
               </div>
@@ -371,7 +375,7 @@ const name = computed(() => localized(doc.value.name) || localized(plugin.value.
               </ATag>
             </template>
             <div class="items">
-              <button v-for="row in pageTexts" :key="row.key" type="button" class="text-row" :disabled="row.runtime" @click="preview?.edit(row.key)">
+              <button v-for="row in pageTexts" :key="row.key" type="button" class="text-row" @click="row.runtime ? router.push(`/plugins/${plugin.id}/translations`) : preview?.edit(row.key)">
                 <span :class="STATE_ICON[row.state]" />
                 <span class="min-w-0">
                   <span class="block">{{ row.label }}</span>
@@ -417,9 +421,9 @@ const name = computed(() => localized(doc.value.name) || localized(plugin.value.
                 <span class="i-tabler-alert-triangle c-warn" />
                 <div>
                   <div>{{ $gettext('Permission notes are not translated here') }}</div>
-                  <div class="text-3 op-65">
-                    {{ $gettext('They come from the manifest and are translated in the repository') }}
-                  </div>
+                  <RouterLink :to="`/plugins/${plugin.id}/translations`" class="text-3">
+                    {{ $gettext('Translate them in the translation workbench') }}
+                  </RouterLink>
                 </div>
               </div>
             </div>

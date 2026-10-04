@@ -6,7 +6,7 @@ import { call, json, mockFetch, signIn } from './helpers'
 const RAW = 'https://raw.githubusercontent.com'
 const ID = 'io.github.octo-author.geoip'
 const listing = { id: ID, name: { en: 'GeoIP Access' }, repository_url: 'https://github.com/octo-author/geoip', trust: 'community', releases: [{ version: '1.0.0', release_notes_url: 'https://github.com/octo-author/geoip/releases/tag/v1.0.0' }] }
-const manifest = { id: ID, name: 'GeoIP Access', description: 'Allow or deny by country.', i18n: { zh_CN: { description: '按国家限制访问。', screenshot_captions: { map: '地图' } } }, screenshots: [{ id: 'map', path: 'docs/map.png', caption: 'Map' }] }
+const manifest = { id: ID, name: 'GeoIP Access', description: 'Allow or deny by country.', permissions: ['network'], permission_reasons: { network: 'Looks up the country of an address.' }, i18n: { zh_CN: { description: '按国家限制访问。', screenshot_captions: { map: '地图' } } }, screenshots: [{ id: 'map', path: 'docs/map.png', caption: 'Map' }] }
 const repo = { id: 77, full_name: 'octo-author/geoip', default_branch: 'main', owner: { id: 4242, login: 'octo-author', type: 'User', avatar_url: '' }, permissions: { admin: true, push: true, pull: true } }
 
 let dispatched: { change: string, payload: string }[] = []
@@ -19,6 +19,7 @@ function routes(): Route[] {
     url => url.href === `${RAW}/octo-author/geoip/v1.0.0/plugin.json` ? json(manifest) : undefined,
     url => url.href === `${RAW}/octo-author/geoip/v1.0.0/README.md` ? new Response('# GeoIP') : undefined,
     url => url.href === 'https://api.github.com/repos/octo-author/geoip' ? json(repo) : undefined,
+    url => url.pathname === '/repos/octo-author/geoip/contents/plugin.json' ? json({ encoding: 'base64', content: btoa(String.fromCharCode(...new TextEncoder().encode(JSON.stringify(manifest, null, 4)))) }) : undefined,
     url => url.pathname === `/repos/${env.CATALOG_REPO}/installation` ? json({ id: 9 }) : undefined,
     url => url.pathname === '/app/installations/9/access_tokens' ? json({ token: 'ghs_actions' }) : undefined,
     async (url, init) => {
@@ -124,6 +125,31 @@ describe('store editor', () => {
     const text = new TextDecoder().decode(await zip.arrayBuffer())
     expect(text).toContain('plugin.store.json')
     expect(text).toContain('"Better."')
+  })
+
+  it('writes runtime strings into plugin.json of the repository', async () => {
+    const cookie = await signedIn()
+    const { doc } = await (await call(`/api/plugins/${ID}/store`, { cookie })).json() as { doc: unknown }
+    await call(`/api/plugins/${ID}/store/draft`, { method: 'PUT', mutate: true, cookie, json: { doc, runtime: { ja_JP: { network: 'アドレスの国を調べます。', unknown: 'x' }, en: { network: 'No.' } } } })
+    const state = await (await call(`/api/plugins/${ID}/store`, { cookie })).json() as { items: { field: string, label: string }[] }
+    expect(state.items.filter(i => i.field === 'runtime')).toEqual([{ field: 'runtime', locale: 'ja_JP', label: 'runtime.ja_JP.network', review: false }])
+    const result = await (await call(`/api/plugins/${ID}/store/submit`, { method: 'POST', mutate: true, cookie, json: {} })).json() as { change: string, moveChange: string | null, delivery: string }
+    expect(result.delivery).toBe('patch')
+    expect(result.moveChange).toBeNull()
+    const zip = new TextDecoder().decode(await (await call(`/api/changes/${result.change}/patch`, { cookie })).arrayBuffer())
+    expect(zip).toContain('plugin.json')
+    expect(zip).not.toContain('plugin.store.json')
+    expect(zip).toContain('"ja_JP": {\n            "permission_reasons": {\n                "network": "アドレスの国を調べます。"')
+  })
+
+  it('keeps runtime strings out of a store hosted by the catalog', async () => {
+    const cookie = await signedIn()
+    entry = { ...entry, store: { source: 'catalog' } }
+    const { doc } = await (await call(`/api/plugins/${ID}/store`, { cookie })).json() as { doc: unknown }
+    await call(`/api/plugins/${ID}/store/draft`, { method: 'PUT', mutate: true, cookie, json: { doc, runtime: { ja_JP: { network: 'アドレスの国を調べます。' } } } })
+    const response = await call(`/api/plugins/${ID}/store/submit`, { method: 'POST', mutate: true, cookie, json: {} })
+    expect(response.status).toBe(409)
+    expect(await response.json()).toEqual({ error: 'runtime_needs_repository' })
   })
 
   it('takes screenshots as 16:10 WebP only', async () => {

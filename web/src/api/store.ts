@@ -15,6 +15,8 @@ export interface StoreDraft {
   readme?: string | null
   source?: Exclude<StoreSourceKind, 'release'>
   ai?: string[]
+  // Translations of the runtime strings of plugin.json, by locale and permission.
+  runtime?: Record<string, Record<string, string>>
   updatedAt: number
 }
 
@@ -41,7 +43,7 @@ export function getStore(id: string) {
   return api<StoreState>(`/plugins/${encodeURIComponent(id)}/store`)
 }
 
-export function saveDraft(id: string, draft: { doc: PreviewDoc, readme?: string | null, source?: string, ai?: string[] }) {
+export function saveDraft(id: string, draft: { doc: PreviewDoc, readme?: string | null, source?: string, ai?: string[], runtime?: Record<string, Record<string, string>> }) {
   return api<{ ok: boolean, problems: string[] }>(`/plugins/${encodeURIComponent(id)}/store/draft`, { method: 'PUT', json: draft })
 }
 
