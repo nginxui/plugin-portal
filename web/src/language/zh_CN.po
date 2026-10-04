@@ -351,11 +351,29 @@ msgstr "已翻译 %{n}"
 msgid "Not translated, shows English"
 msgstr "未翻译，显示英文"
 
+msgid ""
+"The English name is cut short in the card. Keep it to about %{n} characters."
+msgstr "英文名称在卡片中被截断，建议不超过 %{n} 个字符。"
+
+msgid ""
+"In a longer language such as German, the name may be cut short. Keep the "
+"English name to about %{n} characters."
+msgstr "翻译成德语等较长的语言后，名称可能被截断，建议英文名称不超过 %{n} 个字符。"
+
+msgid "Marketplace list card"
+msgstr "插件市场卡片"
+
+msgid "Cards in the list have a fixed width, a long name is cut short"
+msgstr "列表中的卡片宽度固定，过长的名称会被截断"
+
 msgid "List cards at their real width"
 msgstr "按实际宽度显示列表卡片"
 
 msgid "%{n} names are cut short"
 msgstr "%{n} 个名称显示不全"
+
+msgid "%{lang}, shows English"
+msgstr "%{lang}，显示英文"
 
 msgid "Name cut short"
 msgstr "名称显示不全"
@@ -364,7 +382,7 @@ msgid "Community"
 msgstr "社区"
 
 msgid "Nginx UI marketplace, as users see it"
-msgstr "Nginx UI 插件市场预览，与宿主中的显示一致"
+msgstr "Nginx UI 插件市场预览，与用户看到的一致"
 
 msgid "Changes need review"
 msgstr "修改需审核"
@@ -663,9 +681,6 @@ msgstr "最长语言：%{lang}"
 msgid "Right to left: %{lang}"
 msgstr "从右到左：%{lang}"
 
-msgid "Pseudo localized"
-msgstr "伪本地化"
-
 msgid "The name is cut short"
 msgstr "名称被截断"
 
@@ -674,9 +689,6 @@ msgstr "完整显示"
 
 msgid "Marketplace cards"
 msgstr "插件市场卡片"
-
-msgid "Cards in the list have a fixed width, a long name is cut short"
-msgstr "列表中的卡片宽度固定，过长的名称会被截断"
 
 msgid "Draft"
 msgstr "草稿"
@@ -1547,8 +1559,8 @@ msgstr "术语表"
 
 msgid ""
 "Taken from the translations of the Nginx UI interface every day, so plugin "
-"texts use the words of the host."
-msgstr "取自 Nginx UI 界面的现有翻译，使插件译文与宿主用词一致。"
+"texts use the same words as Nginx UI."
+msgstr "取自 Nginx UI 界面的现有翻译，使插件译文与 Nginx UI 用词一致。"
 
 msgid "%{n} languages"
 msgstr "%{n} 种语言"
@@ -2963,6 +2975,22 @@ msgstr "%{total} 项中 %{n} 项未翻译"
 msgid "Permission note: %{name}"
 msgstr "权限说明：%{name}"
 
+msgid "Longest language"
+msgstr "最长的语言"
+
+msgid ""
+"The preview shows %{lang}, the language with the longest name. Check that "
+"names and descriptions are not cut short and that nothing overlaps."
+msgstr "预览切换到名称最长的语言：%{lang}。请检查名称和描述是否被截断，内容之间是否重叠。"
+
+msgid "Right to left"
+msgstr "从右到左"
+
+msgid ""
+"The preview shows Arabic, laid out right to left. Check that texts read in "
+"order and that icons and buttons sit on the correct side."
+msgstr "预览切换到阿拉伯语，从右到左排列。请检查文字顺序是否正确，图标和按钮是否在应有的一侧。"
+
 msgid "Goes to review, English shows until it is approved"
 msgstr "需审核，通过前显示英文"
 
@@ -3051,17 +3079,16 @@ msgstr "压力测试"
 msgid "Off"
 msgstr "关闭"
 
-msgid "Longest language"
-msgstr "最长的语言"
-
-msgid "Right to left"
-msgstr "从右到左"
-
 msgid "Desktop"
 msgstr "桌面"
 
 msgid "Phone"
 msgstr "手机"
+
+msgid ""
+"The cards under the preview show the name in every language of Nginx UI. "
+"Only the preview changes, the store texts stay as they are."
+msgstr "预览下方的卡片展示名称在 Nginx UI 各语言中的显示效果。测试只影响预览，商店资料不会改变。"
 
 msgid "Current"
 msgstr "当前"
@@ -3136,12 +3163,6 @@ msgstr "所有名称都能完整显示在列表卡片中"
 
 msgid "Check that the page reads right to left without overlapping text"
 msgstr "请检查页面从右到左显示时文本是否重叠"
-
-msgid "Permission notes are not translated here"
-msgstr "权限说明不在此处翻译"
-
-msgid "Translate them in the translation workbench"
-msgstr "前往翻译工作台翻译"
 
 msgid "Submit the store changes of %{name}"
 msgstr "提交 %{name} 的商店更改"
@@ -4082,6 +4103,45 @@ msgstr "名称建议"
 
 msgid "An accepted name still goes to a maintainer before it is listed."
 msgstr "名称建议被采纳后，仍需维护者审核才会显示。"
+
+#~ msgid ""
+#~ "Each text shows in the language with its longest translation. Check that "
+#~ "names and descriptions are not cut short and that nothing overlaps."
+#~ msgstr "每段文字都以译文最长的语言显示。请检查名称和描述是否被截断，内容之间是否重叠。"
+
+#~ msgid ""
+#~ "The page is laid out right to left, as for Arabic. Check that texts read in "
+#~ "order and that icons and buttons sit on the correct side."
+#~ msgstr "页面按阿拉伯语等语言的习惯从右到左排列。请检查文字顺序是否正确，图标和按钮是否在应有的一侧。"
+
+#~ msgid "Pseudo localized"
+#~ msgstr "伪本地化"
+
+#~ msgid ""
+#~ "The English texts show with accented letters, a third longer and inside "
+#~ "brackets, like a language that is not there yet, whatever language is "
+#~ "chosen. Plain English that remains cannot be translated here, and a missing "
+#~ "bracket means the text is cut short."
+#~ msgstr ""
+#~ "无论选择哪种语言，都以英文文字为底本，换成带重音的字母，加长约三分之一并放在方括号内，模拟一种尚未翻译的语言。仍显示为普通英文的文字无法在这里翻译；方括号缺了一边，说明文字被截断了。"
+
+#~ msgid "Permission notes are not translated here"
+#~ msgstr "权限说明不在此处翻译"
+
+#~ msgid "Translate them in the translation workbench"
+#~ msgstr "前往翻译工作台翻译"
+
+#~ msgid ""
+#~ "Texts show with accented letters, a third longer and inside brackets, like a"
+#~ " language that is not there yet. Plain English that remains cannot be "
+#~ "translated, and a missing bracket means the text is cut short."
+#~ msgstr ""
+#~ "文字换成带重音的字母，加长约三分之一并放在方括号内，模拟一种尚未翻译的语言。仍显示为普通英文的文字无法翻译；方括号缺了一边，说明文字被截断了。"
+
+#~ msgid ""
+#~ "Taken from the translations of the Nginx UI interface every day, so plugin "
+#~ "texts use the words of the host."
+#~ msgstr "取自 Nginx UI 界面的现有翻译，使插件译文与宿主用词一致。"
 
 #~ msgid "No repository is waiting to be submitted."
 #~ msgstr "暂无可提交的仓库。"

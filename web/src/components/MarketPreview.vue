@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { Localized, Stress } from '@/lib/market'
+import type { Localized } from '@/lib/market'
 import { computed, nextTick, ref, useTemplateRef } from 'vue'
 import { $gettext } from '@/lib/gettext'
 import { RTL_LOCALES } from '@/lib/hostLocales'
@@ -32,7 +32,6 @@ const props = withDefaults(defineProps<{
   locale: string
   theme?: 'light' | 'dark'
   device?: 'desktop' | 'phone'
-  stress?: Stress
   images?: Record<string, string | null>
   manifest?: PreviewManifest | null
   version?: string | null
@@ -60,7 +59,6 @@ const props = withDefaults(defineProps<{
 }>(), {
   theme: 'light',
   device: 'desktop',
-  stress: 'off',
   images: () => ({}),
   manifest: null,
   version: null,
@@ -92,16 +90,15 @@ const emit = defineEmits<{
 
 const LIMITS: Record<string, number> = { name: 64, description: 1000, homepage_url: 500, caption: 200, readme: 65536 }
 
-const s = computed(() => props.stress)
-const rtl = computed(() => s.value === 'rtl' || RTL_LOCALES.includes(props.locale))
-const name = computed(() => resolve(props.doc.name, props.locale, s.value))
-const description = computed(() => resolve(props.doc.description, props.locale, s.value))
-const L = (key: string, value?: string) => label(props.locale, key, value, s.value)
+const rtl = computed(() => RTL_LOCALES.includes(props.locale))
+const name = computed(() => resolve(props.doc.name, props.locale))
+const description = computed(() => resolve(props.doc.description, props.locale))
+const L = (key: string, value?: string) => label(props.locale, key, value)
 
 const shots = computed(() => (props.doc.screenshots ?? []).map(shot => ({
   ...shot,
   url: (props.theme === 'dark' && shot.dark_path ? props.images[shot.dark_path] : null) ?? props.images[shot.path] ?? null,
-  caption: resolve(shot.caption, props.locale, s.value),
+  caption: resolve(shot.caption, props.locale),
 })))
 
 const permissions = computed(() => (props.manifest?.permissions ?? []).map((p) => {
@@ -221,7 +218,7 @@ function editableClass(key: string, missing = false) {
     </div>
     <div class="body" :dir="rtl ? 'rtl' : 'ltr'" :lang="locale.replace('_', '-')">
       <div class="head">
-        <PluginIcon :src="iconUrl" :name="name.text || '?'" :size="48" />
+        <PluginIcon :src="iconUrl" :name="resolve(doc.name, locale).text || '?'" :size="48" />
         <div class="min-w-0 flex-1">
           <div class="pill-row">
             <span v-if="trust" class="pill" :class="trust === 'official' ? 'is-accent' : ''">{{ trustText(locale, trust) }}</span>
@@ -238,7 +235,7 @@ function editableClass(key: string, missing = false) {
           </div>
         </div>
         <button type="button" class="install" disabled>
-          {{ installLabel(locale, stress) }}
+          {{ installLabel(locale) }}
         </button>
       </div>
 

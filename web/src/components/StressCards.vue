@@ -5,16 +5,15 @@ import { $gettext } from '@/lib/gettext'
 import { localeName } from '@/lib/locales'
 import { resolve, trustText } from '@/lib/market'
 
-// The three stress tests side by side, each as a marketplace list card at
+// The stress tests side by side, each as a marketplace list card at
 // the width Nginx UI gives it, with what it found.
 
 export interface StressResults {
   longest: { locale: string, cut: boolean }
   rtl: { cut: boolean, translated: boolean }
-  pseudo: { cut: boolean }
 }
 
-const props = defineProps<{ doc: PreviewDoc, trust: string | null, theme: 'light' | 'dark', author: string | null }>()
+const props = defineProps<{ doc: PreviewDoc, trust: string | null, theme: 'light' | 'dark', author: string | null, iconUrl?: string | null }>()
 const emit = defineEmits<{ results: [results: StressResults] }>()
 
 const CARD_WIDTH = 320
@@ -24,7 +23,6 @@ const longestLocale = computed(() => Object.entries(props.doc.name ?? {}).reduce
 const samples = computed(() => [
   { key: 'longest' as const, title: $gettext('Longest language: %{lang}', { lang: localeName(longestLocale.value) }), locale: longestLocale.value, name: resolve(props.doc.name, longestLocale.value).text, rtl: false },
   { key: 'rtl' as const, title: $gettext('Right to left: %{lang}', { lang: localeName(RTL) }), locale: RTL, name: resolve(props.doc.name, RTL).text, rtl: true },
-  { key: 'pseudo' as const, title: $gettext('Pseudo localized'), locale: 'en', name: resolve(props.doc.name, 'en', 'pseudo').text, rtl: false },
 ])
 
 const names = ref<HTMLElement[]>([])
@@ -39,7 +37,6 @@ async function measure() {
   emit('results', {
     longest: { locale: longestLocale.value, cut: !!out.longest },
     rtl: { cut: !!out.rtl, translated: !!props.doc.name?.[RTL] },
-    pseudo: { cut: !!out.pseudo },
   })
 }
 
@@ -65,7 +62,7 @@ function verdict(key: string) {
         </div>
         <article class="card" :style="{ maxWidth: `${CARD_WIDTH}px` }" :dir="sample.rtl ? 'rtl' : 'ltr'">
           <div class="card-head">
-            <span class="icon">{{ (sample.name || '?').slice(0, 1).toUpperCase() }}</span>
+            <PluginIcon :src="iconUrl" :name="resolve(doc.name, 'en').text || '?'" :size="40" />
             <div class="min-w-0 flex-1">
               <span ref="names" class="name" :class="{ cut: cut[sample.key] }" :data-key="sample.key">{{ sample.name }}</span>
               <span class="sub">{{ author }}</span>
@@ -107,18 +104,6 @@ function verdict(key: string) {
   display: flex;
   align-items: center;
   gap: 10px;
-}
-
-.icon {
-  display: grid;
-  place-items: center;
-  flex: none;
-  width: 40px;
-  height: 40px;
-  border-radius: 10px;
-  background: #e6f4ff;
-  color: #1677ff;
-  font-weight: 600;
 }
 
 .name {

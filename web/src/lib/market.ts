@@ -3,9 +3,9 @@ import { marked } from 'marked'
 import { MARKET_CAPABILITIES, MARKET_CATEGORIES, MARKET_CREDENTIALS, MARKET_LABELS, MARKET_PERMISSIONS, MARKET_UNKNOWN } from './marketStrings'
 
 // How the store preview reads texts: in the preview language, falling back to
-// English as Nginx UI does, and transformed by the stress switch.
+// English as Nginx UI does.
 
-export type Stress = 'off' | 'longest' | 'rtl' | 'pseudo'
+export type Stress = 'off' | 'longest' | 'rtl'
 
 export interface Localized { [locale: string]: string }
 
@@ -32,40 +32,26 @@ const INSTALL: Record<string, string> = {
   ar: 'تثبيت',
 }
 
-const ACCENTS: Record<string, string> = { a: 'á', b: 'ƀ', c: 'ç', d: 'đ', e: 'é', g: 'ĝ', h: 'ĥ', i: 'í', j: 'ĵ', k: 'ķ', l: 'ļ', n: 'ñ', o: 'ö', r: 'ŕ', s: 'š', t: 'ţ', u: 'ü', w: 'ŵ', y: 'ý', z: 'ž', A: 'Á', C: 'Ç', E: 'É', G: 'Ĝ', I: 'Í', N: 'Ñ', O: 'Ö', S: 'Š', U: 'Ü' }
-
-/** Pseudo localized: accented and a third longer, so clipped text shows. */
-export function pseudo(text: string): string {
-  const accented = [...text].map(c => ACCENTS[c] ?? c).join('')
-  const pad = '~'.repeat(Math.max(2, Math.ceil(text.length / 3)))
-  return `[${accented} ${pad}]`
-}
-
-export function resolve(value: Localized | undefined, locale: string, stress: Stress = 'off'): Resolved {
+export function resolve(value: Localized | undefined, locale: string): Resolved {
   if (!value)
     return { text: '', fallback: false }
-  if (stress === 'longest') {
-    const longest = Object.values(value).reduce((a, b) => (b.length > a.length ? b : a), '')
-    return { text: longest, fallback: false }
-  }
   const own = value[locale]
   const text = own ?? value.en ?? Object.values(value)[0] ?? ''
   const fallback = !own && locale !== 'en' && !!text
-  return { text: stress === 'pseudo' ? pseudo(text) : text, fallback }
+  return { text, fallback }
 }
 
 /** A label of the preview chrome in the preview language. */
-export function label(locale: string, key: string, value?: string, stress: Stress = 'off'): string {
+export function label(locale: string, key: string, value?: string): string {
   const table = MARKET_LABELS[locale] ?? MARKET_LABELS.en
   let text = String(table[key] ?? MARKET_LABELS.en[key] ?? key)
   if (value !== undefined)
     text = text.replace('{x}', value)
-  return stress === 'pseudo' ? pseudo(text) : text
+  return text
 }
 
-export function installLabel(locale: string, stress: Stress = 'off'): string {
-  const text = INSTALL[locale] ?? INSTALL.en
-  return stress === 'pseudo' ? pseudo(text) : text
+export function installLabel(locale: string): string {
+  return INSTALL[locale] ?? INSTALL.en
 }
 
 export function trustText(locale: string, trust: string | null | undefined): string {
