@@ -12,6 +12,7 @@ export interface ReviewDetail {
   author: { login: string, avatarUrl: string | null, changes: number, merged: number } | null
   claim: string | null
   repository: string | null
+  repositoryCreatedAt?: string | null
   before: Record<string, unknown> | null
   listing: { description: Record<string, string> | null, screenshots: { url: string, dark_url?: string, caption?: Record<string, string> }[], iconUrl: string | null, capabilities: string[], manifest: Record<string, any> | null, version: string | null } | null
   pull: { number: number, state: string, merged: boolean, mergeable: boolean | null, mergeableState: string, url: string, title: string } | null
@@ -34,6 +35,27 @@ export function approveBatch(ids: string[]) {
 
 export function rejectChange(id: string, comment: string) {
   return api<{ ok: boolean }>(`/review/${encodeURIComponent(id)}/reject`, { method: 'POST', json: { comment } })
+}
+
+export interface AiFinding {
+  severity: 'warn' | 'info' | 'ok'
+  text: string
+  sources: { label: string, url?: string }[]
+}
+
+export interface AiReview {
+  findings: AiFinding[]
+  provider: string
+  model: string
+  createdAt: number
+}
+
+export function getAiReview(id: string, locale: string) {
+  return api<{ enabled: boolean, review: AiReview | null }>(`/review/${encodeURIComponent(id)}/ai?locale=${encodeURIComponent(locale)}`)
+}
+
+export function makeAiReview(id: string, locale: string) {
+  return api<{ review: AiReview, remaining: number }>(`/review/${encodeURIComponent(id)}/ai`, { method: 'POST', json: { locale } })
 }
 
 export function getReview(id: string) {

@@ -1,11 +1,16 @@
 import type { AppEnv, Env } from '../env'
 import type { ChangeRow } from '../lib/changes'
 import { Hono } from 'hono'
+import { AiError, defaultProvider } from '../lib/ai'
+import { preReview, reviewTarget } from '../lib/aiReview'
 import { audit } from '../lib/audit'
+import { cached } from '../lib/cache'
 import { loadCatalog, repoOf } from '../lib/catalog'
 import { event, getChange } from '../lib/changes'
 import { github, GitHubError } from '../lib/github'
+import { isHostLocale } from '../lib/locales'
 import { userToken } from '../lib/session'
+import { headOf } from '../lib/store'
 import { now } from '../lib/time'
 import { requireMaintainer, requireSession } from '../middleware/auth'
 import { present, refresh } from './changes'
@@ -125,6 +130,72 @@ review.get('/catalog', async (c) => {
   return c.json({ plugins: [...listed, ...pending] })
 })
 
+// The repository and ref a change is read at: the release a new listing was
+// drafted from, else the listed release, else the default branch.
+async function target(env: Env, token: string, change: ChangeRow) {
+  const plugin = change.plugin_id ? await env.DB.prepare('SELECT repo_full_name FROM plugins WHERE plugin_id = ?').bind(change.plugin_id).first<{ repo_full_name: string | null }>() : null
+  const listing = change.plugin_id ? (await loadCatalog(env)).plugins.find(p => p.id === change.plugin_id) ?? null : null
+  const found = reviewTarget(change, plugin?.repo_full_name ?? repoOf(listing?.repository_url) ?? null)
+  if (!found.repo || found.ref)
+    return found
+  const tag = /\/releases\/tag\/([^/?#]+)/.exec(listing?.releases?.[0]?.release_notes_url ?? '')?.[1]
+  return { repo: found.repo, ref: tag ? decodeURIComponent(tag) : (await headOf(token, found.repo).catch(() => null))?.sha ?? null }
+}
+
+interface AiReviewRow {
+  findings_json: string
+  provider: string
+  model: string
+  created_at: number
+}
+
+// The AI pre-review of a change in the maintainer's language, if one was made.
+review.get('/:id/ai', async (c) => {
+  const locale = isHostLocale(c.req.query('locale') ?? '') ? c.req.query('locale')! : 'en'
+  const [row, provider] = await Promise.all([
+    c.env.DB.prepare('SELECT findings_json, provider, model, created_at FROM ai_reviews WHERE change_id = ? AND locale = ?').bind(c.req.param('id'), locale).first<AiReviewRow>(),
+    defaultProvider(c.env),
+  ])
+  return c.json({
+    enabled: !!provider && !!c.env.AI_KEY,
+    review: row && { findings: JSON.parse(row.findings_json), provider: row.provider, model: row.model, createdAt: row.created_at },
+  })
+})
+
+review.post('/:id/ai', async (c) => {
+  const session = c.get('session')
+  const body = await c.req.json<{ locale?: string }>().catch(() => ({} as { locale?: string }))
+  const locale = isHostLocale(body.locale ?? '') ? body.locale! : 'en'
+  const change = await getChange(c.env, c.req.param('id'))
+  if (!change)
+    return c.json({ error: 'not_found' }, 404)
+  const token = await userToken(c.env, session.id)
+  const { repo, ref } = await target(c.env, token, change)
+  const before = await currentEntry(c.env, change.plugin_id) as Record<string, unknown> | null
+  try {
+    const result = await preReview(c.env, session.user.id, token, locale, {
+      repo,
+      ref,
+      pluginId: change.plugin_id,
+      kind: change.kind,
+      entry: change.entry_json ? JSON.parse(change.entry_json) : null,
+      before,
+    })
+    const t = now()
+    await c.env.DB.prepare(
+      `INSERT INTO ai_reviews (change_id, locale, findings_json, provider, model, created_by, created_at) VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7)
+       ON CONFLICT (change_id, locale) DO UPDATE SET findings_json = ?3, provider = ?4, model = ?5, created_by = ?6, created_at = ?7`,
+    ).bind(change.id, locale, JSON.stringify(result.findings), result.provider.name, result.provider.model, session.user.id, t).run()
+    await audit(c.env.DB, { actorId: session.user.id, action: 'ai.review', subject: change.plugin_id ?? undefined, detail: { change: change.id, findings: result.findings.length, provider: result.provider.name, model: result.provider.model } })
+    return c.json({ review: { findings: result.findings, provider: result.provider.name, model: result.provider.model, createdAt: t }, remaining: result.remaining })
+  }
+  catch (error) {
+    if (error instanceof AiError)
+      return c.json({ error: error.code }, error.code === 'quota' ? 429 : 503)
+    throw error
+  }
+})
+
 review.get('/:id', async (c) => {
   const session = c.get('session')
   const token = await userToken(c.env, session.id)
@@ -155,6 +226,11 @@ review.get('/:id', async (c) => {
       .first<{ total: number, merged: number | null }>(),
   ])
   const payload = change.payload_json ? JSON.parse(change.payload_json) as { eligibility?: string, repository_url?: string } : {}
+  // When the repository was created, for the author card.
+  const repoName = payload.repository_url?.replace('https://github.com/', '') ?? repoOf(listing?.repository_url) ?? null
+  const repoCreatedAt = repoName
+    ? await cached(`repo-created:${repoName.toLowerCase()}`, 86400, async () => (await github<{ created_at?: string }>(`/repos/${repoName}`, token).catch(() => null))?.created_at ?? null)
+    : null
   const { results: events } = await c.env.DB.prepare(
     `SELECT e.stage, e.detail_json, e.at, u.login AS actor FROM change_events e LEFT JOIN users u ON u.id = e.actor_id
      WHERE e.change_id = ? ORDER BY e.at, e.id`,
@@ -165,6 +241,7 @@ review.get('/:id', async (c) => {
     author: author ? { login: author.login, avatarUrl: author.avatar_url, changes: history?.total ?? 0, merged: history?.merged ?? 0 } : null,
     claim: payload.eligibility ?? null,
     repository: payload.repository_url ?? null,
+    repositoryCreatedAt: repoCreatedAt,
     before,
     // The listing as users see it now, for the comparison.
     listing: listing && { description: listing.description ?? null, screenshots: (listing as { screenshots?: unknown[] }).screenshots ?? [], iconUrl: listing.icon_url ?? null, capabilities: listing.capabilities ?? [], manifest: (listing.releases?.[0] as { manifest?: unknown } | undefined)?.manifest ?? null, version: listing.releases?.[0]?.version ?? null },

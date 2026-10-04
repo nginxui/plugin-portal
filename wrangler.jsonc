@@ -63,7 +63,8 @@
   //   DEPLOY_APP_PRIVATE_KEY its private key, starts apply.yml
   // Optional, each turns a feature on:
   //   BOT_LOGIN, BOT_TOKEN  the machine user that opens store pull requests from its forks
-  //   AI_KEY                32 random bytes, base64, encrypts AI provider keys
+  //   AI_KEY                32 random bytes, base64, encrypts AI provider keys apart from SESSION_KEY;
+  //                         without it SESSION_KEY does, and keys sealed that way still open once it is set
   //   EMAIL_API_URL, EMAIL_API_KEY, EMAIL_FROM  tracker email through an HTTP mail API
   // Screenshot uploads need an R2 bucket bound as MEDIA, plugin-media in the spec.
 }

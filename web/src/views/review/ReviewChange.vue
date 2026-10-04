@@ -1,10 +1,10 @@
 <script setup lang="ts">
-import type { ReviewDetail } from '@/api/review'
+import type { AiReview, ReviewDetail } from '@/api/review'
 import { onKeyStroke } from '@vueuse/core'
 import { computed, onMounted, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { ApiError } from '@/api/client'
-import { approveChange, commentOnChange, getQueue, getReview, rejectChange, requestChanges } from '@/api/review'
+import { approveChange, commentOnChange, getAiReview, getQueue, getReview, makeAiReview, rejectChange, requestChanges } from '@/api/review'
 import { categoryLabel } from '@/lib/categories'
 import { kindLabel } from '@/lib/changeKinds'
 import { checkRunLabel } from '@/lib/checkRuns'
@@ -194,6 +194,51 @@ const approving = ref(false)
 const approveOpen = ref(false)
 const requestOpen = ref(false)
 const requestText = ref('')
+
+// The AI pre-review: findings to look at, never a decision.
+const ai = ref<{ enabled: boolean, review: AiReview | null } | null>(null)
+const aiPicked = ref<number[]>([])
+const aiBusy = ref(false)
+const aiError = ref('')
+watch([id, () => gettext.current], async () => {
+  ai.value = null
+  aiPicked.value = []
+  aiError.value = ''
+  ai.value = await getAiReview(id.value, gettext.current).catch(() => null)
+  pickWarnings()
+}, { immediate: true })
+function pickWarnings() {
+  aiPicked.value = (ai.value?.review?.findings ?? []).map((f, i) => f.severity === 'warn' ? i : -1).filter(i => i >= 0)
+}
+async function runAi() {
+  aiBusy.value = true
+  aiError.value = ''
+  try {
+    const result = await makeAiReview(id.value, gettext.current)
+    ai.value = { enabled: true, review: result.review }
+    pickWarnings()
+  }
+  catch (e) {
+    aiError.value = e instanceof ApiError && e.code === 'quota' ? $gettext('No AI requests are left for today.') : $gettext('The summary could not be made. Please try again later.')
+  }
+  finally {
+    aiBusy.value = false
+  }
+}
+function toggleFinding(index: number, on: boolean) {
+  aiPicked.value = on ? [...aiPicked.value, index] : aiPicked.value.filter(i => i !== index)
+}
+// The picked findings become the text of a request for changes.
+function findingsToRequest() {
+  const findings = ai.value?.review?.findings ?? []
+  requestText.value = aiPicked.value.sort((a, b) => a - b).map(i => `- ${findings[i].text}${findings[i].sources.length ? ` (${findings[i].sources.map(s => s.label).join(', ')})` : ''}`).join('\n')
+  requestOpen.value = true
+}
+const SEVERITY_ICON: Record<string, string> = {
+  warn: 'i-tabler-alert-triangle c-warn',
+  info: 'i-tabler-info-circle c-info',
+  ok: 'i-tabler-circle-check c-ok',
+}
 const requesting = ref(false)
 const comment = ref('')
 const commenting = ref(false)
@@ -375,6 +420,51 @@ onKeyStroke('k', e => !typing(e) && step(-1))
 
       <div class="cols">
         <AFlex vertical gap="middle" class="col-main">
+          <ACard v-if="ai?.enabled || ai?.review">
+            <template #title>
+              <span class="i-tabler-message-2 mr-2 op-65" />{{ $gettext('AI pre-review summary') }}
+            </template>
+            <template #extra>
+              <AFlex align="center" gap="small">
+                <span v-if="ai.review" class="text-3 op-65">{{ $gettext('%{model}, %{time}', { model: ai.review.model, time: fromNow(ai.review.createdAt) }) }}</span>
+                <span class="ai-badge">AI</span>
+              </AFlex>
+            </template>
+            <template v-if="ai.review">
+              <AEmpty v-if="!ai.review.findings.length" :image-style="{ height: '40px' }" :description="$gettext('Nothing to point out.')" />
+              <div v-for="(f, i) in ai.review.findings" :key="i" class="finding">
+                <span :class="SEVERITY_ICON[f.severity]" class="finding-icon" />
+                <div class="min-w-0 flex-1">
+                  <div>{{ f.text }}</div>
+                  <AFlex v-if="f.sources.length" gap="6" wrap class="mt-2">
+                    <component :is="s.url ? 'a' : 'span'" v-for="(s, j) in f.sources" :key="j" class="source" :href="s.url" target="_blank" rel="noopener">
+                      <span class="i-tabler-file-text" />{{ s.label }}
+                    </component>
+                  </AFlex>
+                </div>
+                <ACheckbox :checked="aiPicked.includes(i)" :aria-label="$gettext('Pick this finding')" @change="(e: { target: { checked: boolean } }) => toggleFinding(i, e.target.checked)" />
+              </div>
+              <AFlex justify="space-between" align="center" gap="middle" wrap class="mt-4">
+                <span class="text-3 op-65">{{ $gettext('The summary is for reference only. It approves and rejects nothing; the checks decide.') }}</span>
+                <AFlex gap="small">
+                  <AButton size="small" :loading="aiBusy" @click="runAi">
+                    {{ $gettext('Summarize again') }}
+                  </AButton>
+                  <AButton v-if="isOpen" :disabled="!aiPicked.length" @click="findingsToRequest">
+                    {{ $gettext('Turn the %{n} picked into a request for changes', { n: String(aiPicked.length) }) }}
+                  </AButton>
+                </AFlex>
+              </AFlex>
+            </template>
+            <AFlex v-else justify="space-between" align="center" gap="middle" wrap>
+              <span class="text-3 op-65">{{ $gettext('Reads the README, the manifest, the store texts and the code that names each network host, and points out what deserves a look.') }}</span>
+              <AButton type="primary" :loading="aiBusy" @click="runAi">
+                <span class="i-tabler-sparkles" />{{ $gettext('Summarize') }}
+              </AButton>
+            </AFlex>
+            <AAlert v-if="aiError" type="error" show-icon class="mt-3" :title="aiError" />
+          </ACard>
+
           <ACard>
             <template #title>
               <span class="i-tabler-eye mr-2 op-65" />{{ $gettext('What users will see') }}
@@ -646,6 +736,10 @@ onKeyStroke('k', e => !typing(e) && step(-1))
               <dd>{{ $gettext('%{n} in total, %{merged} merged', { n: String(detail.author.changes), merged: String(detail.author.merged) }) }}</dd>
               <dt>{{ $gettext('Submitted') }}</dt>
               <dd>{{ formatDate(change.createdAt) }}</dd>
+              <template v-if="detail.repositoryCreatedAt">
+                <dt>{{ $gettext('Repository created') }}</dt>
+                <dd>{{ formatDate(detail.repositoryCreatedAt) }}</dd>
+              </template>
             </dl>
           </ACard>
 
@@ -692,6 +786,61 @@ onKeyStroke('k', e => !typing(e) && step(-1))
 </template>
 
 <style scoped>
+.finding {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 12px 0;
+}
+
+.finding + .finding {
+  border-top: 1px solid var(--portal-border);
+}
+
+.finding-icon {
+  flex: none;
+  margin-top: 3px;
+}
+
+.source {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 1px 8px;
+  border-radius: 4px;
+  background: var(--portal-faint);
+  border: 1px solid var(--portal-border);
+  font-size: 12px;
+  color: inherit;
+}
+
+a.source:hover {
+  color: var(--portal-primary);
+}
+
+.ai-badge {
+  padding: 0 6px;
+  border-radius: 4px;
+  font-size: 12px;
+  color: #722ed1;
+  background: #f9f0ff;
+  border: 1px solid #d3adf7;
+}
+
+:global(html.dark) .ai-badge {
+  color: #b37feb;
+  background: #1a1325;
+  border-color: #391085;
+}
+
+.c-warn {
+  color: #d48806;
+}
+
+.c-ok {
+  color: #389e0d;
+}
+
 .keycap {
   display: inline-block;
   min-width: 16px;

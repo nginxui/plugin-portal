@@ -800,6 +800,9 @@ msgstr "修改了 AI 模型 %{name}"
 msgid "Removed the AI model %{name}"
 msgstr "移除了 AI 模型 %{name}"
 
+msgid "Made an AI pre-review with %{n} findings"
+msgstr "生成 AI 预审摘要，共 %{n} 条"
+
 msgid "Read the glossary again, %{n} languages"
 msgstr "重新读取术语表，共 %{n} 种语言"
 
@@ -3137,8 +3140,13 @@ msgstr "填写"
 msgid "Permission notes, live after the merge"
 msgstr "权限说明，合并后生效"
 
-msgid "Translated permission notes go to the store document with the other texts and show once it is merged. Their English stays in plugin.json. Export and import move them as JSON shaped like the i18n of plugin.json."
-msgstr "权限说明的译文和其他商店文本一起保存在 plugin.store.json 中，合并后生效；英文仍取自 plugin.json。导出与导入使用和 plugin.json 的 i18n 相同结构的 JSON。"
+msgid ""
+"Translated permission notes go to the store document with the other texts "
+"and show once it is merged. Their English stays in plugin.json. Export and "
+"import move them as JSON shaped like the i18n of plugin.json."
+msgstr ""
+"权限说明的译文和其他商店文本一起保存在 plugin.store.json 中，合并后生效；英文"
+"仍取自 plugin.json。导出与导入使用和 plugin.json 的 i18n 相同结构的 JSON。"
 
 msgid "Export"
 msgstr "导出"
@@ -3329,6 +3337,12 @@ msgstr "拥有 %{repo} 的 admin 权限"
 msgid "No claim recorded"
 msgstr "没有记录认领依据"
 
+msgid "No AI requests are left for today."
+msgstr "今日 AI 次数已用完。"
+
+msgid "The summary could not be made. Please try again later."
+msgstr "无法生成摘要，请稍后重试。"
+
 msgid ""
 "GitHub refused the merge. The pull request may have conflicts or failing "
 "checks."
@@ -3369,6 +3383,33 @@ msgstr "批准勾选的名称"
 
 msgid "Approve and merge"
 msgstr "批准并合并"
+
+msgid "AI pre-review summary"
+msgstr "AI 预审摘要"
+
+msgid "%{model}, %{time}"
+msgstr "%{model}，%{time}"
+
+msgid "Nothing to point out."
+msgstr "没有需要指出的问题。"
+
+msgid "Pick this finding"
+msgstr "选择此条"
+
+msgid "The summary is for reference only. It approves and rejects nothing; the checks decide."
+msgstr "摘要仅供参考，不会通过或拒绝任何提交，结果以自动检查为准。"
+
+msgid "Summarize again"
+msgstr "重新生成"
+
+msgid "Turn the %{n} picked into a request for changes"
+msgstr "将勾选的 %{n} 条转为修改意见"
+
+msgid "Reads the README, the manifest, the store texts and the code that names each network host, and points out what deserves a look."
+msgstr "阅读 README、插件清单、商店资料以及引用各网络主机的代码，指出值得留意的地方。"
+
+msgid "Summarize"
+msgstr "生成摘要"
 
 msgid "What users will see"
 msgstr "用户将看到的内容"
@@ -3484,6 +3525,9 @@ msgstr "历史变更"
 
 msgid "%{n} in total, %{merged} merged"
 msgstr "共 %{n} 次，已合并 %{merged} 次"
+
+msgid "Repository created"
+msgstr "仓库创建"
 
 msgid "Pull request #%{n} on GitHub"
 msgstr "在 GitHub 上查看拉取请求 #%{n}"

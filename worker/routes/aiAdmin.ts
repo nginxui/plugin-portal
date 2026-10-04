@@ -78,7 +78,7 @@ aiAdmin.get('/providers', async (c) => {
   ])
   return c.json({
     glossary,
-    keyConfigured: !!c.env.AI_KEY,
+    keyConfigured: true,
     providers: providers.results.map(presentProvider),
     today: { authors: usage?.authors ?? 0, requests: usage?.requests ?? 0, inputTokens: usage?.input ?? 0, outputTokens: usage?.output ?? 0 },
   })

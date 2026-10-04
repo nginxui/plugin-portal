@@ -3,8 +3,9 @@ import { open, seal } from './crypto'
 import { glossary } from './glossary'
 import { localeName } from './localeNames'
 
-// AI drafts of store texts (spec 9). Maintainers configure the providers; the
-// keys are sealed with a Worker secret and never reach a browser. A draft is
+// AI drafts of store texts (spec 9). Maintainers configure the providers on
+// the AI models page; the keys are sealed with a Worker secret, AI_KEY when it
+// is set and SESSION_KEY otherwise, and never reach a browser. A draft is
 // never published by itself: an author confirms it first.
 
 export interface ProviderRow {
@@ -29,13 +30,26 @@ export class AiError extends Error {
 const CONTEXT = 'ai-provider-key'
 
 function secret(env: Env): string {
-  if (!env.AI_KEY)
-    throw new AiError('no_key', 'AI_KEY is not set')
-  return env.AI_KEY
+  const value = env.AI_KEY || env.SESSION_KEY
+  if (!value)
+    throw new AiError('no_key', 'neither AI_KEY nor SESSION_KEY is set')
+  return value
 }
 
 export const sealKey = (env: Env, key: string) => seal(secret(env), key, CONTEXT)
-export const openKey = (env: Env, sealed: string) => open(secret(env), sealed, CONTEXT)
+
+/** Opens a key sealed with AI_KEY or, before it was set, with SESSION_KEY. */
+export async function openKey(env: Env, sealed: string): Promise<string> {
+  for (const value of [env.AI_KEY, env.SESSION_KEY]) {
+    if (!value)
+      continue
+    try {
+      return await open(value, sealed, CONTEXT)
+    }
+    catch {}
+  }
+  throw new AiError('no_key', 'the key cannot be opened, enter it again')
+}
 
 export function presentProvider(row: ProviderRow) {
   return {
@@ -79,14 +93,13 @@ export async function prompt(request: DraftRequest): Promise<string> {
   return lines.join('\n')
 }
 
-async function call(env: Env, provider: ProviderRow, system: string, text: string): Promise<{ text: string, input: number, output: number }> {
+async function call(env: Env, provider: ProviderRow, system: string, user: string, maxTokens = 1024): Promise<{ text: string, input: number, output: number }> {
   const key = await openKey(env, provider.key_enc)
-  const user = `<text>\n${text}\n</text>`
   if (provider.kind === 'anthropic') {
     const response = await fetch(`${(provider.base_url || 'https://api.anthropic.com').replace(/\/+$/, '')}/v1/messages`, {
       method: 'POST',
       headers: { 'x-api-key': key, 'anthropic-version': '2023-06-01', 'content-type': 'application/json' },
-      body: JSON.stringify({ model: provider.model, max_tokens: 1024, system, messages: [{ role: 'user', content: user }] }),
+      body: JSON.stringify({ model: provider.model, max_tokens: maxTokens, system, messages: [{ role: 'user', content: user }] }),
     })
     if (!response.ok)
       throw new AiError('provider', `the provider answered ${response.status}`)
@@ -96,7 +109,7 @@ async function call(env: Env, provider: ProviderRow, system: string, text: strin
   const response = await fetch(`${(provider.base_url ?? '').replace(/\/+$/, '')}/chat/completions`, {
     method: 'POST',
     headers: { 'authorization': `Bearer ${key}`, 'content-type': 'application/json' },
-    body: JSON.stringify({ model: provider.model, max_tokens: 1024, messages: [{ role: 'system', content: system }, { role: 'user', content: user }] }),
+    body: JSON.stringify({ model: provider.model, max_tokens: maxTokens, messages: [{ role: 'system', content: system }, { role: 'user', content: user }] }),
   })
   if (!response.ok)
     throw new AiError('provider', `the provider answered ${response.status}`)
@@ -108,8 +121,8 @@ export async function defaultProvider(env: Env): Promise<ProviderRow | null> {
   return env.DB.prepare('SELECT * FROM ai_providers WHERE enabled = 1 ORDER BY is_default DESC, id ASC LIMIT 1').first<ProviderRow>()
 }
 
-/** A draft translation for a user, counted against their daily quota. */
-export async function draft(env: Env, userId: number, request: DraftRequest, provider?: ProviderRow | null): Promise<{ text: string, remaining: number, provider: ProviderRow }> {
+/** One answer of the default provider for a user, counted against their daily quota. */
+export async function complete(env: Env, userId: number, system: string, user: string, maxTokens = 1024, provider?: ProviderRow | null): Promise<{ text: string, remaining: number, provider: ProviderRow }> {
   const chosen = provider ?? await defaultProvider(env)
   if (!chosen)
     throw new AiError('no_provider')
@@ -117,11 +130,17 @@ export async function draft(env: Env, userId: number, request: DraftRequest, pro
   const usage = await env.DB.prepare('SELECT requests FROM ai_usage WHERE user_id = ? AND day = ?').bind(userId, day).first<{ requests: number }>()
   if ((usage?.requests ?? 0) >= chosen.daily_quota)
     throw new AiError('quota')
-  const result = await call(env, chosen, await prompt(request), request.source)
+  const result = await call(env, chosen, system, user, maxTokens)
   await env.DB.prepare(
     `INSERT INTO ai_usage (user_id, day, requests, input_tokens, output_tokens) VALUES (?, ?, 1, ?, ?)
      ON CONFLICT (user_id, day) DO UPDATE SET requests = requests + 1, input_tokens = input_tokens + excluded.input_tokens, output_tokens = output_tokens + excluded.output_tokens`,
   ).bind(userId, day, result.input, result.output).run()
+  return { text: result.text, remaining: chosen.daily_quota - (usage?.requests ?? 0) - 1, provider: chosen }
+}
+
+/** A draft translation for a user, counted against their daily quota. */
+export async function draft(env: Env, userId: number, request: DraftRequest, provider?: ProviderRow | null): Promise<{ text: string, remaining: number, provider: ProviderRow }> {
+  const result = await complete(env, userId, await prompt(request), `<text>\n${request.source}\n</text>`, 1024, provider)
   const text = result.text.trim().replace(/^<text>\s*|\s*<\/text>$/g, '').replace(/^["“]|["”]$/g, '').slice(0, LIMITS[request.field])
-  return { text, remaining: chosen.daily_quota - (usage?.requests ?? 0) - 1, provider: chosen }
+  return { ...result, text }
 }
