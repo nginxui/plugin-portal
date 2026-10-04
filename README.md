@@ -22,7 +22,8 @@ bun run dev
 Sign in uses the GitHub App NGINX UI Plugin Portal, whose callback URLs are
 `https://portal.nginxui.com/api/auth/callback` and
 `http://localhost:5173/api/auth/callback`. Put its client secret in
-`.dev.vars` for local work.
+`.dev.vars` for local work. Its logo is `assets/github-app.png` with the
+badge background color `#ffffff`.
 
 ```bash
 bun run test
