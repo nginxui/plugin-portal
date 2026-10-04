@@ -242,6 +242,7 @@ export async function previewSubmission(env: Env, session: Session, token: strin
 }
 
 export interface ReleaseInfo {
+  signer: string | null
   version: string
   tag: string
   releasedAt: string | null
@@ -270,7 +271,13 @@ export async function repoReleases(token: string, repo: string): Promise<Release
     ...(typeof manifest.description === 'string' && manifest.description.trim() ? { en: manifest.description.trim() } : {}),
     ...manifestDescriptions(manifest),
   }
-  return releases.map(r => ({
+  // The signing key of each release, from the certificate at its tag.
+  const signers = await Promise.all(releases.map(async (r) => {
+    const certificate = await rawFile(repo, r.tag_name, 'plugin.signer')
+    return certificate ? parsePublicKey(certificate)?.id ?? null : null
+  }))
+  return releases.map((r, index) => ({
+    signer: signers[index],
     version: tagVersion(r.tag_name),
     tag: r.tag_name,
     releasedAt: r.published_at ?? null,

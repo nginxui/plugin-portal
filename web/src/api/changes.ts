@@ -13,8 +13,11 @@ export interface Change {
   prNumber: number | null
   prUrl: string | null
   commitSha: string | null
+  commitUrl: string | null
   entry: { name?: Record<string, string>, repo?: string, version?: string } | null
   outcome: { outcome: string, message?: string, problems?: string, runUrl?: string | null } | null
+  operations?: { yank?: string[], unyank?: string[], revoke_signers?: string[], categories?: string[] }
+  reason?: string
   createdAt: number
   updatedAt: number
 }

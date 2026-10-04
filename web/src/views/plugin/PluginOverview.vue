@@ -1,32 +1,57 @@
 <script setup lang="ts">
-import type { Release } from '@/api/plugins'
-import { computed, h } from 'vue'
+import { computed, ref } from 'vue'
+import { useRouter } from 'vue-router'
+import { ApiError } from '@/api/client'
+import { submitSelfService } from '@/api/plugins'
+import { getCategories } from '@/api/submit'
 import { categoryLabel } from '@/lib/categories'
 import { $gettext } from '@/lib/gettext'
 import { localized } from '@/lib/labels'
-import { formatDate } from '@/lib/time'
 import { usePluginStore } from '@/stores/plugin'
 
 const store = usePluginStore()
+const router = useRouter()
 const plugin = computed(() => store.detail!.plugin)
-const releases = computed(() => store.detail!.releases)
+const canEdit = computed(() => (plugin.value.role === 'admin' || plugin.value.role === 'publisher') && !store.detail!.pending && store.detail!.listed)
 
-const columns = computed(() => [
-  { title: $gettext('Version'), dataIndex: 'version', key: 'version' },
-  { title: $gettext('Released'), dataIndex: 'releasedAt', key: 'releasedAt', render: (_: unknown, record: Release) => formatDate(record.releasedAt) },
-  { title: $gettext('Requires Nginx UI'), dataIndex: 'minNginxUiVersion', key: 'min', render: (_: unknown, record: Release) => record.minNginxUiVersion ?? '' },
-  {
-    title: '',
-    key: 'notes',
-    render: (_: unknown, record: Release) => record.notesUrl
-      ? h('a', { href: record.notesUrl, target: '_blank', rel: 'noopener' }, $gettext('Release notes'))
-      : null,
-  },
-])
+const editing = ref(false)
+const known = ref<string[]>([])
+const chosen = ref<string[]>([])
+const saving = ref(false)
+const error = ref('')
+
+async function editCategories() {
+  chosen.value = [...plugin.value.categories]
+  error.value = ''
+  editing.value = true
+  if (!known.value.length)
+    known.value = (await getCategories().catch(() => ({ categories: [] }))).categories
+}
+
+const unchanged = computed(() => chosen.value.length === 0 || [...chosen.value].sort().join() === [...plugin.value.categories].sort().join())
+
+async function saveCategories() {
+  saving.value = true
+  error.value = ''
+  try {
+    const { change } = await submitSelfService(plugin.value.id, { categories: chosen.value })
+    editing.value = false
+    router.push(`/changes/${change}`)
+  }
+  catch (e) {
+    error.value = e instanceof ApiError && e.code === 'busy'
+      ? $gettext('Another change of this plugin is in progress.')
+      : $gettext('The change could not be sent. Please try again.')
+  }
+  finally {
+    saving.value = false
+  }
+}
 </script>
 
 <template>
   <AFlex vertical gap="middle">
+    <PendingChange />
     <ACard :title="$gettext('Listing')">
       <ADescriptions :column="{ xs: 1, md: 2 }">
         <ADescriptionsItem v-if="localized(plugin.description)" :label="$gettext('Description')" :span="2">
@@ -44,14 +69,19 @@ const columns = computed(() => [
           <ATag v-for="category in plugin.categories" :key="category">
             {{ categoryLabel(category) }}
           </ATag>
+          <a v-if="canEdit" class="text-3" role="button" tabindex="0" @click.prevent="editCategories" @keydown.enter.prevent="editCategories">{{ $gettext('Edit') }}</a>
         </ADescriptionsItem>
         <ADescriptionsItem v-if="plugin.version" :label="$gettext('Latest version')">
           v{{ plugin.version }}
         </ADescriptionsItem>
       </ADescriptions>
     </ACard>
-    <ACard :title="$gettext('Versions')">
-      <ATable :columns="columns" :data-source="releases" row-key="version" :pagination="false" size="middle" :scroll="{ x: 560 }" />
-    </ACard>
+    <AModal v-model:open="editing" :title="$gettext('Change categories')" :confirm-loading="saving" :ok-text="$gettext('Save')" :ok-button-props="{ disabled: unchanged }" @ok="saveCategories">
+      <p class="op-75">
+        {{ $gettext('The catalog files the plugin under these categories from its next update.') }}
+      </p>
+      <CategoryPicker v-model="chosen" :options="known" />
+      <AAlert v-if="error" type="error" show-icon class="mt-3" :title="error" />
+    </AModal>
   </AFlex>
 </template>

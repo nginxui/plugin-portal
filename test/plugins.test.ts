@@ -44,6 +44,8 @@ function catalogAndRepos(...extra: Route[]) {
       return json({ ...repo, full_name: match[1], owner: { ...repo.owner, avatar_url: '' } })
     },
     ...githubOAuth(),
+    // Entries on the catalog's main and certificates at tags are absent unless a test says otherwise.
+    url => url.hostname === 'raw.githubusercontent.com' ? new Response('not found', { status: 404 }) : undefined,
   )
 }
 

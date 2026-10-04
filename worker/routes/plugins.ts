@@ -3,7 +3,7 @@ import type { RepoAccess, RepoOwner, Role } from '../lib/access'
 import type { CatalogPlugin, Localized } from '../lib/catalog'
 import { Hono } from 'hono'
 import { mapLimit, repoAccess } from '../lib/access'
-import { latestRelease, loadCatalog, repoOf } from '../lib/catalog'
+import { catalogEntry, latestRelease, loadCatalog, repoOf } from '../lib/catalog'
 import { github, GitHubError } from '../lib/github'
 import { userToken } from '../lib/session'
 import { repoReleases } from '../lib/submission'
@@ -216,15 +216,38 @@ plugins.get('/:id', async (c) => {
       const newest = found.find(r => Object.keys(r.description).length) ?? found[0]
       if (newest) {
         summary = { ...summary, description: Object.keys(newest.description).length ? newest.description : summary.description, version: summary.version ?? newest.version, releasedAt: newest.releasedAt }
-        releases = found.map(r => ({ version: r.version, released_at: r.releasedAt ?? undefined, min_nginx_ui_version: r.minNginxUiVersion ?? undefined, release_notes_url: r.url }))
+        releases = found.map(r => ({ version: r.version, released_at: r.releasedAt ?? undefined, min_nginx_ui_version: r.minNginxUiVersion ?? undefined, release_notes_url: r.url, signer: r.signer ?? undefined }))
       }
     }
   }
   if (!summary.role && !await checkMaintainer(c.env, session.id))
     return c.json({ error: 'no_access' }, 403)
+  const [entry, pending] = await Promise.all([
+    catalogEntry(c.env, id),
+    c.env.DB.prepare(`SELECT id, kind FROM changes WHERE plugin_id = ? AND class = 'self_service' AND state IN ('open', 'merged') ORDER BY created_at DESC LIMIT 1`)
+      .bind(id)
+      .first<{ id: string, kind: string }>(),
+  ])
+  const yanked = new Set(entry?.yanked ?? [])
+  const revoked = new Set((entry?.revoked_signers ?? []).map(s => s.toUpperCase()))
+  // The entry on main is newer than the published index between deploys.
+  if (entry?.categories)
+    summary = { ...summary, categories: entry.categories }
   return c.json({
     plugin: summary,
-    releases: releases.map(r => ({ version: r.version, releasedAt: r.released_at ?? null, minNginxUiVersion: r.min_nginx_ui_version ?? null, notesUrl: r.release_notes_url ?? null })),
+    releases: releases.map(r => ({
+      version: r.version,
+      releasedAt: r.released_at ?? null,
+      minNginxUiVersion: r.min_nginx_ui_version ?? null,
+      notesUrl: r.release_notes_url ?? null,
+      signer: r.signer ?? null,
+      yanked: yanked.has(r.version) || (!!r.signer && revoked.has(r.signer.toUpperCase())),
+      yankedBy: yanked.has(r.version) ? 'version' : r.signer && revoked.has(r.signer.toUpperCase()) ? 'signer' : null,
+      prerelease: r.channel ? r.channel !== 'stable' : r.version.includes('-'),
+    })),
+    revokedSigners: [...revoked],
+    pending,
+    listed: !!entry,
     access: {
       role: summary.role,
       permission: access?.permission ?? null,

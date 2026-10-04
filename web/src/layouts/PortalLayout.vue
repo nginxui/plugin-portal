@@ -63,7 +63,9 @@ const selectedKeys = computed(() => {
     else if (item && 'key' in item)
       keys.push(String(item.key))
   }
-  const match = keys.filter(key => route.path.startsWith(key)).sort((a, b) => b.length - a.length)[0]
+  // A change page belongs to the plugins of its author.
+  const path = route.path.startsWith('/changes/') ? '/plugins' : route.path
+  const match = keys.filter(key => path.startsWith(key)).sort((a, b) => b.length - a.length)[0]
   return match ? [match] : []
 })
 

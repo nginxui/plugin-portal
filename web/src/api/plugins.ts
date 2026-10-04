@@ -38,11 +38,26 @@ export interface Release {
   releasedAt: string | null
   minNginxUiVersion: string | null
   notesUrl: string | null
+  signer: string | null
+  yanked: boolean
+  yankedBy: 'version' | 'signer' | null
+  prerelease: boolean
+}
+
+export interface SelfServiceOperations {
+  yank?: string[]
+  unyank?: string[]
+  revoke_signers?: string[]
+  categories?: string[]
 }
 
 export interface PluginDetail {
   plugin: PluginSummary
   releases: Release[]
+  revokedSigners: string[]
+  // The newest self service change still in progress, or merged and not live.
+  pending: { id: string, kind: string } | null
+  listed: boolean
   access: {
     role: Role | null
     permission: 'admin' | 'maintain' | 'write' | 'triage' | 'other' | null
@@ -81,4 +96,8 @@ export function getOwners() {
 
 export function getOwner(login: string) {
   return api<OwnerDetail>(`/owners/${encodeURIComponent(login)}`)
+}
+
+export function submitSelfService(id: string, operations: SelfServiceOperations, reason = '') {
+  return api<{ change: string }>(`/plugins/${encodeURIComponent(id)}/changes`, { method: 'POST', json: { operations, reason } })
 }

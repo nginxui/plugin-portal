@@ -70,6 +70,13 @@ async function canSee(env: Env, session: Session, token: string, change: ChangeR
   return checkMaintainer(env, session.id)
 }
 
+function selfServiceRequest(payload: string | null): { operations?: Record<string, string[]>, reason?: string } {
+  if (!payload)
+    return {}
+  const parsed = JSON.parse(payload) as { kind?: string, operations?: Record<string, string[]>, reason?: string }
+  return parsed.kind === 'entry_update' ? { operations: parsed.operations, reason: parsed.reason || undefined } : {}
+}
+
 export function present(env: Env, change: ChangeRow) {
   return {
     id: change.id,
@@ -82,7 +89,10 @@ export function present(env: Env, change: ChangeRow) {
     prNumber: change.pr_number,
     prUrl: change.pr_number ? `https://github.com/${env.CATALOG_REPO}/pull/${change.pr_number}` : null,
     commitSha: change.commit_sha,
+    commitUrl: change.commit_sha ? `https://github.com/${env.CATALOG_REPO}/commit/${change.commit_sha}` : null,
     entry: change.entry_json ? JSON.parse(change.entry_json) : null,
+    // What a self service change asked for, as the author sent it.
+    ...selfServiceRequest(change.payload_json),
     outcome: change.outcome_json ? JSON.parse(change.outcome_json) : null,
     createdAt: change.created_at,
     updatedAt: change.updated_at,
