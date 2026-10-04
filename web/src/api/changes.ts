@@ -1,0 +1,39 @@
+import { api } from './client'
+
+export type Stage = 'submitted' | 'checks' | 'review' | 'merged' | 'live'
+
+export interface Change {
+  id: string
+  pluginId: string | null
+  kind: string
+  class: string
+  state: 'draft' | 'open' | 'merged' | 'live' | 'rejected' | 'withdrawn' | 'failed'
+  stage: Stage
+  waitingOn: 'author' | 'maintainer' | 'system' | null
+  prNumber: number | null
+  prUrl: string | null
+  commitSha: string | null
+  entry: { name?: Record<string, string>, repo?: string, version?: string } | null
+  outcome: { outcome: string, message?: string, problems?: string, runUrl?: string | null } | null
+  createdAt: number
+  updatedAt: number
+}
+
+export interface ChangeEvent {
+  stage: string
+  actor: string | null
+  at: number
+  detail: { outcome?: string, prNumber?: number, retry?: boolean, commit?: string, runUrl?: string | null } | null
+}
+
+export function getChanges() {
+  return api<{ changes: Change[] }>('/changes')
+}
+
+export function getChange(id: string) {
+  return api<{ change: Change, canRetry: boolean, events: ChangeEvent[] }>(`/changes/${encodeURIComponent(id)}`)
+}
+
+export function retryChange(id: string) {
+  return api<{ ok: boolean }>(`/changes/${encodeURIComponent(id)}/retry`, { method: 'POST' })
+}

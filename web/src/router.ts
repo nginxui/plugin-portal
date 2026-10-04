@@ -26,6 +26,8 @@ export const router = createRouter({
             { path: 'access', name: 'plugin-access', component: () => import('@/views/plugin/PluginAccess.vue') },
           ],
         },
+        { path: 'submit', name: 'submit', component: () => import('@/views/SubmitPlugin.vue') },
+        { path: 'changes/:id', name: 'change', component: () => import('@/views/ChangeView.vue') },
         { path: 'owners', name: 'owners', component: () => import('@/views/owners/OwnerList.vue') },
         { path: 'owners/:login', name: 'owner', component: () => import('@/views/owners/OwnerPage.vue') },
       ],

@@ -23,6 +23,9 @@ msgstr "插件目录"
 msgid "My plugins"
 msgstr "我的插件"
 
+msgid "Submit a plugin"
+msgstr "提交插件"
+
 msgid "Organizations"
 msgstr "组织"
 
@@ -43,6 +46,105 @@ msgstr "切换深色模式"
 
 msgid "Account menu"
 msgstr "账户菜单"
+
+msgid "Repository"
+msgstr "仓库"
+
+msgid "Permission to submit"
+msgstr "提交权限"
+
+msgid "Release"
+msgstr "发布版本"
+
+msgid "plugin.json"
+msgstr "plugin.json"
+
+msgid "Plugin ID"
+msgstr "插件 ID"
+
+msgid "Name"
+msgstr "名称"
+
+msgid "Packages"
+msgstr "安装包"
+
+msgid "License"
+msgstr "许可证"
+
+msgid "%{repo} is a public repository."
+msgstr "%{repo} 是公开仓库。"
+
+msgid "The repository does not exist or is not public."
+msgstr "仓库不存在或未公开。"
+
+msgid "The repository is private. The catalog lists public repositories only."
+msgstr "仓库为私有。插件目录只收录公开仓库。"
+
+msgid "This repository may not be listed. Contact the maintainers if you think this is a mistake."
+msgstr "此仓库不能上架。如果你认为有误，请联系维护者。"
+
+msgid "The repository is archived."
+msgstr "仓库已归档。"
+
+msgid "You installed the Nginx UI Plugin Catalog app on this repository."
+msgstr "你在此仓库上安装了 Nginx UI 插件目录应用。"
+
+msgid "You have admin permission on this repository."
+msgstr "你在此仓库上拥有 admin 权限。"
+
+msgid "Only an admin of the repository can submit it. Ask an admin to submit it, or to install the Nginx UI Plugin Catalog app."
+msgstr "只有仓库管理员可以提交。请让管理员提交，或请管理员安装 Nginx UI 插件目录应用。"
+
+msgid "Version %{version}, the newest stable release."
+msgstr "版本 %{version}，最新稳定版本。"
+
+msgid "Version %{version} is a prerelease. The listing starts with it until a stable release is published."
+msgstr "版本 %{version} 是预发布版本。在发布稳定版本之前，上架内容以该版本为准。"
+
+msgid "The repository has no GitHub Release with a version tag such as v1.0.0 yet."
+msgstr "仓库还没有带版本标签（例如 v1.0.0）的 GitHub Release。"
+
+msgid "Read from the release %{tag}."
+msgstr "读取自发布版本 %{tag}。"
+
+msgid "There is no plugin.json at the root of the repository at %{tag}."
+msgstr "仓库在 %{tag} 的根目录下没有 plugin.json。"
+
+msgid "plugin.json at %{tag} is not valid JSON."
+msgstr "%{tag} 中的 plugin.json 不是有效的 JSON。"
+
+msgid "The plugin ID %{id} does not follow the naming rule, for example io.github.<owner>.<name>."
+msgstr "插件 ID %{id} 不符合命名规则，例如 io.github.<所有者>.<名称>。"
+
+msgid "The com.nginxui namespace is reserved for the plugins of the Nginx UI project."
+msgstr "com.nginxui 命名空间保留给 Nginx UI 项目自己的插件。"
+
+msgid "The plugin ID %{id} names another GitHub owner than %{owner}."
+msgstr "插件 ID %{id} 中的 GitHub 所有者与 %{owner} 不一致。"
+
+msgid "This plugin ID may not be listed. Contact the maintainers if you think this is a mistake."
+msgstr "此插件 ID 不能上架。如果你认为有误，请联系维护者。"
+
+msgid "A plugin with this ID is listed already."
+msgstr "使用此 ID 的插件已经上架。"
+
+msgid "A submission of this plugin is already under review."
+msgstr "此插件已有一个提交正在审核中。"
+
+msgid "plugin.json has no name."
+msgstr "plugin.json 没有名称。"
+
+msgid "The name holds \"%{word}\", which no name may hold. Only the plugins of the Nginx UI project are official."
+msgstr "名称中包含“%{word}”，任何名称都不能包含它。只有 Nginx UI 项目自己的插件才是官方插件。"
+
+msgid "%{count} packages in the release."
+msgstr "发布版本中有 %{count} 个安装包。"
+
+msgid "The release has no package named %{name} or one per platform."
+msgstr "发布版本中没有名为 %{name} 的安装包，也没有各平台的安装包。"
+
+msgid "GitHub detects no license in the repository. The listing shows none."
+msgstr "GitHub 未在仓库中识别到许可证，上架页面将不显示许可证。"
 
 msgid "Admin"
 msgstr "管理员"
@@ -83,8 +185,113 @@ msgstr "草稿"
 msgid "Delisted"
 msgstr "已下架"
 
+msgid "Submitted"
+msgstr "已提交"
+
+msgid "Checks"
+msgstr "检查"
+
+msgid "Maintainer review"
+msgstr "维护者审核"
+
+msgid "Merged"
+msgstr "已合并"
+
+msgid "Live in the catalog"
+msgstr "已在目录中上线"
+
+msgid "The plugin is listed in the catalog."
+msgstr "插件已在目录中上架。"
+
+msgid "The pull request was closed without merging."
+msgstr "拉取请求已关闭，未合并。"
+
+msgid "The checks found problems. Fix them in a new release, then run the checks again."
+msgstr "检查发现问题。请在新版本中修复，然后重新运行检查。"
+
+msgid "The checks could not be started. Please try again later."
+msgstr "无法启动检查，请稍后重试。"
+
+msgid "The checks could not finish. A maintainer will look into it."
+msgstr "检查未能完成，维护者会跟进处理。"
+
+msgid "The packages, signatures and listing are being checked. This takes a few minutes."
+msgstr "正在检查安装包、签名和上架信息，需要几分钟。"
+
+msgid "Waiting for a maintainer to review the submission."
+msgstr "等待维护者审核。"
+
+msgid "Approved. The plugin appears in the catalog after the next deploy, usually within minutes."
+msgstr "已通过审核。插件会在下次部署后出现在目录中，通常只需几分钟。"
+
+msgid "Checks started again"
+msgstr "已重新开始检查"
+
+msgid "The checks could not be started"
+msgstr "无法启动检查"
+
+msgid "Checks found problems"
+msgstr "检查发现问题"
+
+msgid "Checks could not finish"
+msgstr "检查未能完成"
+
+msgid "Checks passed, pull request #%{n} opened"
+msgstr "检查通过，已创建拉取请求 #%{n}"
+
+msgid "Merged by a maintainer"
+msgstr "维护者已合并"
+
+msgid "Pull request closed"
+msgstr "拉取请求已关闭"
+
+msgid "Listed in the catalog"
+msgstr "已在目录中上架"
+
+msgid "Change not found"
+msgstr "未找到该变更"
+
+msgid "New listing"
+msgstr "新上架"
+
+msgid "Submitted %{time}"
+msgstr "%{time}提交"
+
+msgid "Run the checks again"
+msgstr "重新运行检查"
+
+msgid "History"
+msgstr "记录"
+
+msgid "Links"
+msgstr "链接"
+
+msgid "Pull request #%{n}"
+msgstr "拉取请求 #%{n}"
+
+msgid "Log of the checks"
+msgstr "检查日志"
+
+msgid "Manage the plugin"
+msgstr "管理插件"
+
+msgid "The review is public on GitHub. You are mentioned in the pull request, so GitHub notifies you of comments."
+msgstr "审核在 GitHub 上公开进行。拉取请求中提及了你，GitHub 会通知你新的评论。"
+
 msgid "All"
 msgstr "全部"
+
+msgid "Needs changes"
+msgstr "需修改"
+
+msgid "Checking"
+msgstr "检查中"
+
+msgid "In review"
+msgstr "审核中"
+
+msgid "Publishing"
+msgstr "发布中"
 
 msgid "Manage the plugins you list in the catalog and follow changes under review."
 msgstr "管理你在插件目录中上架的插件，跟进审核中的变更。"
@@ -94,6 +301,12 @@ msgstr "无法加载你的插件。"
 
 msgid "Retry"
 msgstr "重试"
+
+msgid "In progress"
+msgstr "进行中"
+
+msgid "View"
+msgstr "查看"
 
 msgid "Plugins"
 msgstr "插件"
@@ -110,14 +323,20 @@ msgstr "你在插件仓库上拥有 admin、maintain、write 或 triage 权限�
 msgid "Repositories you can submit"
 msgstr "可提交的仓库"
 
-msgid "These repositories have the Nginx UI Plugin Catalog app installed by you. With the app installed, new releases reach the catalog within minutes."
-msgstr "以下仓库由你安装了 Nginx UI 插件目录应用。安装应用后，新版本会在几分钟内同步到目录。"
+msgid "Public repositories you administer or installed the Nginx UI Plugin Catalog app on. With the app installed, new releases reach the catalog within minutes."
+msgstr "你管理的公开仓库，以及你安装了 Nginx UI 插件目录应用的仓库。安装应用后，新版本会在几分钟内同步到目录。"
 
 msgid "No repository is waiting to be submitted."
 msgstr "暂无可提交的仓库。"
 
 msgid "App installed %{time}"
 msgstr "%{time}安装应用"
+
+msgid "You administer this repository"
+msgstr "你是此仓库的管理员"
+
+msgid "Submit as plugin"
+msgstr "提交为插件"
 
 msgid "Install the app on another repository"
 msgstr "在其他仓库上安装应用"
@@ -237,9 +456,6 @@ msgstr "没有使用此插件 ID 的上架内容或草稿。"
 msgid "View in catalog"
 msgstr "在目录中查看"
 
-msgid "Repository"
-msgstr "仓库"
-
 msgid "Plugin sections"
 msgstr "插件页面"
 
@@ -308,6 +524,60 @@ msgstr "使用 GitHub 登录"
 
 msgid "Signing in only confirms your GitHub identity. It grants no write access to your repositories."
 msgstr "登录仅用于确认你的 GitHub 身份，不会获得你仓库的写入权限。"
+
+msgid "The primary public key is not a minisign public key. Paste the content of primary.pub."
+msgstr "主公钥不是 minisign 公钥，请粘贴 primary.pub 的内容。"
+
+msgid "The checks no longer pass. Check the repository again."
+msgstr "检查已不再通过，请重新检查仓库。"
+
+msgid "The submission could not be sent. Please try again."
+msgstr "提交失败，请重试。"
+
+msgid "Once the checks pass, submit the plugin. It is listed after a maintainer approves it."
+msgstr "检查通过后提交，维护者审核通过即在目录中上架。"
+
+msgid "owner/repository"
+msgstr "所有者/仓库"
+
+msgid "Check"
+msgstr "检查"
+
+msgid "You need admin permission on the repository. The newest release, its plugin.json and its packages are read from GitHub."
+msgstr "你需要拥有仓库的 admin 权限。最新版本、其中的 plugin.json 和安装包会从 GitHub 读取。"
+
+msgid "The repository could not be checked. Please try again."
+msgstr "无法检查该仓库，请重试。"
+
+msgid "Name translations"
+msgstr "名称翻译"
+
+msgid "Names in every language are reviewed with the submission."
+msgstr "各语言的名称会随提交一起审核。"
+
+msgid "Details"
+msgstr "提交信息"
+
+msgid "Primary public key"
+msgstr "主公钥"
+
+msgid "The content of primary.pub, created with nginx-ui plugin key init. It verifies the signer certificates of your releases."
+msgstr "使用 nginx-ui plugin key init 生成的 primary.pub 的内容，用于验证你发布版本的签名者证书。"
+
+msgid "Up to three. Suggested from the capabilities of the plugin."
+msgstr "最多三个，根据插件的能力推荐。"
+
+msgid "Submit for review"
+msgstr "提交审核"
+
+msgid "Passed"
+msgstr "已通过"
+
+msgid "After you submit, the packages, their signatures and the signer certificate are verified in the catalog repository."
+msgstr "提交后，插件目录仓库会校验安装包、签名和签名者证书。"
+
+#~ msgid "These repositories have the Nginx UI Plugin Catalog app installed by you. With the app installed, new releases reach the catalog within minutes."
+#~ msgstr "以下仓库由你安装了 Nginx UI 插件目录应用。安装应用后，新版本会在几分钟内同步到目录。"
 
 #~ msgid "You have no plugins yet."
 #~ msgstr "你还没有插件。"

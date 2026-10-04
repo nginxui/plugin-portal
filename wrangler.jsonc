@@ -27,8 +27,33 @@
     "CATALOG_REPO": "nginxui/plugins",
     "CATALOG_APP_SLUG": "nginx-ui-plugin-catalog",
     "GITHUB_CLIENT_ID": "Iv23liIZ9byWbTtC8v83"
-  }
-  // Secrets, set with `wrangler secret put <NAME>`:
+  },
+  "env": {
+    // portal-staging.nginxui.com, against the test catalog nginxui/plugins-staging.
+    // Build and deploy with `bun run deploy:staging`.
+    "staging": {
+      "name": "nginxui-plugin-portal-staging",
+      "routes": [{ "pattern": "portal-staging.nginxui.com", "custom_domain": true }],
+      "d1_databases": [
+        {
+          "binding": "DB",
+          "database_name": "portal-staging",
+          "database_id": "9d9781ae-fd46-4037-b823-f743de92de17",
+          "migrations_dir": "migrations"
+        }
+      ],
+      "vars": {
+        "PORTAL_ORIGIN": "https://portal-staging.nginxui.com",
+        "CATALOG_URL": "https://plugins.nginxui.com",
+        "CATALOG_REPO": "nginxui/plugins-staging",
+        "CATALOG_APP_SLUG": "nginx-ui-plugin-catalog",
+        "GITHUB_CLIENT_ID": "Iv23liIZ9byWbTtC8v83"
+      }
+    }
+  },
+  // Secrets, set with `wrangler secret put <NAME>` (add `--env staging` for staging):
   //   GITHUB_CLIENT_SECRET  client secret of the Portal GitHub App
   //   SESSION_KEY           32 random bytes, base64, encrypts GitHub tokens
+  //   DEPLOY_APP_ID         id of the NGINX UI Catalog Deploy App
+  //   DEPLOY_APP_PRIVATE_KEY its private key, starts apply.yml
 }
