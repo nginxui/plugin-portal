@@ -1,13 +1,15 @@
 <script setup lang="ts">
 import type { ReviewDetail } from '@/api/review'
-import { computed, ref, watch } from 'vue'
+import { onKeyStroke } from '@vueuse/core'
+import { computed, onMounted, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { ApiError } from '@/api/client'
-import { approveChange, commentOnChange, getReview, rejectChange, requestChanges } from '@/api/review'
+import { approveChange, commentOnChange, getQueue, getReview, rejectChange, requestChanges } from '@/api/review'
 import { categoryLabel } from '@/lib/categories'
 import { kindLabel } from '@/lib/changeKinds'
 import { checkRunLabel } from '@/lib/checkRuns'
 import { $gettext } from '@/lib/gettext'
+import { HOST_LOCALES } from '@/lib/hostLocales'
 import { localized, trustLabel } from '@/lib/labels'
 import { localeName } from '@/lib/locales'
 import { previewRows } from '@/lib/preview'
@@ -115,6 +117,54 @@ const claimText = computed(() => {
   return claim || $gettext('No claim recorded')
 })
 
+// What users see now and after the change.
+interface Doc { name?: Record<string, string>, description?: Record<string, string>, homepage_url?: string, screenshots?: { id: string, path: string, dark_path?: string, caption?: Record<string, string> }[] }
+const compareMode = ref<'side' | 'slider' | 'changes'>('side')
+const compareTheme = ref<'light' | 'dark'>('light')
+const compareLocale = ref('en')
+const localeOptions = HOST_LOCALES.map(code => ({ value: code, label: localeName(code) }))
+const beforeDoc = computed<Doc | null>(() => {
+  const b = detail.value?.before as Record<string, any> | null
+  const l = detail.value?.listing
+  if (!b && !l)
+    return null
+  return {
+    name: b?.name,
+    description: b?.description ?? l?.description ?? undefined,
+    homepage_url: b?.homepage_url,
+    screenshots: (l?.screenshots ?? []).map((sh, i) => ({ id: `s${i + 1}`, path: sh.url, ...(sh.dark_url ? { dark_path: sh.dark_url } : {}), ...(sh.caption ? { caption: sh.caption } : {}) })),
+  }
+})
+const afterDoc = computed<Doc>(() => {
+  const e = entry.value ?? {}
+  const base = beforeDoc.value ?? {}
+  return {
+    ...base,
+    ...(e.name ? { name: e.name } : {}),
+    ...(e.description ? { description: e.description } : {}),
+    ...(e.homepage_url ? { homepage_url: e.homepage_url } : {}),
+  }
+})
+const compareImages = computed(() => Object.fromEntries((beforeDoc.value?.screenshots ?? []).flatMap(sh => [[sh.path, sh.path], ...(sh.dark_path ? [[sh.dark_path, sh.dark_path]] : [])])))
+
+// Names by language, each approved or kept as listed.
+const nameRows = computed(() => {
+  const before = (detail.value?.before as { name?: Record<string, string> } | null)?.name ?? {}
+  const after = (entry.value?.name ?? {}) as Record<string, string>
+  return [...new Set([...Object.keys(before), ...Object.keys(after)])].map(locale => ({
+    locale,
+    before: before[locale] ?? '',
+    after: after[locale] ?? '',
+    state: !before[locale] ? 'add' : !after[locale] ? 'removed' : before[locale] === after[locale] ? 'same' : 'mod',
+  })).sort((a, b) => Number(a.state === 'same') - Number(b.state === 'same'))
+})
+const changedNames = computed(() => nameRows.value.filter(r => r.state !== 'same'))
+const unchecked = ref<string[]>([])
+watch(() => change.value?.id, () => (unchecked.value = []))
+function toggleName(locale: string, on: boolean) {
+  unchecked.value = on ? unchecked.value.filter(l => l !== locale) : [...unchecked.value, locale]
+}
+
 const checksPassed = computed(() => (detail.value?.checks ?? []).every(c => c.status !== 'completed' || ['success', 'neutral', 'skipped'].includes(c.conclusion ?? '')))
 
 // Acting on the pull request.
@@ -131,7 +181,7 @@ async function approve() {
   approving.value = true
   actionError.value = ''
   try {
-    await approveChange(id.value)
+    await approveChange(id.value, '', unchecked.value)
     approveOpen.value = false
     await Promise.all([load(), reviewStore.refresh()])
   }
@@ -215,6 +265,43 @@ function reviewState(state: string | null) {
     default: return ''
   }
 }
+
+// Keys: a approve, r request changes, v next comparison, j and k the next
+// and previous change of the queue.
+const queueIds = ref<string[]>([])
+onMounted(async () => {
+  queueIds.value = (await getQueue().catch(() => ({ changes: [] }))).changes.filter(c => c.waitingOn === 'maintainer').map(c => c.id)
+})
+function typing(e: KeyboardEvent) {
+  return e.metaKey || e.ctrlKey || e.altKey || approveOpen.value || requestOpen.value || rejectOpen.value
+    || (e.target instanceof HTMLElement && (/^(?:INPUT|TEXTAREA|SELECT)$/.test(e.target.tagName) || e.target.isContentEditable))
+}
+onKeyStroke('a', (e) => {
+  if (!typing(e) && isOpen.value) {
+    e.preventDefault()
+    approveOpen.value = true
+  }
+})
+onKeyStroke('r', (e) => {
+  if (!typing(e) && isOpen.value) {
+    e.preventDefault()
+    requestOpen.value = true
+  }
+})
+onKeyStroke('v', (e) => {
+  if (typing(e))
+    return
+  const order = ['side', 'slider', 'changes'] as const
+  compareMode.value = order[(order.indexOf(compareMode.value) + 1) % order.length]
+})
+function step(by: number) {
+  const at = queueIds.value.indexOf(id.value)
+  const next = queueIds.value[at + by]
+  if (next)
+    router.push(`/review/${next}`)
+}
+onKeyStroke('j', e => !typing(e) && step(1))
+onKeyStroke('k', e => !typing(e) && step(-1))
 </script>
 
 <template>
@@ -250,7 +337,7 @@ function reviewState(state: string | null) {
             </AButton>
             <AButton type="primary" @click="approveOpen = true">
               <span class="i-tabler-check" />
-              {{ $gettext('Approve and merge') }}
+              {{ unchecked.length ? $gettext('Approve the checked names') : $gettext('Approve and merge') }}
             </AButton>
           </AFlex>
         </div>
@@ -259,6 +346,72 @@ function reviewState(state: string | null) {
 
       <div class="cols">
         <AFlex vertical gap="middle" class="col-main">
+          <ACard>
+            <template #title>
+              <span class="i-tabler-eye mr-2 op-65" />{{ $gettext('What users will see') }}
+            </template>
+            <template #extra>
+              <AFlex gap="small" wrap>
+                <ASegmented v-model:value="compareMode" size="small" :options="[{ value: 'side', label: $gettext('Side by side') }, { value: 'slider', label: $gettext('Slider') }, { value: 'changes', label: $gettext('Changes only') }]" />
+                <ASegmented v-model:value="compareTheme" size="small" :options="[{ value: 'light', label: $gettext('Light') }, { value: 'dark', label: $gettext('Dark') }]" />
+                <ASelect v-model:value="compareLocale" size="small" class="w-32" :options="localeOptions" :aria-label="$gettext('Preview language')" />
+              </AFlex>
+            </template>
+            <ReviewCompare
+              v-model:mode="compareMode"
+              :before="beforeDoc"
+              :after="afterDoc"
+              :manifest="detail.listing?.manifest ?? null"
+              :version="detail.listing?.version ?? null"
+              :author="(entry?.author as string | undefined) ?? null"
+              :trust="(entry?.trust as string | undefined) ?? null"
+              :categories="(entry?.categories as string[] | undefined) ?? []"
+              :icon-url="detail.listing?.iconUrl ?? null"
+              :locale="compareLocale"
+              :theme="compareTheme"
+              :images="compareImages"
+            />
+          </ACard>
+
+          <ACard v-if="changedNames.length" :title="$gettext('Names by language')" :styles="{ body: { padding: 0 } }">
+            <template #extra>
+              <span class="text-3 op-65">{{ $gettext('Uncheck a name to keep it as listed') }}</span>
+            </template>
+            <div class="overflow-x-auto">
+              <table class="diff">
+                <thead>
+                  <tr>
+                    <th>{{ $gettext('Language') }}</th>
+                    <th>{{ $gettext('Now') }}</th>
+                    <th>{{ $gettext('After the change') }}</th>
+                    <th>{{ $gettext('Kind of change') }}</th>
+                    <th>{{ $gettext('Approve') }}</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr v-for="row in nameRows" :key="row.locale">
+                    <td>{{ localeName(row.locale) }}</td>
+                    <td :class="{ old: row.state === 'mod' || row.state === 'removed' }">
+                      {{ row.before || $gettext('Not set') }}
+                    </td>
+                    <td :class="{ new: row.state === 'mod' || row.state === 'add' }">
+                      {{ row.after || $gettext('Not set') }}
+                    </td>
+                    <td>
+                      <ATag v-if="row.state !== 'same'" :color="row.state === 'add' ? 'success' : row.state === 'removed' ? 'error' : 'blue'" class="m-0">
+                        {{ row.state === 'add' ? $gettext('New') : row.state === 'removed' ? $gettext('Removed') : $gettext('Changed') }}
+                      </ATag>
+                      <span v-else class="text-3 op-50">{{ $gettext('Unchanged') }}</span>
+                    </td>
+                    <td>
+                      <ACheckbox v-if="row.state !== 'same'" :checked="!unchecked.includes(row.locale)" :disabled="!isOpen || (row.locale === 'en' && row.state === 'add')" :aria-label="$gettext('Approve the name in %{lang}', { lang: localeName(row.locale) })" @change="(e: { target: { checked: boolean } }) => toggleName(row.locale, e.target.checked)" />
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </ACard>
+
           <ACard v-if="!detail.before" :title="$gettext('Listing')">
             <template #extra>
               <span class="text-3 op-65">{{ $gettext('Not listed yet') }}</span>
@@ -441,6 +594,7 @@ function reviewState(state: string | null) {
       <AModal v-model:open="approveOpen" :title="$gettext('Approve and merge')" :confirm-loading="approving" :ok-text="$gettext('Approve and merge')" @ok="approve">
         <p>{{ $gettext('Approve pull request #%{n} and merge it as you. The plugin is listed at the next deploy.', { n: String(detail.pull?.number ?? '') }) }}</p>
         <AAlert v-if="!checksPassed" type="warning" show-icon :title="$gettext('Some checks of the pull request have not passed.')" />
+        <AAlert v-if="unchecked.length" type="info" show-icon class="mt-3" :title="$gettext('The names in %{list} stay as listed: they are taken out of the pull request before it is merged.', { list: unchecked.map(localeName).join(', ') })" />
       </AModal>
 
       <AModal v-model:open="requestOpen" :title="$gettext('Request changes')" :confirm-loading="requesting" :ok-text="$gettext('Send')" :ok-button-props="{ disabled: !requestText.trim() }" @ok="sendRequest">

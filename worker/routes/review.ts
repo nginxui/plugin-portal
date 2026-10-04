@@ -27,7 +27,7 @@ interface Pull {
   mergeable_state: string
   html_url: string
   title: string
-  head: { sha: string }
+  head: { sha: string, ref: string }
 }
 
 interface Review {
@@ -138,6 +138,7 @@ review.get('/:id', async (c) => {
       github<CheckRuns>(`/repos/${repo}/commits/${pull.head.sha}/check-runs?per_page=50`, token).then(r => r.check_runs).catch(() => []),
     ])
   }
+  const listing = change.plugin_id ? (await loadCatalog(c.env)).plugins.find(p => p.id === change.plugin_id) ?? null : null
   const [author, before, history] = await Promise.all([
     c.env.DB.prepare('SELECT login, avatar_url FROM users WHERE id = ?').bind(change.author_id).first<{ login: string, avatar_url: string | null }>(),
     currentEntry(c.env, change.plugin_id),
@@ -157,6 +158,8 @@ review.get('/:id', async (c) => {
     claim: payload.eligibility ?? null,
     repository: payload.repository_url ?? null,
     before,
+    // The listing as users see it now, for the comparison.
+    listing: listing && { description: listing.description ?? null, screenshots: (listing as { screenshots?: unknown[] }).screenshots ?? [], iconUrl: listing.icon_url ?? null, capabilities: listing.capabilities ?? [], manifest: (listing.releases?.[0] as { manifest?: unknown } | undefined)?.manifest ?? null, version: listing.releases?.[0]?.version ?? null },
     pull: pull && {
       number: pull.number,
       state: pull.state,
@@ -191,11 +194,42 @@ function readBody(text: unknown): string {
 
 // Approves and squash merges the pull request as the maintainer. The head sha
 // pins the merge to the commit that was reviewed.
-async function approve(env: Env, token: string, actorId: number, id: string, comment: string, onlyLowRisk = false) {
+// Keeps the names of some languages as listed: the entry on the pull request
+// branch gets them back from main, in a commit by the maintainer, before the
+// review and the merge pin the new head.
+async function keepNames(env: Env, token: string, change: ChangeRow, pull: Pull, locales: string[]): Promise<Pull> {
+  if (!change.plugin_id || !locales.length)
+    return pull
+  const path = `plugins/${change.plugin_id}.json`
+  const file = await github<{ content: string, sha: string }>(`/repos/${env.CATALOG_REPO}/contents/${path}?ref=${encodeURIComponent(pull.head.ref)}`, token)
+  const entry = JSON.parse(new TextDecoder().decode(Uint8Array.from(atob(file.content.replace(/\n/g, '')), ch => ch.charCodeAt(0)))) as { name?: Record<string, string> }
+  const listed = await currentEntry(env, change.plugin_id) as { name?: Record<string, string> } | null
+  const names = { ...(entry.name ?? {}) }
+  for (const locale of locales) {
+    if (listed?.name?.[locale])
+      names[locale] = listed.name[locale]
+    else if (locale !== 'en')
+      delete names[locale]
+  }
+  const next = `${JSON.stringify({ ...entry, name: names }, null, 2)}\n`
+  const bytes = new TextEncoder().encode(next)
+  let binary = ''
+  for (const b of bytes)
+    binary += String.fromCharCode(b)
+  await github(`/repos/${env.CATALOG_REPO}/contents/${path}`, token, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ message: `Keep the listed names in ${locales.join(', ')}`, content: btoa(binary), sha: file.sha, branch: pull.head.ref }),
+  })
+  return github<Pull>(`/repos/${env.CATALOG_REPO}/pulls/${pull.number}`, token)
+}
+
+async function approve(env: Env, token: string, actorId: number, id: string, comment: string, onlyLowRisk = false, keep: string[] = []) {
   const found = await openPull(env, token, id)
   if ('error' in found)
     return found
-  const { change, pull } = found
+  const { change } = found
+  const pull = await keepNames(env, token, change, found.pull, keep.filter(l => /^[a-z]{2,3}(?:_[A-Z]{2})?$/.test(l)).slice(0, 20))
   if (onlyLowRisk && (risk(change) === 'high' || change.waiting_on !== 'maintainer'))
     return { error: 'not_low_risk' as const }
   const repo = env.CATALOG_REPO
@@ -229,8 +263,8 @@ async function approve(env: Env, token: string, actorId: number, id: string, com
 review.post('/:id/approve', async (c) => {
   const session = c.get('session')
   const token = await userToken(c.env, session.id)
-  const { comment } = await c.req.json<{ comment?: string }>().catch(() => ({ comment: '' }))
-  const result = await approve(c.env, token, session.user.id, c.req.param('id'), comment ?? '')
+  const { comment, keepNames: keep } = await c.req.json<{ comment?: string, keepNames?: string[] }>().catch(() => ({ comment: '', keepNames: [] as string[] }))
+  const result = await approve(c.env, token, session.user.id, c.req.param('id'), comment ?? '', false, Array.isArray(keep) ? keep : [])
   return result.error ? c.json(result, 409) : c.json(result)
 })
 

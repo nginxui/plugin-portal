@@ -6,6 +6,12 @@ import { call, githubOAuth, json, mockFetch, signIn } from './helpers'
 const PR = `/repos/${env.CATALOG_REPO}/pulls/12`
 let calls: { method: string, path: string, body: unknown }[] = []
 let mergeStatus = 200
+let listedEntry: unknown = null
+
+// Base64 of UTF-8 text, as the contents API sends it.
+function base64(text: string) {
+  return btoa(String.fromCharCode(...new TextEncoder().encode(text)))
+}
 
 function pullRoutes(): Route[] {
   return [
@@ -17,7 +23,7 @@ function pullRoutes(): Route[] {
       const body = init.body ? JSON.parse(await new Response(init.body).text()) : null
       calls.push({ method, path: url.pathname, body })
       if (url.pathname === PR && method === 'GET')
-        return json({ number: 12, state: 'open', merged: false, mergeable: true, mergeable_state: 'clean', html_url: 'https://github.com/x/pull/12', title: 'feat(plugins): list io.github.octo.hello', head: { sha: 'abc123' } })
+        return json({ number: 12, state: 'open', merged: false, mergeable: true, mergeable_state: 'clean', html_url: 'https://github.com/x/pull/12', title: 'feat(plugins): list io.github.octo.hello', head: { sha: 'abc123', ref: 'portal/c_review00000001' } })
       if (url.pathname === PR && method === 'PATCH')
         return json({ number: 12, state: 'closed' })
       if (url.pathname === `${PR}/reviews` && method === 'POST')
@@ -34,6 +40,18 @@ function pullRoutes(): Route[] {
         return json({ check_runs: [{ name: 'validate', status: 'completed', conclusion: 'success', html_url: 'https://github.com/x/runs/1' }] })
       return undefined
     },
+    url => url.href === `${env.CATALOG_URL}/v1/index.json` ? json({ plugins: [] }) : undefined,
+    async (url, init) => {
+      if (url.pathname !== `/repos/${env.CATALOG_REPO}/contents/plugins/io.github.octo.hello.json`)
+        return undefined
+      const method = init.method ?? 'GET'
+      const body = init.body ? JSON.parse(await new Response(init.body).text()) : null
+      calls.push({ method, path: url.pathname, body })
+      if (method === 'PUT')
+        return json({ commit: { sha: 'kept1' } })
+      return json({ sha: 'blob1', content: base64(JSON.stringify({ id: 'io.github.octo.hello', name: { en: 'Hello', ja_JP: 'ハロー', de_DE: 'Hallo' } })) })
+    },
+    url => url.href === `https://raw.githubusercontent.com/${env.CATALOG_REPO}/main/plugins/io.github.octo.hello.json` && listedEntry ? json(listedEntry) : undefined,
     url => url.hostname === 'raw.githubusercontent.com' ? new Response('not found', { status: 404 }) : undefined,
   ]
 }
@@ -43,6 +61,7 @@ async function maintainer() {
   vi.restoreAllMocks()
   calls = []
   mergeStatus = 200
+  listedEntry = null
   mockFetch(...pullRoutes(), ...githubOAuth({ push: true }))
   return cookie
 }
@@ -140,5 +159,18 @@ describe('review', () => {
     const low = await (await call('/api/review/approve-batch', { method: 'POST', mutate: true, cookie, json: { ids: ['c_review00000001'] } })).json()
     expect(low).toEqual({ results: { c_review00000001: 'merged' } })
     expect((await call('/api/review/approve-batch', { method: 'POST', mutate: true, cookie, json: { ids: [] } })).status).toBe(422)
+  })
+
+  it('keeps the names a maintainer leaves unchecked as listed', async () => {
+    const cookie = await maintainer()
+    await seedChange('names')
+    listedEntry = { id: 'io.github.octo.hello', name: { en: 'Hello', de_DE: 'Hallo alt' } }
+    await caches.default.delete(`${env.CATALOG_URL}/v1/index.json`)
+    const response = await call('/api/review/c_review00000001/approve', { method: 'POST', mutate: true, cookie, json: { keepNames: ['ja_JP', 'de_DE'] } })
+    expect(response.status).toBe(200)
+    const put = calls.find(c => c.method === 'PUT')!
+    const written = JSON.parse(new TextDecoder().decode(Uint8Array.from(atob((put.body as { content: string }).content), ch => ch.charCodeAt(0))))
+    expect(written.name).toEqual({ en: 'Hello', de_DE: 'Hallo alt' })
+    expect(put.body).toMatchObject({ branch: 'portal/c_review00000001', sha: 'blob1' })
   })
 })

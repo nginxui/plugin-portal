@@ -73,6 +73,7 @@ declare module 'vue' {
     PluginIcon: typeof import('./web/src/components/PluginIcon.vue')['default']
     PluginRow: typeof import('./web/src/components/PluginRow.vue')['default']
     RepoPicker: typeof import('./web/src/components/RepoPicker.vue')['default']
+    ReviewCompare: typeof import('./web/src/components/ReviewCompare.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
     SiderNav: typeof import('./web/src/components/SiderNav.vue')['default']
