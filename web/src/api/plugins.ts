@@ -57,6 +57,8 @@ export interface PluginDetail {
   revokedSigners: string[]
   // The newest self service change still in progress, or merged and not live.
   pending: { id: string, kind: string } | null
+  openChanges: OpenChange[]
+  store: { source: 'repo' | 'catalog', follow?: 'branch' | 'release' } | null
   listed: boolean
   access: {
     role: Role | null
@@ -65,6 +67,33 @@ export interface PluginDetail {
     source: 'repository'
     manageUrl: string | null
   }
+}
+
+export interface OpenChange {
+  id: string
+  kind: string
+  class: string
+  stage: string
+  waitingOn: string | null
+  prNumber: number | null
+  createdAt: number
+  updatedAt: number
+}
+
+export type StoreSource = 'release' | 'repo-branch' | 'repo-release' | 'catalog'
+
+export interface Insights {
+  id: string
+  downloads: { version: string, count: number }[]
+  platforms: number | null
+  translated: string[]
+  untranslated: string[]
+  screenshots: { total: number, dark: number }
+  readme: boolean
+  storeSource: StoreSource
+  minHostVersion: string | null
+  openIssues: number | null
+  releases: { version: string, publishedAt: string | null, yanked: boolean, prerelease: boolean }[]
 }
 
 export interface OwnerSummary {
@@ -84,6 +113,10 @@ export interface OwnerDetail {
 
 export function getMyPlugins() {
   return api<{ plugins: PluginSummary[], installable: Installable[], installUrl: string }>('/plugins/mine')
+}
+
+export function getInsights() {
+  return api<{ insights: Insights[] }>('/plugins/insights')
 }
 
 export function getPlugin(id: string) {

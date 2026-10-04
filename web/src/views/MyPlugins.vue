@@ -1,15 +1,19 @@
 <script setup lang="ts">
 import type { Change } from '@/api/changes'
-import type { Installable, PluginSummary } from '@/api/plugins'
+import type { Insights, Installable, PluginSummary } from '@/api/plugins'
 import { computed, onMounted, ref } from 'vue'
 import { getChanges } from '@/api/changes'
-import { getMyPlugins } from '@/api/plugins'
+import { getInsights, getMyPlugins } from '@/api/plugins'
+import { announcements } from '@/lib/announcements'
+import { kindLabel } from '@/lib/changeKinds'
 import { $gettext } from '@/lib/gettext'
 import { localized } from '@/lib/labels'
-import { fromNow } from '@/lib/time'
+import { localeName } from '@/lib/locales'
+import { formatDate, fromNow, waited } from '@/lib/time'
 
 const plugins = ref<PluginSummary[]>([])
 const changes = ref<Change[]>([])
+const insights = ref<Record<string, Insights>>({})
 const installable = ref<Installable[]>([])
 const installUrl = ref('')
 const loading = ref(true)
@@ -32,36 +36,103 @@ async function load() {
   finally {
     loading.value = false
   }
+  // Downloads and completeness come from GitHub and load after the list.
+  getInsights()
+    .then(r => (insights.value = Object.fromEntries(r.insights.map(i => [i.id, i]))))
+    .catch(() => {})
 }
 
 onMounted(load)
 
-const ownerOptions = computed(() => {
+const owners = computed(() => {
   const counts = new Map<string, number>()
   for (const plugin of plugins.value) {
     const login = plugin.owner?.login
     if (login)
       counts.set(login, (counts.get(login) ?? 0) + 1)
   }
-  return [
-    { value: 'all', label: `${$gettext('All')} ${plugins.value.length}` },
-    ...[...counts].map(([login, count]) => ({ value: login, label: `${login} ${count}` })),
-  ]
+  return counts
 })
 
-function stageLabel(change: Change): string {
-  if (change.stage === 'checks')
-    return change.waitingOn === 'author' ? $gettext('Needs changes') : $gettext('Checking')
-  if (change.stage === 'review')
-    return $gettext('In review')
-  if (change.stage === 'merged')
-    return $gettext('Publishing')
-  return $gettext('Submitted')
-}
+const ownerOptions = computed(() => [
+  { value: 'all', label: `${$gettext('All')} ${plugins.value.length}` },
+  ...[...owners.value].map(([login, count]) => ({ value: login, label: `${login} ${count}` })),
+])
+
+const summary = computed(() => {
+  const orgs = new Set(plugins.value.filter(p => p.owner?.kind === 'organization').map(p => p.owner!.login))
+  return orgs.size
+    ? $gettext('%{n} plugins, from your account and %{orgs} organizations. Roles come from your permission on each GitHub repository.', { n: String(plugins.value.length), orgs: String(orgs.size) })
+    : $gettext('%{n} plugins. Roles come from your permission on each GitHub repository.', { n: String(plugins.value.length) })
+})
 
 const shown = computed(() => ownerFilter.value === 'all'
   ? plugins.value
   : plugins.value.filter(p => p.owner?.login === ownerFilter.value))
+
+const changeOf = (id: string) => changes.value.find(c => c.pluginId === id && c.state === 'open')
+const nameOf = (id: string | null) => localized(plugins.value.find(p => p.id === id)?.name) || id || ''
+
+interface Todo {
+  key: string
+  plugin: string
+  title: string
+  sub: string
+  action: string
+  to: string
+  primary?: boolean
+}
+
+// Everything that waits on the user, across all their plugins.
+const todos = computed<Todo[]>(() => {
+  const out: Todo[] = []
+  for (const change of changes.value) {
+    if (change.state !== 'open' || change.waitingOn !== 'author')
+      continue
+    const name = nameOf(change.pluginId) || localized(change.entry?.name)
+    if (change.stage === 'review' && change.class !== 'self_service') {
+      out.push({ key: change.id, plugin: name, title: $gettext('Answer the review'), sub: $gettext('%{name}, a maintainer asked for changes %{time}', { name, time: fromNow(change.updatedAt) }), action: $gettext('View'), to: `/changes/${change.id}`, primary: true })
+    }
+    else if (change.stage === 'review') {
+      out.push({ key: change.id, plugin: name, title: $gettext('Merge the store change'), sub: $gettext('%{name}, pull request #%{n} waiting %{time}', { name, n: String(change.prNumber ?? ''), time: waited(change.updatedAt) }), action: $gettext('Follow the change'), to: `/changes/${change.id}` })
+    }
+    else {
+      out.push({ key: change.id, plugin: name, title: $gettext('Fix what the checks found'), sub: $gettext('%{name}, %{kind}', { name, kind: kindLabel(change.kind) }), action: $gettext('View'), to: `/changes/${change.id}`, primary: true })
+    }
+  }
+  for (const plugin of plugins.value) {
+    const i = insights.value[plugin.id]
+    if (!i || plugin.role === null)
+      continue
+    const name = localized(plugin.name)
+    if (i.screenshots.total > i.screenshots.dark) {
+      const missing = i.screenshots.total - i.screenshots.dark
+      out.push({ key: `${plugin.id}:dark`, plugin: name, title: $gettext('Add dark screenshots'), sub: $gettext('%{name}, %{n} screenshots have only a light version', { name, n: String(missing) }), action: $gettext('Screenshot studio'), to: `/plugins/${plugin.id}/screenshots` })
+    }
+    if (i.untranslated.length) {
+      const names = i.untranslated.slice(0, 5).map(localeName).join(', ')
+      out.push({
+        key: `${plugin.id}:i18n`,
+        plugin: name,
+        title: $gettext('Translate into %{n} more languages', { n: String(i.untranslated.length) }),
+        sub: i.untranslated.length > 5 ? $gettext('%{name}, %{list} and more', { name, list: names }) : $gettext('%{name}, %{list}', { name, list: names }),
+        action: $gettext('Translations'),
+        to: `/plugins/${plugin.id}/translations`,
+      })
+    }
+  }
+  return out
+})
+
+const recentReleases = computed(() => plugins.value
+  .flatMap(p => (insights.value[p.id]?.releases ?? []).map(r => ({ ...r, plugin: localized(p.name), id: p.id })))
+  .filter(r => r.publishedAt)
+  .sort((a, b) => (b.publishedAt ?? '').localeCompare(a.publishedAt ?? ''))
+  .slice(0, 5))
+
+const activity = computed(() => plugins.value
+  .filter(p => p.repo && typeof insights.value[p.id]?.openIssues === 'number')
+  .map(p => ({ id: p.id, name: localized(p.name), repo: p.repo!, issues: insights.value[p.id].openIssues ?? 0 })))
 </script>
 
 <template>
@@ -72,7 +143,7 @@ const shown = computed(() => ownerFilter.value === 'all'
           {{ $gettext('My plugins') }}
         </h1>
         <ATypographyText type="secondary">
-          {{ $gettext('Manage the plugins you list in the catalog and follow changes under review.') }}
+          {{ loading ? $gettext('Manage the plugins you list in the catalog and follow changes under review.') : summary }}
         </ATypographyText>
       </div>
       <RouterLink to="/submit">
@@ -83,12 +154,7 @@ const shown = computed(() => ownerFilter.value === 'all'
       </RouterLink>
     </AFlex>
 
-    <AAlert
-      v-if="failed"
-      type="error"
-      show-icon
-      :title="$gettext('Your plugins could not be loaded.')"
-    >
+    <AAlert v-if="failed" type="error" show-icon :title="$gettext('Your plugins could not be loaded.')">
       <template #action>
         <AButton size="small" @click="load">
           {{ $gettext('Retry') }}
@@ -96,66 +162,196 @@ const shown = computed(() => ownerFilter.value === 'all'
       </template>
     </AAlert>
 
-    <ACard v-if="changes.length" :title="$gettext('In progress')">
-      <AFlex v-for="change in changes" :key="change.id" align="center" gap="middle" class="py-2">
-        <div class="flex-1 min-w-0">
-          <div class="font-600">
-            {{ localized(change.entry?.name) || change.pluginId }}
-          </div>
-          <div class="mono text-3 op-65">
-            {{ change.pluginId }}
-          </div>
-        </div>
-        <ATag :color="change.waitingOn === 'author' ? 'warning' : 'processing'" class="m-0">
-          {{ stageLabel(change) }}
-        </ATag>
-        <RouterLink :to="`/changes/${change.id}`">
-          <AButton>{{ $gettext('View') }}</AButton>
-        </RouterLink>
-      </AFlex>
-    </ACard>
+    <AFlex v-if="owners.size > 1" align="center" gap="small" wrap>
+      <span class="text-3 op-65">{{ $gettext('Owner') }}</span>
+      <ASegmented v-model:value="ownerFilter" :options="ownerOptions" :aria-label="$gettext('Filter by owner')" />
+    </AFlex>
 
-    <ACard :title="$gettext('Plugins')" :loading="loading">
-      <div v-if="ownerOptions.length > 2" class="overflow-x-auto pb-2">
-        <ASegmented v-model:value="ownerFilter" :options="ownerOptions" :aria-label="$gettext('Filter by owner')" />
-      </div>
-      <AEmpty v-if="shown.length === 0" :description="$gettext('You have no role on any listed plugin yet.')">
-        <ATypographyText type="secondary" class="text-3">
-          {{ $gettext('Plugins appear here when you have admin, maintain, write or triage permission on their repository.') }}
-        </ATypographyText>
-      </AEmpty>
-      <PluginRow v-for="plugin in shown" :key="plugin.id" :plugin="plugin" />
-    </ACard>
-
-    <ACard :title="$gettext('Repositories you can submit')" :loading="loading">
-      <ATypographyParagraph type="secondary">
-        {{ $gettext('Public repositories you administer or installed the Nginx UI Plugin Catalog app on. With the app installed, new releases reach the catalog within minutes.') }}
-      </ATypographyParagraph>
-      <AEmpty v-if="installable.length === 0" :description="$gettext('No repository is waiting to be submitted.')" />
-      <AFlex v-for="repo in installable" :key="repo.repo" align="center" gap="middle" class="py-3">
-        <span class="i-tabler-brand-github text-6 op-65" />
-        <div class="flex-1 min-w-0">
-          <a :href="`https://github.com/${repo.repo}`" target="_blank" rel="noopener" class="font-600">{{ repo.repo }}</a>
-          <div class="text-3 op-65">
-            <template v-if="repo.description">
-              {{ repo.description }}
-            </template>
-            <template v-else-if="repo.source === 'installation'">
-              {{ $gettext('App installed %{time}', { time: fromNow(repo.at) }) }}
-            </template>
-            <template v-else>
-              {{ $gettext('You administer this repository') }}
-            </template>
+    <div class="cols">
+      <AFlex vertical gap="middle" class="col-main">
+        <ACard v-if="todos.length" :title="$gettext('To do')" :styles="{ body: { padding: '4px 0' } }">
+          <template #extra>
+            <ATag class="m-0">
+              {{ $gettext('%{n} items', { n: String(todos.length) }) }}
+            </ATag>
+          </template>
+          <div v-for="todo in todos" :key="todo.key" class="todo">
+            <PluginIcon :name="todo.plugin" :size="28" />
+            <div class="min-w-0 flex-1">
+              <div>{{ todo.title }}</div>
+              <div class="text-3 op-65">
+                {{ todo.sub }}
+              </div>
+            </div>
+            <RouterLink :to="todo.to">
+              <AButton size="small" :type="todo.primary ? 'primary' : 'default'">
+                {{ todo.action }}
+              </AButton>
+            </RouterLink>
           </div>
+        </ACard>
+
+        <ASkeleton v-if="loading" active />
+        <ACard v-else-if="shown.length === 0">
+          <AEmpty :description="$gettext('You have no role on any listed plugin yet.')">
+            <ATypographyText type="secondary" class="text-3">
+              {{ $gettext('Plugins appear here when you have admin, maintain, write or triage permission on their repository.') }}
+            </ATypographyText>
+          </AEmpty>
+        </ACard>
+        <div v-else class="grid">
+          <PluginCard v-for="plugin in shown" :key="plugin.id" :plugin="plugin" :insights="insights[plugin.id]" :change="changeOf(plugin.id)" />
         </div>
-        <RouterLink :to="{ path: '/submit', query: { repo: repo.repo } }">
-          <AButton>{{ $gettext('Submit as plugin') }}</AButton>
-        </RouterLink>
+
+        <ACard :title="$gettext('Repositories you can submit')" :loading="loading">
+          <template #extra>
+            <a :href="installUrl" target="_blank" rel="noopener" class="text-3">
+              {{ $gettext('Install the app on another repository') }}
+              <span class="i-tabler-external-link" />
+            </a>
+          </template>
+          <ATypographyParagraph type="secondary" class="text-3">
+            {{ $gettext('Public repositories you administer or installed the Nginx UI Plugin Catalog app on. With the app installed, new releases reach the catalog within minutes.') }}
+          </ATypographyParagraph>
+          <AEmpty v-if="installable.length === 0" :image-style="{ height: '40px' }" :description="$gettext('No repository is waiting to be submitted.')" />
+          <AFlex v-for="repo in installable" :key="repo.repo" align="center" gap="middle" class="py-2">
+            <span class="i-tabler-brand-github text-6 op-65" />
+            <div class="flex-1 min-w-0">
+              <a :href="`https://github.com/${repo.repo}`" target="_blank" rel="noopener" class="font-600">{{ repo.repo }}</a>
+              <div class="text-3 op-65">
+                <template v-if="repo.description">
+                  {{ repo.description }}
+                </template>
+                <template v-else-if="repo.source === 'installation'">
+                  {{ $gettext('App installed %{time}', { time: fromNow(repo.at) }) }}
+                </template>
+                <template v-else>
+                  {{ $gettext('You administer this repository') }}
+                </template>
+              </div>
+            </div>
+            <RouterLink :to="{ path: '/submit', query: { repo: repo.repo } }">
+              <AButton>{{ $gettext('Submit as plugin') }}</AButton>
+            </RouterLink>
+          </AFlex>
+        </ACard>
       </AFlex>
-      <a :href="installUrl" target="_blank" rel="noopener" class="inline-block mt-2">
-        {{ $gettext('Install the app on another repository') }}
-        <span class="i-tabler-external-link" />
-      </a>
-    </ACard>
+
+      <AFlex vertical gap="middle" class="col-side">
+        <ACard :title="$gettext('Recent releases')">
+          <div v-if="recentReleases.length" class="timeline">
+            <div v-for="release in recentReleases" :key="`${release.id}@${release.version}`" class="tl-item">
+              <span class="tl-dot" :class="release.yanked ? 'warn' : 'ok'" />
+              <div class="min-w-0">
+                <div>
+                  {{ release.yanked ? $gettext('%{name} v%{version} yanked', { name: release.plugin, version: release.version }) : $gettext('%{name} v%{version}', { name: release.plugin, version: release.version }) }}
+                </div>
+                <div class="text-3 op-65">
+                  {{ $gettext('Released %{time}', { time: fromNow(release.publishedAt) }) }}
+                </div>
+              </div>
+            </div>
+          </div>
+          <ATypographyText v-else type="secondary" class="text-3">
+            {{ $gettext('No releases yet.') }}
+          </ATypographyText>
+        </ACard>
+        <ACard v-if="activity.length" :title="$gettext('Repository activity')">
+          <AFlex vertical gap="10">
+            <AFlex v-for="item in activity" :key="item.id" justify="space-between" align="center" gap="small">
+              <AFlex align="center" gap="small" class="min-w-0">
+                <PluginIcon :name="item.name" :size="24" />
+                <span class="truncate">{{ item.name }}</span>
+              </AFlex>
+              <a v-if="item.issues" :href="`https://github.com/${item.repo}/issues`" target="_blank" rel="noopener" class="text-3 nowrap">{{ $gettext('%{n} open issues', { n: String(item.issues) }) }}</a>
+              <span v-else class="text-3 op-65 nowrap">{{ $gettext('No open issues') }}</span>
+            </AFlex>
+          </AFlex>
+        </ACard>
+        <ACard :title="$gettext('Announcements')">
+          <AFlex vertical gap="12">
+            <div v-for="item in announcements()" :key="item.title">
+              <div class="font-500 text-3">
+                {{ item.title }}
+              </div>
+              <div class="text-3 op-65">
+                {{ item.text }} {{ formatDate(item.date) }}
+              </div>
+            </div>
+          </AFlex>
+        </ACard>
+        <ACard :title="$gettext('Getting started')">
+          <AFlex vertical gap="10">
+            <a href="https://nginxui.com/plugin/overview" target="_blank" rel="noopener" class="link-row"><span class="i-tabler-book" />{{ $gettext('Plugin development guide') }}</a>
+            <a href="https://nginxui.com/plugin/signing" target="_blank" rel="noopener" class="link-row"><span class="i-tabler-key" />{{ $gettext('Create the primary key and signer certificates') }}</a>
+            <a href="https://github.com/nginxui/plugin-release" target="_blank" rel="noopener" class="link-row"><span class="i-tabler-package" />{{ $gettext('Package and sign with the release action') }}</a>
+          </AFlex>
+        </ACard>
+      </AFlex>
+    </div>
   </div>
 </template>
+
+<style scoped>
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+  gap: 16px;
+}
+
+@media (max-width: 420px) {
+  .grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+.todo {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 24px;
+}
+
+.todo + .todo {
+  border-top: 1px solid var(--portal-border);
+}
+
+.timeline {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  font-size: 13px;
+}
+
+.tl-item {
+  display: flex;
+  gap: 10px;
+}
+
+.tl-dot {
+  flex: none;
+  width: 8px;
+  height: 8px;
+  margin-top: 6px;
+  border-radius: 50%;
+  background: var(--portal-border-strong);
+}
+
+.tl-dot.ok {
+  background: #52c41a;
+}
+
+.tl-dot.warn {
+  background: #faad14;
+}
+
+.link-row {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.nowrap {
+  white-space: nowrap;
+}
+</style>

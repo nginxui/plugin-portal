@@ -24,6 +24,7 @@ export const router = createRouter({
           children: [
             { path: '', name: 'plugin', component: () => import('@/views/plugin/PluginOverview.vue') },
             { path: 'versions', name: 'plugin-versions', component: () => import('@/views/plugin/PluginVersions.vue') },
+            { path: 'signers', name: 'plugin-signers', component: () => import('@/views/plugin/PluginVersions.vue'), props: { section: 'signers' } },
             { path: 'access', name: 'plugin-access', component: () => import('@/views/plugin/PluginAccess.vue') },
           ],
         },

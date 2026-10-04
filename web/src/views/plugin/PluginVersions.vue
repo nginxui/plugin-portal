@@ -8,6 +8,10 @@ import { $gettext } from '@/lib/gettext'
 import { formatDate } from '@/lib/time'
 import { usePluginStore } from '@/stores/plugin'
 
+// One page for versions and one for signers, sharing the confirmation of a
+// self service change.
+const props = withDefaults(defineProps<{ section?: 'versions' | 'signers' }>(), { section: 'versions' })
+
 const store = usePluginStore()
 const router = useRouter()
 const detail = computed(() => store.detail!)
@@ -123,7 +127,7 @@ async function confirm() {
   <AFlex vertical gap="middle">
     <PendingChange />
 
-    <ACard :title="$gettext('Versions')" :styles="{ body: { padding: 0 } }">
+    <ACard v-if="props.section === 'versions'" :title="$gettext('Versions')" :styles="{ body: { padding: 0 } }">
       <template #extra>
         <span class="text-3 op-65">{{ $gettext('Yanking and restoring take effect at the next catalog update, usually within minutes') }}</span>
       </template>
@@ -195,7 +199,7 @@ async function confirm() {
       </div>
     </ACard>
 
-    <ACard :title="$gettext('Signers')">
+    <ACard v-else :title="$gettext('Signers')">
       <template #extra>
         <span class="text-3 op-65">{{ $gettext('Signing keys certified by your primary key') }}</span>
       </template>

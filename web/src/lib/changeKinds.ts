@@ -12,6 +12,9 @@ export function kindLabel(kind: string): string {
     case 'revoke_signer': return $gettext('Revoke a signer')
     case 'categories': return $gettext('Change categories')
     case 'batch': return $gettext('Batch change')
+    case 'store': return $gettext('Store change')
+    case 'store_source': return $gettext('Store source move')
+    case 'translations': return $gettext('Community translations')
     default: return $gettext('Update')
   }
 }
