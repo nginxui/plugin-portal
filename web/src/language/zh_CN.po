@@ -164,6 +164,12 @@ msgstr "提交插件"
 msgid "Organizations"
 msgstr "组织"
 
+msgid "Maintenance"
+msgstr "维护"
+
+msgid "Review queue"
+msgstr "审核队列"
+
 msgid "GitHub profile"
 msgstr "GitHub 个人主页"
 
@@ -223,6 +229,36 @@ msgstr "集成"
 
 msgid "Tools"
 msgstr "工具"
+
+msgid "New listing"
+msgstr "新上架"
+
+msgid "Name change"
+msgstr "名称变更"
+
+msgid "Primary key rotation"
+msgstr "主公钥轮换"
+
+msgid "Repository move"
+msgstr "仓库迁移"
+
+msgid "Delisting"
+msgstr "下架"
+
+msgid "Update"
+msgstr "更新"
+
+msgid "Entry format and structure"
+msgstr "条目格式与结构"
+
+msgid "Releases, packages and lint"
+msgstr "发布版本、安装包与规范检查"
+
+msgid "Drafting the entry"
+msgstr "起草条目"
+
+msgid "Checking the entry"
+msgstr "检查条目"
 
 msgid "Repository"
 msgstr "仓库"
@@ -433,9 +469,6 @@ msgstr "已在目录中上架"
 
 msgid "Change not found"
 msgstr "未找到该变更"
-
-msgid "New listing"
-msgstr "新上架"
 
 msgid "Submitted %{time}"
 msgstr "%{time}提交"
@@ -660,6 +693,204 @@ msgstr "最新版本"
 msgid "Versions"
 msgstr "版本"
 
+msgid "Closed"
+msgstr "已关闭"
+
+msgid "Waiting for the author"
+msgstr "等待作者"
+
+msgid "Waiting for review"
+msgstr "待审核"
+
+msgid "Author"
+msgstr "作者"
+
+msgid "Primary public key"
+msgstr "主公钥"
+
+msgid "Trust"
+msgstr "信任级别"
+
+msgid "Listed release"
+msgstr "上架版本"
+
+msgid "Platforms"
+msgstr "平台"
+
+msgid "Icon"
+msgstr "图标"
+
+msgid "Installed the Nginx UI Plugin Catalog app on %{repo}"
+msgstr "在 %{repo} 上安装了 Nginx UI 插件目录应用"
+
+msgid "Has admin permission on %{repo}"
+msgstr "拥有 %{repo} 的 admin 权限"
+
+msgid "No claim recorded"
+msgstr "没有记录认领依据"
+
+msgid "GitHub refused the merge. The pull request may have conflicts or failing checks."
+msgstr "GitHub 拒绝了合并，拉取请求可能有冲突或检查未通过。"
+
+msgid "The change could not be approved. Please try again."
+msgstr "无法批准该变更，请重试。"
+
+msgid "The request could not be sent. Please try again."
+msgstr "请求发送失败，请重试。"
+
+msgid "approved"
+msgstr "已批准"
+
+msgid "requested changes"
+msgstr "要求修改"
+
+msgid "High risk change"
+msgstr "高风险变更"
+
+msgid "submitted by @%{login} %{time}"
+msgstr "@%{login} %{time}提交"
+
+msgid "Request changes"
+msgstr "要求修改"
+
+msgid "Approve and merge"
+msgstr "批准并合并"
+
+msgid "Not listed yet"
+msgstr "尚未上架"
+
+msgid "What changes"
+msgstr "变更内容"
+
+msgid "Compared with the current listing"
+msgstr "与当前上架内容对比"
+
+msgid "Field"
+msgstr "字段"
+
+msgid "Current"
+msgstr "当前"
+
+msgid "After the change"
+msgstr "变更后"
+
+msgid "Listed as"
+msgstr "上架内容"
+
+msgid "Listing preview"
+msgstr "上架预览"
+
+msgid "Identity"
+msgstr "身份核验"
+
+msgid "Read from GitHub when the change was submitted"
+msgstr "提交时从 GitHub 读取"
+
+msgid "Discussion"
+msgstr "讨论"
+
+msgid "Public on GitHub"
+msgstr "在 GitHub 上公开"
+
+msgid "No comments yet."
+msgstr "暂无评论。"
+
+msgid "Leave a comment. Markdown is supported."
+msgstr "发表评论，支持 Markdown。"
+
+msgid "Comment"
+msgstr "评论"
+
+msgid "All passed"
+msgstr "全部通过"
+
+msgid "Needs attention"
+msgstr "需要处理"
+
+msgid "No checks reported on the pull request."
+msgstr "拉取请求上没有检查结果。"
+
+msgid "Log of the submission checks"
+msgstr "提交检查日志"
+
+msgid "Earlier changes"
+msgstr "历史变更"
+
+msgid "%{n} in total, %{merged} merged"
+msgstr "共 %{n} 次，已合并 %{merged} 次"
+
+msgid "Pull request #%{n} on GitHub"
+msgstr "在 GitHub 上查看拉取请求 #%{n}"
+
+msgid "Back to the review queue"
+msgstr "返回审核队列"
+
+msgid "Approve pull request #%{n} and merge it as you. The plugin is listed at the next deploy."
+msgstr "以你的身份批准并合并拉取请求 #%{n}。插件会在下次部署时上架。"
+
+msgid "Some checks of the pull request have not passed."
+msgstr "拉取请求有检查未通过。"
+
+msgid "Send"
+msgstr "发送"
+
+msgid "The author sees this on GitHub and in the Developer Center, and can resubmit from their change page."
+msgstr "作者会在 GitHub 和开发者中心看到这条意见，并可以在变更页面重新提交。"
+
+msgid "What should the author change?"
+msgstr "需要作者修改什么？"
+
+msgid "All in progress"
+msgstr "全部进行中"
+
+msgid "Running"
+msgstr "运行中"
+
+msgid "Failed"
+msgstr "未通过"
+
+msgid "Passed"
+msgstr "已通过"
+
+msgid "New listings and changes that need a review, highest risk first."
+msgstr "新上架与需要审核的变更，按风险排序。"
+
+msgid "The queue could not be loaded."
+msgstr "无法加载审核队列。"
+
+msgid "Plugin ID or author"
+msgstr "插件 ID 或作者"
+
+msgid "Search"
+msgstr "搜索"
+
+msgid "Risk"
+msgstr "风险"
+
+msgid "Change"
+msgstr "更换"
+
+msgid "Plugin"
+msgstr "插件"
+
+msgid "Waiting"
+msgstr "等待"
+
+msgid "High"
+msgstr "高"
+
+msgid "Normal"
+msgstr "一般"
+
+msgid "Review"
+msgstr "审核"
+
+msgid "Nothing is waiting here."
+msgstr "这里没有待处理的变更。"
+
+msgid "Move"
+msgstr "上下移动"
+
 msgid "Sign in was cancelled on GitHub."
 msgstr "已在 GitHub 上取消登录。"
 
@@ -744,14 +975,8 @@ msgstr "已有带版本标签的 GitHub Release，其中包含签名的安装包
 msgid "The primary public key from nginx-ui plugin key init is at hand."
 msgstr "准备好 nginx-ui plugin key init 生成的主公钥。"
 
-msgid "Change"
-msgstr "更换"
-
 msgid "The content of primary.pub, created with nginx-ui plugin key init. It verifies the signer certificates of your releases."
 msgstr "使用 nginx-ui plugin key init 生成的 primary.pub 的内容，用于验证你发布版本的签名者证书。"
-
-msgid "Primary public key"
-msgstr "主公钥"
 
 msgid "How to create the keys"
 msgstr "如何生成密钥"
@@ -803,9 +1028,6 @@ msgstr "提交审核"
 
 #~ msgid "Name translations"
 #~ msgstr "名称翻译"
-
-#~ msgid "Passed"
-#~ msgstr "已通过"
 
 #~ msgid "After you submit, the packages, their signatures and the signer certificate are verified in the catalog repository."
 #~ msgstr "提交后，插件目录仓库会校验安装包、签名和签名者证书。"

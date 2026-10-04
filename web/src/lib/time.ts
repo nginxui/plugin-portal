@@ -22,3 +22,10 @@ export function formatDate(value: string | number | null | undefined): string {
   const time = typeof value === 'number' ? dayjs.unix(value) : dayjs(value)
   return time.format('YYYY-MM-DD')
 }
+
+/** How long ago, without the suffix, for a "waiting" column. */
+export function waited(value: number | null | undefined): string {
+  if (!value)
+    return ''
+  return dayjs.unix(value).locale(locale()).fromNow(true)
+}

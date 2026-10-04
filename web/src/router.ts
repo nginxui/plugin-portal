@@ -28,6 +28,8 @@ export const router = createRouter({
         },
         { path: 'submit', name: 'submit', component: () => import('@/views/SubmitPlugin.vue') },
         { path: 'changes/:id', name: 'change', component: () => import('@/views/ChangeView.vue') },
+        { path: 'review', name: 'review', component: () => import('@/views/review/ReviewQueue.vue'), meta: { maintainer: true } },
+        { path: 'review/:id', name: 'review-change', component: () => import('@/views/review/ReviewChange.vue'), meta: { maintainer: true } },
         { path: 'owners', name: 'owners', component: () => import('@/views/owners/OwnerList.vue') },
         { path: 'owners/:login', name: 'owner', component: () => import('@/views/owners/OwnerPage.vue') },
       ],

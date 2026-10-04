@@ -240,3 +240,42 @@ export async function previewSubmission(env: Env, session: Session, token: strin
   }
   return done(draft, claim)
 }
+
+export interface ReleaseInfo {
+  version: string
+  tag: string
+  releasedAt: string | null
+  url: string
+  description: Record<string, string>
+  minNginxUiVersion: string | null
+}
+
+/**
+ * The releases a plugin's repository offers and what the newest one's
+ * plugin.json says, for a plugin the published index does not list yet. The
+ * catalog reads the same things when it builds.
+ */
+export async function repoReleases(token: string, repo: string): Promise<ReleaseInfo[]> {
+  const releases = (await github<(ReleaseResponse & { published_at?: string })[]>(`/repos/${repo}/releases?per_page=10`, token).catch(() => []))
+    .filter(r => !r.draft && isSemver(tagVersion(r.tag_name)))
+  if (releases.length === 0)
+    return []
+  const newest = releases.find(r => !r.prerelease) ?? releases[0]
+  let manifest: Manifest & { min_nginx_ui_version?: unknown } = {}
+  try {
+    manifest = JSON.parse(await rawFile(repo, newest.tag_name, 'plugin.json') ?? '{}')
+  }
+  catch {}
+  const description = {
+    ...(typeof manifest.description === 'string' && manifest.description.trim() ? { en: manifest.description.trim() } : {}),
+    ...manifestDescriptions(manifest),
+  }
+  return releases.map(r => ({
+    version: tagVersion(r.tag_name),
+    tag: r.tag_name,
+    releasedAt: r.published_at ?? null,
+    url: r.html_url,
+    description: r === newest ? description : {},
+    minNginxUiVersion: r === newest && typeof manifest.min_nginx_ui_version === 'string' ? manifest.min_nginx_ui_version : null,
+  }))
+}

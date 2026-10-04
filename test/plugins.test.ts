@@ -1,3 +1,4 @@
+import type { Route } from './helpers'
 import { env } from 'cloudflare:workers'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { call, githubOAuth, json, mockFetch, signIn } from './helpers'
@@ -17,8 +18,9 @@ const repos: Record<string, { id: number, owner: { id: number, login: string, ty
   'other/probe': { id: 13, owner: { id: 901, login: 'other', type: 'User' }, permissions: { pull: true } },
 }
 
-function catalogAndRepos() {
+function catalogAndRepos(...extra: Route[]) {
   return mockFetch(
+    ...extra,
     url => url.href === `${env.CATALOG_URL}/v1/index.json` ? json(catalog) : undefined,
     url => url.pathname === '/users/octo-author/repos'
       ? json([{ full_name: 'octo-author/owned-only', description: 'Mine', private: false, archived: false, fork: false, pushed_at: null }])
@@ -114,6 +116,19 @@ describe('my plugins', () => {
     expect(body.installUrl).toBe('https://github.com/apps/nginx-ui-plugin-catalog/installations/new')
   })
 
+  it('keeps a plugin the published index does not list yet, with the name of its newest change', async () => {
+    const cookie = await signedIn()
+    const t = Math.floor(Date.now() / 1000)
+    await env.DB.batch([
+      env.DB.prepare(`INSERT INTO plugins (plugin_id, repo_full_name, state, created_at, updated_at) VALUES ('io.github.octo-author.fresh', 'octo-author/geoip', 'listed', ?, ?)`).bind(t, t),
+      env.DB.prepare(`INSERT INTO changes (id, plugin_id, author_id, kind, class, entry_json, state, stage, created_at, updated_at) VALUES ('c_fresh000000000', 'io.github.octo-author.fresh', 4242, 'new_listing', 'reviewed', ?, 'live', 'live', ?, ?)`)
+        .bind(JSON.stringify({ id: 'io.github.octo-author.fresh', name: { en: 'Fresh' }, categories: ['security'], trust: 'community' }), t, t),
+    ])
+    catalogAndRepos()
+    const body = await (await call('/api/plugins/mine', { cookie })).json() as { plugins: { id: string, state: string, name: Record<string, string> }[] }
+    expect(body.plugins.find(p => p.id === 'io.github.octo-author.fresh')).toMatchObject({ state: 'listed', name: { en: 'Fresh' } })
+  })
+
   it('needs a session', async () => {
     expect((await call('/api/plugins/mine')).status).toBe(401)
   })
@@ -146,6 +161,20 @@ describe('plugin page', () => {
     finally {
       delete repos[env.CATALOG_REPO]
     }
+  })
+
+  it('reads the description and versions of a plugin the index does not list yet from its releases', async () => {
+    const cookie = await signedIn()
+    const t = Math.floor(Date.now() / 1000)
+    await env.DB.prepare(`INSERT INTO plugins (plugin_id, repo_full_name, state, created_at, updated_at) VALUES ('io.github.octo-author.fresh', 'octo-author/geoip', 'listed', ?, ?)`).bind(t, t).run()
+    catalogAndRepos(
+      url => url.pathname === '/repos/octo-author/geoip/releases' ? json([{ tag_name: 'v0.2.0', prerelease: false, draft: false, html_url: 'https://github.com/octo-author/geoip/releases/tag/v0.2.0', published_at: '2026-10-01T00:00:00Z', assets: [] }]) : undefined,
+      url => url.href === 'https://raw.githubusercontent.com/octo-author/geoip/v0.2.0/plugin.json' ? new Response(JSON.stringify({ description: 'Fresh plugin.', i18n: { zh_CN: { description: '新插件。' } } })) : undefined,
+    )
+    const body = await (await call('/api/plugins/io.github.octo-author.fresh', { cookie })).json() as { plugin: { description: Record<string, string>, version: string }, releases: { version: string }[] }
+    expect(body.plugin.description).toEqual({ en: 'Fresh plugin.', zh_CN: '新插件。' })
+    expect(body.plugin.version).toBe('0.2.0')
+    expect(body.releases.map(r => r.version)).toEqual(['0.2.0'])
   })
 
   it('is not found for an unknown id', async () => {

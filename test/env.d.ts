@@ -8,6 +8,7 @@ declare namespace Cloudflare {
     CATALOG_REPO: string
     GITHUB_CLIENT_ID: string
     CATALOG_APP_SLUG: string
+    DEPLOY_WORKFLOW?: string
     GITHUB_CLIENT_SECRET: string
     SESSION_KEY: string
     DEPLOY_APP_ID: string

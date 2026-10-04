@@ -79,3 +79,68 @@ hooks.post('/apply', async (c) => {
   await audit(c.env.DB, { actorId: null, action: 'change.applied', subject: change.plugin_id ?? undefined, detail: { change: change.id, outcome: report.outcome, run: claims.run_id } })
   return c.json({ ok: true })
 })
+
+interface DeployReport {
+  commit?: string
+  entries?: Record<string, unknown>
+  listed?: string[]
+}
+
+// The same entry whatever the key order, so a reformatted file still matches.
+function canonical(value: unknown): string {
+  if (Array.isArray(value))
+    return `[${value.map(canonical).join(',')}]`
+  if (value && typeof value === 'object')
+    return `{${Object.keys(value).sort().map(key => `${JSON.stringify(key)}:${canonical((value as Record<string, unknown>)[key])}`).join(',')}}`
+  return JSON.stringify(value)
+}
+
+// Reports of the catalog deploy: merged changes whose entry the deploy
+// published become live, a delisting once its entry is gone.
+hooks.post('/deploy', async (c) => {
+  const token = c.req.header('Authorization')?.replace(/^Bearer /, '') ?? ''
+  let claims
+  try {
+    claims = await verifyActionsToken(token, {
+      audience: new URL(c.env.PORTAL_ORIGIN).host,
+      repository: c.env.CATALOG_REPO,
+      workflow: c.env.DEPLOY_WORKFLOW || 'deploy.yml',
+    })
+  }
+  catch (error) {
+    if (error instanceof OidcError)
+      return c.json({ error: 'unauthorized', reason: error.message }, 401)
+    throw error
+  }
+
+  const report = await c.req.json<DeployReport>()
+  const entries = report.entries && typeof report.entries === 'object' ? report.entries : {}
+  const listed = new Set(Array.isArray(report.listed) ? report.listed.map(String) : [])
+  const commit = typeof report.commit === 'string' ? report.commit.slice(0, 64) : null
+  const { results } = await c.env.DB.prepare(`SELECT id, plugin_id, kind, entry_json FROM changes WHERE state = 'merged'`)
+    .all<{ id: string, plugin_id: string | null, kind: string, entry_json: string | null }>()
+
+  const t = now()
+  const live: string[] = []
+  const statements: D1PreparedStatement[] = []
+  for (const change of results) {
+    if (!change.plugin_id)
+      continue
+    const published = entries[change.plugin_id]
+    const done = change.kind === 'delisting'
+      ? published === undefined
+      : published !== undefined && listed.has(change.plugin_id) && !!change.entry_json && canonical(published) === canonical(JSON.parse(change.entry_json))
+    if (!done)
+      continue
+    live.push(change.id)
+    statements.push(
+      c.env.DB.prepare(`UPDATE changes SET state = 'live', stage = 'live', waiting_on = NULL, deployed_at = ?, updated_at = ? WHERE id = ?`).bind(t, t, change.id),
+      c.env.DB.prepare(`UPDATE plugins SET state = ?, updated_at = ? WHERE plugin_id = ?`).bind(change.kind === 'delisting' ? 'delisted' : 'listed', t, change.plugin_id),
+      event(c.env, change.id, 'live', null, { commit }),
+    )
+  }
+  if (statements.length)
+    await c.env.DB.batch(statements)
+  await audit(c.env.DB, { actorId: null, action: 'catalog.deployed', subject: commit ?? undefined, detail: { live, run: claims.run_id } })
+  return c.json({ live })
+})

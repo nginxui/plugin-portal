@@ -6,6 +6,7 @@ import { useGettext } from 'vue3-gettext'
 import { useRoute, useRouter } from 'vue-router'
 import { $gettext, languages, setLanguage } from '@/lib/gettext'
 import { isDark, toggleTheme } from '@/lib/theme'
+import { useReviewStore } from '@/stores/review'
 import { useSessionStore } from '@/stores/session'
 
 const route = useRoute()
@@ -23,18 +24,47 @@ function icon(name: string) {
   return h('span', { class: `${name} text-4` })
 }
 
+const reviewStore = useReviewStore()
+watch(() => session.isMaintainer, (isMaintainer) => {
+  if (isMaintainer)
+    reviewStore.refresh()
+}, { immediate: true })
+
+function withBadge(label: string, count: number) {
+  return count > 0
+    ? h('span', { class: 'menu-label' }, [label, h('span', { class: 'menu-badge' }, String(count))])
+    : label
+}
+
 const menuItems = computed<MenuProps['items']>(() => {
   const items: MenuProps['items'] = [
     { key: '/plugins', icon: icon('i-tabler-layout-grid'), label: $gettext('My plugins') },
     { key: '/submit', icon: icon('i-tabler-plus'), label: $gettext('Submit a plugin') },
     { key: '/owners', icon: icon('i-tabler-building'), label: $gettext('Organizations') },
   ]
+  if (session.isMaintainer) {
+    items.push({
+      type: 'group',
+      label: $gettext('Maintenance'),
+      children: [
+        { key: '/review', icon: icon('i-tabler-inbox'), label: withBadge($gettext('Review queue'), reviewStore.pending) },
+      ],
+    })
+  }
   return items
 })
 
+// The menu key whose path the current route starts with, groups included.
 const selectedKeys = computed(() => {
-  const match = menuItems.value?.find(item => item && 'key' in item && route.path.startsWith(String(item.key)))
-  return match && 'key' in match ? [String(match.key)] : []
+  const keys: string[] = []
+  for (const item of menuItems.value ?? []) {
+    if (item && 'children' in item && item.children)
+      keys.push(...item.children.map((child: { key?: unknown } | null) => child && 'key' in child ? String(child.key) : '').filter(Boolean))
+    else if (item && 'key' in item)
+      keys.push(String(item.key))
+  }
+  const match = keys.filter(key => route.path.startsWith(key)).sort((a, b) => b.length - a.length)[0]
+  return match ? [match] : []
 })
 
 function onNavigate(key: string) {
@@ -104,6 +134,28 @@ async function onUserMenu({ key }: { key: string | number }) {
     </ALayout>
   </ALayout>
 </template>
+
+<style>
+.menu-label {
+  display: inline-flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  width: 100%;
+}
+
+.menu-badge {
+  min-width: 20px;
+  height: 20px;
+  padding: 0 6px;
+  border-radius: 10px;
+  background: #cf1322;
+  color: #fff;
+  font-size: 12px;
+  line-height: 20px;
+  text-align: center;
+}
+</style>
 
 <style scoped>
 .sider {

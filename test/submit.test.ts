@@ -212,6 +212,51 @@ describe('apply report', () => {
     expect(response.status).toBe(401)
   })
 
+  async function mergedChange(cookie: string) {
+    const change = await submitted(cookie)
+    const entry = { id: 'io.github.octo-author.geoip', name: { en: 'GeoIP Access' }, trust: 'community' }
+    await env.DB.prepare(`UPDATE changes SET state = 'merged', stage = 'merged', entry_json = ? WHERE id = ?`).bind(JSON.stringify(entry), change).run()
+    return { change, entry }
+  }
+
+  function deployClaims(extra: Record<string, unknown> = {}) {
+    return claims({ workflow_ref: `${env.CATALOG_REPO}/.github/workflows/deploy.yml@refs/heads/main`, ...extra })
+  }
+
+  it('moves a merged change live once a deploy publishes its entry', async () => {
+    const cookie = await withJwks(await signedIn())
+    const { change, entry } = await mergedChange(cookie)
+    const response = await call('/api/hooks/deploy', {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${await oidc(deployClaims())}` },
+      // The key order differs from the stored entry.
+      body: JSON.stringify({ commit: 'abc', entries: { [entry.id]: { trust: 'community', name: { en: 'GeoIP Access' }, id: entry.id } }, listed: [entry.id] }),
+    })
+    expect(await response.json()).toEqual({ live: [change] })
+    expect(await env.DB.prepare('SELECT state, stage FROM changes WHERE id = ?').bind(change).first()).toEqual({ state: 'live', stage: 'live' })
+    expect(await env.DB.prepare('SELECT state FROM plugins WHERE plugin_id = ?').bind(entry.id).first()).toEqual({ state: 'listed' })
+  })
+
+  it('keeps a change merged while the deploy publishes another entry or no verified release', async () => {
+    const cookie = await withJwks(await signedIn())
+    const { change, entry } = await mergedChange(cookie)
+    for (const body of [
+      { commit: 'abc', entries: { [entry.id]: { ...entry, name: { en: 'Older name' } } }, listed: [entry.id] },
+      { commit: 'abc', entries: { [entry.id]: entry }, listed: [] },
+    ]) {
+      const response = await call('/api/hooks/deploy', { method: 'POST', headers: { Authorization: `Bearer ${await oidc(deployClaims())}` }, body: JSON.stringify(body) })
+      expect(await response.json()).toEqual({ live: [] })
+    }
+    expect(await env.DB.prepare('SELECT state FROM changes WHERE id = ?').bind(change).first()).toEqual({ state: 'merged' })
+  })
+
+  it('takes deploy reports from the deploy workflow only', async () => {
+    const cookie = await withJwks(await signedIn())
+    await mergedChange(cookie)
+    const response = await call('/api/hooks/deploy', { method: 'POST', headers: { Authorization: `Bearer ${await oidc(claims())}` }, body: JSON.stringify({ entries: {}, listed: [] }) })
+    expect(response.status).toBe(401)
+  })
+
   it('follows the pull request to merged and the plugin to live', async () => {
     const cookie = await withJwks(await signedIn())
     const change = await submitted(cookie)

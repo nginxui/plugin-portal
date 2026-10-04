@@ -6,6 +6,8 @@ export interface Env {
   CATALOG_REPO: string
   GITHUB_CLIENT_ID: string
   CATALOG_APP_SLUG: string
+  // The catalog workflow that reports deploys, deploy.yml unless set.
+  DEPLOY_WORKFLOW?: string
   GITHUB_CLIENT_SECRET: string
   SESSION_KEY: string
   DEPLOY_APP_ID: string

@@ -1,0 +1,40 @@
+import type { Change, ChangeEvent } from './changes'
+import { api } from './client'
+
+export interface QueueItem extends Change {
+  author: string | null
+  repo: string | null
+  risk: 'high' | 'normal'
+}
+
+export interface ReviewDetail {
+  change: Change & { risk: 'high' | 'normal' }
+  author: { login: string, avatarUrl: string | null, changes: number, merged: number } | null
+  claim: string | null
+  repository: string | null
+  before: Record<string, unknown> | null
+  pull: { number: number, state: string, merged: boolean, mergeable: boolean | null, mergeableState: string, url: string, title: string } | null
+  checks: { name: string, status: string, conclusion: string | null, url: string }[]
+  conversation: { kind: 'review' | 'comment', state: string | null, author: string | null, body: string, at: string }[]
+  events: ChangeEvent[]
+}
+
+export function getQueue() {
+  return api<{ changes: QueueItem[] }>('/review/queue')
+}
+
+export function getReview(id: string) {
+  return api<ReviewDetail>(`/review/${encodeURIComponent(id)}`)
+}
+
+export function approveChange(id: string, comment = '') {
+  return api<{ ok: boolean, commit: string }>(`/review/${encodeURIComponent(id)}/approve`, { method: 'POST', json: { comment } })
+}
+
+export function requestChanges(id: string, comment: string) {
+  return api<{ ok: boolean }>(`/review/${encodeURIComponent(id)}/request-changes`, { method: 'POST', json: { comment } })
+}
+
+export function commentOnChange(id: string, comment: string) {
+  return api<{ ok: boolean }>(`/review/${encodeURIComponent(id)}/comment`, { method: 'POST', json: { comment } })
+}

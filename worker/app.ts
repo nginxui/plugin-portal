@@ -9,6 +9,7 @@ import { hooks } from './routes/hooks'
 import { me } from './routes/me'
 import { owners } from './routes/owners'
 import { plugins } from './routes/plugins'
+import { review } from './routes/review'
 import { submit } from './routes/submit'
 
 export const app = new Hono<AppEnv>().basePath('/api')
@@ -21,6 +22,7 @@ app.route('/owners', owners)
 app.route('/submit', submit)
 app.route('/changes', changes)
 app.route('/hooks', hooks)
+app.route('/review', review)
 
 app.notFound(c => c.json({ error: 'not_found' }, 404))
 
