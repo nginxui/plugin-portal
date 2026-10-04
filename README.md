@@ -41,3 +41,7 @@ custom domain `portal.nginxui.com`.
    `wrangler secret put GITHUB_CLIENT_SECRET` and
    `wrangler secret put SESSION_KEY` (`openssl rand -base64 32`).
 4. `bun run deploy`
+
+## License
+
+[AGPL-3.0](LICENSE)
