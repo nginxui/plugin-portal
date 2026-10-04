@@ -1,8 +1,9 @@
 <script setup lang="ts">
 import type { StoreState } from '@/api/store'
+import type { Estimate } from '@/components/ListCardRow.vue'
 import type { StressResults } from '@/components/StressCards.vue'
 import type { Stress } from '@/lib/market'
-import { computed, onMounted, ref, useTemplateRef, watch } from 'vue'
+import { computed, nextTick, onMounted, ref, useTemplateRef, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { ApiError } from '@/api/client'
 import { aiDraft, aiStatus } from '@/api/community'
@@ -104,7 +105,48 @@ const pageTexts = computed(() => {
 })
 
 const cut = ref<Record<string, boolean>>({})
+const estimate = ref<Estimate | null>(null)
+
+// Opens the name in the language a result is about, not the one in view.
+async function editName(lang: string) {
+  locale.value = lang
+  await nextTick()
+  preview.value?.edit('name')
+}
 const stressResults = ref<StressResults | null>(null)
+
+// The language whose name is longest, for the longest language test.
+const longestLocale = computed(() => Object.entries(doc.value.name ?? {}).reduce((a, b) => (b[1].length > a[1].length ? b : a), ['en', ''])[0])
+
+// A stress test shows the preview in its language, interface included, and
+// turning it off brings back the language chosen before.
+let chosenLocale: string | null = null
+watch(stress, (value, previous) => {
+  if (previous === 'off')
+    chosenLocale = locale.value
+  if (value === 'longest') {
+    locale.value = longestLocale.value
+  }
+  else if (value === 'rtl') {
+    locale.value = 'ar'
+  }
+  else if (chosenLocale) {
+    locale.value = chosenLocale
+    chosenLocale = null
+  }
+})
+
+// What the chosen stress test shows and what to look for.
+const stressNote = computed(() => {
+  switch (stress.value) {
+    case 'longest':
+      return { title: $gettext('Longest language'), text: $gettext('The preview shows %{lang}, the language with the longest name. Check that names and descriptions are not cut short and that nothing overlaps.', { lang: localeName(longestLocale.value) }) }
+    case 'rtl':
+      return { title: $gettext('Right to left'), text: $gettext('The preview shows Arabic, laid out right to left. Check that texts read in order and that icons and buttons sit on the correct side.') }
+    default:
+      return null
+  }
+})
 
 const STATE_ICON: Record<string, string> = {
   ok: 'i-tabler-check c-ok',
@@ -241,7 +283,6 @@ const name = computed(() => localized(doc.value.name) || localized(plugin.value.
                 { value: 'off', label: $gettext('Off') },
                 { value: 'longest', label: $gettext('Longest language') },
                 { value: 'rtl', label: $gettext('Right to left') },
-                { value: 'pseudo', label: $gettext('Pseudo localized') },
               ]"
             />
             <ASegmented v-model:value="theme" :options="[{ value: 'light', label: $gettext('Light') }, { value: 'dark', label: $gettext('Dark') }]" />
@@ -249,6 +290,20 @@ const name = computed(() => localized(doc.value.name) || localized(plugin.value.
           </AFlex>
         </AFlex>
       </ACard>
+
+      <AAlert v-if="stressNote" type="info" show-icon>
+        <template #title>
+          <div class="font-500">
+            {{ stressNote.title }}
+          </div>
+          <div class="text-3">
+            {{ stressNote.text }}
+          </div>
+          <div class="text-3 op-65">
+            {{ $gettext('The cards under the preview show the name in every language of Nginx UI. Only the preview changes, the store texts stay as they are.') }}
+          </div>
+        </template>
+      </AAlert>
 
       <div class="cols">
         <div class="col-main">
@@ -258,7 +313,6 @@ const name = computed(() => localized(doc.value.name) || localized(plugin.value.
             :locale="locale"
             :theme="theme"
             :device="device"
-            :stress="stress"
             :images="S.images"
             :manifest="S.manifest"
             :version="S.version"
@@ -283,8 +337,8 @@ const name = computed(() => localized(doc.value.name) || localized(plugin.value.
             @studio="router.push(`/plugins/${plugin.id}/screenshots`)"
             @categories="categoriesOpen = true"
           />
-          <StressCards v-if="stress !== 'off'" class="mt-4" :doc="doc" :trust="plugin.trust" :theme="theme" :author="plugin.owner?.login ?? null" @results="stressResults = $event" />
-          <ListCardRow v-if="stress !== 'off'" class="mt-4" :doc="doc" :locale="locale" :stress="stress" :trust="plugin.trust" :theme="theme" @results="cut = $event" />
+          <StressCards v-if="stress !== 'off'" class="mt-4" :doc="doc" :trust="plugin.trust" :theme="theme" :author="plugin.owner?.login ?? null" :icon-url="plugin.iconUrl" @results="stressResults = $event" />
+          <ListCardRow class="mt-4" :doc="doc" :locale="locale" :stress="stress" :trust="plugin.trust" :theme="theme" :author="plugin.owner?.login ?? null" :icon-url="plugin.iconUrl" @results="cut = $event" @estimate="estimate = $event" />
         </div>
 
         <AFlex vertical gap="middle" class="col-side">
@@ -391,7 +445,7 @@ const name = computed(() => localized(doc.value.name) || localized(plugin.value.
                   <span :class="stressResults.longest.cut ? 'i-tabler-alert-triangle c-warn' : 'i-tabler-circle-check c-ok'" />
                   <div>
                     <div>{{ stressResults.longest.cut ? $gettext('Longest language: the name in %{lang} is cut short in the card', { lang: localeName(stressResults.longest.locale) }) : $gettext('Longest language: the name in %{lang} fits the card', { lang: localeName(stressResults.longest.locale) }) }}</div>
-                    <a v-if="stressResults.longest.cut" role="button" tabindex="0" class="text-3" @click="preview?.edit('name')" @keydown.enter="preview?.edit('name')">{{ $gettext('Go to the name') }}</a>
+                    <a v-if="stressResults.longest.cut" role="button" tabindex="0" class="text-3" @click="editName(stressResults.longest.locale)" @keydown.enter="editName(stressResults.longest.locale)">{{ $gettext('Go to the name') }}</a>
                   </div>
                 </div>
                 <div class="item">
@@ -402,7 +456,10 @@ const name = computed(() => localized(doc.value.name) || localized(plugin.value.
               <template v-for="(isCut, lang) in cut" :key="lang">
                 <div v-if="isCut" class="item">
                   <span class="i-tabler-cut c-warn" />
-                  <div>{{ $gettext('The name in %{lang} is cut short in the list card', { lang: localeName(String(lang)) }) }}</div>
+                  <div>
+                    <div>{{ $gettext('The name in %{lang} is cut short in the list card', { lang: localeName(String(lang)) }) }}</div>
+                    <a role="button" tabindex="0" class="text-3" @click="editName(String(lang))" @keydown.enter="editName(String(lang))">{{ $gettext('Go to the name') }}</a>
+                  </div>
                 </div>
               </template>
               <div v-if="!Object.values(cut).some(Boolean)" class="item">
@@ -413,13 +470,11 @@ const name = computed(() => localized(doc.value.name) || localized(plugin.value.
                 <span class="i-tabler-text-direction-rtl c-info" />
                 <div>{{ $gettext('Check that the page reads right to left without overlapping text') }}</div>
               </div>
-              <div v-if="stress === 'pseudo' && pageTexts.some(r => r.runtime)" class="item">
+              <div v-if="estimate" class="item">
                 <span class="i-tabler-alert-triangle c-warn" />
                 <div>
-                  <div>{{ $gettext('Permission notes are not translated here') }}</div>
-                  <RouterLink :to="`/plugins/${plugin.id}/translations`" class="text-3">
-                    {{ $gettext('Translate them in the translation workbench') }}
-                  </RouterLink>
+                  <div>{{ estimate.now ? $gettext('The English name is cut short in the card. Keep it to about %{n} characters.', { n: String(estimate.maxChars) }) : $gettext('In a longer language such as German, the name may be cut short. Keep the English name to about %{n} characters.', { n: String(estimate.maxChars) }) }}</div>
+                  <a role="button" tabindex="0" class="text-3" @click="editName('en')" @keydown.enter="editName('en')">{{ $gettext('Go to the name') }}</a>
                 </div>
               </div>
             </div>

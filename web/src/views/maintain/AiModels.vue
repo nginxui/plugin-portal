@@ -245,7 +245,7 @@ const host = (url: string | null, kind: string) => url ? url.replace(/^https:\/\
         </ACard>
         <ACard :title="$gettext('Glossary')">
           <ATypographyParagraph class="text-3">
-            {{ $gettext('Taken from the translations of the Nginx UI interface every day, so plugin texts use the words of the host.') }}
+            {{ $gettext('Taken from the translations of the Nginx UI interface every day, so plugin texts use the same words as Nginx UI.') }}
           </ATypographyParagraph>
           <dl class="kv">
             <dt>{{ $gettext('Languages') }}</dt>
