@@ -19,7 +19,7 @@ interface PullResponse {
 
 // Moves a change along by what GitHub and the published catalog say now:
 // its pull request merged or closed, its plugin in the index.
-async function refresh(env: Env, token: string, change: ChangeRow): Promise<ChangeRow> {
+export async function refresh(env: Env, token: string, change: ChangeRow): Promise<ChangeRow> {
   if (change.state !== 'open' && change.state !== 'merged')
     return change
   const t = now()
@@ -41,7 +41,9 @@ async function refresh(env: Env, token: string, change: ChangeRow): Promise<Chan
       return { ...change, state: 'rejected', waiting_on: null }
     }
   }
-  if (change.stage === 'merged' && change.plugin_id) {
+  // The deploy report moves changes to live; for a new listing the index is
+  // a fallback when a report was missed.
+  if (change.stage === 'merged' && change.plugin_id && change.kind === 'new_listing') {
     const catalog = await loadCatalog(env)
     if (catalog.plugins.some(p => p.id === change.plugin_id)) {
       await env.DB.batch([
@@ -68,7 +70,7 @@ async function canSee(env: Env, session: Session, token: string, change: ChangeR
   return checkMaintainer(env, session.id)
 }
 
-function present(env: Env, change: ChangeRow) {
+export function present(env: Env, change: ChangeRow) {
   return {
     id: change.id,
     pluginId: change.plugin_id,
@@ -111,10 +113,18 @@ changes.get('/:id', async (c) => {
   ).bind(change.id).all<{ stage: string, detail_json: string | null, at: number, actor: string | null }>()
   return c.json({
     change: present(c.env, change),
-    canRetry: change.author_id === session.user.id && change.state === 'open' && change.stage === 'checks' && change.waiting_on !== null,
+    canRetry: change.author_id === session.user.id && retryable(change),
     events: results.map(e => ({ stage: e.stage, actor: e.actor, at: e.at, detail: e.detail_json ? JSON.parse(e.detail_json) : null })),
   })
 })
+
+// The author may run the checks again after they failed, or after a
+// maintainer asked for changes; the pull request is then updated in place.
+function retryable(change: ChangeRow): boolean {
+  if (change.state !== 'open')
+    return false
+  return (change.stage === 'checks' && change.waiting_on !== null) || (change.stage === 'review' && change.waiting_on === 'author')
+}
 
 // Runs apply.yml again for a change whose checks failed, with the newest
 // release of the repository.
@@ -123,11 +133,11 @@ changes.post('/:id/retry', async (c) => {
   const change = await getChange(c.env, c.req.param('id'))
   if (!change || change.author_id !== session.user.id)
     return c.json({ error: 'not_found' }, 404)
-  if (change.state !== 'open' || change.stage !== 'checks' || !change.payload_json)
+  if (!retryable(change) || !change.payload_json)
     return c.json({ error: 'not_retryable' }, 409)
   const t = now()
   await c.env.DB.batch([
-    c.env.DB.prepare(`UPDATE changes SET waiting_on = 'system', dispatched_at = ?, outcome_json = NULL, updated_at = ? WHERE id = ?`).bind(t, t, change.id),
+    c.env.DB.prepare(`UPDATE changes SET stage = 'checks', waiting_on = 'system', dispatched_at = ?, outcome_json = NULL, updated_at = ? WHERE id = ?`).bind(t, t, change.id),
     event(c.env, change.id, 'submitted', session.user.id, { retry: true }),
   ])
   await dispatchApply(c.env, change.id, JSON.parse(change.payload_json))

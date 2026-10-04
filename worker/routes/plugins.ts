@@ -6,6 +6,7 @@ import { mapLimit, repoAccess } from '../lib/access'
 import { latestRelease, loadCatalog, repoOf } from '../lib/catalog'
 import { github, GitHubError } from '../lib/github'
 import { userToken } from '../lib/session'
+import { repoReleases } from '../lib/submission'
 import { checkMaintainer, requireSession } from '../middleware/auth'
 
 export interface PluginSummary {
@@ -84,7 +85,14 @@ interface PluginRow {
   plugin_id: string
   repo_full_name: string | null
   state: 'draft' | 'listed' | 'delisted'
+  // The entry of its newest change: a draft before the checks, the catalog
+  // entry after them.
+  entry_json: string | null
 }
+
+const PLUGIN_ROWS = `SELECT p.plugin_id, p.repo_full_name, p.state,
+  (SELECT c.entry_json FROM changes c WHERE c.plugin_id = p.plugin_id ORDER BY c.updated_at DESC LIMIT 1) AS entry_json
+  FROM plugins p`
 
 function summarize(env: Env, plugin: CatalogPlugin, access: RepoAccess | null): PluginSummary {
   const release = latestRelease(plugin)
@@ -105,17 +113,24 @@ function summarize(env: Env, plugin: CatalogPlugin, access: RepoAccess | null): 
   }
 }
 
+// A plugin the portal knows that the published index does not list yet: a
+// draft, or one listed by a deploy the cached index has not caught up with.
 function summarizeDraft(row: PluginRow, access: RepoAccess | null): PluginSummary {
+  let entry: { name?: Localized, description?: unknown, version?: string, categories?: string[], trust?: string } = {}
+  try {
+    entry = row.entry_json ? JSON.parse(row.entry_json) : {}
+  }
+  catch {}
   return {
     id: row.plugin_id,
-    name: { en: row.plugin_id },
-    description: null,
+    name: entry.name && typeof entry.name === 'object' ? entry.name : { en: row.plugin_id },
+    description: entry.description && typeof entry.description === 'object' ? entry.description as Localized : null,
     iconUrl: null,
     repo: row.repo_full_name,
     owner: access?.owner ?? null,
-    trust: null,
-    categories: [],
-    version: null,
+    trust: entry.trust ?? null,
+    categories: entry.categories ?? [],
+    version: entry.version ?? null,
     releasedAt: null,
     state: row.state,
     role: access?.role ?? null,
@@ -130,8 +145,7 @@ export async function collectMine(env: Env, session: Session) {
   const token = await userToken(env, session.id)
   const catalog = await loadCatalog(env)
   const listed = new Set(catalog.plugins.map(p => p.id))
-  const drafts = (await env.DB.prepare(`SELECT plugin_id, repo_full_name, state FROM plugins WHERE state != 'listed'`)
-    .all<PluginRow>()).results.filter(row => !listed.has(row.plugin_id))
+  const drafts = (await env.DB.prepare(PLUGIN_ROWS).all<PluginRow>()).results.filter(row => !listed.has(row.plugin_id))
 
   const repos = new Set<string>()
   for (const plugin of catalog.plugins) {
@@ -189,13 +203,22 @@ plugins.get('/:id', async (c) => {
     releases = plugin.releases ?? []
   }
   else {
-    const row = await c.env.DB.prepare('SELECT plugin_id, repo_full_name, state FROM plugins WHERE plugin_id = ?')
+    const row = await c.env.DB.prepare(`${PLUGIN_ROWS} WHERE p.plugin_id = ?`)
       .bind(id)
       .first<PluginRow>()
     if (!row)
       return c.json({ error: 'not_found' }, 404)
     access = row.repo_full_name ? await repoAccess(c.env, session.user.id, token, row.repo_full_name) : null
     summary = summarizeDraft(row, access)
+    // Description and versions come from the releases, as the catalog reads them.
+    if (row.repo_full_name) {
+      const found = await repoReleases(token, row.repo_full_name)
+      const newest = found.find(r => Object.keys(r.description).length) ?? found[0]
+      if (newest) {
+        summary = { ...summary, description: Object.keys(newest.description).length ? newest.description : summary.description, version: summary.version ?? newest.version, releasedAt: newest.releasedAt }
+        releases = found.map(r => ({ version: r.version, released_at: r.releasedAt ?? undefined, min_nginx_ui_version: r.minNginxUiVersion ?? undefined, release_notes_url: r.url }))
+      }
+    }
   }
   if (!summary.role && !await checkMaintainer(c.env, session.id))
     return c.json({ error: 'no_access' }, 403)

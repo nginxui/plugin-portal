@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import type { Release } from '@/api/plugins'
 import { computed, h } from 'vue'
+import { categoryLabel } from '@/lib/categories'
 import { $gettext } from '@/lib/gettext'
 import { localized } from '@/lib/labels'
 import { formatDate } from '@/lib/time'
@@ -28,7 +29,7 @@ const columns = computed(() => [
   <AFlex vertical gap="middle">
     <ACard :title="$gettext('Listing')">
       <ADescriptions :column="{ xs: 1, md: 2 }">
-        <ADescriptionsItem :label="$gettext('Description')" :span="2">
+        <ADescriptionsItem v-if="localized(plugin.description)" :label="$gettext('Description')" :span="2">
           {{ localized(plugin.description) }}
         </ADescriptionsItem>
         <ADescriptionsItem :label="$gettext('Repository')">
@@ -41,13 +42,11 @@ const columns = computed(() => [
         </ADescriptionsItem>
         <ADescriptionsItem :label="$gettext('Categories')">
           <ATag v-for="category in plugin.categories" :key="category">
-            {{ category }}
+            {{ categoryLabel(category) }}
           </ATag>
         </ADescriptionsItem>
-        <ADescriptionsItem :label="$gettext('Latest version')">
-          <template v-if="plugin.version">
-            v{{ plugin.version }}
-          </template>
+        <ADescriptionsItem v-if="plugin.version" :label="$gettext('Latest version')">
+          v{{ plugin.version }}
         </ADescriptionsItem>
       </ADescriptions>
     </ACard>

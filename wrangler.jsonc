@@ -47,10 +47,12 @@
         "CATALOG_URL": "https://plugins.nginxui.com",
         "CATALOG_REPO": "nginxui/plugins-staging",
         "CATALOG_APP_SLUG": "nginx-ui-plugin-catalog",
-        "GITHUB_CLIENT_ID": "Iv23liIZ9byWbTtC8v83"
+        "GITHUB_CLIENT_ID": "Iv23liIZ9byWbTtC8v83",
+        // The test catalog does not deploy; a workflow of its own sends the report.
+        "DEPLOY_WORKFLOW": "report-deploy.yml"
       }
     }
-  },
+  }
   // Secrets, set with `wrangler secret put <NAME>` (add `--env staging` for staging):
   //   GITHUB_CLIENT_SECRET  client secret of the Portal GitHub App
   //   SESSION_KEY           32 random bytes, base64, encrypts GitHub tokens
