@@ -57,6 +57,7 @@ async function refreshRepoStore(env: Env, token: string, change: ChangeRow): Pro
   await env.DB.batch([
     env.DB.prepare(`UPDATE changes SET state = 'merged', stage = 'merged', waiting_on = 'system', commit_sha = ?, updated_at = ? WHERE id = ?`).bind(commit, t, change.id),
     event(env, change.id, 'merged', null, { commit, repo: payload.repo }),
+    env.DB.prepare(`UPDATE suggestions SET state = 'merged' WHERE change_id = ? AND state = 'accepted'`).bind(change.id),
   ])
   // The catalog reads the repository at its next build; start one now.
   await dispatchDeploy(env).catch(error => console.error('deploy dispatch failed', error))
@@ -66,7 +67,7 @@ async function refreshRepoStore(env: Env, token: string, change: ChangeRow): Pro
 export async function refresh(env: Env, token: string, change: ChangeRow): Promise<ChangeRow> {
   if (change.state !== 'open' && change.state !== 'merged')
     return change
-  if (change.kind === 'store' && change.state === 'open' && change.stage === 'review' && change.waiting_on === 'author')
+  if ((change.kind === 'store' || change.kind === 'translations') && change.state === 'open' && change.stage === 'review' && change.waiting_on === 'author')
     return refreshRepoStore(env, token, change)
   const t = now()
   if (change.stage === 'review' && change.pr_number) {

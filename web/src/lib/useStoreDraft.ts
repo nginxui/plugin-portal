@@ -18,6 +18,8 @@ export function useStoreDraft(pluginId: () => string) {
   const savedAt = ref<number | null>(null)
   const problems = ref<string[]>([])
   const saving = ref(false)
+  // Texts an AI drafted that no one confirmed yet, as key.locale.
+  const ai = ref<string[]>([])
 
   async function load() {
     try {
@@ -28,6 +30,7 @@ export function useStoreDraft(pluginId: () => string) {
       readmeChanged.value = s.draft?.readme !== undefined && s.draft?.readme !== null
       source.value = s.draft?.source ?? (s.source === 'release' ? 'repo-branch' : s.source)
       savedAt.value = s.draft?.updatedAt ?? null
+      ai.value = s.draft?.ai ?? []
       failed.value = false
     }
     catch {
@@ -48,6 +51,7 @@ export function useStoreDraft(pluginId: () => string) {
         doc: doc.value,
         ...(readmeChanged.value ? { readme: readme.value } : {}),
         ...(sourceChanged.value ? { source: source.value } : {}),
+        ...(ai.value.length ? { ai: ai.value } : {}),
       })
       problems.value = result.problems
       savedAt.value = Math.floor(Date.now() / 1000)
@@ -62,8 +66,13 @@ export function useStoreDraft(pluginId: () => string) {
     persist()
   }
 
-  /** Sets one text in one language; an empty value removes it. */
-  function setText(key: string, locale: string, value: string) {
+  /**
+   * Sets one text in one language; an empty value removes it. A text an AI
+   * drafted stays unconfirmed until it is set again by hand.
+   */
+  function setText(key: string, locale: string, value: string, drafted = false) {
+    const id = `${key}.${locale}`
+    ai.value = drafted && value ? [...new Set([...ai.value, id])] : ai.value.filter(k => k !== id)
     const next = structuredClone(doc.value)
     const set = (target: Record<string, string> | undefined) => {
       const out = { ...(target ?? {}) }
@@ -93,5 +102,11 @@ export function useStoreDraft(pluginId: () => string) {
     await load()
   }
 
-  return { state, failed, doc, readme, readmeChanged, source, sourceChanged, items, dirty, savedAt, saving, problems, load, persist, update, setText, setReadme, discard }
+  /** Confirms an AI draft as it is. */
+  function confirm(key: string, locale: string) {
+    ai.value = ai.value.filter(k => k !== `${key}.${locale}`)
+    persist()
+  }
+
+  return { ai, confirm, state, failed, doc, readme, readmeChanged, source, sourceChanged, items, dirty, savedAt, saving, problems, load, persist, update, setText, setReadme, discard }
 }

@@ -1,13 +1,16 @@
 <script setup lang="ts">
 import type { StoreState } from '@/api/store'
 import type { Stress } from '@/lib/market'
-import { computed, ref, watch } from 'vue'
+import { computed, onMounted, ref, useTemplateRef, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { ApiError } from '@/api/client'
+import { aiDraft, aiStatus } from '@/api/community'
 import { submitStore } from '@/api/store'
 import gettext, { $gettext } from '@/lib/gettext'
 import { HOST_LOCALES } from '@/lib/hostLocales'
 import { localized } from '@/lib/labels'
+import { localeName } from '@/lib/locales'
+import { permissionText } from '@/lib/market'
 import { coverageOf, itemLabel } from '@/lib/storeDiff'
 import { fromNow } from '@/lib/time'
 import { useStoreDraft } from '@/lib/useStoreDraft'
@@ -33,7 +36,90 @@ const S = computed(() => state.value as StoreState)
 const coverage = computed(() => coverageOf(doc.value))
 const translated = computed(() => HOST_LOCALES.filter(l => (coverage.value[l] ?? 0) > 0).length)
 
-const onChange = draft.setText
+const preview = useTemplateRef<{ edit: (key: string) => void }>('preview')
+const onChange = (key: string, lang: string, value: string, drafted: boolean) => draft.setText(key, lang, value, drafted)
+
+// AI drafts, when a maintainer configured a provider.
+const ai = ref<{ enabled: boolean, remaining?: number }>({ enabled: false })
+onMounted(async () => {
+  ai.value = await aiStatus().catch(() => ({ enabled: false }))
+})
+
+function englishOf(key: string): string {
+  if (key === 'name' || key === 'description')
+    return doc.value[key]?.en ?? ''
+  return doc.value.screenshots?.find(sh => `caption:${sh.id}` === key)?.caption?.en ?? ''
+}
+
+async function draftText(key: string, lang: string): Promise<string> {
+  const result = await aiDraft(plugin.value.id, key, lang, englishOf(key))
+  ai.value = { ...ai.value, remaining: result.remaining }
+  return result.text
+}
+
+// Texts of the page in the preview language, in page order.
+const keys = computed(() => ['name', 'description', ...(doc.value.screenshots ?? []).map(sh => `caption:${sh.id}`)].filter(k => englishOf(k)))
+function textIn(key: string, lang: string): string {
+  if (key === 'name' || key === 'description')
+    return doc.value[key]?.[lang] ?? ''
+  return doc.value.screenshots?.find(sh => `caption:${sh.id}` === key)?.caption?.[lang] ?? ''
+}
+const missing = computed(() => keys.value.filter(k => !textIn(k, locale.value)))
+const progress = computed(() => locale.value === 'en' ? '' : $gettext('%{n} of %{total} untranslated', { n: String(missing.value.length), total: String(keys.value.length) }))
+
+function goNext(after: string) {
+  const order = keys.value
+  const start = order.indexOf(after)
+  const next = [...order.slice(start + 1), ...order.slice(0, start + 1)].find(k => !textIn(k, locale.value))
+  if (next)
+    preview.value?.edit(next)
+}
+
+function keyLabel(key: string): string {
+  if (key === 'name')
+    return $gettext('Name')
+  if (key === 'description')
+    return $gettext('Description')
+  const index = (doc.value.screenshots ?? []).findIndex(sh => `caption:${sh.id}` === key) + 1
+  return $gettext('Caption of screenshot %{n}', { n: String(index) })
+}
+
+const pageTexts = computed(() => {
+  const rows = keys.value.map((key) => {
+    const own = textIn(key, locale.value)
+    const changedName = key === 'name' && own && own !== (S.value.doc.name?.[locale.value] ?? '')
+    const state = draft.ai.value.includes(`${key}.${locale.value}`) ? 'ai' : changedName ? 'review' : own ? 'ok' : 'miss'
+    return { key, label: keyLabel(key), state, runtime: false }
+  })
+  // Permission notes come from the manifest and ship with a release.
+  const manifest = S.value.manifest
+  for (const permission of Object.keys(manifest?.permission_reasons ?? {})) {
+    const translated = !!manifest?.i18n?.[locale.value]?.permission_reasons?.[permission]
+    rows.push({ key: `reason:${permission}`, label: $gettext('Permission note: %{name}', { name: permissionText(locale.value, permission).label }), state: translated ? 'ok' : 'runtime', runtime: true })
+  }
+  return rows
+})
+
+const cut = ref<Record<string, boolean>>({})
+
+const STATE_ICON: Record<string, string> = {
+  ok: 'i-tabler-check c-ok',
+  miss: 'i-tabler-alert-triangle c-warn',
+  review: 'i-tabler-shield-check c-info',
+  ai: 'i-tabler-sparkles c-ai',
+  runtime: 'i-tabler-package c-warn',
+}
+
+function stateText(state: string): string {
+  switch (state) {
+    case 'miss': return $gettext('Not translated, shows English')
+    case 'review': return $gettext('Goes to review, English shows until it is approved')
+    case 'ai': return $gettext('AI draft waiting for confirmation')
+    case 'runtime': return $gettext('Comes from the manifest and ships with the next release')
+    default: return ''
+  }
+}
+
 const onReadme = draft.setReadme
 const discard = draft.discard
 
@@ -143,12 +229,14 @@ const name = computed(() => localized(doc.value.name) || localized(plugin.value.
         <AFlex justify="space-between" align="center" gap="middle" wrap>
           <AFlex align="center" gap="middle" wrap>
             <LanguagePicker v-model="locale" :coverage="coverage" />
-            <span class="text-3 op-65">{{ $gettext('Translated into %{n} of %{total} languages, the others show English', { n: String(translated), total: String(HOST_LOCALES.length) }) }}</span>
+            <span v-if="locale === 'en'" class="text-3 op-65">{{ $gettext('Translated into %{n} of %{total} languages, the others show English', { n: String(translated), total: String(HOST_LOCALES.length) }) }}</span>
+            <span v-else class="text-3 op-65">{{ $gettext('Click any text in the preview to translate it. Tab goes to the next untranslated text.') }}</span>
           </AFlex>
           <AFlex align="center" gap="small" wrap>
-            <ASelect
-              v-model:value="stress" class="w-40" :aria-label="$gettext('Stress test')" :options="[
-                { value: 'off', label: $gettext('No stress test') },
+            <span class="text-3 op-65">{{ $gettext('Stress test') }}</span>
+            <ASegmented
+              v-model:value="stress" :options="[
+                { value: 'off', label: $gettext('Off') },
                 { value: 'longest', label: $gettext('Longest language') },
                 { value: 'rtl', label: $gettext('Right to left') },
                 { value: 'pseudo', label: $gettext('Pseudo localized') },
@@ -163,6 +251,7 @@ const name = computed(() => localized(doc.value.name) || localized(plugin.value.
       <div class="cols">
         <div class="col-main">
           <MarketPreview
+            ref="preview"
             :doc="doc"
             :locale="locale"
             :theme="theme"
@@ -183,15 +272,67 @@ const name = computed(() => localized(doc.value.name) || localized(plugin.value.
             :editable="S.canEdit.texts"
             :locked="locked"
             outline
+            :draft="ai.enabled ? draftText : null"
+            :progress="progress"
+            :ai-keys="draft.ai.value"
+            @next="goNext"
             @change="onChange"
             @readme="onReadme"
             @studio="router.push(`/plugins/${plugin.id}/screenshots`)"
             @categories="categoriesOpen = true"
           />
-          <ListCardRow v-if="stress !== 'off'" class="mt-4" :doc="doc" :locale="locale" :stress="stress" :trust="plugin.trust" :theme="theme" />
+          <ListCardRow v-if="stress !== 'off'" class="mt-4" :doc="doc" :locale="locale" :stress="stress" :trust="plugin.trust" :theme="theme" @results="cut = $event" />
         </div>
 
         <AFlex vertical gap="middle" class="col-side">
+          <ACard v-if="locale !== 'en'" :title="$gettext('Texts of this page, %{lang}', { lang: localeName(locale) })">
+            <template #extra>
+              <ATag class="m-0">
+                {{ keys.length - missing.length }} / {{ keys.length }}
+              </ATag>
+            </template>
+            <div class="items">
+              <button v-for="row in pageTexts" :key="row.key" type="button" class="text-row" :disabled="row.runtime" @click="preview?.edit(row.key)">
+                <span :class="STATE_ICON[row.state]" />
+                <span class="min-w-0">
+                  <span class="block">{{ row.label }}</span>
+                  <span v-if="row.state !== 'ok'" class="block text-3 op-65">{{ stateText(row.state) }}</span>
+                </span>
+              </button>
+            </div>
+            <div v-if="ai.enabled && ai.remaining !== undefined" class="text-3 op-65 mt-3">
+              {{ $gettext('AI drafts left today: %{n}', { n: String(ai.remaining) }) }}
+            </div>
+          </ACard>
+
+          <ACard v-if="stress !== 'off'" :title="$gettext('Stress test results')">
+            <div class="items">
+              <template v-for="(isCut, lang) in cut" :key="lang">
+                <div v-if="isCut" class="item">
+                  <span class="i-tabler-cut c-warn" />
+                  <div>{{ $gettext('The name in %{lang} is cut short in the list card', { lang: localeName(String(lang)) }) }}</div>
+                </div>
+              </template>
+              <div v-if="!Object.values(cut).some(Boolean)" class="item">
+                <span class="i-tabler-check c-ok" />
+                <div>{{ $gettext('Every name fits the list card') }}</div>
+              </div>
+              <div v-if="stress === 'rtl'" class="item">
+                <span class="i-tabler-text-direction-rtl c-info" />
+                <div>{{ $gettext('Check that the page reads right to left without overlapping text') }}</div>
+              </div>
+              <div v-if="stress === 'pseudo' && pageTexts.some(r => r.runtime)" class="item">
+                <span class="i-tabler-alert-triangle c-warn" />
+                <div>
+                  <div>{{ $gettext('Permission notes are not translated here') }}</div>
+                  <div class="text-3 op-65">
+                    {{ $gettext('They come from the manifest and are translated in the repository') }}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </ACard>
+
           <ACard :title="$gettext('Store source')">
             <div class="radios" role="radiogroup" :aria-label="$gettext('Store source')">
               <button
@@ -365,6 +506,36 @@ const name = computed(() => localized(doc.value.name) || localized(plugin.value.
 
 .c-warn {
   color: #faad14;
+}
+
+.c-ai {
+  color: #722ed1;
+}
+
+.text-row {
+  all: unset;
+  box-sizing: border-box;
+  display: flex;
+  gap: 8px;
+  width: 100%;
+  padding: 4px 6px;
+  border-radius: 6px;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.text-row:hover:not(:disabled),
+.text-row:focus-visible {
+  background: var(--portal-faint);
+}
+
+.text-row:disabled {
+  cursor: default;
+}
+
+.text-row > span:first-child {
+  flex: none;
+  margin-top: 3px;
 }
 
 .confirm-list {

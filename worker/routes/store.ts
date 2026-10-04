@@ -10,6 +10,7 @@ import { dispatchApply } from '../lib/deployApp'
 import { draftKey, imageUrl, MAX_BYTES, MAX_SIDE, mediaBytes, mediaEnabled, mediaShas, publishedKey, publishMedia, sha256Hex, webpSize } from '../lib/media'
 import { pluginContext } from '../lib/pluginContext'
 import { cleanDoc, diffDoc, readStore, textsOnly } from '../lib/store'
+import { repoFiles, storeJson } from '../lib/storeFiles'
 import { now } from '../lib/time'
 import { zip } from '../lib/zip'
 import { requireSession } from '../middleware/auth'
@@ -30,6 +31,8 @@ interface Draft {
   doc: StoreDoc
   readme?: string | null
   source?: Source
+  // Texts an AI drafted that no one confirmed yet, as field.locale keys.
+  ai?: string[]
 }
 
 // What the editor starts from: the document, with the names the listing
@@ -104,13 +107,15 @@ store.put('/plugins/:id/store/draft', requireSession, async (c) => {
   const rights = canEdit(ctx)
   if (!rights.texts)
     return c.json({ error: 'no_access' }, 403)
-  const body = await c.req.json<{ doc?: unknown, readme?: unknown, source?: unknown }>().catch(() => ({} as { doc?: unknown, readme?: unknown, source?: unknown }))
+  const body = await c.req.json<{ doc?: unknown, readme?: unknown, source?: unknown, ai?: unknown[] }>().catch(() => ({} as { doc?: unknown, readme?: unknown, source?: unknown, ai?: unknown[] }))
   const { doc, problems } = cleanDoc(body.doc)
   const draft: Draft = { doc }
   if (typeof body.readme === 'string')
     draft.readme = body.readme.slice(0, README_LIMIT)
   if (body.source === 'repo-branch' || body.source === 'repo-release' || body.source === 'catalog')
     draft.source = body.source
+  if (Array.isArray(body.ai))
+    draft.ai = body.ai.filter((k): k is string => typeof k === 'string' && k.length <= 64).slice(0, 300)
   if (!rights.all) {
     const state = await readStore(c.env, ctx.token, { id: ctx.id, repo: ctx.repo, tag: ctx.tag, entry: ctx.entry })
     if (!textsOnly(baseline(state, ctx), doc) || draft.source || draft.readme !== undefined)
@@ -142,22 +147,6 @@ async function dispatchOrRecord(env: Env, change: string, payload: unknown) {
   }
 }
 
-// Image paths of a document as they land in a repository.
-function repoFiles(doc: StoreDoc): { doc: StoreDoc, images: { sha: string, path: string }[] } {
-  const out: { sha: string, path: string }[] = []
-  const place = (path: string | undefined, name: string) => {
-    if (!path?.startsWith('media:'))
-      return path
-    const target = `docs/screenshots/${name}.webp`
-    out.push({ sha: path.slice(6), path: target })
-    return target
-  }
-  const screenshots = doc.screenshots?.map(s => ({ ...s, path: place(s.path, s.id)!, ...(s.dark_path ? { dark_path: place(s.dark_path, `${s.id}-dark`) } : {}) }))
-  return { doc: { ...doc, ...(screenshots ? { screenshots } : {}) }, images: out }
-}
-
-const storeJson = (doc: StoreDoc) => `${JSON.stringify({ $schema: 'https://plugins.nginxui.com/schema/store.schema.json', ...doc }, null, 2)}\n`
-
 store.post('/plugins/:id/store/submit', requireSession, async (c) => {
   const session = c.get('session')
   const ctx = await pluginContext(c.env, session, c.req.param('id'))
@@ -185,6 +174,9 @@ store.post('/plugins/:id/store/submit', requireSession, async (c) => {
   const { problems } = cleanDoc(draft.doc)
   if (problems.length)
     return c.json({ error: 'invalid', problems }, 422)
+  // An AI draft is published only once someone confirmed it.
+  if (draft.ai?.length)
+    return c.json({ error: 'unconfirmed_ai', keys: draft.ai }, 409)
   const busy = await c.env.DB.prepare(`SELECT id FROM changes WHERE plugin_id = ? AND kind IN ('store', 'store_source') AND state = 'open' LIMIT 1`).bind(ctx.id).first()
   if (busy)
     return c.json({ error: 'busy' }, 409)

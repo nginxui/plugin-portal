@@ -49,6 +49,7 @@ const menuItems = computed<MenuProps['items']>(() => {
   const items: MenuProps['items'] = [
     { key: '/plugins', icon: icon('i-tabler-layout-grid'), label: $gettext('My plugins') },
     { key: '/submit', icon: icon('i-tabler-plus'), label: $gettext('Submit a plugin') },
+    { key: '/translate', icon: icon('i-tabler-language'), label: $gettext('Translate') },
     { key: '/owners', icon: icon('i-tabler-building'), label: $gettext('Organizations') },
   ]
   if (session.isMaintainer) {
@@ -58,6 +59,7 @@ const menuItems = computed<MenuProps['items']>(() => {
       children: [
         { key: '/review', icon: icon('i-tabler-inbox'), label: withBadge($gettext('Review queue'), reviewStore.pending) },
         { key: '/audit', icon: icon('i-tabler-history'), label: $gettext('Audit log') },
+        { key: '/ai', icon: icon('i-tabler-sparkles'), label: $gettext('AI models') },
       ],
     })
   }

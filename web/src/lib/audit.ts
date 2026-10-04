@@ -9,6 +9,9 @@ export function auditKindLabel(kind: AuditKind): string {
     case 'submission': return $gettext('Submission')
     case 'system': return $gettext('System')
     case 'account': return $gettext('Sign in')
+    case 'maintainer': return $gettext('Maintainer action')
+    case 'ai': return $gettext('AI')
+    case 'settings': return $gettext('Settings')
   }
 }
 
@@ -18,6 +21,9 @@ export const AUDIT_KIND_COLORS: Record<AuditKind, string> = {
   submission: 'cyan',
   system: 'default',
   account: 'default',
+  maintainer: 'orange',
+  ai: 'purple',
+  settings: 'default',
 }
 
 function versions(list: string[]): string {
@@ -47,6 +53,14 @@ export function auditLines(entry: AuditEntry): string[] {
     case 'review.merge': return [$gettext('Approved and merged #%{n}', { n: pr })]
     case 'review.request_changes': return [$gettext('Requested changes on #%{n}', { n: pr })]
     case 'review.reject': return [$gettext('Rejected #%{n}', { n: pr })]
+    case 'store.submit': return [$gettext('Submitted %{n} store changes', { n: String(d.items ?? 0) })]
+    case 'community.decide': return [$gettext('Accepted %{a} and declined %{d} community translations', { a: String(d.accepted ?? 0), d: String(d.declined ?? 0) })]
+    case 'community.enable': return [$gettext('Turned community translation on')]
+    case 'community.disable': return [$gettext('Turned community translation off')]
+    case 'ai.draft': return [$gettext('Drafted a translation into %{lang} with %{model}', { lang: String(d.locale ?? ''), model: String(d.model ?? '') })]
+    case 'ai.provider_add': return [$gettext('Added the AI model %{name}', { name: entry.subject ?? '' })]
+    case 'ai.provider_change': return [d.quota ? $gettext('Changed the AI model %{name}: drafts per author per day %{from} to %{to}', { name: entry.subject ?? '', from: String(d.quota.from), to: String(d.quota.to) }) : $gettext('Changed the AI model %{name}', { name: entry.subject ?? '' })]
+    case 'ai.provider_remove': return [$gettext('Removed the AI model %{name}', { name: entry.subject ?? '' })]
     case 'change.self_service': {
       const ops = (d.operations ?? {}) as { yank?: string[], unyank?: string[], revoke_signers?: string[], categories?: string[] }
       const lines: string[] = []

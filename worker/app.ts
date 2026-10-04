@@ -3,9 +3,11 @@ import { Hono } from 'hono'
 import { GitHubError } from './lib/github'
 import { SessionExpired } from './lib/session'
 import { security } from './middleware/security'
+import { aiAdmin } from './routes/aiAdmin'
 import { audit } from './routes/audit'
 import { auth } from './routes/auth'
 import { changes } from './routes/changes'
+import { community } from './routes/community'
 import { hooks } from './routes/hooks'
 import { me } from './routes/me'
 import { owners } from './routes/owners'
@@ -22,6 +24,7 @@ app.route('/auth', auth)
 app.route('/me', me)
 app.route('/media', media)
 app.route('/', store)
+app.route('/', community)
 app.route('/plugins', selfService)
 app.route('/plugins', plugins)
 app.route('/owners', owners)
@@ -30,6 +33,7 @@ app.route('/changes', changes)
 app.route('/hooks', hooks)
 app.route('/review', review)
 app.route('/audit', audit)
+app.route('/ai/admin', aiAdmin)
 
 app.notFound(c => c.json({ error: 'not_found' }, 404))
 

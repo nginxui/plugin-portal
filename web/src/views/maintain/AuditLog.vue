@@ -82,7 +82,7 @@ function newer() {
 
 const kinds = computed(() => [
   { value: 'all', label: $gettext('All') },
-  ...(['review', 'self_service', 'submission', 'system', 'account'] as AuditKind[]).map(k => ({ value: k, label: auditKindLabel(k) })),
+  ...(['review', 'self_service', 'submission', 'maintainer', 'ai', 'settings', 'system', 'account'] as AuditKind[]).map(k => ({ value: k, label: auditKindLabel(k) })),
 ])
 
 const ranges = computed(() => [
