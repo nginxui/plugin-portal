@@ -43,7 +43,7 @@ export const community = new Hono<AppEnv>()
 community.post('/ai/draft', requireSession, async (c) => {
   const session = c.get('session')
   const body = await c.req.json<{ plugin_id?: string, field?: string, locale?: string, source?: string }>().catch(() => ({} as Record<string, string>))
-  const runtime = /^runtime:[a-z][a-z0-9._-]{0,47}$/.test(body.field ?? '')
+  const runtime = /^reason:[a-z][a-z0-9._-]{0,47}$/.test(body.field ?? '')
   if (!body.plugin_id || !body.field || !body.locale || !body.source || !(validField(body.field) || runtime) || !isHostLocale(body.locale) || body.locale === 'en')
     return c.json({ error: 'invalid' }, 422)
   const ctx = await pluginContext(c.env, session, body.plugin_id)

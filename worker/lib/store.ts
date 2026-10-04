@@ -24,9 +24,13 @@ export interface StoreDoc {
   description?: Localized
   homepage_url?: string
   screenshots?: StoreScreenshot[]
+  // Translations of the notes that explain each permission, keyed by
+  // permission. English stays in plugin.json, next to the permissions.
+  permission_reasons?: Record<string, Localized>
 }
 
-export const LIMITS = { name: 64, description: 1000, caption: 200, screenshots: 8 }
+export const LIMITS = { name: 64, description: 1000, caption: 200, reason: 300, screenshots: 8 }
+const PERMISSION = /^[a-z][a-z0-9._-]{0,47}$/
 
 export interface Manifest {
   id?: string
@@ -83,6 +87,9 @@ export function docFromManifest(manifest: Manifest | null): StoreDoc {
     doc.description = description
   if (manifest.homepage_url)
     doc.homepage_url = manifest.homepage_url
+  const reasons = reasonsOf(manifest)
+  if (reasons)
+    doc.permission_reasons = reasons
   if (manifest.screenshots?.length) {
     doc.screenshots = manifest.screenshots.map((shot) => {
       const caption: Localized = {}
@@ -97,6 +104,49 @@ export function docFromManifest(manifest: Manifest | null): StoreDoc {
     })
   }
   return doc
+}
+
+/** The translated permission notes of a manifest, English left out. */
+export function reasonsOf(manifest: Manifest | null): Record<string, Localized> | undefined {
+  const out: Record<string, Localized> = {}
+  for (const permission of Object.keys(manifest?.permission_reasons ?? {})) {
+    for (const [locale, text] of Object.entries(manifest?.i18n ?? {})) {
+      const value = text?.permission_reasons?.[permission]?.trim()
+      if (value && locale !== 'en')
+        (out[permission] ??= {})[locale] = value
+    }
+  }
+  return Object.keys(out).length ? out : undefined
+}
+
+/**
+ * A document with the translated notes of the manifest under its own, so
+ * the editor shows them; a document written before notes were part of it
+ * holds none.
+ */
+export function withManifestReasons(doc: StoreDoc, manifest: Manifest | null): StoreDoc {
+  const fromManifest = reasonsOf(manifest)
+  if (!fromManifest)
+    return doc
+  const merged: Record<string, Localized> = {}
+  for (const permission of new Set([...Object.keys(fromManifest), ...Object.keys(doc.permission_reasons ?? {})]))
+    merged[permission] = { ...fromManifest[permission], ...doc.permission_reasons?.[permission] }
+  return { ...doc, permission_reasons: merged }
+}
+
+/** A document without the notes that only repeat the manifest, as it is written. */
+export function withoutManifestReasons(doc: StoreDoc, manifest: Manifest | null): StoreDoc {
+  if (!doc.permission_reasons)
+    return doc
+  const own: Record<string, Localized> = {}
+  for (const [permission, texts] of Object.entries(doc.permission_reasons)) {
+    for (const [locale, text] of Object.entries(texts)) {
+      if (text !== manifest?.i18n?.[locale]?.permission_reasons?.[permission])
+        (own[permission] ??= {})[locale] = text
+    }
+  }
+  const { permission_reasons: _, ...rest } = doc
+  return Object.keys(own).length ? { ...rest, permission_reasons: own } : rest
 }
 
 async function raw(repo: string, ref: string, path: string): Promise<string | null> {
@@ -133,14 +183,14 @@ export async function readStore(env: Env, token: string, opts: { id: string, rep
       rawJson<StoreDoc>(env.CATALOG_REPO, 'main', `store/${opts.id}/store.json`),
       raw(env.CATALOG_REPO, 'main', `store/${opts.id}/README.md`),
     ])
-    return { source, repo: env.CATALOG_REPO, ref: 'main', doc: doc ?? {}, readme, manifest, tag: opts.tag }
+    return { source, repo: env.CATALOG_REPO, ref: 'main', doc: withManifestReasons(doc ?? {}, manifest), readme, manifest, tag: opts.tag }
   }
   if (source === 'repo-branch' || source === 'repo-release') {
     const ref = source === 'repo-branch' && opts.repo ? (await headOf(token, opts.repo)).sha : opts.tag
     const [doc, readme] = opts.repo && ref
       ? await Promise.all([rawJson<StoreDoc>(opts.repo, ref, 'plugin.store.json'), raw(opts.repo, ref, 'README.md')])
       : [null, null]
-    return { source, repo: opts.repo, ref, doc: doc ?? docFromManifest(manifest), readme, manifest, tag: opts.tag }
+    return { source, repo: opts.repo, ref, doc: withManifestReasons(doc ?? docFromManifest(manifest), manifest), readme, manifest, tag: opts.tag }
   }
   const readme = opts.repo && opts.tag ? await raw(opts.repo, opts.tag, 'README.md') : null
   return { source, repo: opts.repo, ref: opts.tag, doc: docFromManifest(manifest), readme, manifest, tag: opts.tag }
@@ -231,6 +281,21 @@ export function cleanDoc(input: unknown): { doc: StoreDoc, problems: string[] } 
     if (shots.length)
       doc.screenshots = shots
   }
+  if (value.permission_reasons && typeof value.permission_reasons === 'object' && !Array.isArray(value.permission_reasons)) {
+    const reasons: Record<string, Localized> = {}
+    for (const [permission, texts] of Object.entries(value.permission_reasons as Record<string, unknown>).slice(0, 40)) {
+      if (!PERMISSION.test(permission))
+        continue
+      const clean = cleanLocalized(texts, LIMITS.reason, `permission_reasons.${permission}`, problems)
+      if (clean) {
+        delete clean.en
+        if (Object.keys(clean).length)
+          reasons[permission] = clean
+      }
+    }
+    if (Object.keys(reasons).length)
+      doc.permission_reasons = reasons
+  }
   return { doc, problems }
 }
 
@@ -276,6 +341,14 @@ export function diffDoc(before: StoreDoc, after: StoreDoc): StoreItem[] {
   for (const id of shotsBefore.keys()) {
     if (!shotsAfter.some(s => s.id === id))
       items.push({ field: 'screenshots', label: `screenshots.${id}.removed`, review: false })
+  }
+  for (const permission of new Set([...Object.keys(before.permission_reasons ?? {}), ...Object.keys(after.permission_reasons ?? {})])) {
+    const a = before.permission_reasons?.[permission] ?? {}
+    const b = after.permission_reasons?.[permission] ?? {}
+    for (const locale of new Set([...Object.keys(a), ...Object.keys(b)])) {
+      if ((a[locale] ?? '') !== (b[locale] ?? ''))
+        items.push({ field: 'permission_reasons', locale, label: `reason.${locale}.${permission}`, review: false })
+    }
   }
   return items
 }

@@ -111,39 +111,55 @@ function onDropFile(e: DragEvent) {
   openFile(e.dataTransfer?.files?.[0], 'new')
 }
 
-function recrop() {
-  const url = imageOf(side.value === 'dark' ? selected.value?.dark_path : selected.value?.path)
-  if (url)
-    pending.value = { url, target: side.value, name: selected.value!.id }
-}
+// The image of the selected screenshot sits in a crop box all the time; a
+// crop is encoded and uploaded only when it is confirmed.
+const liveUrl = computed(() => imageOf(side.value === 'dark' ? selected.value?.dark_path : selected.value?.path))
+const live = useTemplateRef<{ crop: () => Promise<Blob | null>, reset: () => void }>('live')
+const adjusted = ref(false)
+const liveFailed = ref(false)
+watch(liveUrl, () => {
+  adjusted.value = false
+  liveFailed.value = false
+})
 
 async function applyCrop() {
   const p = pending.value
   if (!p)
     return
+  if (await upload(() => cropper.value?.crop() ?? Promise.resolve(null), p.target, p.name)) {
+    URL.revokeObjectURL(p.url)
+    pending.value = null
+  }
+}
+
+async function applyLive() {
+  if (selected.value && await upload(() => live.value?.crop() ?? Promise.resolve(null), side.value, selected.value.id))
+    adjusted.value = false
+}
+
+async function upload(make: () => Promise<Blob | null>, target: 'new' | 'light' | 'dark', name: string): Promise<boolean> {
   uploading.value = true
   uploadError.value = ''
   try {
-    const blob = await cropper.value?.crop()
+    const blob = await make()
     if (!blob) {
       uploadError.value = $gettext('The image could not be encoded under 2 MB.')
-      return
+      return false
     }
     const { path, url } = await uploadImage(blob)
     if (state.value)
       state.value.images[path] = url
-    if (p.target === 'new') {
-      const id = slug(p.name)
+    if (target === 'new') {
+      const id = slug(name)
       setShots([...shots.value, { id, path }])
       selectedId.value = id
       side.value = 'light'
     }
     else if (selected.value) {
-      const key = p.target === 'dark' ? 'dark_path' : 'path'
+      const key = target === 'dark' ? 'dark_path' : 'path'
       setShots(shots.value.map(s => s.id === selected.value!.id ? { ...s, [key]: path } : s))
     }
-    URL.revokeObjectURL(p.url)
-    pending.value = null
+    return true
   }
   catch (e) {
     const code = (e as Error).message
@@ -152,6 +168,7 @@ async function applyCrop() {
       : code === 'uploads_off'
         ? $gettext('Uploads are not available yet.')
         : $gettext('The image could not be uploaded. Please try again.')
+    return false
   }
   finally {
     uploading.value = false
@@ -332,17 +349,24 @@ const changedIds = computed(() => new Set(items.value.filter(i => i.field === 's
               <ASegmented v-model:value="side" size="small" :options="[{ value: 'light', label: $gettext('Light') }, { value: 'dark', label: $gettext('Dark') }]" />
             </template>
             <div class="preview">
-              <img v-if="imageOf(side === 'dark' ? selected.dark_path : selected.path)" :src="imageOf(side === 'dark' ? selected.dark_path : selected.path)!" alt="" referrerpolicy="no-referrer">
-              <div v-else class="missing big">
+              <ImageCropper v-if="liveUrl && canEdit && S.uploads && !liveFailed" ref="live" :key="liveUrl" :src="liveUrl" @adjusted="adjusted = $event" @failed="liveFailed = true" />
+              <img v-else-if="liveUrl" :src="liveUrl" alt="" referrerpolicy="no-referrer">
+              <div v-else class="missing big" :class="{ clickable: canEdit && S.uploads }" @click="canEdit && S.uploads && pick(side)">
                 {{ $gettext('No dark version') }}
+                <span v-if="canEdit && S.uploads" class="block text-3">{{ $gettext('Click to upload') }}</span>
               </div>
             </div>
             <AFlex gap="small" wrap class="mt-3">
+              <template v-if="adjusted">
+                <AButton size="small" type="primary" :loading="uploading" @click="applyLive">
+                  {{ $gettext('Use this crop') }}
+                </AButton>
+                <AButton size="small" :disabled="uploading" @click="live?.reset()">
+                  {{ $gettext('Undo the crop') }}
+                </AButton>
+              </template>
               <AButton size="small" :disabled="!canEdit || !S.uploads" @click="pick(side)">
                 {{ side === 'dark' && !selected.dark_path ? $gettext('Upload the dark version') : $gettext('Replace the image') }}
-              </AButton>
-              <AButton v-if="imageOf(side === 'dark' ? selected.dark_path : selected.path)" size="small" :disabled="!canEdit || !S.uploads" @click="recrop">
-                {{ $gettext('Crop again') }}
               </AButton>
               <AButton v-if="side === 'dark' && selected.dark_path" size="small" :disabled="!canEdit" @click="removeDark">
                 {{ $gettext('Remove the dark version') }}

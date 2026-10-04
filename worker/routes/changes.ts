@@ -136,15 +136,14 @@ function storeRequest(env: Env, change: ChangeRow) {
     pr_url?: string
     repo?: string
     items?: { field: string, locale?: string, label: string, review: boolean }[]
-    doc?: { name?: Record<string, string>, description?: Record<string, string>, screenshots?: { id: string, caption?: Record<string, string> }[] }
-    runtime?: Record<string, Record<string, string>>
+    doc?: { name?: Record<string, string>, description?: Record<string, string>, screenshots?: { id: string, caption?: Record<string, string> }[], permission_reasons?: Record<string, Record<string, string>> }
   }
   const repoPr = payload.delivery === 'bot' && payload.pr_url
   // The new text of a name or a caption, short enough to show in a row.
   const valueOf = (item: { field: string, locale?: string, label: string }) => {
     const doc = payload.doc
-    if (item.field === 'runtime' && item.locale)
-      return payload.runtime?.[item.locale]?.[item.label.split('.').slice(2).join('.')]
+    if (item.field === 'permission_reasons' && item.locale)
+      return payload.doc?.permission_reasons?.[item.label.split('.').slice(2).join('.')]?.[item.locale]
     if (!doc || !item.locale)
       return undefined
     if (item.field === 'name')

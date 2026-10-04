@@ -1,13 +1,21 @@
 <script setup lang="ts">
 import type { SubmitDraft } from '@/lib/submitDrafts'
-import { computed } from 'vue'
+import { computed, ref } from 'vue'
 import { checkTitle } from '@/lib/checks'
 import { localized } from '@/lib/labels'
+import { forgetDraft } from '@/lib/submitDrafts'
 import { fromNow } from '@/lib/time'
 
 // A submission started in this browser and not sent yet.
 
 const props = defineProps<{ draft: SubmitDraft }>()
+const emit = defineEmits<{ discard: [] }>()
+const discarding = ref(false)
+async function discard() {
+  discarding.value = true
+  await forgetDraft(props.draft.repo)
+  emit('discard')
+}
 
 const name = computed(() => localized(props.draft.name) || props.draft.repo.split('/')[1] || props.draft.repo)
 const steps = computed(() => [1, 2, 3, 4].map(n => (n < props.draft.step ? 'done' : n === props.draft.step ? 'cur' : '')))
@@ -47,6 +55,9 @@ const steps = computed(() => [1, 2, 3, 4].map(n => (n < props.draft.step ? 'done
           {{ $gettext('Continue the submission') }}
         </AButton>
       </RouterLink>
+      <AButton type="text" size="small" :loading="discarding" @click="discard">
+        {{ $gettext('Discard') }}
+      </AButton>
     </div>
   </section>
 </template>

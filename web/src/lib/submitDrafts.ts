@@ -1,7 +1,8 @@
 import type { Check } from '@/api/submit'
+import { api } from '@/api/client'
 
-// Submissions started and not sent yet, kept in this browser so My plugins
-// can offer to continue them. Only a convenience: nothing here is shared.
+// Submissions started and not sent yet, kept with the account so they can be
+// continued on any device.
 
 export interface SubmitDraft {
   repo: string
@@ -10,31 +11,18 @@ export interface SubmitDraft {
   step: number
   at: number
   problem: Check | null
+  publicKey?: string
+  categories?: string[]
 }
 
-const KEY = 'portal-submit-drafts'
-
-export function loadDrafts(): SubmitDraft[] {
-  try {
-    const parsed = JSON.parse(localStorage.getItem(KEY) ?? '[]') as SubmitDraft[]
-    return Array.isArray(parsed) ? parsed : []
-  }
-  catch {
-    return []
-  }
+export async function loadDrafts(): Promise<SubmitDraft[]> {
+  return (await api<{ drafts: SubmitDraft[] }>('/submit/drafts')).drafts
 }
 
-function save(drafts: SubmitDraft[]) {
-  try {
-    localStorage.setItem(KEY, JSON.stringify(drafts.slice(0, 5)))
-  }
-  catch {}
-}
-
-export function rememberDraft(draft: SubmitDraft) {
-  save([draft, ...loadDrafts().filter(d => d.repo.toLowerCase() !== draft.repo.toLowerCase())])
+export function rememberDraft(draft: Omit<SubmitDraft, 'at'>) {
+  return api<{ ok: boolean }>('/submit/drafts', { method: 'PUT', json: draft }).catch(() => null)
 }
 
 export function forgetDraft(repo: string) {
-  save(loadDrafts().filter(d => d.repo.toLowerCase() !== repo.toLowerCase()))
+  return api<{ ok: boolean }>(`/submit/drafts?repo=${encodeURIComponent(repo)}`, { method: 'DELETE' }).catch(() => null)
 }

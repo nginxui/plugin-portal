@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { Installable } from '@/api/plugins'
 import type { Preview } from '@/api/submit'
-import { useMediaQuery } from '@vueuse/core'
+import { useDebounceFn, useMediaQuery } from '@vueuse/core'
 import { computed, onMounted, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { ApiError } from '@/api/client'
@@ -11,7 +11,7 @@ import { categoryLabel } from '@/lib/categories'
 import gettext, { $gettext } from '@/lib/gettext'
 import { keyState } from '@/lib/keys'
 import { localeName } from '@/lib/locales'
-import { forgetDraft, rememberDraft } from '@/lib/submitDrafts'
+import { loadDrafts, rememberDraft } from '@/lib/submitDrafts'
 
 const route = useRoute()
 const router = useRouter()
@@ -59,10 +59,12 @@ watch(step, (value) => {
     checksOpen.value = true
 })
 
-// Keep a started submission so it can be continued later.
-watch([step, preview], () => {
+// Keep a started submission with the account so it can be continued later,
+// on any device.
+let sent = false
+const remember = useDebounceFn(() => {
   const repo = preview.value?.draft?.repo ?? (typeof route.query.repo === 'string' ? route.query.repo : '')
-  if (!repo || submitting.value)
+  if (!repo || submitting.value || sent)
     return
   const failed = preview.value?.checks.find(c => c.status === 'fail')
   rememberDraft({
@@ -70,10 +72,21 @@ watch([step, preview], () => {
     id: preview.value?.draft?.id ?? null,
     name: preview.value?.draft?.name ?? {},
     step: step.value + 1,
-    at: Math.floor(Date.now() / 1000),
     problem: failed ?? null,
+    publicKey: publicKey.value,
+    categories: chosen.value,
   })
-})
+}, 800)
+watch([step, preview, publicKey, chosen], remember, { deep: true })
+
+// Picks up the key and categories of a saved draft of the repository.
+async function restore(repo: string) {
+  const saved = (await loadDrafts().catch(() => [])).find(d => d.repo.toLowerCase() === repo.toLowerCase())
+  if (saved?.publicKey && !publicKey.value)
+    publicKey.value = saved.publicKey
+  if (saved?.categories?.length)
+    chosen.value = saved.categories
+}
 const missingCertificate = computed(() => !draft.value?.signer?.signingKeyId || !draft.value?.signer?.primaryKeyId)
 
 const isNarrow = useMediaQuery('(max-width: 720px)')
@@ -94,6 +107,7 @@ async function pick(repo: string) {
     preview.value = await checkRepository(repo)
     chosen.value = [...(preview.value.draft?.categories ?? [])]
     router.replace({ query: { repo: preview.value.draft?.repo ?? repo } })
+    await restore(preview.value.draft?.repo ?? repo)
     if (preview.value.ok)
       step.value = 1
   }
@@ -118,7 +132,7 @@ async function submit() {
   submitError.value = ''
   try {
     const { change } = await submitPlugin({ repo: draft.value.repo, authorPublicKey: publicKey.value, categories: chosen.value })
-    forgetDraft(draft.value.repo)
+    sent = true
     router.push(`/changes/${change}`)
   }
   catch (e) {

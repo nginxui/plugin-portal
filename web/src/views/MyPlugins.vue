@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import type { Change } from '@/api/changes'
 import type { Insights, Installable, PluginSummary } from '@/api/plugins'
+import type { SubmitDraft } from '@/lib/submitDrafts'
 import { computed, onMounted, ref } from 'vue'
 import { getChanges } from '@/api/changes'
 import { getInsights, getMyPlugins } from '@/api/plugins'
@@ -21,8 +22,10 @@ const loading = ref(true)
 const failed = ref(false)
 const ownerFilter = ref('all')
 
-// Submissions started in this browser whose plugin is not here yet.
-const drafts = computed(() => loadDrafts().filter(d => !plugins.value.some(p => p.repo?.toLowerCase() === d.repo.toLowerCase() || p.id === d.id)))
+// Submissions started and not sent yet whose plugin is not here yet.
+const savedDrafts = ref<SubmitDraft[]>([])
+loadDrafts().then(list => (savedDrafts.value = list)).catch(() => {})
+const drafts = computed(() => savedDrafts.value.filter(d => !plugins.value.some(p => p.repo?.toLowerCase() === d.repo.toLowerCase() || p.id === d.id)))
 
 async function load() {
   loading.value = true
@@ -205,7 +208,7 @@ const activity = computed(() => plugins.value
         </ACard>
         <div v-else class="grid">
           <PluginCard v-for="plugin in shown" :key="plugin.id" :plugin="plugin" :insights="insights[plugin.id]" :change="changeOf(plugin.id)" />
-          <SubmitDraftCard v-for="draft in ownerFilter === 'all' ? drafts : []" :key="draft.repo" :draft="draft" />
+          <SubmitDraftCard v-for="draft in ownerFilter === 'all' ? drafts : []" :key="draft.repo" :draft="draft" @discard="savedDrafts = savedDrafts.filter(d => d.repo !== draft.repo)" />
         </div>
 
         <ACard :title="$gettext('Repositories you can submit')" :loading="loading">

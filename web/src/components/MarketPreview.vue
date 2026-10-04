@@ -13,6 +13,8 @@ export interface PreviewDoc {
   description?: Localized
   homepage_url?: string
   screenshots?: { id: string, path: string, dark_path?: string, caption?: Localized }[]
+  // Translations of the permission notes, keyed by permission.
+  permission_reasons?: Record<string, Localized>
 }
 
 export interface PreviewManifest {
@@ -104,7 +106,7 @@ const shots = computed(() => (props.doc.screenshots ?? []).map(shot => ({
 
 const permissions = computed(() => (props.manifest?.permissions ?? []).map((p) => {
   const reasons = props.manifest?.i18n?.[props.locale]?.permission_reasons ?? props.manifest?.permission_reasons ?? {}
-  return { id: p, ...permissionText(props.locale, p), reason: reasons[p] ?? props.manifest?.permission_reasons?.[p] ?? '' }
+  return { id: p, ...permissionText(props.locale, p), reason: props.doc.permission_reasons?.[p]?.[props.locale] || reasons[p] || props.manifest?.permission_reasons?.[p] || '' }
 }))
 
 const facts = computed(() => {

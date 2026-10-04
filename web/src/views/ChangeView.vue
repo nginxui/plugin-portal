@@ -318,7 +318,7 @@ async function retry() {
               <span class="text-3 op-65">{{ submittedBy }}</span>
             </template>
             <ASteps :current="current" :items="steps" label-placement="vertical" responsive class="change-steps" />
-            <div v-if="repoStore && change.state === 'open' && change.stage === 'review'" class="callout mt-5">
+            <div v-if="repoStore && change.state === 'open' && change.stage === 'review'" class="callout pointed mt-5" :style="{ '--arrow': `${(current + 0.5) / steps.length * 100}%` }">
               <span class="i-tabler-clock text-6 c-warn" />
               <div class="min-w-0 flex-1">
                 <div class="font-600">
@@ -509,19 +509,35 @@ async function retry() {
 
 <style scoped>
 .callout {
+  position: relative;
   display: flex;
   align-items: flex-start;
   gap: 12px;
   flex-wrap: wrap;
   padding: 14px 16px;
-  border: 1px solid #ffe58f;
+  border: 1px solid var(--portal-warn-border);
   border-radius: 8px;
-  background: #fffbe6;
+  background: var(--portal-warn-bg);
 }
 
-:global(html.dark) .callout {
-  border-color: #594214;
-  background: #2b2111;
+/* Points at the step the change waits in. */
+.callout.pointed::before {
+  content: '';
+  position: absolute;
+  top: -7px;
+  left: calc(var(--arrow) - 6px);
+  width: 12px;
+  height: 12px;
+  border-left: 1px solid var(--portal-warn-border);
+  border-top: 1px solid var(--portal-warn-border);
+  background: var(--portal-warn-bg);
+  transform: rotate(45deg);
+}
+
+@media (max-width: 640px) {
+  .callout.pointed::before {
+    display: none;
+  }
 }
 
 .c-warn {

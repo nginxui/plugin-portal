@@ -3,8 +3,9 @@ import { computed, onBeforeUnmount, ref, watch } from 'vue'
 import { $gettext } from '@/lib/gettext'
 
 // Crops an image to 16:10 with zoom and drag, and encodes it as WebP at a
-// width the catalog accepts.
+// width the catalog accepts. Nothing is encoded until crop() is called.
 const props = defineProps<{ src: string }>()
+const emit = defineEmits<{ adjusted: [adjusted: boolean], failed: [] }>()
 
 const RATIO = 1.6
 const MAX_WIDTH = 1920
@@ -24,7 +25,10 @@ watch(() => props.src, (src) => {
   const img = new Image()
   img.crossOrigin = 'anonymous'
   img.onload = () => (image.value = img)
-  img.onerror = () => (failed.value = true)
+  img.onerror = () => {
+    failed.value = true
+    emit('failed')
+  }
   img.src = src
 }, { immediate: true })
 
@@ -78,6 +82,21 @@ onBeforeUnmount(onUp)
 
 const tooSmall = computed(() => !!region.value && region.value.width < MIN_WIDTH)
 
+// Whether the crop differs from the whole image, as it was loaded.
+watch(region, (r) => {
+  const img = image.value
+  if (!r || !img)
+    return
+  const centred = Math.abs(r.left - (img.naturalWidth - r.width) / 2) < 0.5 && Math.abs(r.top - (img.naturalHeight - r.height) / 2) < 0.5
+  emit('adjusted', zoom.value !== 1 || !centred)
+})
+
+/** Back to the whole image. */
+function reset() {
+  zoom.value = 1
+  offset.value = { x: 0, y: 0 }
+}
+
 /** The crop as WebP, or null when the image cannot be read. */
 async function crop(): Promise<Blob | null> {
   const img = image.value
@@ -100,7 +119,7 @@ async function crop(): Promise<Blob | null> {
   return null
 }
 
-defineExpose({ crop })
+defineExpose({ crop, reset })
 </script>
 
 <template>
