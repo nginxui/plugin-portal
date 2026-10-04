@@ -16,3 +16,9 @@ export async function store<T>(key: string, seconds: number, value: T): Promise<
     headers: { 'Content-Type': 'application/json', 'Cache-Control': `max-age=${seconds}` },
   }))
 }
+
+/** The value the edge cache holds for a key, or null. */
+export async function peek<T>(key: string): Promise<T | null> {
+  const hit = await caches.default.match(`https://portal.cache/${encodeURIComponent(key)}`)
+  return hit ? hit.json() as Promise<T> : null
+}

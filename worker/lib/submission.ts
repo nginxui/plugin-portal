@@ -1,6 +1,7 @@
 import type { Env, Session } from '../env'
 import type { Manifest } from './rules'
 import { repoAccess } from './access'
+import { peek, store } from './cache'
 import { loadCatalog } from './catalog'
 import { github, GitHubError } from './github'
 import { categoriesFromManifest, isSemver, manifestDescriptions, manifestNames, packageAssets, parseCertificateSignature, parsePublicKey, PLUGIN_ID, reservedWord, tagVersion } from './rules'
@@ -257,6 +258,18 @@ export interface ReleaseInfo {
  * catalog reads the same things when it builds.
  */
 export async function repoReleases(token: string, repo: string): Promise<ReleaseInfo[]> {
+  // An empty answer is not kept, so a first release shows up at once.
+  const key = `releases:${repo.toLowerCase()}`
+  const hit = await peek<ReleaseInfo[]>(key)
+  if (hit?.length)
+    return hit
+  const found = await readReleases(token, repo)
+  if (found.length)
+    await store(key, 300, found)
+  return found
+}
+
+async function readReleases(token: string, repo: string): Promise<ReleaseInfo[]> {
   const releases = (await github<(ReleaseResponse & { published_at?: string })[]>(`/repos/${repo}/releases?per_page=10`, token).catch(() => []))
     .filter(r => !r.draft && isSemver(tagVersion(r.tag_name)))
   if (releases.length === 0)

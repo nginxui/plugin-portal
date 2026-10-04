@@ -2,6 +2,7 @@ import type { AppEnv, Env, Session } from '../env'
 import type { RepoAccess, RepoOwner, Role } from '../lib/access'
 import type { CatalogPlugin, Localized } from '../lib/catalog'
 import type { RepoPermission } from '../lib/github'
+import type { ReleaseInfo } from '../lib/submission'
 import { Hono } from 'hono'
 import { mapLimit, repoAccess, roleOf } from '../lib/access'
 import { catalogEntry, latestRelease, loadCatalog, repoOf } from '../lib/catalog'
@@ -115,6 +116,33 @@ function summarize(env: Env, plugin: CatalogPlugin, access: RepoAccess | null): 
   }
 }
 
+// The catalog entry of a plugin the published index does not list yet, with
+// its releases read from the repository the way the catalog reads them.
+function pendingEntry(row: PluginRow, found: ReleaseInfo[]): CatalogPlugin {
+  const draft = summarizeDraft(row, null)
+  const described = found.find(r => Object.keys(r.description).length)
+  return {
+    id: row.plugin_id,
+    name: draft.name,
+    description: described ? described.description : draft.description ?? undefined,
+    repository_url: row.repo_full_name ? `https://github.com/${row.repo_full_name}` : undefined,
+    categories: draft.categories,
+    trust: draft.trust ?? undefined,
+    releases: found.map(r => ({ version: r.version, released_at: r.releasedAt ?? undefined, min_nginx_ui_version: r.minNginxUiVersion ?? undefined, release_notes_url: r.url, signer: r.signer ?? undefined })),
+  }
+}
+
+// A summary of such a plugin, versions included.
+async function summarizePending(env: Env, token: string, row: PluginRow, access: RepoAccess | null): Promise<{ summary: PluginSummary, entry: CatalogPlugin }> {
+  const entry = pendingEntry(row, row.repo_full_name ? await repoReleases(token, row.repo_full_name) : [])
+  const release = latestRelease(entry)
+  const draft = summarizeDraft(row, access)
+  return {
+    summary: { ...draft, description: entry.description ?? draft.description, version: release?.version ?? draft.version, releasedAt: release?.released_at ?? null },
+    entry,
+  }
+}
+
 // A plugin the portal knows that the published index does not list yet: a
 // draft, or one listed by a deploy the cached index has not caught up with.
 function summarizeDraft(row: PluginRow, access: RepoAccess | null): PluginSummary {
@@ -169,15 +197,12 @@ export async function collectMine(env: Env, session: Session) {
     if (a?.role)
       plugins.push(summarize(env, plugin, a))
   }
-  for (const row of drafts) {
-    const a = accessOf(row.repo_full_name)
-    if (a?.role)
-      plugins.push(summarizeDraft(row, a))
-  }
+  const pending = await mapLimit(drafts.filter(row => accessOf(row.repo_full_name)?.role), 4, row => summarizePending(env, token, row, accessOf(row.repo_full_name)))
+  plugins.push(...pending.map(p => p.summary))
 
   const installable = await installedRepos(env, session, repos)
 
-  return { plugins, installable }
+  return { plugins, installable, pendingEntries: pending.map(p => p.entry) }
 }
 
 export const plugins = new Hono<AppEnv>()
@@ -214,9 +239,10 @@ plugins.get('/repositories', async (c) => {
 plugins.get('/insights', async (c) => {
   const session = c.get('session')
   const token = await userToken(c.env, session.id)
-  const [{ plugins: mine }, catalog] = await Promise.all([collectMine(c.env, session), loadCatalog(c.env)])
+  const [{ plugins: mine, pendingEntries }, catalog] = await Promise.all([collectMine(c.env, session), loadCatalog(c.env)])
   const ids = new Set(mine.filter(p => p.state === 'listed').map(p => p.id))
-  const listed = catalog.plugins.filter(p => ids.has(p.id))
+  // Listed plugins the published index has not caught up with count too.
+  const listed = [...catalog.plugins, ...pendingEntries].filter(p => ids.has(p.id))
   return c.json({ insights: await mapLimit(listed, 4, plugin => insightsOf(c.env, token, plugin)) })
 })
 
@@ -242,16 +268,10 @@ plugins.get('/:id', async (c) => {
     if (!row)
       return c.json({ error: 'not_found' }, 404)
     access = row.repo_full_name ? await repoAccess(c.env, session.user.id, token, row.repo_full_name) : null
-    summary = summarizeDraft(row, access)
     // Description and versions come from the releases, as the catalog reads them.
-    if (row.repo_full_name) {
-      const found = await repoReleases(token, row.repo_full_name)
-      const newest = found.find(r => Object.keys(r.description).length) ?? found[0]
-      if (newest) {
-        summary = { ...summary, description: Object.keys(newest.description).length ? newest.description : summary.description, version: summary.version ?? newest.version, releasedAt: newest.releasedAt }
-        releases = found.map(r => ({ version: r.version, released_at: r.releasedAt ?? undefined, min_nginx_ui_version: r.minNginxUiVersion ?? undefined, release_notes_url: r.url, signer: r.signer ?? undefined }))
-      }
-    }
+    const pending = await summarizePending(c.env, token, row, access)
+    summary = pending.summary
+    releases = pending.entry.releases ?? []
   }
   if (!summary.role && !await checkMaintainer(c.env, session.id))
     return c.json({ error: 'no_access' }, 403)
