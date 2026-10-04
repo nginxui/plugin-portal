@@ -7,7 +7,7 @@ import { now } from '../lib/time'
 
 interface ApplyReport {
   change: string
-  outcome: 'opened' | 'rejected' | 'checks_failed' | 'unsupported' | 'failed'
+  outcome: 'opened' | 'committed' | 'rejected' | 'checks_failed' | 'unsupported' | 'failed'
   message?: string
   problems?: string
   preview?: string
@@ -15,6 +15,7 @@ interface ApplyReport {
   fields?: unknown[]
   entry?: unknown
   pr_number?: number | null
+  commit_sha?: string | null
   run_url?: string
 }
 
@@ -58,6 +59,18 @@ hooks.post('/apply', async (c) => {
     fields: Array.isArray(report.fields) ? report.fields.slice(0, 50) : [],
   }
   const t = now()
+  // A self service change is in the catalog once committed.
+  if (report.outcome === 'committed' && typeof report.commit_sha === 'string' && /^[0-9a-f]{40}$/.test(report.commit_sha)) {
+    await c.env.DB.batch([
+      c.env.DB.prepare(
+        `UPDATE changes SET state = 'merged', stage = 'merged', waiting_on = 'system', commit_sha = ?, class = 'self_service',
+         entry_json = coalesce(?, entry_json), outcome_json = ?, updated_at = ? WHERE id = ?`,
+      ).bind(report.commit_sha, report.entry ? JSON.stringify(report.entry) : null, JSON.stringify(outcome), t, change.id),
+      event(c.env, change.id, 'merged', null, { commit: report.commit_sha, runUrl: outcome.runUrl }),
+    ])
+    await audit(c.env.DB, { actorId: null, action: 'change.applied', subject: change.plugin_id ?? undefined, detail: { change: change.id, outcome: report.outcome, commit: report.commit_sha, run: claims.run_id } })
+    return c.json({ ok: true })
+  }
   const opened = report.outcome === 'opened' && Number.isSafeInteger(report.pr_number)
   const waitingOn = opened ? 'maintainer' : report.outcome === 'rejected' || report.outcome === 'checks_failed' ? 'author' : 'system'
   await c.env.DB.batch([

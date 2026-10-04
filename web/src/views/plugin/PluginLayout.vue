@@ -29,6 +29,7 @@ const crumbs = computed(() => [
 
 const tabs = computed(() => [
   { key: 'plugin', label: $gettext('Overview'), to: `/plugins/${id.value}` },
+  { key: 'plugin-versions', label: $gettext('Versions'), to: `/plugins/${id.value}/versions` },
   { key: 'plugin-access', label: $gettext('Access'), to: `/plugins/${id.value}/access` },
 ])
 </script>
@@ -100,8 +101,16 @@ const tabs = computed(() => [
 .tabs {
   display: flex;
   gap: 24px;
-  border-bottom: 1px solid var(--portal-border);
   overflow-x: auto;
+  overflow-y: hidden;
+  scrollbar-width: none;
+  /* The bottom line is drawn inside, so the underline of the open tab can
+     cover it without overflowing and making the bar scroll. */
+  box-shadow: inset 0 -1px 0 var(--portal-border);
+}
+
+.tabs::-webkit-scrollbar {
+  display: none;
 }
 
 .tab {
@@ -109,7 +118,6 @@ const tabs = computed(() => [
   color: inherit;
   white-space: nowrap;
   border-bottom: 2px solid transparent;
-  margin-bottom: -1px;
 }
 
 .tab.on {

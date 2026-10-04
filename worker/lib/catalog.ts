@@ -4,6 +4,8 @@ export type Localized = Record<string, string>
 
 export interface CatalogRelease {
   version: string
+  yanked?: boolean
+  channel?: string
   released_at?: string
   min_nginx_ui_version?: string
   release_notes_url?: string
@@ -58,4 +60,25 @@ export function repoOf(url: string | undefined | null): string | null {
 
 export function latestRelease(plugin: CatalogPlugin): CatalogRelease | null {
   return plugin.releases?.[0] ?? null
+}
+
+export interface CatalogEntry {
+  id: string
+  yanked?: string[]
+  revoked_signers?: string[]
+  categories?: string[]
+  [key: string]: unknown
+}
+
+/** The entry of a plugin on the main branch of the catalog repository. */
+export async function catalogEntry(env: Env, id: string): Promise<CatalogEntry | null> {
+  const response = await fetch(`https://raw.githubusercontent.com/${env.CATALOG_REPO}/main/plugins/${id}.json`, { cf: { cacheTtl: 30 } } as RequestInit)
+  if (!response.ok)
+    return null
+  try {
+    return await response.json() as CatalogEntry
+  }
+  catch {
+    return null
+  }
 }

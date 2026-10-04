@@ -10,6 +10,7 @@ import { me } from './routes/me'
 import { owners } from './routes/owners'
 import { plugins } from './routes/plugins'
 import { review } from './routes/review'
+import { selfService } from './routes/selfService'
 import { submit } from './routes/submit'
 
 export const app = new Hono<AppEnv>().basePath('/api')
@@ -17,6 +18,7 @@ export const app = new Hono<AppEnv>().basePath('/api')
 app.use('*', security)
 app.route('/auth', auth)
 app.route('/me', me)
+app.route('/plugins', selfService)
 app.route('/plugins', plugins)
 app.route('/owners', owners)
 app.route('/submit', submit)

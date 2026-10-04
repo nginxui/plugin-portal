@@ -23,6 +23,7 @@ export const router = createRouter({
           component: () => import('@/views/plugin/PluginLayout.vue'),
           children: [
             { path: '', name: 'plugin', component: () => import('@/views/plugin/PluginOverview.vue') },
+            { path: 'versions', name: 'plugin-versions', component: () => import('@/views/plugin/PluginVersions.vue') },
             { path: 'access', name: 'plugin-access', component: () => import('@/views/plugin/PluginAccess.vue') },
           ],
         },

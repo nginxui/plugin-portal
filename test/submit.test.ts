@@ -279,3 +279,65 @@ describe('apply report', () => {
     expect(await env.DB.prepare('SELECT state FROM plugins WHERE plugin_id = ?').bind('io.github.octo-author.geoip').first()).toEqual({ state: 'listed' })
   })
 })
+
+describe('self service', () => {
+  async function listed(cookie: string) {
+    const t = Math.floor(Date.now() / 1000)
+    await env.DB.prepare(`INSERT INTO plugins (plugin_id, repo_full_name, state, created_at, updated_at) VALUES ('io.github.octo-author.geoip', 'octo-author/geoip', 'listed', ?, ?)`).bind(t, t).run()
+    return cookie
+  }
+
+  it('sends the operations to apply.yml for an admin of the repository', async () => {
+    const cookie = await listed(await signedIn())
+    const response = await call('/api/plugins/io.github.octo-author.geoip/changes', { method: 'POST', mutate: true, cookie, json: { operations: { yank: ['1.0.0'] }, reason: 'Breaks the config' } })
+    expect(response.status).toBe(201)
+    const { change } = await response.json() as { change: string }
+    expect(JSON.parse(dispatched[0].payload)).toMatchObject({ kind: 'entry_update', plugin_id: 'io.github.octo-author.geoip', operations: { yank: ['1.0.0'] }, reason: 'Breaks the config' })
+    expect(await env.DB.prepare('SELECT kind, class, stage FROM changes WHERE id = ?').bind(change).first()).toEqual({ kind: 'yank', class: 'self_service', stage: 'checks' })
+  })
+
+  it('batches several operations, never both ways for one version', async () => {
+    const cookie = await listed(await signedIn())
+    expect((await call('/api/plugins/io.github.octo-author.geoip/changes', { method: 'POST', mutate: true, cookie, json: { operations: { yank: ['1.0.0'], unyank: ['1.0.0'] } } })).status).toBe(422)
+    const response = await call('/api/plugins/io.github.octo-author.geoip/changes', { method: 'POST', mutate: true, cookie, json: { operations: { yank: ['1.0.0', '1.1.0'], unyank: ['0.9.0'] } } })
+    expect(response.status).toBe(201)
+    const { change } = await response.json() as { change: string }
+    expect(await env.DB.prepare('SELECT kind FROM changes WHERE id = ?').bind(change).first()).toEqual({ kind: 'batch' })
+  })
+
+  it('takes known operations only and one change per plugin', async () => {
+    const cookie = await listed(await signedIn())
+    expect((await call('/api/plugins/io.github.octo-author.geoip/changes', { method: 'POST', mutate: true, cookie, json: { operations: { trust: ['official'] } } })).status).toBe(422)
+    expect((await call('/api/plugins/io.github.octo-author.geoip/changes', { method: 'POST', mutate: true, cookie, json: { operations: { yank: ['1.0.0'] } } })).status).toBe(201)
+    const busy = await call('/api/plugins/io.github.octo-author.geoip/changes', { method: 'POST', mutate: true, cookie, json: { operations: { unyank: ['1.0.0'] } } })
+    expect(busy.status).toBe(409)
+  })
+
+  it('refuses someone who cannot publish to the repository', async () => {
+    const cookie = await listed(await signedIn())
+    const saved = repo.permissions
+    repo.permissions = { admin: false, push: false, pull: true }
+    try {
+      expect((await call('/api/plugins/io.github.octo-author.geoip/changes', { method: 'POST', mutate: true, cookie, json: { operations: { categories: ['dns'] } } })).status).toBe(403)
+    }
+    finally {
+      repo.permissions = saved
+    }
+  })
+
+  it('moves a committed change to merged', async () => {
+    const cookie = await listed(await signedIn())
+    const { change } = await (await call('/api/plugins/io.github.octo-author.geoip/changes', { method: 'POST', mutate: true, cookie, json: { operations: { categories: ['dns'] } } })).json() as { change: string }
+    const signing = await crypto.subtle.generateKey({ name: 'RSASSA-PKCS1-v1_5', modulusLength: 2048, publicExponent: new Uint8Array([1, 0, 1]), hash: 'SHA-256' }, true, ['sign', 'verify']) as CryptoKeyPair
+    const jwk = await crypto.subtle.exportKey('jwk', signing.publicKey)
+    vi.restoreAllMocks()
+    mockFetch(url => url.href === 'https://token.actions.githubusercontent.com/.well-known/jwks' ? json({ keys: [{ ...jwk, kid: 'self' }] }) : undefined)
+    const t = Math.floor(Date.now() / 1000)
+    const encode = (value: unknown) => base64url(new TextEncoder().encode(JSON.stringify(value)))
+    const unsigned = `${encode({ alg: 'RS256', kid: 'self' })}.${encode({ iss: 'https://token.actions.githubusercontent.com', aud: 'portal.test', iat: t, exp: t + 300, repository: env.CATALOG_REPO, workflow_ref: `${env.CATALOG_REPO}/.github/workflows/apply.yml@refs/heads/main`, run_id: '9' })}`
+    const token = `${unsigned}.${base64url(new Uint8Array(await crypto.subtle.sign('RSASSA-PKCS1-v1_5', signing.privateKey, new TextEncoder().encode(unsigned))))}`
+    const response = await call('/api/hooks/apply', { method: 'POST', headers: { Authorization: `Bearer ${token}` }, body: JSON.stringify({ change, outcome: 'committed', class: 'self_service', commit_sha: 'a'.repeat(40), entry: { id: 'io.github.octo-author.geoip', categories: ['dns'] } }) })
+    expect(response.status).toBe(200)
+    expect(await env.DB.prepare('SELECT state, stage, commit_sha FROM changes WHERE id = ?').bind(change).first()).toEqual({ state: 'merged', stage: 'merged', commit_sha: 'a'.repeat(40) })
+  })
+})

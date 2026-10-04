@@ -9,8 +9,8 @@ export const usePluginStore = defineStore('plugin', () => {
   const error = ref<string | null>(null)
   const loading = ref(false)
 
-  async function open(id: string) {
-    if (detail.value?.plugin.id === id)
+  async function open(id: string, force = false) {
+    if (!force && detail.value?.plugin.id === id)
       return
     loading.value = true
     error.value = null

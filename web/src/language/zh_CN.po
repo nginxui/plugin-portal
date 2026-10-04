@@ -5,7 +5,7 @@ msgstr ""
 "Language-Team: none\n"
 "Language: zh_CN\n"
 "MIME-Version: 1.0\n"
-"Content-Type: text/plain; charset=utf-8\n"
+"Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
 msgid "Categories"
@@ -23,7 +23,8 @@ msgstr "最多三个。推荐分类根据插件的能力得出。"
 msgid "%{n} of %{max} chosen"
 msgstr "已选 %{n}/%{max}"
 
-msgid "This is not a minisign public key. Paste the whole content of primary.pub."
+msgid ""
+"This is not a minisign public key. Paste the whole content of primary.pub."
 msgstr "这不是 minisign 公钥，请粘贴 primary.pub 的完整内容。"
 
 msgid "Key %{id}. The release has no certificate to check it against."
@@ -92,7 +93,9 @@ msgstr "插件仓库"
 msgid "The root and the release environment"
 msgstr "根目录和 release 环境"
 
-msgid "Add it as the secret PLUGIN_SIGNING_KEY of the release environment, then delete the local copy."
+msgid ""
+"Add it as the secret PLUGIN_SIGNING_KEY of the release environment, then "
+"delete the local copy."
 msgstr "设为 release 环境的 secret PLUGIN_SIGNING_KEY，然后删除本地副本。"
 
 msgid "Your offline backup"
@@ -104,14 +107,23 @@ msgstr "密码管理器或离线存储"
 msgid "Without it no new certificate can be issued"
 msgstr "丢失后将无法再签发新证书"
 
-msgid "Then publish every release with nginxui/plugin-release, which signs the packages when a version tag is pushed."
-msgstr "之后用 nginxui/plugin-release 发布每个版本，推送版本标签时它会为安装包签名。"
+msgid ""
+"Then publish every release with nginxui/plugin-release, which signs the "
+"packages when a version tag is pushed."
+msgstr ""
+"之后用 nginxui/plugin-release 发布每个版本，推送版本标签时它会为安装包签名。"
 
 msgid "Signing and trust"
 msgstr "签名与信任"
 
 msgid "Community"
 msgstr "社区"
+
+msgid "%{kind} is in progress. Other changes can be made once it is done."
+msgstr "“%{kind}”正在处理，完成后才能进行其他改动。"
+
+msgid "View progress"
+msgstr "查看进度"
 
 msgid "Manage"
 msgstr "管理"
@@ -245,6 +257,21 @@ msgstr "仓库迁移"
 msgid "Delisting"
 msgstr "下架"
 
+msgid "Yank a version"
+msgstr "撤回版本"
+
+msgid "Restore a version"
+msgstr "恢复版本"
+
+msgid "Revoke a signer"
+msgstr "撤销签名者"
+
+msgid "Change categories"
+msgstr "调整分类"
+
+msgid "Batch change"
+msgstr "批量改动"
+
 msgid "Update"
 msgstr "更新"
 
@@ -296,7 +323,9 @@ msgstr "仓库不存在或未公开。"
 msgid "The repository is private. The catalog lists public repositories only."
 msgstr "仓库为私有。插件目录只收录公开仓库。"
 
-msgid "This repository may not be listed. Contact the maintainers if you think this is a mistake."
+msgid ""
+"This repository may not be listed. Contact the maintainers if you think this "
+"is a mistake."
 msgstr "此仓库不能上架。如果你认为有误，请联系维护者。"
 
 msgid "The repository is archived."
@@ -308,16 +337,24 @@ msgstr "你在此仓库上安装了 Nginx UI 插件目录应用。"
 msgid "You have admin permission on this repository."
 msgstr "你在此仓库上拥有 admin 权限。"
 
-msgid "Only an admin of the repository can submit it. Ask an admin to submit it, or to install the Nginx UI Plugin Catalog app."
-msgstr "只有仓库管理员可以提交。请让管理员提交，或请管理员安装 Nginx UI 插件目录应用。"
+msgid ""
+"Only an admin of the repository can submit it. Ask an admin to submit it, or "
+"to install the Nginx UI Plugin Catalog app."
+msgstr ""
+"只有仓库管理员可以提交。请让管理员提交，或请管理员安装 Nginx UI 插件目录应"
+"用。"
 
 msgid "Version %{version}, the newest stable release."
 msgstr "版本 %{version}，最新稳定版本。"
 
-msgid "Version %{version} is a prerelease. The listing starts with it until a stable release is published."
-msgstr "版本 %{version} 是预发布版本。在发布稳定版本之前，上架内容以该版本为准。"
+msgid ""
+"Version %{version} is a prerelease. The listing starts with it until a "
+"stable release is published."
+msgstr ""
+"版本 %{version} 是预发布版本。在发布稳定版本之前，上架内容以该版本为准。"
 
-msgid "The repository has no GitHub Release with a version tag such as v1.0.0 yet."
+msgid ""
+"The repository has no GitHub Release with a version tag such as v1.0.0 yet."
 msgstr "仓库还没有带版本标签（例如 v1.0.0）的 GitHub Release。"
 
 msgid "Read from the release %{tag}."
@@ -329,16 +366,22 @@ msgstr "仓库在 %{tag} 的根目录下没有 plugin.json。"
 msgid "plugin.json at %{tag} is not valid JSON."
 msgstr "%{tag} 中的 plugin.json 不是有效的 JSON。"
 
-msgid "The plugin ID %{id} does not follow the naming rule, for example io.github.<owner>.<name>."
+msgid ""
+"The plugin ID %{id} does not follow the naming rule, for example io.github."
+"<owner>.<name>."
 msgstr "插件 ID %{id} 不符合命名规则，例如 io.github.<所有者>.<名称>。"
 
-msgid "The com.nginxui namespace is reserved for the plugins of the Nginx UI project."
+msgid ""
+"The com.nginxui namespace is reserved for the plugins of the Nginx UI "
+"project."
 msgstr "com.nginxui 命名空间保留给 Nginx UI 项目自己的插件。"
 
 msgid "The plugin ID %{id} names another GitHub owner than %{owner}."
 msgstr "插件 ID %{id} 中的 GitHub 所有者与 %{owner} 不一致。"
 
-msgid "This plugin ID may not be listed. Contact the maintainers if you think this is a mistake."
+msgid ""
+"This plugin ID may not be listed. Contact the maintainers if you think this "
+"is a mistake."
 msgstr "此插件 ID 不能上架。如果你认为有误，请联系维护者。"
 
 msgid "A plugin with this ID is listed already."
@@ -350,8 +393,12 @@ msgstr "此插件已有一个提交正在审核中。"
 msgid "plugin.json has no name."
 msgstr "plugin.json 没有名称。"
 
-msgid "The name holds \"%{word}\", which no name may hold. Only the plugins of the Nginx UI project are official."
-msgstr "名称中包含“%{word}”，任何名称都不能包含它。只有 Nginx UI 项目自己的插件才是官方插件。"
+msgid ""
+"The name holds \"%{word}\", which no name may hold. Only the plugins of the "
+"Nginx UI project are official."
+msgstr ""
+"名称中包含“%{word}”，任何名称都不能包含它。只有 Nginx UI 项目自己的插件才是官"
+"方插件。"
 
 msgid "%{count} packages in the release."
 msgstr "发布版本中有 %{count} 个安装包。"
@@ -362,8 +409,11 @@ msgstr "发布版本中没有名为 %{name} 的安装包，也没有各平台的
 msgid "Issued by the primary key %{key}."
 msgstr "由主密钥 %{key} 签发。"
 
-msgid "There is no plugin.signer at %{tag}. Create the keys as described in the next step and publish a new release."
-msgstr "%{tag} 中没有 plugin.signer。请按下一步中的说明生成密钥，并发布新版本。"
+msgid ""
+"There is no plugin.signer at %{tag}. Create the keys as described in the "
+"next step and publish a new release."
+msgstr ""
+"%{tag} 中没有 plugin.signer。请按下一步中的说明生成密钥，并发布新版本。"
 
 msgid "The certificate was issued for %{id}, not for this plugin."
 msgstr "该证书是为 %{id} 签发的，不属于此插件。"
@@ -380,8 +430,12 @@ msgstr "翻译者"
 msgid "No access"
 msgstr "无权限"
 
-msgid "Everything a publisher can do, plus organization actions such as the partner application and turning community translation on or off."
-msgstr "发布者的全部操作，以及组织层面的操作，例如申请成为合作伙伴、开启或关闭社区翻译。"
+msgid ""
+"Everything a publisher can do, plus organization actions such as the partner "
+"application and turning community translation on or off."
+msgstr ""
+"发布者的全部操作，以及组织层面的操作，例如申请成为合作伙伴、开启或关闭社区翻"
+"译。"
 
 msgid "Edit store data, manage versions and signers, and run preflight checks."
 msgstr "编辑商店资料，管理版本与签名者，运行发布前检查。"
@@ -410,14 +464,20 @@ msgstr "已提交"
 msgid "Checks"
 msgstr "检查"
 
+msgid "Committed to the catalog"
+msgstr "已提交到目录"
+
+msgid "Live in the catalog"
+msgstr "已在目录中上线"
+
 msgid "Maintainer review"
 msgstr "维护者审核"
 
 msgid "Merged"
 msgstr "已合并"
 
-msgid "Live in the catalog"
-msgstr "已在目录中上线"
+msgid "The change is live in the catalog."
+msgstr "改动已在插件目录中生效。"
 
 msgid "The plugin is listed in the catalog."
 msgstr "插件已在目录中上架。"
@@ -425,7 +485,9 @@ msgstr "插件已在目录中上架。"
 msgid "The pull request was closed without merging."
 msgstr "拉取请求已关闭，未合并。"
 
-msgid "The checks found problems. Fix them in a new release, then run the checks again."
+msgid ""
+"The checks found problems. Fix them in a new release, then run the checks "
+"again."
 msgstr "检查发现问题。请在新版本中修复，然后重新运行检查。"
 
 msgid "The checks could not be started. Please try again later."
@@ -434,13 +496,22 @@ msgstr "无法启动检查，请稍后重试。"
 msgid "The checks could not finish. A maintainer will look into it."
 msgstr "检查未能完成，维护者会跟进处理。"
 
-msgid "The packages, signatures and listing are being checked. This takes a few minutes."
+msgid ""
+"The packages, signatures and listing are being checked. This takes a few "
+"minutes."
 msgstr "正在检查安装包、签名和上架信息，需要几分钟。"
 
 msgid "Waiting for a maintainer to review the submission."
 msgstr "等待维护者审核。"
 
-msgid "Approved. The plugin appears in the catalog after the next deploy, usually within minutes."
+msgid ""
+"The change is in the catalog sources and takes effect at its next update, "
+"usually within minutes."
+msgstr "改动已提交到插件目录，会在下次目录更新后生效，通常只需几分钟。"
+
+msgid ""
+"Approved. The plugin appears in the catalog after the next deploy, usually "
+"within minutes."
 msgstr "已通过审核。插件会在下次部署后出现在目录中，通常只需几分钟。"
 
 msgid "Checks started again"
@@ -476,6 +547,12 @@ msgstr "%{time}提交"
 msgid "Run the checks again"
 msgstr "重新运行检查"
 
+msgid "What was asked"
+msgstr "改动内容"
+
+msgid "Reason"
+msgstr "原因"
+
 msgid "History"
 msgstr "记录"
 
@@ -485,14 +562,20 @@ msgstr "链接"
 msgid "Pull request #%{n}"
 msgstr "拉取请求 #%{n}"
 
+msgid "Commit in the catalog"
+msgstr "目录中的提交"
+
 msgid "Log of the checks"
 msgstr "检查日志"
 
 msgid "Manage the plugin"
 msgstr "管理插件"
 
-msgid "The review is public on GitHub. You are mentioned in the pull request, so GitHub notifies you of comments."
-msgstr "审核在 GitHub 上公开进行。拉取请求中提及了你，GitHub 会通知你新的评论。"
+msgid ""
+"The review is public on GitHub. You are mentioned in the pull request, so "
+"GitHub notifies you of comments."
+msgstr ""
+"审核在 GitHub 上公开进行。拉取请求中提及了你，GitHub 会通知你新的评论。"
 
 msgid "All"
 msgstr "全部"
@@ -509,7 +592,8 @@ msgstr "审核中"
 msgid "Publishing"
 msgstr "发布中"
 
-msgid "Manage the plugins you list in the catalog and follow changes under review."
+msgid ""
+"Manage the plugins you list in the catalog and follow changes under review."
 msgstr "管理你在插件目录中上架的插件，跟进审核中的变更。"
 
 msgid "Your plugins could not be loaded."
@@ -533,14 +617,23 @@ msgstr "按所有者筛选"
 msgid "You have no role on any listed plugin yet."
 msgstr "你还没有任何已上架插件的角色。"
 
-msgid "Plugins appear here when you have admin, maintain, write or triage permission on their repository."
-msgstr "你在插件仓库上拥有 admin、maintain、write 或 triage 权限时，插件会显示在这里。"
+msgid ""
+"Plugins appear here when you have admin, maintain, write or triage "
+"permission on their repository."
+msgstr ""
+"你在插件仓库上拥有 admin、maintain、write 或 triage 权限时，插件会显示在这"
+"里。"
 
 msgid "Repositories you can submit"
 msgstr "可提交的仓库"
 
-msgid "Public repositories you administer or installed the Nginx UI Plugin Catalog app on. With the app installed, new releases reach the catalog within minutes."
-msgstr "你管理的公开仓库，以及你安装了 Nginx UI 插件目录应用的仓库。安装应用后，新版本会在几分钟内同步到目录。"
+msgid ""
+"Public repositories you administer or installed the Nginx UI Plugin Catalog "
+"app on. With the app installed, new releases reach the catalog within "
+"minutes."
+msgstr ""
+"你管理的公开仓库，以及你安装了 Nginx UI 插件目录应用的仓库。安装应用后，新版"
+"本会在几分钟内同步到目录。"
 
 msgid "App installed %{time}"
 msgstr "%{time}安装应用"
@@ -560,7 +653,9 @@ msgstr "你访问的页面不存在。"
 msgid "Back to my plugins"
 msgstr "返回我的插件"
 
-msgid "The accounts and organizations that own the plugins you work on. Names, avatars and members come from GitHub."
+msgid ""
+"The accounts and organizations that own the plugins you work on. Names, "
+"avatars and members come from GitHub."
 msgstr "你参与的插件所属的个人账号与组织。名称、头像与成员均来自 GitHub。"
 
 msgid "The organizations could not be loaded."
@@ -594,13 +689,17 @@ msgstr "在 GitHub 上查看组织"
 msgid "View account on GitHub"
 msgstr "在 GitHub 上查看账号"
 
-msgid "Plugins of this account you have a role on. Each role follows your permission on that repository."
+msgid ""
+"Plugins of this account you have a role on. Each role follows your "
+"permission on that repository."
 msgstr "该账号下你拥有角色的插件，角色按你在各仓库上的权限显示。"
 
 msgid "Members and access"
 msgstr "成员与权限"
 
-msgid "Members and permissions are managed on GitHub. The Developer Center decides what each person may do from their repository permission."
+msgid ""
+"Members and permissions are managed on GitHub. The Developer Center decides "
+"what each person may do from their repository permission."
 msgstr "成员与权限在 GitHub 上管理，开发者中心按仓库权限决定每个人能做什么。"
 
 msgid "Manage teams and repository access on GitHub"
@@ -636,17 +735,26 @@ msgstr "开发者中心角色"
 msgid "What it allows"
 msgstr "可以做的事"
 
-msgid "When someone loses their permission on GitHub, their role in the Developer Center ends with it."
+msgid ""
+"When someone loses their permission on GitHub, their role in the Developer "
+"Center ends with it."
 msgstr "在 GitHub 上移除某人的权限后，对方在开发者中心的角色随即失效。"
 
 msgid "Owner"
 msgstr "所有者"
 
-msgid "The owner is the owner of the repository. When the repository moves to another owner on GitHub, the plugin moves with it after review."
-msgstr "所有者就是仓库的所有者。仓库在 GitHub 上转移给其他所有者后，插件会在审核后随之转移。"
+msgid ""
+"The owner is the owner of the repository. When the repository moves to "
+"another owner on GitHub, the plugin moves with it after review."
+msgstr ""
+"所有者就是仓库的所有者。仓库在 GitHub 上转移给其他所有者后，插件会在审核后随"
+"之转移。"
 
 msgid "Overview"
 msgstr "概览"
+
+msgid "Versions"
+msgstr "版本"
 
 msgid "Access"
 msgstr "访问权限"
@@ -669,17 +777,11 @@ msgstr "在目录中查看"
 msgid "Plugin sections"
 msgstr "插件页面"
 
-msgid "Version"
-msgstr "版本"
+msgid "Another change of this plugin is in progress."
+msgstr "该插件已有一项改动正在处理。"
 
-msgid "Released"
-msgstr "发布日期"
-
-msgid "Requires Nginx UI"
-msgstr "所需 Nginx UI 版本"
-
-msgid "Release notes"
-msgstr "发布说明"
+msgid "The change could not be sent. Please try again."
+msgstr "改动提交失败，请重试。"
 
 msgid "Listing"
 msgstr "上架信息"
@@ -687,11 +789,161 @@ msgstr "上架信息"
 msgid "Description"
 msgstr "描述"
 
+msgid "Edit"
+msgstr "修改"
+
 msgid "Latest version"
 msgstr "最新版本"
 
-msgid "Versions"
+msgid "Save"
+msgstr "保存"
+
+msgid ""
+"The catalog files the plugin under these categories from its next update."
+msgstr "插件目录下次更新后，会把插件归入这些分类。"
+
+msgid "Signer revoked"
+msgstr "签名者已撤销"
+
+msgid "Yanked"
+msgstr "已撤回"
+
+msgid "Prerelease"
+msgstr "预发布"
+
+msgid "Available"
+msgstr "正常"
+
+msgid "Restore versions"
+msgstr "恢复版本"
+
+msgid "Restore version"
+msgstr "恢复版本"
+
+msgid "Yank versions"
+msgstr "撤回版本"
+
+msgid "Yank version"
+msgstr "撤回版本"
+
+msgid "Revoke signer"
+msgstr "撤销签名者"
+
+msgid "Yank %{n} versions"
+msgstr "撤回 %{n} 个版本"
+
+msgid "Yank v%{version}"
+msgstr "撤回 v%{version}"
+
+msgid "Restore %{n} versions"
+msgstr "恢复 %{n} 个版本"
+
+msgid "Restore v%{version}"
+msgstr "恢复 v%{version}"
+
+msgid "Revoke signer %{id}"
+msgstr "撤销签名者 %{id}"
+
+msgid "Only publishers and admins of the repository can do this."
+msgstr "只有仓库的发布者和管理员可以进行此操作。"
+
+msgid ""
+"Yanking and restoring take effect at the next catalog update, usually within "
+"minutes"
+msgstr "撤回与恢复会在下次目录更新后生效，通常只需几分钟"
+
+msgid "%{n} versions selected"
+msgstr "已选择 %{n} 个版本"
+
+msgid "Clear"
+msgstr "取消选择"
+
+msgid "Restore %{n}"
+msgstr "恢复 %{n} 个"
+
+msgid "Yank %{n}"
+msgstr "撤回 %{n} 个"
+
+msgid "Select all versions"
+msgstr "选择全部版本"
+
+msgid "Version"
 msgstr "版本"
+
+msgid "Released"
+msgstr "发布日期"
+
+msgid "Signer"
+msgstr "签名者"
+
+msgid "Status"
+msgstr "状态"
+
+msgid "Select v%{version}"
+msgstr "选择 v%{version}"
+
+msgid "Restore"
+msgstr "恢复"
+
+msgid "Yank"
+msgstr "撤回"
+
+msgid "No release yet."
+msgstr "还没有发布版本。"
+
+msgid "Signers"
+msgstr "签名者"
+
+msgid "Signing keys certified by your primary key"
+msgstr "由你的主密钥签发证书的签名密钥"
+
+msgid "No release names its signer."
+msgstr "没有版本标明签名者。"
+
+msgid "Signed %{n} releases"
+msgstr "签名了 %{n} 个版本"
+
+msgid "Revoked"
+msgstr "已撤销"
+
+msgid "Revoke"
+msgstr "撤销"
+
+msgid ""
+"Revoke a signer when its signing key leaked or was lost. Restoring a revoked "
+"signer needs a maintainer."
+msgstr ""
+"签名密钥泄露或丢失时，请撤销对应的签名者。已撤销的签名者需要由维护者恢复。"
+
+msgid "Once yanked, these versions leave the catalog at its next update and can no longer be installed. All of them are changed in one update, and you can restore them at any time."
+msgstr "撤回后，这些版本会在目录下次更新时一并下架，无法再安装。它们在同一次更新中生效，之后可随时恢复。"
+
+msgid ""
+"Once yanked, this version leaves the catalog at its next update and can no "
+"longer be installed. You can restore it at any time."
+msgstr ""
+"撤回后，该版本会在下次目录更新时下架，用户将无法再安装。你可以随时恢复。"
+
+msgid "Once restored, these versions return to the catalog together at its next update."
+msgstr "恢复后，这些版本会在目录下次更新时一并回到目录。"
+
+msgid "Once restored, this version returns to the catalog at its next update."
+msgstr "恢复后，该版本会在下次目录更新时重新上架。"
+
+msgid ""
+"Every release this key signed is yanked, and only a maintainer can restore "
+"the signer."
+msgstr "由这把密钥签名的所有版本都会被撤回，且只有维护者可以恢复该签名者。"
+
+msgid ""
+"No release would stay installable. Publish a release signed by a new signing "
+"key first."
+msgstr "撤销后将没有可安装的版本。请先用新的签名密钥发布一个版本。"
+
+msgid ""
+"Kept with the change, for example: the configuration cannot be read after "
+"upgrading, use v1.2.0 instead."
+msgstr "会随改动一并记录，例如：升级后配置文件无法读取，请改用 v1.2.0。"
 
 msgid "Closed"
 msgstr "已关闭"
@@ -729,7 +981,9 @@ msgstr "拥有 %{repo} 的 admin 权限"
 msgid "No claim recorded"
 msgstr "没有记录认领依据"
 
-msgid "GitHub refused the merge. The pull request may have conflicts or failing checks."
+msgid ""
+"GitHub refused the merge. The pull request may have conflicts or failing "
+"checks."
 msgstr "GitHub 拒绝了合并，拉取请求可能有冲突或检查未通过。"
 
 msgid "The change could not be approved. Please try again."
@@ -825,7 +1079,9 @@ msgstr "在 GitHub 上查看拉取请求 #%{n}"
 msgid "Back to the review queue"
 msgstr "返回审核队列"
 
-msgid "Approve pull request #%{n} and merge it as you. The plugin is listed at the next deploy."
+msgid ""
+"Approve pull request #%{n} and merge it as you. The plugin is listed at the "
+"next deploy."
 msgstr "以你的身份批准并合并拉取请求 #%{n}。插件会在下次部署时上架。"
 
 msgid "Some checks of the pull request have not passed."
@@ -834,7 +1090,9 @@ msgstr "拉取请求有检查未通过。"
 msgid "Send"
 msgstr "发送"
 
-msgid "The author sees this on GitHub and in the Developer Center, and can resubmit from their change page."
+msgid ""
+"The author sees this on GitHub and in the Developer Center, and can resubmit "
+"from their change page."
 msgstr "作者会在 GitHub 和开发者中心看到这条意见，并可以在变更页面重新提交。"
 
 msgid "What should the author change?"
@@ -903,19 +1161,25 @@ msgstr "GitHub 未能完成登录，请稍后重试。"
 msgid "Submit plugins"
 msgstr "提交插件"
 
-msgid "Choose a repository and the release and plugin details are read for you. Preview the listing before you submit."
+msgid ""
+"Choose a repository and the release and plugin details are read for you. "
+"Preview the listing before you submit."
 msgstr "选择仓库后自动读取版本与插件信息，提交前即可预览上架效果。"
 
 msgid "Manage on your own"
 msgstr "自助管理"
 
-msgid "Yank versions, revoke signers and change categories. Saved changes take effect immediately."
+msgid ""
+"Yank versions, revoke signers and change categories. Saved changes take "
+"effect immediately."
 msgstr "撤回版本、撤销签名者、调整分类，保存后立即生效。"
 
 msgid "Public review"
 msgstr "公开审核"
 
-msgid "New listings and key changes are reviewed by maintainers, and every review is public."
+msgid ""
+"New listings and key changes are reviewed by maintainers, and every review "
+"is public."
 msgstr "新上架与关键信息变更由维护者审核，审核记录公开可查。"
 
 msgid "Nginx UI Developer Center"
@@ -927,7 +1191,9 @@ msgstr "提交插件，管理上架内容，查看审核进度。"
 msgid "Sign in with GitHub"
 msgstr "使用 GitHub 登录"
 
-msgid "Signing in only confirms your GitHub identity. It grants no write access to your repositories."
+msgid ""
+"Signing in only confirms your GitHub identity. It grants no write access to "
+"your repositories."
 msgstr "登录仅用于确认你的 GitHub 身份，不会获得你仓库的写入权限。"
 
 msgid "%{total} checks passed, %{n} with a warning"
@@ -945,7 +1211,9 @@ msgstr "填写信息"
 msgid "Check and submit"
 msgstr "检查与提交"
 
-msgid "The primary public key is not a minisign public key. Paste the content of primary.pub."
+msgid ""
+"The primary public key is not a minisign public key. Paste the content of "
+"primary.pub."
 msgstr "主公钥不是 minisign 公钥，请粘贴 primary.pub 的内容。"
 
 msgid "The checks no longer pass. Check the repository again."
@@ -954,13 +1222,17 @@ msgstr "检查已不再通过，请重新检查仓库。"
 msgid "The submission could not be sent. Please try again."
 msgstr "提交失败，请重试。"
 
-msgid "Once the checks pass, submit the plugin. It is listed after a maintainer approves it."
+msgid ""
+"Once the checks pass, submit the plugin. It is listed after a maintainer "
+"approves it."
 msgstr "检查通过后提交，维护者审核通过即在目录中上架。"
 
 msgid "The repository could not be checked. Please try again."
 msgstr "无法检查该仓库，请重试。"
 
-msgid "Fix the problems in the repository or a new release, then choose the repository again."
+msgid ""
+"Fix the problems in the repository or a new release, then choose the "
+"repository again."
 msgstr "请在仓库或新版本中修复这些问题，然后重新选择该仓库。"
 
 msgid "Before you start"
@@ -969,19 +1241,26 @@ msgstr "开始之前"
 msgid "The repository is public and you are its admin."
 msgstr "仓库已公开，且你是仓库管理员。"
 
-msgid "A GitHub Release with a version tag holds the signed packages of the plugin."
+msgid ""
+"A GitHub Release with a version tag holds the signed packages of the plugin."
 msgstr "已有带版本标签的 GitHub Release，其中包含签名的安装包。"
 
 msgid "The primary public key from nginx-ui plugin key init is at hand."
 msgstr "准备好 nginx-ui plugin key init 生成的主公钥。"
 
-msgid "The content of primary.pub, created with nginx-ui plugin key init. It verifies the signer certificates of your releases."
-msgstr "使用 nginx-ui plugin key init 生成的 primary.pub 的内容，用于验证你发布版本的签名者证书。"
+msgid ""
+"The content of primary.pub, created with nginx-ui plugin key init. It "
+"verifies the signer certificates of your releases."
+msgstr ""
+"使用 nginx-ui plugin key init 生成的 primary.pub 的内容，用于验证你发布版本的"
+"签名者证书。"
 
 msgid "How to create the keys"
 msgstr "如何生成密钥"
 
-msgid "%{tag} has no signer certificate, so the keys of this plugin have not been created yet."
+msgid ""
+"%{tag} has no signer certificate, so the keys of this plugin have not been "
+"created yet."
 msgstr "%{tag} 中没有签名者证书，说明这个插件还没有生成签名密钥。"
 
 msgid "Show the steps"
@@ -996,7 +1275,9 @@ msgstr "下一步"
 msgid "Catalog preview"
 msgstr "目录预览"
 
-msgid "The packages, their signatures and the signer certificate are verified again in the catalog repository after you submit."
+msgid ""
+"The packages, their signatures and the signer certificate are verified again "
+"in the catalog repository after you submit."
 msgstr "提交后，插件目录仓库会再次校验安装包、签名和签名者证书。"
 
 msgid "Hide details"
@@ -1008,28 +1289,46 @@ msgstr "查看明细"
 msgid "Plugin details"
 msgstr "插件信息"
 
-msgid "Edit"
-msgstr "修改"
-
 msgid "%{count} packages"
 msgstr "%{count} 个安装包"
 
 msgid "Matches the certificate"
 msgstr "与证书匹配"
 
-msgid "Names in every language are reviewed with the submission. The description and screenshots come from plugin.json and update with every release."
-msgstr "各语言的名称会随本次提交一同审核。描述与截图取自 plugin.json，发布新版本后自动更新。"
+msgid ""
+"Names in every language are reviewed with the submission. The description "
+"and screenshots come from plugin.json and update with every release."
+msgstr ""
+"各语言的名称会随本次提交一同审核。描述与截图取自 plugin.json，发布新版本后自"
+"动更新。"
 
-msgid "After you submit, a maintainer reviews the plugin. Follow it on the change page, and GitHub notifies you of the review."
-msgstr "提交后由维护者审核，进度可以在变更页面查看，审核结果也会通过 GitHub 通知你。"
+msgid ""
+"After you submit, a maintainer reviews the plugin. Follow it on the change "
+"page, and GitHub notifies you of the review."
+msgstr ""
+"提交后由维护者审核，进度可以在变更页面查看，审核结果也会通过 GitHub 通知你。"
 
 msgid "Submit for review"
 msgstr "提交审核"
 
+#~ msgid "Categories become %{list}"
+#~ msgstr "分类改为 %{list}"
+
+#~ msgid "Reason: %{text}"
+#~ msgstr "原因：%{text}"
+
+#~ msgid "Requires Nginx UI"
+#~ msgstr "所需 Nginx UI 版本"
+
+#~ msgid "Release notes"
+#~ msgstr "发布说明"
+
 #~ msgid "Name translations"
 #~ msgstr "名称翻译"
 
-#~ msgid "After you submit, the packages, their signatures and the signer certificate are verified in the catalog repository."
+#~ msgid ""
+#~ "After you submit, the packages, their signatures and the signer "
+#~ "certificate are verified in the catalog repository."
 #~ msgstr "提交后，插件目录仓库会校验安装包、签名和签名者证书。"
 
 #~ msgid "GitHub notifies you of the review."
@@ -1119,8 +1418,12 @@ msgstr "提交审核"
 #~ msgid "Create the keys"
 #~ msgstr "生成密钥"
 
-#~ msgid "Run this with Nginx UI installed. It creates a primary key, a signing key and a certificate that links them."
-#~ msgstr "在装有 Nginx UI 的环境中运行以下命令，它会生成主密钥、签名密钥，以及关联两者的证书。"
+#~ msgid ""
+#~ "Run this with Nginx UI installed. It creates a primary key, a signing key "
+#~ "and a certificate that links them."
+#~ msgstr ""
+#~ "在装有 Nginx UI 的环境中运行以下命令，它会生成主密钥、签名密钥，以及关联两"
+#~ "者的证书。"
 
 #~ msgid "Keep each file where it belongs"
 #~ msgstr "妥善放置生成的文件"
@@ -1128,11 +1431,19 @@ msgstr "提交审核"
 #~ msgid "Paste its content above."
 #~ msgstr "将内容粘贴到上方。"
 
-#~ msgid "Store it offline with a backup, never in a repository or CI. Without it no new signing key can be certified."
-#~ msgstr "离线保存并做好备份，切勿放入仓库或 CI。丢失后将无法再为新的签名密钥签发证书。"
+#~ msgid ""
+#~ "Store it offline with a backup, never in a repository or CI. Without it "
+#~ "no new signing key can be certified."
+#~ msgstr ""
+#~ "离线保存并做好备份，切勿放入仓库或 CI。丢失后将无法再为新的签名密钥签发证"
+#~ "书。"
 
-#~ msgid "Add it as the PLUGIN_SIGNING_KEY secret of a release environment in the repository, then delete the local copy."
-#~ msgstr "在仓库中创建 release 环境，将其设为该环境的 PLUGIN_SIGNING_KEY secret，然后删除本地副本。"
+#~ msgid ""
+#~ "Add it as the PLUGIN_SIGNING_KEY secret of a release environment in the "
+#~ "repository, then delete the local copy."
+#~ msgstr ""
+#~ "在仓库中创建 release 环境，将其设为该环境的 PLUGIN_SIGNING_KEY secret，然"
+#~ "后删除本地副本。"
 
 #~ msgid "Commit them to the root of the repository."
 #~ msgstr "提交到仓库根目录。"
@@ -1140,11 +1451,18 @@ msgstr "提交审核"
 #~ msgid "Sign every release"
 #~ msgstr "为每个版本签名"
 
-#~ msgid "Publish releases with the nginxui/plugin-release action, which signs the packages with the signing key."
-#~ msgstr "使用 nginxui/plugin-release Action 发布版本，它会用签名密钥为安装包签名。"
+#~ msgid ""
+#~ "Publish releases with the nginxui/plugin-release action, which signs the "
+#~ "packages with the signing key."
+#~ msgstr ""
+#~ "使用 nginxui/plugin-release Action 发布版本，它会用签名密钥为安装包签名。"
 
-#~ msgid "You need admin permission on the repository. The newest release, its plugin.json and its packages are read from GitHub."
-#~ msgstr "你需要拥有仓库的 admin 权限。最新版本、其中的 plugin.json 和安装包会从 GitHub 读取。"
+#~ msgid ""
+#~ "You need admin permission on the repository. The newest release, its "
+#~ "plugin.json and its packages are read from GitHub."
+#~ msgstr ""
+#~ "你需要拥有仓库的 admin 权限。最新版本、其中的 plugin.json 和安装包会从 "
+#~ "GitHub 读取。"
 
 #~ msgid "Names in every language are reviewed with the submission."
 #~ msgstr "各语言的名称会随提交一起审核。"
@@ -1152,8 +1470,12 @@ msgstr "提交审核"
 #~ msgid "Details"
 #~ msgstr "提交信息"
 
-#~ msgid "These repositories have the Nginx UI Plugin Catalog app installed by you. With the app installed, new releases reach the catalog within minutes."
-#~ msgstr "以下仓库由你安装了 Nginx UI 插件目录应用。安装应用后，新版本会在几分钟内同步到目录。"
+#~ msgid ""
+#~ "These repositories have the Nginx UI Plugin Catalog app installed by you. "
+#~ "With the app installed, new releases reach the catalog within minutes."
+#~ msgstr ""
+#~ "以下仓库由你安装了 Nginx UI 插件目录应用。安装应用后，新版本会在几分钟内同"
+#~ "步到目录。"
 
 #~ msgid "You have no plugins yet."
 #~ msgstr "你还没有插件。"
