@@ -25,6 +25,7 @@ export const router = createRouter({
             { path: '', name: 'plugin', component: () => import('@/views/plugin/PluginStore.vue') },
             { path: 'screenshots', name: 'plugin-screenshots', component: () => import('@/views/plugin/PluginScreenshots.vue') },
             { path: 'translations', name: 'plugin-translations', component: () => import('@/views/plugin/PluginTranslations.vue') },
+            { path: 'preflight', name: 'plugin-preflight', component: () => import('@/views/plugin/PluginPreflight.vue') },
             { path: 'versions', name: 'plugin-versions', component: () => import('@/views/plugin/PluginVersions.vue') },
             { path: 'signers', name: 'plugin-signers', component: () => import('@/views/plugin/PluginVersions.vue'), props: { section: 'signers' } },
             { path: 'access', name: 'plugin-access', component: () => import('@/views/plugin/PluginAccess.vue') },
