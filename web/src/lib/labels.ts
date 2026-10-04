@@ -68,3 +68,16 @@ export function storeSourceLabel(source: string): string {
       return $gettext('The manifest of the newest release')
   }
 }
+
+export function storeSourceShort(source: string): string {
+  switch (source) {
+    case 'repo-branch':
+      return $gettext('Repository, branch')
+    case 'repo-release':
+      return $gettext('Repository, releases')
+    case 'catalog':
+      return $gettext('Catalog')
+    default:
+      return $gettext('Manifest')
+  }
+}

@@ -27,7 +27,9 @@ owners.get('/', async (c) => {
   return c.json({ owners: [...byLogin.values()] })
 })
 
-owners.get('/:login', async (c) => {
+// Superseded by the richer route in partners.ts, which lists every plugin of
+// the owner with the user's role, none included.
+owners.get('/:login/mine', async (c) => {
   const login = c.req.param('login').toLowerCase()
   const { plugins } = await collectMine(c.env, c.get('session'))
   const own = plugins.filter(p => p.owner?.login.toLowerCase() === login)

@@ -9,8 +9,10 @@ import { auth } from './routes/auth'
 import { changes } from './routes/changes'
 import { community } from './routes/community'
 import { hooks } from './routes/hooks'
+import { maintain } from './routes/maintain'
 import { me } from './routes/me'
 import { owners } from './routes/owners'
+import { partners } from './routes/partners'
 import { plugins } from './routes/plugins'
 import { preflight } from './routes/preflight'
 import { review } from './routes/review'
@@ -29,6 +31,7 @@ app.route('/', community)
 app.route('/', preflight)
 app.route('/plugins', selfService)
 app.route('/plugins', plugins)
+app.route('/', partners)
 app.route('/owners', owners)
 app.route('/submit', submit)
 app.route('/changes', changes)
@@ -36,6 +39,7 @@ app.route('/hooks', hooks)
 app.route('/review', review)
 app.route('/audit', audit)
 app.route('/ai/admin', aiAdmin)
+app.route('/maintain', maintain)
 
 app.notFound(c => c.json({ error: 'not_found' }, 404))
 
