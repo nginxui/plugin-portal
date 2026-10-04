@@ -232,7 +232,7 @@ describe('apply report', () => {
       // The key order differs from the stored entry.
       body: JSON.stringify({ commit: 'abc', entries: { [entry.id]: { trust: 'community', name: { en: 'GeoIP Access' }, id: entry.id } }, listed: [entry.id] }),
     })
-    expect(await response.json()).toEqual({ live: [change] })
+    expect(await response.json()).toEqual({ live: [change], names: [] })
     expect(await env.DB.prepare('SELECT state, stage FROM changes WHERE id = ?').bind(change).first()).toEqual({ state: 'live', stage: 'live' })
     expect(await env.DB.prepare('SELECT state FROM plugins WHERE plugin_id = ?').bind(entry.id).first()).toEqual({ state: 'listed' })
   })
@@ -245,9 +245,27 @@ describe('apply report', () => {
       { commit: 'abc', entries: { [entry.id]: entry }, listed: [] },
     ]) {
       const response = await call('/api/hooks/deploy', { method: 'POST', headers: { Authorization: `Bearer ${await oidc(deployClaims())}` }, body: JSON.stringify(body) })
-      expect(await response.json()).toEqual({ live: [] })
+      expect(await response.json()).toEqual({ live: [], names: [] })
     }
     expect(await env.DB.prepare('SELECT state FROM changes WHERE id = ?').bind(change).first()).toEqual({ state: 'merged' })
+  })
+
+  it('turns names waiting for review into one reviewed change per plugin', async () => {
+    await withJwks(await signedIn())
+    const id = 'io.github.octo-author.geoip'
+    const report: { commit: string, entries: object, listed: string[], pending: { id: string, version?: string, names: Record<string, string> }[] } = { commit: 'abc', entries: {}, listed: [], pending: [{ id, version: '1.2.0', names: { 'zh_CN': '地理访问', 'bad locale': 'x' } }, { id: 'not an id', names: { en: 'X' } }] }
+    const send = async () => (await call('/api/hooks/deploy', { method: 'POST', headers: { Authorization: `Bearer ${await oidc(deployClaims())}` }, body: JSON.stringify(report) })).json() as Promise<{ names: string[] }>
+    const first = await send()
+    expect(first.names).toHaveLength(1)
+    const row = await env.DB.prepare('SELECT plugin_id, author_id, kind, class, state FROM changes WHERE id = ?').bind(first.names[0]).first()
+    expect(row).toEqual({ plugin_id: id, author_id: 0, kind: 'names', class: 'reviewed', state: 'open' })
+    expect(JSON.parse(dispatched.at(-1)!.payload)).toEqual({ kind: 'entry_update', system: true, plugin_id: id, version: '1.2.0', operations: { names: { zh_CN: '地理访问' } } })
+    // An open change, then the same names declined, start nothing new.
+    expect((await send()).names).toEqual([])
+    await env.DB.prepare(`UPDATE changes SET state = 'rejected' WHERE id = ?`).bind(first.names[0]).run()
+    expect((await send()).names).toEqual([])
+    report.pending[0].names = { zh_CN: '地理访问控制' }
+    expect((await send()).names).toHaveLength(1)
   })
 
   it('takes deploy reports from the deploy workflow only', async () => {

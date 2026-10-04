@@ -1,7 +1,8 @@
-import type { AppEnv } from '../env'
+import type { AppEnv, Env } from '../env'
 import { Hono } from 'hono'
 import { audit } from '../lib/audit'
-import { event, getChange } from '../lib/changes'
+import { event, getChange, newChangeId } from '../lib/changes'
+import { dispatchApply } from '../lib/deployApp'
 import { OidcError, verifyActionsToken } from '../lib/oidc'
 import { now } from '../lib/time'
 
@@ -93,10 +94,17 @@ hooks.post('/apply', async (c) => {
   return c.json({ ok: true })
 })
 
+interface PendingNames {
+  id?: unknown
+  version?: unknown
+  names?: unknown
+}
+
 interface DeployReport {
   commit?: string
   entries?: Record<string, unknown>
   listed?: string[]
+  pending?: PendingNames[]
 }
 
 // The same entry whatever the key order, so a reformatted file still matches.
@@ -108,8 +116,66 @@ function canonical(value: unknown): string {
   return JSON.stringify(value)
 }
 
+const PLUGIN_ID = /^[a-z0-9]+(?:\.[a-z0-9-]+)+$/
+const LOCALE = /^[a-z]{2,3}(?:_[A-Z][A-Za-z]{1,3})?$/
+
+/** The names a release brought, cleaned, or null when none is usable. */
+function cleanNames(value: unknown): Record<string, string> | null {
+  if (!value || typeof value !== 'object')
+    return null
+  const names: Record<string, string> = {}
+  for (const [locale, name] of Object.entries(value as Record<string, unknown>).slice(0, 40)) {
+    if (LOCALE.test(locale) && typeof name === 'string' && name.trim())
+      names[locale] = name.trim().slice(0, 80)
+  }
+  return Object.keys(names).length ? names : null
+}
+
+// Names a release brought that the entry does not hold become a reviewed
+// change, unless one is open for the plugin or the same names were declined.
+async function proposeNames(env: Env, pending: PendingNames[]): Promise<string[]> {
+  const wanted = pending
+    .map(p => ({ id: typeof p?.id === 'string' && PLUGIN_ID.test(p.id) ? p.id : '', version: typeof p?.version === 'string' ? p.version.slice(0, 64) : null, names: cleanNames(p?.names) }))
+    .filter((p): p is { id: string, version: string | null, names: Record<string, string> } => !!p.id && !!p.names)
+    .slice(0, 50)
+  if (!wanted.length)
+    return []
+  const { results } = await env.DB.prepare(
+    `SELECT plugin_id, state, payload_json FROM changes WHERE kind = 'names' AND (state = 'open' OR (author_id = 0 AND state = 'rejected'))`,
+  ).all<{ plugin_id: string | null, state: string, payload_json: string | null }>()
+  const opened: string[] = []
+  for (const p of wanted) {
+    const seen = results.filter(r => r.plugin_id === p.id)
+    if (seen.some(r => r.state === 'open'))
+      continue
+    const key = canonical(p.names)
+    if (seen.some(r => canonical((JSON.parse(r.payload_json ?? '{}') as { operations?: { names?: unknown } }).operations?.names ?? null) === key))
+      continue
+    const change = newChangeId()
+    const t = now()
+    const payload = { kind: 'entry_update', system: true, plugin_id: p.id, version: p.version, operations: { names: p.names } }
+    await env.DB.batch([
+      env.DB.prepare(
+        `INSERT INTO changes (id, plugin_id, author_id, kind, class, state, stage, waiting_on, payload_json, dispatched_at, created_at, updated_at)
+         VALUES (?, ?, 0, 'names', 'reviewed', 'open', 'checks', 'system', ?, ?, ?, ?)`,
+      ).bind(change, p.id, JSON.stringify(payload), t, t, t),
+      event(env, change, 'submitted', null, { names: p.names, version: p.version }),
+    ])
+    try {
+      await dispatchApply(env, change, payload)
+    }
+    catch (error) {
+      console.error('dispatch failed', error)
+      await env.DB.prepare('UPDATE changes SET outcome_json = ? WHERE id = ?').bind(JSON.stringify({ outcome: 'dispatch_failed' }), change).run()
+    }
+    opened.push(change)
+  }
+  return opened
+}
+
 // Reports of the catalog deploy: merged changes whose entry the deploy
-// published become live, a delisting once its entry is gone.
+// published become live, a delisting once its entry is gone, and names
+// waiting for review become changes.
 hooks.post('/deploy', async (c) => {
   const token = c.req.header('Authorization')?.replace(/^Bearer /, '') ?? ''
   let claims
@@ -158,6 +224,7 @@ hooks.post('/deploy', async (c) => {
   }
   if (statements.length)
     await c.env.DB.batch(statements)
-  await audit(c.env.DB, { actorId: null, action: 'catalog.deployed', subject: commit ?? undefined, detail: { commit, live, run: claims.run_id } })
-  return c.json({ live })
+  const names = await proposeNames(c.env, Array.isArray(report.pending) ? report.pending : [])
+  await audit(c.env.DB, { actorId: null, action: 'catalog.deployed', subject: commit ?? undefined, detail: { commit, live, names, run: claims.run_id } })
+  return c.json({ live, names })
 })

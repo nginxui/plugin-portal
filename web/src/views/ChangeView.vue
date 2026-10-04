@@ -113,6 +113,8 @@ const requested = computed(() => {
     rows.push({ key: 'revoke', icon: 'i-tabler-key-off', tone: 'bad', title: $gettext('Revoke a signer'), values: ops.revoke_signers, mono: true })
   if (ops.categories)
     rows.push({ key: 'categories', icon: 'i-tabler-tags', tone: 'info', title: $gettext('Change categories'), values: ops.categories.map(categoryLabel), mono: false })
+  if (ops.names)
+    rows.push({ key: 'names', icon: 'i-tabler-language', tone: 'info', title: $gettext('Names from a new release'), values: Object.entries(ops.names).map(([locale, name]) => `${locale}: ${name}`), mono: false })
   return rows
 })
 
