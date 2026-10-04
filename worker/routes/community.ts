@@ -43,7 +43,8 @@ export const community = new Hono<AppEnv>()
 community.post('/ai/draft', requireSession, async (c) => {
   const session = c.get('session')
   const body = await c.req.json<{ plugin_id?: string, field?: string, locale?: string, source?: string }>().catch(() => ({} as Record<string, string>))
-  if (!body.plugin_id || !body.field || !body.locale || !body.source || !validField(body.field) || !isHostLocale(body.locale) || body.locale === 'en')
+  const runtime = /^runtime:[a-z][a-z0-9._-]{0,47}$/.test(body.field ?? '')
+  if (!body.plugin_id || !body.field || !body.locale || !body.source || !(validField(body.field) || runtime) || !isHostLocale(body.locale) || body.locale === 'en')
     return c.json({ error: 'invalid' }, 422)
   const ctx = await pluginContext(c.env, session, body.plugin_id)
   if (!ctx || !atLeast(ctx.role, 'translator'))
@@ -53,7 +54,7 @@ community.post('/ai/draft', requireSession, async (c) => {
     const result = await draft(c.env, session.user.id, {
       source: body.source.slice(0, 2000),
       locale: body.locale,
-      field: body.field.startsWith('caption:') ? 'caption' : body.field as 'name' | 'description',
+      field: runtime ? 'note' : body.field.startsWith('caption:') ? 'caption' : body.field as 'name' | 'description',
       plugin: name,
     })
     await audit(c.env.DB, { actorId: session.user.id, action: 'ai.draft', subject: ctx.id, detail: { field: body.field, locale: body.locale, provider: result.provider.name, model: result.provider.model } })

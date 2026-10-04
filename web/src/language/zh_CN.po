@@ -1133,6 +1133,9 @@ msgstr "描述（%{lang}）"
 msgid "Caption of screenshot %{n} in %{lang}"
 msgstr "截图 %{n} 的说明（%{lang}）"
 
+msgid "Permission note %{name} in %{lang}"
+msgstr "权限说明（%{name}，%{lang}）"
+
 msgid "Order of the screenshots"
 msgstr "截图顺序"
 
@@ -2909,8 +2912,8 @@ msgstr "需审核，通过前显示英文"
 msgid "AI draft waiting for confirmation"
 msgstr "AI 草稿，等待确认"
 
-msgid "Comes from the manifest and ships with the next release"
-msgstr "来自清单，随下个发布版本生效"
+msgid "Translated in the translation workbench, ships with the next release"
+msgstr "在翻译工作台中翻译，随下一个版本发布"
 
 msgid "Set in the catalog entry"
 msgstr "在目录条目中设置"
@@ -2976,6 +2979,12 @@ msgid ""
 "An uploaded screenshot is missing. Upload it again in the screenshot studio."
 msgstr "缺少一张已上传的截图，请在截图工作室中重新上传。"
 
+msgid "Runtime strings ship with the packages, so they go to the repository. Pick a repository as the store source, or export them for the author."
+msgstr "运行时文案随安装包发布，需要提交到仓库。请把商店来源设为仓库，或导出后交给作者。"
+
+msgid "The repository has no plugin.json at its root. Export the runtime strings and translate them in the source code."
+msgstr "仓库根目录没有 plugin.json，请导出运行时文案并在源代码中翻译。"
+
 msgid "A store change of this plugin is in progress."
 msgstr "此插件有一项商店改动正在进行中。"
 
@@ -3022,6 +3031,9 @@ msgstr "待发布的改动"
 
 msgid "Goes to name review after the merge"
 msgstr "合并后进行名称审核"
+
+msgid "Ships with the next release"
+msgstr "随下一个版本发布"
 
 msgid "Live after the merge"
 msgstr "合并后生效"
@@ -3083,8 +3095,8 @@ msgstr "请检查页面从右到左显示时文本是否重叠"
 msgid "Permission notes are not translated here"
 msgstr "权限说明不在此处翻译"
 
-msgid "They come from the manifest and are translated in the repository"
-msgstr "权限说明来自清单，需在仓库中翻译"
+msgid "Translate them in the translation workbench"
+msgstr "前往翻译工作台翻译"
 
 msgid "Submit the store changes of %{name}"
 msgstr "提交 %{name} 的商店改动"
@@ -3101,20 +3113,26 @@ msgstr "，需审核"
 msgid "Store source: %{source}"
 msgstr "商店来源：%{source}"
 
+msgid "%{n} texts imported."
+msgstr "已导入 %{n} 条。"
+
+msgid "The file could not be read. Use a file exported here."
+msgstr "无法读取该文件，请使用从这里导出的文件。"
+
 msgid "The %{n} interface languages of Nginx UI. Pick the columns to show."
 msgstr "Nginx UI 的 %{n} 种界面语言，请选择要显示的列。"
 
 msgid "AI draft the missing texts"
-msgstr "使用 AI 起草缺失的文本"
+msgstr "AI 起草缺失项"
 
 msgid "A text left out in a language shows in English there"
 msgstr "某种语言未提供的文本会在该语言中显示英文"
 
-msgid "Text"
-msgstr "文本"
+msgid "Field"
+msgstr "字段"
 
 msgid "Store texts, live after the merge"
-msgstr "商店文本，合并后生效"
+msgstr "商店资料，合并后生效"
 
 msgid "Goes to review"
 msgstr "需审核"
@@ -3122,21 +3140,26 @@ msgstr "需审核"
 msgid "%{n} suggestions"
 msgstr "%{n} 条建议"
 
+msgid "Fill in"
+msgstr "填写"
+
 msgid "Runtime strings, ship with the next release"
-msgstr "运行时字符串，随下个发布版本生效"
+msgstr "运行时文案，随下一个版本发布"
 
-msgid ""
-"Runtime strings are translated in plugin.json in the repository. A generated "
-"plugin.json takes them from its source code; export them to translate there."
-msgstr ""
-"运行时字符串需在仓库的 plugin.json 中翻译。如 plugin.json 由源代码生成，请导"
-"出这些字符串并在源代码中翻译。"
+msgid "Runtime strings go to the repository as a pull request and take effect once the next version is released. For a plugin.json generated from code, use export and import."
+msgstr "运行时文案会作为拉取请求提交到仓库，在下一个版本发布后生效。由代码生成的 plugin.json 请使用导出与导入。"
 
-msgid "Export runtime strings"
-msgstr "导出运行时字符串"
+msgid "Runtime strings ship with the packages of the plugin. Export them for its author to translate in the source code."
+msgstr "运行时文案随插件安装包发布，请导出后交给作者在源代码中翻译。"
 
-msgid "English"
-msgstr "英文"
+msgid "Export"
+msgstr "导出"
+
+msgid "Import"
+msgstr "导入"
+
+msgid "Source text"
+msgstr "原文"
 
 msgid "There is no English text yet"
 msgstr "还没有英文文本"
@@ -3144,8 +3167,11 @@ msgstr "还没有英文文本"
 msgid "Translation"
 msgstr "译文"
 
-msgid "Terms as Nginx UI translates them: %{terms}"
-msgstr "Nginx UI 中的译法：%{terms}"
+msgid "Terms as the Nginx UI interface translates them: %{terms}"
+msgstr "术语与 Nginx UI 界面保持一致：%{terms}"
+
+msgid "Goes to plugin.json in the repository and ships with the next release."
+msgstr "将写入仓库的 plugin.json，随下一个版本发布。"
 
 msgid "Confirm the translation"
 msgstr "确认译文"
@@ -3406,9 +3432,6 @@ msgstr "变更内容"
 
 msgid "Compared with the current listing"
 msgstr "与当前上架内容对比"
-
-msgid "Field"
-msgstr "字段"
 
 msgid "Listed as"
 msgstr "上架内容"
@@ -3888,6 +3911,9 @@ msgstr "暂无插件在此语言开放社区翻译。"
 msgid "Fill in only what you add or change"
 msgstr "只需填写你新增或修改的内容"
 
+msgid "Text"
+msgstr "文本"
+
 msgid "Current translation"
 msgstr "当前译文"
 
@@ -3938,6 +3964,29 @@ msgstr "名称建议"
 
 msgid "An accepted name still goes to a maintainer before it is listed."
 msgstr "被接受的名称在上架前仍需经维护者审核。"
+
+#~ msgid "Comes from the manifest and ships with the next release"
+#~ msgstr "来自清单，随下个发布版本生效"
+
+#~ msgid "They come from the manifest and are translated in the repository"
+#~ msgstr "权限说明来自清单，需在仓库中翻译"
+
+#~ msgid ""
+#~ "Runtime strings are translated in plugin.json in the repository. A "
+#~ "generated plugin.json takes them from its source code; export them to "
+#~ "translate there."
+#~ msgstr ""
+#~ "运行时字符串需在仓库的 plugin.json 中翻译。如 plugin.json 由源代码生成，请"
+#~ "导出这些字符串并在源代码中翻译。"
+
+#~ msgid "Export runtime strings"
+#~ msgstr "导出运行时字符串"
+
+#~ msgid "English"
+#~ msgstr "英文"
+
+#~ msgid "Terms as Nginx UI translates them: %{terms}"
+#~ msgstr "Nginx UI 中的译法：%{terms}"
 
 #~ msgid "Store"
 #~ msgstr "商店"
