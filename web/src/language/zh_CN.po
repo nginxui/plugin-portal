@@ -8,6 +8,22 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
+msgid "Another change of this plugin is in progress."
+msgstr "该插件已有一项改动正在处理。"
+
+msgid "The change could not be sent. Please try again."
+msgstr "改动提交失败，请重试。"
+
+msgid "Change categories"
+msgstr "调整分类"
+
+msgid "Save"
+msgstr "保存"
+
+msgid ""
+"The catalog files the plugin under these categories from its next update."
+msgstr "插件目录下次更新后，会把插件归入这些分类。"
+
 msgid "Categories"
 msgstr "分类"
 
@@ -131,6 +147,96 @@ msgstr "打开"
 msgid "Open in a new tab"
 msgstr "在新标签页打开"
 
+msgid "Name"
+msgstr "名称"
+
+msgid "Description"
+msgstr "描述"
+
+msgid "Caption of screenshot %{n}"
+msgstr "截图 %{n} 的说明"
+
+msgid "The decision could not be saved. Please try again."
+msgstr "无法保存处理结果，请重试。"
+
+msgid "Community translation"
+msgstr "社区翻译"
+
+msgid "Community translation needs a store source. Pick one on the store page and submit once."
+msgstr "社区翻译需要先设置商店来源。请在商店页面选择来源并提交一次。"
+
+msgid "When it is on, signed in users can suggest translations of the store texts. You review every suggestion before it goes out."
+msgstr "开启后，已登录的用户可以为商店文本提交翻译建议。每条建议都需经你审核后才会发布。"
+
+msgid "Open languages"
+msgstr "开放的语言"
+
+msgid "All %{n}"
+msgstr "全部 %{n}"
+
+msgid "Edit"
+msgstr "修改"
+
+msgid "Waiting for review, %{n}"
+msgstr "待审核 %{n}"
+
+msgid "Now: %{text}"
+msgstr "当前：%{text}"
+
+msgid "not translated"
+msgstr "未翻译"
+
+msgid "Suggested: %{text}"
+msgstr "建议：%{text}"
+
+msgid "Why, shown to the translator"
+msgstr "原因（会展示给译者）"
+
+msgid "Decline"
+msgstr "拒绝"
+
+msgid "Cancel"
+msgstr "取消"
+
+msgid "Accept the edit"
+msgstr "接受修改后的内容"
+
+msgid "Accept"
+msgstr "接受"
+
+msgid "Edit and accept"
+msgstr "修改后接受"
+
+msgid "No suggestions are waiting."
+msgstr "暂无待审核的建议。"
+
+msgid "Community translations, pull request #%{n}"
+msgstr "社区翻译，拉取请求 #%{n}"
+
+msgid "Community translations"
+msgstr "社区翻译"
+
+msgid "%{batches} batches with %{strings} translations, waiting for the merge."
+msgstr "%{batches} 批共 %{strings} 条翻译，等待合并。"
+
+msgid "View on GitHub"
+msgstr "在 GitHub 上查看"
+
+msgid "View progress"
+msgstr "查看进度"
+
+msgid "Accepted translations go into one pull request, with the translators as co-authors of each commit."
+msgstr "接受的翻译会合并到同一个拉取请求中，译者会作为每个提交的共同作者。"
+
+msgid "The image could not be read."
+msgstr "无法读取该图片。"
+
+msgid "Zoom"
+msgstr "缩放"
+
+msgid "The crop is smaller than 640 pixels wide and will look blurred."
+msgstr "裁剪区域宽度小于 640 像素，显示时会模糊。"
+
 msgid ""
 "This is not a minisign public key. Paste the whole content of primary.pub."
 msgstr "这不是 minisign 公钥，请粘贴 primary.pub 的完整内容。"
@@ -224,14 +330,193 @@ msgstr ""
 msgid "Signing and trust"
 msgstr "签名与信任"
 
+msgid "Search languages"
+msgstr "搜索语言"
+
+msgid "Translated, %{n}"
+msgstr "已翻译 %{n}"
+
+msgid "Not translated, shows English"
+msgstr "未翻译，显示英文"
+
+msgid "List cards at their real width"
+msgstr "按实际宽度显示列表卡片"
+
+msgid "%{n} names are cut short"
+msgstr "%{n} 个名称显示不全"
+
+msgid "Name cut short"
+msgstr "名称显示不全"
+
 msgid "Community"
 msgstr "社区"
+
+msgid "Nginx UI marketplace, as users see it"
+msgstr "Nginx UI 插件市场中用户看到的样子"
+
+msgid "Changes need review"
+msgstr "改动需要审核"
+
+msgid "AI draft"
+msgstr "AI 草稿"
+
+msgid "Save and go to the next"
+msgstr "保存并前往下一项"
+
+msgid "Done"
+msgstr "完成"
+
+msgid "Add a description"
+msgstr "添加描述"
+
+msgid "Add a homepage"
+msgstr "添加主页"
+
+msgid "Homepage"
+msgstr "主页"
+
+msgid "Edit in the screenshot studio"
+msgstr "在截图工作室中编辑"
+
+msgid "Add a caption"
+msgstr "添加说明"
+
+msgid "Caption"
+msgstr "说明"
+
+msgid "Add a README"
+msgstr "添加 README"
+
+msgid "README"
+msgstr "README"
+
+msgid "The catalog"
+msgstr "插件目录"
+
+msgid "The checks passed and the pull request is open"
+msgstr "检查已通过，拉取请求已开启"
+
+msgid "The checks found problems"
+msgstr "检查发现问题"
+
+msgid "%{who} asked for changes"
+msgstr "%{who} 要求修改"
+
+msgid "%{who} merged it"
+msgstr "%{who} 已合并"
+
+msgid "It was merged"
+msgstr "已合并"
+
+msgid "It is live in the catalog"
+msgstr "已在插件目录中上线"
+
+msgid "%{who} rejected it"
+msgstr "%{who} 已拒绝"
+
+msgid "It has waited for you for a while"
+msgstr "已等待你处理一段时间"
+
+msgid "It was withdrawn"
+msgstr "已撤回"
+
+msgid "Notifications"
+msgstr "通知"
+
+msgid "Nothing new."
+msgstr "暂无新动态。"
 
 msgid "%{kind} is in progress. Other changes can be made once it is done."
 msgstr "“%{kind}”正在处理，完成后才能进行其他改动。"
 
-msgid "View progress"
-msgstr "查看进度"
+msgid "Needs changes"
+msgstr "需修改"
+
+msgid "In review"
+msgstr "审核中"
+
+msgid "Submitted"
+msgstr "已提交"
+
+msgid "Checks passed"
+msgstr "检查已通过"
+
+msgid "Maintainer review"
+msgstr "维护者审核"
+
+msgid "Listed"
+msgstr "已上架"
+
+msgid "Owner %{owner}, your role: %{role}."
+msgstr "所有者 %{owner}，你的角色：%{role}。"
+
+msgid "Store texts: %{source}."
+msgstr "商店文本：%{source}。"
+
+msgid "Needs Nginx UI %{version} or later."
+msgstr "需要 Nginx UI %{version} 或更高版本。"
+
+msgid "Submitted version"
+msgstr "提交的版本"
+
+msgid "Waiting"
+msgstr "等待"
+
+msgid ""
+"The checks found problems. Fix them in a new release, then run the checks "
+"again."
+msgstr "检查发现问题。请在新版本中修复，然后重新运行检查。"
+
+msgid "A maintainer asked for changes. See the review on the change page."
+msgstr "维护者要求修改，请在改动页面查看审核意见。"
+
+msgid "Newest version"
+msgstr "最新版本"
+
+msgid "Released"
+msgstr "发布日期"
+
+msgid "Platforms"
+msgstr "平台"
+
+msgid "All"
+msgstr "全部"
+
+msgid "Downloads GitHub counts, last %{n} versions"
+msgstr "下载量（GitHub 统计，最近 %{n} 个版本）"
+
+msgid "%{n} for this version"
+msgstr "此版本 %{n} 次"
+
+msgid "Languages"
+msgstr "语言"
+
+msgid "Screenshots"
+msgstr "截图"
+
+msgid "%{dark} of %{total} with dark"
+msgstr "%{total} 张中 %{dark} 张有深色版本"
+
+msgid "Provided"
+msgstr "已提供"
+
+msgid "Missing"
+msgstr "缺失"
+
+msgid "Store"
+msgstr "商店"
+
+msgid "Preflight"
+msgstr "预检"
+
+msgid "Versions"
+msgstr "版本"
+
+msgid "Catalog page"
+msgstr "目录页面"
+
+msgid "Follow the review"
+msgstr "跟进审核"
 
 msgid "Manage"
 msgstr "管理"
@@ -266,6 +551,27 @@ msgstr "检查"
 msgid "Install the app on another repository"
 msgstr "在其他仓库上安装应用"
 
+msgid "Now"
+msgstr "当前"
+
+msgid "Not listed yet"
+msgstr "尚未上架"
+
+msgid "A new listing has nothing to compare with."
+msgstr "新上架的插件没有可对比的内容。"
+
+msgid "After the change"
+msgstr "变更后"
+
+msgid "Compare"
+msgstr "对比"
+
+msgid "Changes: %{list}."
+msgstr "改动：%{list}。"
+
+msgid "Nothing users see changes."
+msgstr "用户可见的内容没有变化。"
+
 msgid "Developer Center"
 msgstr "开发者中心"
 
@@ -275,8 +581,20 @@ msgstr "开发者文档"
 msgid "Plugin catalog"
 msgstr "插件目录"
 
+msgid "Translate"
+msgstr "翻译"
+
 msgid "Maintenance"
 msgstr "维护"
+
+msgid "All plugins"
+msgstr "全部插件"
+
+msgid "Partners"
+msgstr "合作伙伴"
+
+msgid "AI models"
+msgstr "AI 模型"
 
 msgid "GitHub profile"
 msgstr "GitHub 个人主页"
@@ -299,6 +617,18 @@ msgstr "切换深色模式"
 msgid "Account menu"
 msgstr "账户菜单"
 
+msgid "Store texts in every Nginx UI language"
+msgstr "覆盖 Nginx UI 所有语言的商店文本"
+
+msgid "Names, descriptions and screenshot captions follow the 14 interface languages of Nginx UI. A language a plugin leaves out shows English."
+msgstr "名称、描述和截图说明与 Nginx UI 的 14 种界面语言对应。插件未提供的语言会显示英文。"
+
+msgid "Name changes are reviewed"
+msgstr "名称变更需要审核"
+
+msgid "A changed name in any language goes to review before it is listed."
+msgstr "任何语言的名称变更都需经过审核才会上架。"
+
 msgid "Review"
 msgstr "审核"
 
@@ -314,14 +644,20 @@ msgstr "系统"
 msgid "Sign in"
 msgstr "登录"
 
+msgid "Maintainer action"
+msgstr "维护者操作"
+
+msgid "AI"
+msgstr "AI"
+
+msgid "Settings"
+msgstr "设置"
+
 msgid "Opened pull request #%{n} for review"
 msgstr "已开启拉取请求 #%{n} 等待审核"
 
 msgid "Committed the change to the catalog"
 msgstr "已将改动提交到插件目录"
-
-msgid "The checks found problems"
-msgstr "检查发现问题"
 
 msgid "The change was refused by the catalog rules"
 msgstr "改动不符合插件目录的规则"
@@ -349,6 +685,33 @@ msgstr "要求修改 #%{n}"
 
 msgid "Rejected #%{n}"
 msgstr "拒绝 #%{n}"
+
+msgid "Submitted %{n} store changes"
+msgstr "提交了 %{n} 项商店改动"
+
+msgid "Accepted %{a} and declined %{d} community translations"
+msgstr "接受了 %{a} 条、拒绝了 %{d} 条社区翻译"
+
+msgid "Turned community translation on"
+msgstr "开启了社区翻译"
+
+msgid "Turned community translation off"
+msgstr "关闭了社区翻译"
+
+msgid "Drafted a translation into %{lang} with %{model}"
+msgstr "使用 %{model} 起草了 %{lang} 翻译"
+
+msgid "Added the AI model %{name}"
+msgstr "添加了 AI 模型 %{name}"
+
+msgid "Changed the AI model %{name}: drafts per author per day %{from} to %{to}"
+msgstr "修改了 AI 模型 %{name}：每位作者每日草稿数由 %{from} 改为 %{to}"
+
+msgid "Changed the AI model %{name}"
+msgstr "修改了 AI 模型 %{name}"
+
+msgid "Removed the AI model %{name}"
+msgstr "移除了 AI 模型 %{name}"
 
 msgid "Yanked %{versions}"
 msgstr "撤回 %{versions}"
@@ -383,20 +746,11 @@ msgstr "日志"
 msgid "Analytics"
 msgstr "分析"
 
-msgid "Notifications"
-msgstr "通知"
-
 msgid "Backup"
 msgstr "备份"
 
-msgid "AI"
-msgstr "AI"
-
 msgid "Templates"
 msgstr "模板"
-
-msgid "Languages"
-msgstr "语言"
 
 msgid "Integrations"
 msgstr "集成"
@@ -428,11 +782,26 @@ msgstr "恢复版本"
 msgid "Revoke a signer"
 msgstr "撤销签名者"
 
-msgid "Change categories"
-msgstr "调整分类"
-
 msgid "Batch change"
 msgstr "批量改动"
+
+msgid "Store change"
+msgstr "商店改动"
+
+msgid "Store source move"
+msgstr "迁移商店来源"
+
+msgid "Trust change"
+msgstr "信任级别变更"
+
+msgid "Block list entry"
+msgstr "屏蔽列表条目"
+
+msgid "Partner change"
+msgstr "合作伙伴变更"
+
+msgid "Commercial details"
+msgstr "商业信息"
 
 msgid "Update"
 msgstr "更新"
@@ -463,9 +832,6 @@ msgstr "plugin.json"
 
 msgid "Plugin ID"
 msgstr "插件 ID"
-
-msgid "Name"
-msgstr "名称"
 
 msgid "Packages"
 msgstr "安装包"
@@ -611,17 +977,65 @@ msgstr "官方"
 msgid "Partner"
 msgstr "合作伙伴"
 
-msgid "Listed"
-msgstr "已上架"
-
 msgid "Draft"
 msgstr "草稿"
 
 msgid "Delisted"
 msgstr "已下架"
 
-msgid "Submitted"
-msgstr "已提交"
+msgid "Repository, following the default branch"
+msgstr "仓库，跟随默认分支"
+
+msgid "Repository, following releases"
+msgstr "仓库，跟随发布版本"
+
+msgid "Hosted by the catalog"
+msgstr "由插件目录托管"
+
+msgid "The manifest of the newest release"
+msgstr "最新发布版本的清单"
+
+msgid "Repository, branch"
+msgstr "仓库分支"
+
+msgid "Repository, releases"
+msgstr "仓库发布版本"
+
+msgid "Catalog"
+msgstr "插件目录"
+
+msgid "Manifest"
+msgstr "清单"
+
+msgid "Name in %{lang}"
+msgstr "名称（%{lang}）"
+
+msgid "Description in %{lang}"
+msgstr "描述（%{lang}）"
+
+msgid "Caption of screenshot %{n} in %{lang}"
+msgstr "截图 %{n} 的说明（%{lang}）"
+
+msgid "Order of the screenshots"
+msgstr "截图顺序"
+
+msgid "New screenshot %{n}"
+msgstr "新截图 %{n}"
+
+msgid "Removed screenshot %{id}"
+msgstr "移除了截图 %{id}"
+
+msgid "Image of screenshot %{n}"
+msgstr "截图 %{n} 的图片"
+
+msgid "Merge the pull request"
+msgstr "合并拉取请求"
+
+msgid "Catalog updated"
+msgstr "插件目录已更新"
+
+msgid "Visible to users"
+msgstr "用户可见"
 
 msgid "Checks"
 msgstr "检查"
@@ -632,11 +1046,14 @@ msgstr "已提交到目录"
 msgid "Live in the catalog"
 msgstr "已在目录中上线"
 
-msgid "Maintainer review"
-msgstr "维护者审核"
-
 msgid "Merged"
 msgstr "已合并"
+
+msgid "Waiting for you"
+msgstr "等待你处理"
+
+msgid "Names from a new release"
+msgstr "新版本带来的名称"
 
 msgid "The change is live in the catalog."
 msgstr "改动已在插件目录中生效。"
@@ -646,11 +1063,6 @@ msgstr "插件已在目录中上架。"
 
 msgid "The pull request was closed without merging."
 msgstr "拉取请求已关闭，未合并。"
-
-msgid ""
-"The checks found problems. Fix them in a new release, then run the checks "
-"again."
-msgstr "检查发现问题。请在新版本中修复，然后重新运行检查。"
 
 msgid "The checks could not be started. Please try again later."
 msgstr "无法启动检查，请稍后重试。"
@@ -688,6 +1100,9 @@ msgstr "检查发现问题"
 msgid "Checks could not finish"
 msgstr "检查未能完成"
 
+msgid "Pull request #%{n} opened on %{repo}"
+msgstr "已在 %{repo} 上开启拉取请求 #%{n}"
+
 msgid "Checks passed, pull request #%{n} opened"
 msgstr "检查通过，已创建拉取请求 #%{n}"
 
@@ -700,8 +1115,29 @@ msgstr "维护者已拒绝"
 msgid "Pull request closed"
 msgstr "拉取请求已关闭"
 
+msgid "A maintainer asked for changes"
+msgstr "维护者要求修改"
+
+msgid "Waited %{h} hours for you, a reminder was sent"
+msgstr "已等待你 %{h} 小时，已发送提醒"
+
+msgid "Withdrawn"
+msgstr "已撤回"
+
+msgid "More translations added to the pull request"
+msgstr "更多翻译已加入拉取请求"
+
 msgid "Listed in the catalog"
 msgstr "已在目录中上架"
+
+msgid "Waiting for a maintainer"
+msgstr "等待维护者"
+
+msgid "Takes effect at the next catalog update"
+msgstr "将在目录下次更新时生效"
+
+msgid "Being checked"
+msgstr "检查中"
 
 msgid "Change not found"
 msgstr "未找到该变更"
@@ -709,17 +1145,56 @@ msgstr "未找到该变更"
 msgid "Submitted %{time}"
 msgstr "%{time}提交"
 
+msgid "Waiting for you to merge pull request #%{n} on GitHub"
+msgstr "等待你在 GitHub 上合并拉取请求 #%{n}"
+
+msgid "Waiting for you to commit the files to %{repo}"
+msgstr "等待你将文件提交到 %{repo}"
+
+msgid "The pull request is on %{repo}. Once it is merged, the change shows in the catalog within minutes."
+msgstr "拉取请求位于 %{repo}。合并后，改动会在几分钟内显示在插件目录中。"
+
+msgid "Unpack the patch at the root of the repository and commit it to the default branch. The portal notices the commit by itself."
+msgstr "请在仓库根目录解压补丁，并提交到默认分支。开发者中心会自动发现该提交。"
+
+msgid "Withdraw the change"
+msgstr "撤回改动"
+
+msgid "Merge on GitHub"
+msgstr "在 GitHub 上合并"
+
+msgid "Download the patch"
+msgstr "下载补丁"
+
 msgid "Reason: %{reason}"
 msgstr "原因：%{reason}"
 
 msgid "Run the checks again"
 msgstr "重新运行检查"
 
+msgid "Withdraw"
+msgstr "撤回"
+
 msgid "What was asked"
 msgstr "改动内容"
 
 msgid "Reason"
 msgstr "原因"
+
+msgid "Each item"
+msgstr "各项内容"
+
+msgid "Item"
+msgstr "项目"
+
+msgid "Progress"
+msgstr "进度"
+
+msgid "Name review after the merge"
+msgstr "合并后进行名称审核"
+
+msgid "No review"
+msgstr "无需审核"
 
 msgid "History"
 msgstr "记录"
@@ -745,8 +1220,269 @@ msgid ""
 msgstr ""
 "审核在 GitHub 上公开进行。拉取请求中提及了你，GitHub 会通知你新的评论。"
 
-msgid "All"
-msgstr "全部"
+msgid "Your other changes in progress"
+msgstr "你的其他进行中的改动"
+
+msgid "Tell me in the portal when a change moves"
+msgstr "改动状态变化时在开发者中心通知我"
+
+msgid "Email me when I need to act"
+msgstr "需要我处理时发送邮件"
+
+msgid "Email me when a listing goes live"
+msgstr "上架内容生效时发送邮件"
+
+msgid "Email address"
+msgstr "邮箱地址"
+
+msgid "Email is not available yet."
+msgstr "暂不支持邮件通知。"
+
+msgid "Pull request #%{n} is closed and the change stops here. You can submit again at any time."
+msgstr "拉取请求 #%{n} 已关闭，此改动到此结束。你可以随时重新提交。"
+
+msgid "The change stops here. You can submit again at any time."
+msgstr "此改动到此结束。你可以随时重新提交。"
+
+msgid "The Worker has no key to seal provider keys with yet."
+msgstr "Worker 尚未配置用于加密服务商密钥的密钥。"
+
+msgid "Check the fields: a name, a model, a key and, for an OpenAI compatible endpoint, its base URL."
+msgstr "请检查字段：名称、模型、密钥，以及 OpenAI 兼容端点的基础 URL。"
+
+msgid "Connected in %{ms} ms: %{text}"
+msgstr "已连接，用时 %{ms} 毫秒：%{text}"
+
+msgid "The provider did not answer."
+msgstr "服务商没有响应。"
+
+msgid "The models the translation workbench drafts with. Authors can neither see nor change these settings."
+msgstr "翻译工作台起草时使用的模型。作者无法查看或修改这些设置。"
+
+msgid "Add a model"
+msgstr "添加模型"
+
+msgid "The Worker secret AI_KEY is not set, so provider keys cannot be saved yet."
+msgstr "Worker 密钥 AI_KEY 尚未设置，暂时无法保存服务商密钥。"
+
+msgid "Kind"
+msgstr "类型"
+
+msgid "Model"
+msgstr "模型"
+
+msgid "Endpoint"
+msgstr "端点"
+
+msgid "State"
+msgstr "状态"
+
+msgid "Default"
+msgstr "默认"
+
+msgid "OpenAI compatible"
+msgstr "OpenAI 兼容"
+
+msgid "On"
+msgstr "开启"
+
+msgid "Off"
+msgstr "关闭"
+
+msgid "No model yet. Drafts are off until one is added."
+msgstr "尚无模型。添加模型之前无法起草。"
+
+msgid "New model"
+msgstr "新模型"
+
+msgid "Edit: %{name}"
+msgstr "编辑：%{name}"
+
+msgid "For an OpenAI compatible endpoint, its base URL, for example https://llm.example.com/v1."
+msgstr "OpenAI 兼容端点的基础 URL，例如 https://llm.example.com/v1。"
+
+msgid "API key"
+msgstr "API 密钥"
+
+msgid "Kept encrypted and never sent to a browser."
+msgstr "加密保存，不会发送到浏览器。"
+
+msgid "Saved, can only be replaced"
+msgstr "已保存，只能替换"
+
+msgid "Drafts per author per day"
+msgstr "每位作者每日草稿数"
+
+msgid "Test the connection"
+msgstr "测试连接"
+
+msgid "Remove"
+msgstr "移除"
+
+msgid "Today"
+msgstr "今日"
+
+msgid "Drafts"
+msgstr "草稿"
+
+msgid "Tokens in and out"
+msgstr "输入与输出 Token"
+
+msgid "Glossary"
+msgstr "术语表"
+
+msgid "Taken from the translations of the Nginx UI interface every day, so plugin texts use the words of the host."
+msgstr "每天从 Nginx UI 界面的翻译中提取，使插件文本与宿主用词一致。"
+
+msgid "Rules"
+msgstr "规则"
+
+msgid "An AI translation is a draft until an author confirms it."
+msgstr "AI 翻译在作者确认之前只是草稿。"
+
+msgid "A confirmed name still goes to name review."
+msgstr "确认后的名称仍需经过名称审核。"
+
+msgid "Past the daily number, an author cannot draft until the next day."
+msgstr "超过每日次数后，作者需等到第二天才能继续起草。"
+
+msgid "Newest version yanked"
+msgstr "最新版本已撤回"
+
+msgid "Give a reason. It goes to the audit log and to the admins of the plugin."
+msgstr "请填写原因，它会记入审计日志并发送给插件的管理员。"
+
+msgid "The action could not be sent. Please try again."
+msgstr "无法提交该操作，请重试。"
+
+msgid "Change the trust of %{name}"
+msgstr "更改 %{name} 的信任级别"
+
+msgid "Delist %{name}"
+msgstr "下架 %{name}"
+
+msgid "Delist and block %{name}"
+msgstr "下架并屏蔽 %{name}"
+
+msgid "Add to the block list"
+msgstr "添加到屏蔽列表"
+
+msgid "Every plugin of the catalog and what maintainers may do to it. Delisting and blocking are written to the catalog repository as pull requests."
+msgstr "插件目录中的全部插件及维护者可执行的操作。下架与屏蔽会以拉取请求的形式写入目录仓库。"
+
+msgid "The plugins could not be loaded."
+msgstr "无法加载插件列表。"
+
+msgid "Official %{a}, partner %{b}, community %{c}"
+msgstr "官方 %{a}，合作伙伴 %{b}，社区 %{c}"
+
+msgid "New this week"
+msgstr "本周新增"
+
+msgid "No review this week"
+msgstr "本周没有审核"
+
+msgid "Reviewed in %{h} hours on average"
+msgstr "平均 %{h} 小时完成审核"
+
+msgid "Users stay on the version before"
+msgstr "用户会停留在之前的版本"
+
+msgid "Block list"
+msgstr "屏蔽列表"
+
+msgid "Plugin ids and repositories"
+msgstr "插件 ID 与仓库"
+
+msgid "Any trust"
+msgstr "全部信任级别"
+
+msgid "Any source"
+msgstr "全部来源"
+
+msgid "GitHub releases"
+msgstr "GitHub 发布版本"
+
+msgid "Vendor feed"
+msgstr "厂商源"
+
+msgid "Plugin ID, name or owner"
+msgstr "插件 ID、名称或所有者"
+
+msgid "Plugin"
+msgstr "插件"
+
+msgid "Owner"
+msgstr "所有者"
+
+msgid "Trust"
+msgstr "信任级别"
+
+msgid "Version"
+msgstr "版本"
+
+msgid "Store texts"
+msgstr "商店文本"
+
+msgid "Vendor"
+msgstr "厂商"
+
+msgid "GitHub"
+msgstr "GitHub"
+
+msgid "%{n} changes"
+msgstr "%{n} 项改动"
+
+msgid "None"
+msgstr "无"
+
+msgid "Audit records"
+msgstr "审计记录"
+
+msgid "Change the trust"
+msgstr "更改信任级别"
+
+msgid "Delist, with a reason"
+msgstr "下架（需填写原因）"
+
+msgid "More actions"
+msgstr "更多操作"
+
+msgid "%{n} plugins"
+msgstr "%{n} 个插件"
+
+msgid ", added by @%{login}"
+msgstr "，由 @%{login} 添加"
+
+msgid "Nothing is blocked."
+msgstr "屏蔽列表为空。"
+
+msgid "Add an entry"
+msgstr "添加条目"
+
+msgid "Delisting and blocking"
+msgstr "下架与屏蔽"
+
+msgid "Delisting removes a plugin from the catalog and leaves installed copies alone. Blocking also keeps the same plugin id or repository from being listed again."
+msgstr "下架会将插件从目录中移除，已安装的副本不受影响。屏蔽还会阻止相同的插件 ID 或仓库再次上架。"
+
+msgid "Both need a reason, which goes to the audit log and to the admins of the plugin."
+msgstr "两者都需要填写原因，原因会记入审计日志并发送给插件的管理员。"
+
+msgid "Open the pull request"
+msgstr "开启拉取请求"
+
+msgid "owner/repo"
+msgstr "owner/repo"
+
+msgid "Also block it from being listed again"
+msgstr "同时屏蔽，禁止再次上架"
+
+msgid "Also block the repository"
+msgstr "同时屏蔽仓库"
+
+msgid "Leave empty to block the plugin id only."
+msgstr "留空则只屏蔽插件 ID。"
 
 msgid "Last 7 days"
 msgstr "最近 7 天"
@@ -794,9 +1530,6 @@ msgstr "时间范围"
 msgid "Time"
 msgstr "时间"
 
-msgid "Kind"
-msgstr "类型"
-
 msgid "Action"
 msgstr "操作"
 
@@ -840,17 +1573,191 @@ msgstr ""
 msgid "Sign ins and other portal actions are recorded only here."
 msgstr "登录等开发者中心内的操作只记录在此日志中。"
 
-msgid "Needs changes"
-msgstr "需修改"
+msgid "Partner application"
+msgstr "合作伙伴申请"
 
-msgid "Checking"
-msgstr "检查中"
+msgid "Key rotation"
+msgstr "密钥轮换"
 
-msgid "In review"
-msgstr "审核中"
+msgid "Key revocation"
+msgstr "密钥吊销"
 
-msgid "Publishing"
-msgstr "发布中"
+msgid "Profile change"
+msgstr "资料变更"
+
+msgid "Created with the admins %{list}."
+msgstr "已创建，管理员为 %{list}。"
+
+msgid "none"
+msgstr "无"
+
+msgid "Give a name. The admins are GitHub usernames."
+msgstr "请填写名称。管理员需填写 GitHub 用户名。"
+
+msgid "Revoked"
+msgstr "已撤销"
+
+msgid "Expired"
+msgstr "已过期"
+
+msgid "Expires %{date}"
+msgstr "%{date} 到期"
+
+msgid "Valid"
+msgstr "有效"
+
+msgid "Partners sign with a partner key and may list commercial plugins. Their profiles and keys live in the partners folder of the catalog repository."
+msgstr "合作伙伴使用合作伙伴密钥签名，并可上架商业插件。其资料和密钥保存在目录仓库的 partners 文件夹中。"
+
+msgid "The partners could not be loaded."
+msgstr "无法加载合作伙伴列表。"
+
+msgid "Pending requests"
+msgstr "待处理的请求"
+
+msgid "%{n} items"
+msgstr "%{n} 项"
+
+msgid "Nothing is waiting."
+msgstr "暂无待处理事项。"
+
+msgid "GitHub organization"
+msgstr "GitHub 组织"
+
+msgid "Sent by @%{login} %{time}"
+msgstr "@%{login} %{time}提交"
+
+msgid ", key ID %{id}"
+msgstr "，密钥 ID %{id}"
+
+msgid "%{n} plugins listed"
+msgstr "已上架 %{n} 个插件"
+
+msgid "Partner key given"
+msgstr "已提供合作伙伴密钥"
+
+msgid "No partner key yet"
+msgstr "尚无合作伙伴密钥"
+
+msgid "Approve"
+msgstr "通过"
+
+msgid "Approving opens a pull request in the catalog repository that writes the partner profile and key; it takes effect once merged."
+msgstr "通过后会在目录仓库中开启一个写入合作伙伴资料和密钥的拉取请求，合并后生效。"
+
+msgid "%{n} in all"
+msgstr "共 %{n} 个"
+
+msgid "Key ID"
+msgstr "密钥 ID"
+
+msgid "Valid until"
+msgstr "有效期至"
+
+msgid "Vendor without a public repository"
+msgstr "没有公开仓库的厂商"
+
+msgid "No partner yet."
+msgstr "尚无合作伙伴。"
+
+msgid "New vendor"
+msgstr "新厂商"
+
+msgid "For example Orbit Labs"
+msgstr "例如 Orbit Labs"
+
+msgid "Partner name"
+msgstr "合作伙伴名称"
+
+msgid "The name in partners/, once its key is added."
+msgstr "添加密钥后在 partners/ 中使用的名称。"
+
+msgid "First admins"
+msgstr "首批管理员"
+
+msgid "GitHub usernames, separated by spaces"
+msgstr "GitHub 用户名，以空格分隔"
+
+msgid "Only for vendors without a public repository. A partner with a GitHub organization applies from its organization page, and GitHub decides its members."
+msgstr "仅适用于没有公开仓库的厂商。拥有 GitHub 组织的合作伙伴请在其组织页面申请，成员由 GitHub 决定。"
+
+msgid "Create"
+msgstr "创建"
+
+msgid ", %{n} plugins"
+msgstr "，%{n} 个插件"
+
+msgid "Revoke a key"
+msgstr "吊销密钥"
+
+msgid "Once revoked, every version signed with the key stops installing. A revocation needs no review and is committed to the catalog repository at once."
+msgstr "吊销后，该密钥签名的所有版本都将无法安装。吊销无需审核，会立即提交到目录仓库。"
+
+msgid "Choose the key to revoke"
+msgstr "选择要吊销的密钥"
+
+msgid "Decline the request"
+msgstr "拒绝请求"
+
+msgid "Why, shown to the applicant"
+msgstr "原因（会展示给申请人）"
+
+msgid "Revoke a partner key"
+msgstr "吊销合作伙伴密钥"
+
+msgid "Revoke"
+msgstr "撤销"
+
+msgid "%{n} plugins, from your account and %{orgs} organizations. Roles come from your permission on each GitHub repository."
+msgstr "%{n} 个插件，来自你的账号和 %{orgs} 个组织。角色取决于你在各 GitHub 仓库中的权限。"
+
+msgid "%{n} plugins. Roles come from your permission on each GitHub repository."
+msgstr "%{n} 个插件。角色取决于你在各 GitHub 仓库中的权限。"
+
+msgid "Answer the review"
+msgstr "回复审核意见"
+
+msgid "%{name}, a maintainer asked for changes %{time}"
+msgstr "%{name}，维护者%{time}要求修改"
+
+msgid "View"
+msgstr "查看"
+
+msgid "Merge the store change"
+msgstr "合并商店改动"
+
+msgid "%{name}, pull request #%{n} waiting %{time}"
+msgstr "%{name}，拉取请求 #%{n} 已等待 %{time}"
+
+msgid "Follow the change"
+msgstr "跟进改动"
+
+msgid "Fix what the checks found"
+msgstr "修复检查发现的问题"
+
+msgid "%{name}, %{kind}"
+msgstr "%{name}，%{kind}"
+
+msgid "Add dark screenshots"
+msgstr "添加深色截图"
+
+msgid "%{name}, %{n} screenshots have only a light version"
+msgstr "%{name}，%{n} 张截图只有浅色版本"
+
+msgid "Screenshot studio"
+msgstr "截图工作室"
+
+msgid "Translate into %{n} more languages"
+msgstr "翻译为另外 %{n} 种语言"
+
+msgid "%{name}, %{list} and more"
+msgstr "%{name}，%{list} 等"
+
+msgid "%{name}, %{list}"
+msgstr "%{name}，%{list}"
+
+msgid "Translations"
+msgstr "翻译"
 
 msgid ""
 "Manage the plugins you list in the catalog and follow changes under review."
@@ -862,14 +1769,11 @@ msgstr "无法加载你的插件。"
 msgid "Retry"
 msgstr "重试"
 
-msgid "In progress"
-msgstr "进行中"
-
-msgid "View"
-msgstr "查看"
-
 msgid "Filter by owner"
 msgstr "按所有者筛选"
+
+msgid "To do"
+msgstr "待办"
 
 msgid "You have no role on any listed plugin yet."
 msgstr "你还没有任何已上架插件的角色。"
@@ -901,6 +1805,45 @@ msgstr "你是此仓库的管理员"
 msgid "Submit as plugin"
 msgstr "提交为插件"
 
+msgid "Recent releases"
+msgstr "最近发布"
+
+msgid "%{name} v%{version} yanked"
+msgstr "%{name} v%{version} 已撤回"
+
+msgid "%{name} v%{version}"
+msgstr "%{name} v%{version}"
+
+msgid "Released %{time}"
+msgstr "%{time}发布"
+
+msgid "No releases yet."
+msgstr "还没有发布版本。"
+
+msgid "Repository activity"
+msgstr "仓库动态"
+
+msgid "%{n} open issues"
+msgstr "%{n} 个未关闭的议题"
+
+msgid "No open issues"
+msgstr "没有未关闭的议题"
+
+msgid "Announcements"
+msgstr "公告"
+
+msgid "Getting started"
+msgstr "入门"
+
+msgid "Plugin development guide"
+msgstr "插件开发指南"
+
+msgid "Create the primary key and signer certificates"
+msgstr "创建主密钥和签名者证书"
+
+msgid "Package and sign with the release action"
+msgstr "使用发布 Action 打包并签名"
+
 msgid "Page not found"
 msgstr "页面不存在"
 
@@ -918,9 +1861,6 @@ msgstr "你参与的插件所属的个人账号与组织。名称、头像与成
 msgid "The organizations could not be loaded."
 msgstr "无法加载组织。"
 
-msgid "GitHub organization"
-msgstr "GitHub 组织"
-
 msgid "Personal account"
 msgstr "个人账号"
 
@@ -928,11 +1868,17 @@ msgid "%{n} plugin"
 msgid_plural "%{n} plugins"
 msgstr[0] "%{n} 个插件"
 
+msgid "An application of this organization is waiting for a maintainer."
+msgstr "该组织已有一份申请正在等待维护者处理。"
+
+msgid "Check the fields: a partner name of lower case letters, a display name and a minisign public key."
+msgstr "请检查字段：由小写字母组成的合作伙伴名称、显示名称和 minisign 公钥。"
+
 msgid "Organization not found"
 msgstr "未找到该组织"
 
-msgid "You have no role on any plugin of this account."
-msgstr "你在该账号的插件上没有任何角色。"
+msgid "There is no GitHub account with this name."
+msgstr "不存在此名称的 GitHub 账号。"
 
 msgid "Name, avatar and members come from GitHub"
 msgstr "名称、头像与成员均来自 GitHub"
@@ -943,10 +1889,41 @@ msgstr "在 GitHub 上查看组织"
 msgid "View account on GitHub"
 msgstr "在 GitHub 上查看账号"
 
-msgid ""
-"Plugins of this account you have a role on. Each role follows your "
-"permission on that repository."
-msgstr "该账号下你拥有角色的插件，角色按你在各仓库上的权限显示。"
+msgid "Every plugin of this account in the catalog, with your role from each repository"
+msgstr "此账号在插件目录中的所有插件，以及你在各仓库中的角色"
+
+msgid "This account lists no plugin yet."
+msgstr "此账号尚未上架任何插件。"
+
+msgid "you have no permission on its repository and can only view it"
+msgstr "你对其仓库没有权限，只能查看"
+
+msgid "Your role: %{role}"
+msgstr "你的角色：%{role}"
+
+msgid "The partner key of this organization was revoked."
+msgstr "该组织的合作伙伴密钥已被吊销。"
+
+msgid "This organization is a partner. Packages signed with its partner key show as verified in Nginx UI."
+msgstr "该组织是合作伙伴。使用其合作伙伴密钥签名的安装包在 Nginx UI 中显示为已验证。"
+
+msgid "No end date"
+msgstr "无截止日期"
+
+msgid "Partner plugins carry a verified mark and may be commercial. An admin of a plugin repository of the organization applies, and a maintainer confirms it."
+msgstr "合作伙伴插件带有已验证标记，并可作为商业插件。由组织内插件仓库的管理员申请，维护者确认。"
+
+msgid "The application was declined: %{reason}"
+msgstr "申请被拒绝：%{reason}"
+
+msgid "Applied %{time}, waiting for a maintainer."
+msgstr "%{time}申请，等待维护者处理。"
+
+msgid "Apply to become a partner"
+msgstr "申请成为合作伙伴"
+
+msgid "Needs admin permission on one of the plugin repositories of the organization"
+msgstr "需要组织内某个插件仓库的管理员权限"
 
 msgid "Members and access"
 msgstr "成员与权限"
@@ -958,6 +1935,192 @@ msgstr "成员与权限在 GitHub 上管理，开发者中心按仓库权限决�
 
 msgid "Manage teams and repository access on GitHub"
 msgstr "在 GitHub 上管理团队与仓库权限"
+
+msgid "My organizations"
+msgstr "我的组织"
+
+msgid "Send the application"
+msgstr "提交申请"
+
+msgid "Lower case letters, digits and dashes. Partner certificates name it."
+msgstr "小写字母、数字和连字符，合作伙伴证书中会使用此名称。"
+
+msgid "Display name"
+msgstr "显示名称"
+
+msgid "About"
+msgstr "简介"
+
+msgid "Partner public key"
+msgstr "合作伙伴公钥"
+
+msgid "A minisign public key kept apart from your plugin keys."
+msgstr "与插件密钥分开保管的 minisign 公钥。"
+
+msgid "Note to the maintainers"
+msgstr "给维护者的备注"
+
+msgid "Check the fields: an English price text and an https purchase link."
+msgstr "请检查字段：英文价格说明和 https 购买链接。"
+
+msgid "This plugin id belongs to another owner."
+msgstr "此插件 ID 属于其他所有者。"
+
+msgid "The vendor has no partner key yet."
+msgstr "该厂商尚无合作伙伴密钥。"
+
+msgid "Check the fields: a reverse domain id, an English name and an https release feed."
+msgstr "请检查字段：反向域名 ID、英文名称和 https 发布源。"
+
+msgid "There is no GitHub user with this name."
+msgstr "不存在此名称的 GitHub 用户。"
+
+msgid "The member could not be added."
+msgstr "无法添加该成员。"
+
+msgid "A vendor keeps at least one admin."
+msgstr "厂商至少需要保留一名管理员。"
+
+msgid "Give a reason, and for a rotation a minisign public key."
+msgstr "请填写原因；如为轮换，还需提供 minisign 公钥。"
+
+msgid "Vendor not found"
+msgstr "未找到厂商"
+
+msgid "You are not a member of this vendor."
+msgstr "你不是该厂商的成员。"
+
+msgid "Commercial"
+msgstr "商业"
+
+msgid "A vendor whose plugins have no public repository. Its members are managed here."
+msgstr "插件没有公开仓库的厂商，其成员在此管理。"
+
+msgid "New commercial plugin"
+msgstr "新商业插件"
+
+msgid "No plugin yet."
+msgstr "尚无插件。"
+
+msgid "v%{version}, from the vendor feed, store texts hosted by the catalog"
+msgstr "v%{version}，来自厂商源，商店文本由插件目录托管"
+
+msgid "Waiting for its review"
+msgstr "等待审核"
+
+msgid "Commercial details: %{name}"
+msgstr "商业信息：%{name}"
+
+msgid "Shown in the catalog and the Nginx UI marketplace"
+msgstr "显示在插件目录和 Nginx UI 插件市场中"
+
+msgid "Commercial license"
+msgstr "商业许可"
+
+msgid "Subscription"
+msgstr "订阅"
+
+msgid "Trial days"
+msgstr "试用天数"
+
+msgid "Price text"
+msgstr "价格说明"
+
+msgid "Per language; a language left out shows English."
+msgstr "按语言填写，未填写的语言显示英文。"
+
+msgid "Purchase link"
+msgstr "购买链接"
+
+msgid "Payment and license checks are yours and the plugin's. The catalog only shows these details."
+msgstr "付款与许可证校验由你和插件负责，插件目录只展示这些信息。"
+
+msgid "Submit for review"
+msgstr "提交审核"
+
+msgid "Release feed"
+msgstr "发布源"
+
+msgid "Readable"
+msgstr "可读取"
+
+msgid "Unreadable"
+msgstr "无法读取"
+
+msgid "No feed yet"
+msgstr "尚无发布源"
+
+msgid "Newest in the feed"
+msgstr "源中的最新版本"
+
+msgid "%{n} releases"
+msgstr "%{n} 个发布版本"
+
+msgid "Nothing yet"
+msgstr "暂无"
+
+msgid "Error"
+msgstr "错误"
+
+msgid "Packages stay on your servers. The catalog verifies each new package once and pins its digest."
+msgstr "安装包保留在你的服务器上。插件目录会对每个新安装包验证一次并固定其摘要。"
+
+msgid "Partner key"
+msgstr "合作伙伴密钥"
+
+msgid "Ask for a rotation"
+msgstr "申请轮换"
+
+msgid "Ask for a revocation"
+msgstr "申请吊销"
+
+msgid "Rotation requested %{date}, waiting for a maintainer"
+msgstr "已于 %{date} 申请轮换，等待维护者处理"
+
+msgid "Revocation requested %{date}, waiting for a maintainer"
+msgstr "已于 %{date} 申请吊销，等待维护者处理"
+
+msgid "A maintainer adds the partner key once the contract is in place."
+msgstr "合同签订后，维护者会添加合作伙伴密钥。"
+
+msgid "Members"
+msgstr "成员"
+
+msgid "Managed by the vendor admins"
+msgstr "由厂商管理员管理"
+
+msgid "Added by @%{login}"
+msgstr "由 @%{login} 添加"
+
+msgid "Remove %{login}"
+msgstr "移除 %{login}"
+
+msgid "GitHub username"
+msgstr "GitHub 用户名"
+
+msgid "Add"
+msgstr "添加"
+
+msgid "A reverse domain id of your company, for example com.example.log-shipper."
+msgstr "你公司的反向域名 ID，例如 com.example.log-shipper。"
+
+msgid "A JSON feed of your releases with package links and digests."
+msgstr "包含安装包链接和摘要的 JSON 发布源。"
+
+msgid "Ask for a key rotation"
+msgstr "申请密钥轮换"
+
+msgid "Ask for a key revocation"
+msgstr "申请密钥吊销"
+
+msgid "Send"
+msgstr "发送"
+
+msgid "New partner public key"
+msgstr "新的合作伙伴公钥"
+
+msgid "Once revoked, every version signed with this key stops installing."
+msgstr "吊销后，使用此密钥签名的所有版本都将无法安装。"
 
 msgid "Your access"
 msgstr "你的权限"
@@ -994,9 +2157,6 @@ msgid ""
 "Center ends with it."
 msgstr "在 GitHub 上移除某人的权限后，对方在开发者中心的角色随即失效。"
 
-msgid "Owner"
-msgstr "所有者"
-
 msgid ""
 "The owner is the owner of the repository. When the repository moves to "
 "another owner on GitHub, the plugin moves with it after review."
@@ -1004,14 +2164,101 @@ msgstr ""
 "所有者就是仓库的所有者。仓库在 GitHub 上转移给其他所有者后，插件会在审核后随"
 "之转移。"
 
-msgid "Overview"
-msgstr "概览"
+msgid "Listing state"
+msgstr "上架状态"
 
-msgid "Versions"
-msgstr "版本"
+msgid "Translation coverage"
+msgstr "翻译覆盖率"
+
+msgid "Required Nginx UI version"
+msgstr "所需的 Nginx UI 版本"
+
+msgid "Badges"
+msgstr "徽章"
+
+msgid "Rounded"
+msgstr "圆角"
+
+msgid "Square"
+msgstr "方角"
+
+msgid "Large"
+msgstr "大号"
+
+msgid "Badge language"
+msgstr "徽章语言"
+
+msgid "Use"
+msgstr "用途"
+
+msgid "Shows"
+msgstr "显示内容"
+
+msgid "File"
+msgstr "文件"
+
+msgid "Preview"
+msgstr "预览"
+
+msgid "Light"
+msgstr "浅色"
+
+msgid "Dark"
+msgstr "深色"
+
+msgid "Code"
+msgstr "代码"
+
+msgid "Each badge opens the page of the plugin in the catalog."
+msgstr "每个徽章都会打开该插件在插件目录中的页面。"
+
+msgid "About badges"
+msgstr "关于徽章"
+
+msgid "Badges change with the catalog: a new release or new translations show at its next update."
+msgstr "徽章随插件目录更新：新的发布版本或翻译会在目录下次更新时显示。"
+
+msgid "The badge text comes in every language of the catalog site."
+msgstr "徽章文本支持插件目录网站的所有语言。"
+
+msgid "The catalog serves them with no sign in, and records no visitor."
+msgstr "插件目录无需登录即可提供徽章，也不会记录访问者。"
+
+msgid "Yanked versions"
+msgstr "已撤回的版本"
+
+msgid "Yanked version badge"
+msgstr "版本撤回徽章"
+
+msgid "When the newest version is yanked, the version badge says so, so visitors of the repository know."
+msgstr "最新版本被撤回时，版本徽章会注明这一点，方便仓库访问者知晓。"
+
+msgid "Signers"
+msgstr "签名者"
 
 msgid "Access"
 msgstr "访问权限"
+
+msgid "%{kind}, the checks found problems"
+msgstr "%{kind}，检查发现问题"
+
+msgid "%{kind}, waiting for you to merge pull request #%{n}"
+msgstr "%{kind}，等待你合并拉取请求 #%{n}"
+
+msgid "%{kind}, a maintainer asked for changes"
+msgstr "%{kind}，维护者要求修改"
+
+msgid "%{kind}, waiting for a maintainer to review"
+msgstr "%{kind}，等待维护者审核"
+
+msgid "%{kind}, takes effect at the next catalog update"
+msgstr "%{kind}，将在目录下次更新时生效"
+
+msgid "%{kind}, being checked"
+msgstr "%{kind}，检查中"
+
+msgid "%{text}, waiting %{time}"
+msgstr "%{text}，已等待 %{time}"
 
 msgid "You have no access to this plugin"
 msgstr "你没有此插件的访问权限"
@@ -1028,33 +2275,542 @@ msgstr "没有使用此插件 ID 的上架内容或草稿。"
 msgid "View in catalog"
 msgstr "在目录中查看"
 
+msgid "Change in progress"
+msgstr "进行中的改动"
+
+msgid "%{n} more"
+msgstr "另外 %{n} 项"
+
 msgid "Plugin sections"
 msgstr "插件页面"
 
-msgid "Another change of this plugin is in progress."
-msgstr "该插件已有一项改动正在处理。"
+msgid "The ref could not be read. Check that it exists in the repository."
+msgstr "无法读取该引用，请确认它存在于仓库中。"
 
-msgid "The change could not be sent. Please try again."
-msgstr "改动提交失败，请重试。"
+msgid "Branches"
+msgstr "分支"
 
-msgid "Listing"
-msgstr "上架信息"
+msgid "Branch %{name}, %{sha}, %{time}"
+msgstr "分支 %{name}，%{sha}，%{time}"
 
-msgid "Description"
-msgstr "描述"
+msgid "Branch %{name}, %{sha}"
+msgstr "分支 %{name}，%{sha}"
 
-msgid "Edit"
-msgstr "修改"
+msgid "Tags"
+msgstr "标签"
 
-msgid "Latest version"
-msgstr "最新版本"
+msgid "Tag %{name}"
+msgstr "标签 %{name}"
 
-msgid "Save"
-msgstr "保存"
+msgid "Permission %{name}"
+msgstr "权限 %{name}"
 
-msgid ""
-"The catalog files the plugin under these categories from its next update."
-msgstr "插件目录下次更新后，会把插件归入这些分类。"
+msgid "Network host"
+msgstr "网络主机"
+
+msgid "Capability"
+msgstr "能力"
+
+msgid "Required Nginx UI version %{from} to %{to}"
+msgstr "所需的 Nginx UI 版本由 %{from} 改为 %{to}"
+
+msgid "any"
+msgstr "任意"
+
+msgid "Setting"
+msgstr "设置项"
+
+msgid "Default of the setting"
+msgstr "设置项默认值"
+
+msgid "Cannot be enabled together with"
+msgstr "不能同时启用"
+
+msgid "Name in %{lang}: %{from} to %{to}"
+msgstr "名称（%{lang}）：由 %{from} 改为 %{to}"
+
+msgid "Screenshot removed"
+msgstr "截图已移除"
+
+msgid "New screenshot"
+msgstr "新截图"
+
+msgid "Screenshot image changed"
+msgstr "截图图片已更改"
+
+msgid "Note from the author: %{note}"
+msgstr "作者备注：%{note}"
+
+msgid "The manifest gives no reason for it. Add one in permission_reasons."
+msgstr "清单中没有说明原因，请在 permission_reasons 中补充。"
+
+msgid "Users of an older Nginx UI stay on v%{version}"
+msgstr "使用旧版 Nginx UI 的用户会停留在 v%{version}"
+
+msgid "Goes to name review once released, the listed name shows until it is approved"
+msgstr "发布后进入名称审核，通过前显示已上架的名称"
+
+msgid "Holds a word no name may hold and would not be listed"
+msgstr "包含名称中不允许使用的词，不会上架"
+
+msgid "Claims to be official and would be left out"
+msgstr "声称是官方插件，会被略去"
+
+msgid "New"
+msgstr "新增"
+
+msgid "Affects updates"
+msgstr "影响更新"
+
+msgid "Reviewed"
+msgstr "需审核"
+
+msgid "Left out"
+msgstr "已略去"
+
+msgid "The manifest is valid, version %{version} is newer than the listed one"
+msgstr "清单有效，版本 %{version} 比已上架的版本新"
+
+msgid "There is no plugin.json at this ref"
+msgstr "此引用下没有 plugin.json"
+
+msgid "The manifest names another plugin: %{id}"
+msgstr "清单指向另一个插件：%{id}"
+
+msgid "Version %{version} is not newer than the listed %{listed}"
+msgstr "版本 %{version} 不比已上架的 %{listed} 新"
+
+msgid "Raise the version before releasing."
+msgstr "请在发布前提升版本号。"
+
+msgid "The signer certificate was issued by your primary key"
+msgstr "签名者证书由你的主密钥签发"
+
+msgid "There is no signer certificate at this ref"
+msgstr "此引用下没有签名者证书"
+
+msgid "Packages signed without one are not listed."
+msgstr "没有签名者证书签名的安装包不会上架。"
+
+msgid "The signer certificate was issued for another plugin: %{id}"
+msgstr "签名者证书是为另一个插件签发的：%{id}"
+
+msgid "The signer certificate was issued by another primary key: %{key}"
+msgstr "签名者证书由另一个主密钥签发：%{key}"
+
+msgid "it is %{mb} MB, more than 2 MB"
+msgstr "大小为 %{mb} MB，超过 2 MB"
+
+msgid "it is not PNG, JPEG or WebP"
+msgstr "不是 PNG、JPEG 或 WebP 格式"
+
+msgid "it cannot be loaded"
+msgstr "无法加载"
+
+msgid "Screenshot %{id}: %{why}"
+msgstr "截图 %{id}：%{why}"
+
+msgid "Once released this screenshot would not show."
+msgstr "发布后此截图将无法显示。"
+
+msgid "Branch or tag"
+msgstr "分支或标签"
+
+msgid "Nothing listed"
+msgstr "尚未上架"
+
+msgid "Check again"
+msgstr "重新检查"
+
+msgid "Permissions and network"
+msgstr "权限与网络"
+
+msgid "Needs attention"
+msgstr "需要处理"
+
+msgid "No permission or network host changes."
+msgstr "权限和网络主机没有变化。"
+
+msgid "%{n} permissions stay as they are"
+msgstr "%{n} 项权限保持不变"
+
+msgid "Compatibility and settings"
+msgstr "兼容性与设置"
+
+msgid "No compatibility or settings changes."
+msgstr "兼容性和设置没有变化。"
+
+msgid "From plugin.store.json"
+msgstr "来自 plugin.store.json"
+
+msgid "From plugin.json"
+msgstr "来自 plugin.json"
+
+msgid "The store texts stay as they are."
+msgstr "商店文本保持不变。"
+
+msgid "What users see when they update"
+msgstr "用户更新时看到的内容"
+
+msgid "Update %{name}"
+msgstr "更新 %{name}"
+
+msgid "New in this version"
+msgstr "此版本新增"
+
+msgid "Connects to %{host}"
+msgstr "连接到 %{host}"
+
+msgid "Nothing new to approve."
+msgstr "没有需要批准的新内容。"
+
+msgid "Later"
+msgstr "稍后"
+
+msgid "New permissions and network hosts are explained to users before they update, and maintainers look at them first."
+msgstr "新的权限和网络主机会在用户更新前向其说明，维护者也会优先查看。"
+
+msgid "Create the v%{version} release on GitHub"
+msgstr "在 GitHub 上创建 v%{version} 发布版本"
+
+msgid "The catalog lists it within minutes of its release."
+msgstr "发布后几分钟内，插件目录就会将其上架。"
+
+msgid "Use a PNG, JPEG or WebP image."
+msgstr "请使用 PNG、JPEG 或 WebP 图片。"
+
+msgid "The image is larger than 20 MB."
+msgstr "图片大于 20 MB。"
+
+msgid "The image could not be encoded under 2 MB."
+msgstr "无法将图片压缩到 2 MB 以内。"
+
+msgid "The image was refused: it must be 16:10 and between 640 and 3840 pixels wide."
+msgstr "图片不符合要求：必须为 16:10，宽度在 640 到 3840 像素之间。"
+
+msgid "Uploads are not available yet."
+msgstr "暂不支持上传。"
+
+msgid "The image could not be uploaded. Please try again."
+msgstr "无法上传图片，请重试。"
+
+msgid "The store texts could not be loaded."
+msgstr "无法加载商店文本。"
+
+msgid "Uploads are not available yet. You can reorder the screenshots and edit their captions."
+msgstr "暂不支持上传。你可以调整截图顺序并编辑说明。"
+
+msgid "The catalog entry sets the screenshots of this plugin, so they cannot be changed here."
+msgstr "此插件的截图由目录条目设置，无法在此更改。"
+
+msgid "16:10, light and dark in pairs"
+msgstr "16:10，浅色与深色成对"
+
+msgid "Add a screenshot"
+msgstr "添加截图"
+
+msgid "Screenshot %{n}"
+msgstr "截图 %{n}"
+
+msgid "Changed"
+msgstr "已更改"
+
+msgid "Complete"
+msgstr "完整"
+
+msgid "No dark version"
+msgstr "没有深色版本"
+
+msgid "No caption"
+msgstr "没有说明"
+
+msgid "Drop a PNG, JPEG or WebP image here"
+msgstr "将 PNG、JPEG 或 WebP 图片拖放到此处"
+
+msgid "Cropped to 16:10 and converted to WebP, up to 2 MB"
+msgstr "裁剪为 16:10 并转换为 WebP，最大 2 MB"
+
+msgid "No screenshots yet."
+msgstr "还没有截图。"
+
+msgid "Saving the draft"
+msgstr "正在保存草稿"
+
+msgid "Draft saved %{time}. Submit it from the store page."
+msgstr "草稿已保存（%{time}），请在商店页面提交。"
+
+msgid "Dark version"
+msgstr "深色版本"
+
+msgid "Light version"
+msgstr "浅色版本"
+
+msgid "Add the screenshot"
+msgstr "添加截图"
+
+msgid "Use this crop"
+msgstr "使用此裁剪"
+
+msgid "Upload the dark version"
+msgstr "上传深色版本"
+
+msgid "Replace the image"
+msgstr "替换图片"
+
+msgid "Crop again"
+msgstr "重新裁剪"
+
+msgid "Remove the dark version"
+msgstr "移除深色版本"
+
+msgid "Show filled languages only"
+msgstr "只显示已填写的语言"
+
+msgid "The other languages, %{n} of %{total} filled"
+msgstr "其他语言，已填写 %{n} / %{total}"
+
+msgid "Delete this screenshot"
+msgstr "删除此截图"
+
+msgid "%{n} of %{total} untranslated"
+msgstr "%{total} 项中 %{n} 项未翻译"
+
+msgid "Permission note: %{name}"
+msgstr "权限说明：%{name}"
+
+msgid "Goes to review, English shows until it is approved"
+msgstr "需审核，通过前显示英文"
+
+msgid "AI draft waiting for confirmation"
+msgstr "AI 草稿，等待确认"
+
+msgid "Comes from the manifest and ships with the next release"
+msgstr "来自清单，随下个发布版本生效"
+
+msgid "Set in the catalog entry"
+msgstr "在目录条目中设置"
+
+msgid "Publishers edit this"
+msgstr "由发布者编辑"
+
+msgid "plugin.store.json in %{repo}, live minutes after it is merged."
+msgstr "%{repo} 中的 plugin.store.json，合并几分钟后生效。"
+
+msgid "Goes live with the next release, so screenshots of unreleased features stay off the listing."
+msgstr "随下个发布版本生效，未发布功能的截图不会提前出现在上架页面。"
+
+msgid "Kept in the catalog repository and live at its next update. For plugins without a public repository."
+msgstr "保存在目录仓库中，目录下次更新时生效。适用于没有公开仓库的插件。"
+
+msgid "Kept in the catalog"
+msgstr "保存在插件目录中"
+
+msgid "From the default branch of the repository"
+msgstr "来自仓库的默认分支"
+
+msgid "From the tag of the listed release"
+msgstr "来自已上架发布版本的标签"
+
+msgid "There is no English description"
+msgstr "没有英文描述"
+
+msgid "No description in %{n} languages"
+msgstr "%{n} 种语言没有描述"
+
+msgid "Screenshot %{n} has no dark version"
+msgstr "截图 %{n} 没有深色版本"
+
+msgid "There are no screenshots"
+msgstr "没有截图"
+
+msgid "Committed to the catalog and live at its next update. Names go to review first."
+msgstr "提交到插件目录，目录下次更新时生效。名称需先经过审核。"
+
+msgid "Opened as a pull request on %{repo}, which you merge on GitHub."
+msgstr "以拉取请求的形式在 %{repo} 上开启，由你在 GitHub 上合并。"
+
+msgid "You download the files and commit them to %{repo}. The change follows once the default branch holds them."
+msgstr "下载文件后提交到 %{repo}，默认分支包含这些文件后改动即会跟进。"
+
+msgid "Another store change of this plugin is in progress."
+msgstr "此插件的另一项商店改动正在进行中。"
+
+msgid "Some texts cannot be listed. Check the names for words such as official."
+msgstr "部分文本无法上架，请检查名称中是否含有“官方”等词。"
+
+msgid "An uploaded screenshot is missing. Upload it again in the screenshot studio."
+msgstr "缺少一张已上传的截图，请在截图工作室中重新上传。"
+
+msgid "A store change of this plugin is in progress."
+msgstr "此插件有一项商店改动正在进行中。"
+
+msgid "Translated into %{n} of %{total} languages, the others show English"
+msgstr "已翻译为 %{total} 种语言中的 %{n} 种，其他语言显示英文"
+
+msgid "Click any text in the preview to translate it. Tab goes to the next untranslated text."
+msgstr "点击预览中的任意文本进行翻译，按 Tab 键前往下一条未翻译的文本。"
+
+msgid "Stress test"
+msgstr "压力测试"
+
+msgid "Longest language"
+msgstr "最长的语言"
+
+msgid "Right to left"
+msgstr "从右到左"
+
+msgid "Pseudo localized"
+msgstr "伪本地化"
+
+msgid "Desktop"
+msgstr "桌面"
+
+msgid "Phone"
+msgstr "手机"
+
+msgid "Texts of this page, %{lang}"
+msgstr "本页文本，%{lang}"
+
+msgid "AI drafts left today: %{n}"
+msgstr "今日剩余 AI 草稿次数：%{n}"
+
+msgid "Stress test results"
+msgstr "压力测试结果"
+
+msgid "The name in %{lang} is cut short in the list card"
+msgstr "名称（%{lang}）在列表卡片中显示不全"
+
+msgid "Every name fits the list card"
+msgstr "所有名称都能完整显示在列表卡片中"
+
+msgid "Check that the page reads right to left without overlapping text"
+msgstr "请检查页面从右到左显示时文本是否重叠"
+
+msgid "Permission notes are not translated here"
+msgstr "权限说明不在此处翻译"
+
+msgid "They come from the manifest and are translated in the repository"
+msgstr "权限说明来自清单，需在仓库中翻译"
+
+msgid "Store source"
+msgstr "商店来源"
+
+msgid "Current"
+msgstr "当前"
+
+msgid "The store texts come from the manifest of each release now. Submitting creates the first store document."
+msgstr "目前商店文本来自每个发布版本的清单。提交后会创建第一份商店文档。"
+
+msgid "Moving the store source is reviewed by a maintainer."
+msgstr "迁移商店来源需经维护者审核。"
+
+msgid "Changes to publish"
+msgstr "待发布的改动"
+
+msgid "Goes to name review after the merge"
+msgstr "合并后进行名称审核"
+
+msgid "Live after the merge"
+msgstr "合并后生效"
+
+msgid "Click a text in the preview to change it."
+msgstr "点击预览中的文本进行修改。"
+
+msgid "Submit changes"
+msgstr "提交改动"
+
+msgid "Draft saved %{time}"
+msgstr "草稿已保存（%{time}）"
+
+msgid "Discard the draft"
+msgstr "丢弃草稿"
+
+msgid "Suggestions"
+msgstr "建议"
+
+msgid "Add them in the translation workbench"
+msgstr "前往翻译工作台添加"
+
+msgid "Open the screenshot studio"
+msgstr "打开截图工作室"
+
+msgid "Submit the store changes of %{name}"
+msgstr "提交 %{name} 的商店改动"
+
+msgid "Create the patch"
+msgstr "生成补丁"
+
+msgid "Submit"
+msgstr "提交"
+
+msgid ", reviewed"
+msgstr "，需审核"
+
+msgid "Store source: %{source}"
+msgstr "商店来源：%{source}"
+
+msgid "Waiting for confirmation"
+msgstr "等待确认"
+
+msgid "No AI drafts are left for today."
+msgstr "今日 AI 草稿次数已用完。"
+
+msgid "The AI draft could not be made. Please try again later."
+msgstr "无法生成 AI 草稿，请稍后重试。"
+
+msgid "The %{n} interface languages of Nginx UI. Pick the columns to show."
+msgstr "Nginx UI 的 %{n} 种界面语言，请选择要显示的列。"
+
+msgid "Drafting %{done} of %{total}"
+msgstr "正在起草 %{done} / %{total}"
+
+msgid "AI draft the missing texts"
+msgstr "使用 AI 起草缺失的文本"
+
+msgid "A text left out in a language shows in English there"
+msgstr "某种语言未提供的文本会在该语言中显示英文"
+
+msgid "Text"
+msgstr "文本"
+
+msgid "Store texts, live after the merge"
+msgstr "商店文本，合并后生效"
+
+msgid "Goes to review"
+msgstr "需审核"
+
+msgid "%{n} suggestions"
+msgstr "%{n} 条建议"
+
+msgid "Runtime strings, ship with the next release"
+msgstr "运行时字符串，随下个发布版本生效"
+
+msgid "Runtime strings are translated in plugin.json in the repository. A generated plugin.json takes them from its source code; export them to translate there."
+msgstr "运行时字符串需在仓库的 plugin.json 中翻译。如 plugin.json 由源代码生成，请导出这些字符串并在源代码中翻译。"
+
+msgid "Export runtime strings"
+msgstr "导出运行时字符串"
+
+msgid "English"
+msgstr "英文"
+
+msgid "There is no English text yet"
+msgstr "还没有英文文本"
+
+msgid "Translation"
+msgstr "译文"
+
+msgid "Terms as Nginx UI translates them: %{terms}"
+msgstr "Nginx UI 中的译法：%{terms}"
+
+msgid "Confirm the translation"
+msgstr "确认译文"
+
+msgid "Draft again"
+msgstr "重新起草"
+
+msgid "Pick a cell to translate it."
+msgstr "选择一个单元格进行翻译。"
 
 msgid "Signer revoked"
 msgstr "签名者已撤销"
@@ -1121,12 +2877,6 @@ msgstr "撤回 %{n} 个"
 msgid "Select all versions"
 msgstr "选择全部版本"
 
-msgid "Version"
-msgstr "版本"
-
-msgid "Released"
-msgstr "发布日期"
-
 msgid "Signer"
 msgstr "签名者"
 
@@ -1145,9 +2895,6 @@ msgstr "撤回"
 msgid "No release yet."
 msgstr "还没有发布版本。"
 
-msgid "Signers"
-msgstr "签名者"
-
 msgid "Signing keys certified by your primary key"
 msgstr "由你的主密钥签发证书的签名密钥"
 
@@ -1156,12 +2903,6 @@ msgstr "没有版本标明签名者。"
 
 msgid "Signed %{n} releases"
 msgstr "签名了 %{n} 个版本"
-
-msgid "Revoked"
-msgstr "已撤销"
-
-msgid "Revoke"
-msgstr "撤销"
 
 msgid ""
 "Revoke a signer when its signing key leaked or was lost. Restoring a revoked "
@@ -1209,20 +2950,17 @@ msgstr "会随改动一并记录，例如：升级后配置文件无法读取，
 msgid "Closed"
 msgstr "已关闭"
 
+msgid "Checking"
+msgstr "检查中"
+
 msgid "Author"
 msgstr "作者"
 
 msgid "Primary public key"
 msgstr "主公钥"
 
-msgid "Trust"
-msgstr "信任级别"
-
 msgid "Listed release"
 msgstr "上架版本"
-
-msgid "Platforms"
-msgstr "平台"
 
 msgid "Icon"
 msgstr "图标"
@@ -1262,17 +3000,59 @@ msgstr "高风险变更"
 msgid "submitted by @%{login} %{time}"
 msgstr "@%{login} %{time}提交"
 
+msgid "found in a new release %{time}"
+msgstr "%{time}在新发布版本中发现"
+
 msgid "Reject"
 msgstr "拒绝"
 
 msgid "Request changes"
 msgstr "要求修改"
 
+msgid "Approve the checked names"
+msgstr "批准勾选的名称"
+
 msgid "Approve and merge"
 msgstr "批准并合并"
 
-msgid "Not listed yet"
-msgstr "尚未上架"
+msgid "What users will see"
+msgstr "用户将看到的内容"
+
+msgid "Side by side"
+msgstr "并排"
+
+msgid "Slider"
+msgstr "滑块"
+
+msgid "Changes only"
+msgstr "仅显示改动"
+
+msgid "Preview language"
+msgstr "预览语言"
+
+msgid "Names by language"
+msgstr "各语言名称"
+
+msgid "Uncheck a name to keep it as listed"
+msgstr "取消勾选的名称将保持已上架的内容"
+
+msgid "Kind of change"
+msgstr "改动"
+
+msgid "Not set"
+msgstr "未设置"
+
+msgid "Removed"
+msgstr "已移除"
+
+msgid "Unchanged"
+msgstr "未改动"
+
+msgid "Approve the name in %{lang}"
+msgstr "批准名称（%{lang}）"
+
+msgid "Listing"
+msgstr "上架信息"
 
 msgid "What changes"
 msgstr "变更内容"
@@ -1282,12 +3062,6 @@ msgstr "与当前上架内容对比"
 
 msgid "Field"
 msgstr "字段"
-
-msgid "Current"
-msgstr "当前"
-
-msgid "After the change"
-msgstr "变更后"
 
 msgid "Listed as"
 msgstr "上架内容"
@@ -1319,9 +3093,6 @@ msgstr "评论"
 msgid "All passed"
 msgstr "全部通过"
 
-msgid "Needs attention"
-msgstr "需要处理"
-
 msgid "No checks reported on the pull request."
 msgstr "拉取请求上没有检查结果。"
 
@@ -1348,8 +3119,8 @@ msgstr "以你的身份批准并合并拉取请求 #%{n}。插件会在下次部
 msgid "Some checks of the pull request have not passed."
 msgstr "拉取请求有检查未通过。"
 
-msgid "Send"
-msgstr "发送"
+msgid "The names in %{list} stay as listed: they are taken out of the pull request before it is merged."
+msgstr "%{list} 的名称将保持已上架的内容：合并前会从拉取请求中移除。"
 
 msgid ""
 "The author sees this on GitHub and in the Developer Center, and can resubmit "
@@ -1439,15 +3210,6 @@ msgstr "选择全部低风险改动"
 msgid "Risk"
 msgstr "风险"
 
-msgid "Kind of change"
-msgstr "改动"
-
-msgid "Plugin"
-msgstr "插件"
-
-msgid "Waiting"
-msgstr "等待"
-
 msgid "Select %{name}"
 msgstr "选择 %{name}"
 
@@ -1462,9 +3224,6 @@ msgstr "这里没有待处理的变更。"
 
 msgid "Move"
 msgstr "上下移动"
-
-msgid "Approve"
-msgstr "通过"
 
 msgid "Approve selected"
 msgstr "批量通过"
@@ -1669,8 +3428,121 @@ msgid ""
 msgstr ""
 "提交后由维护者审核，进度可以在变更页面查看，审核结果也会通过 GitHub 通知你。"
 
-msgid "Submit for review"
-msgstr "提交审核"
+msgid "No suggestion reviewed yet"
+msgstr "尚未审核过建议"
+
+msgid "Usually reviews within two days"
+msgstr "通常在两天内审核"
+
+msgid "Usually reviews within a week"
+msgstr "通常在一周内审核"
+
+msgid "Reviews take longer than a week"
+msgstr "审核时间通常超过一周"
+
+msgid "%{n} suggestions sent for review."
+msgstr "已提交 %{n} 条建议等待审核。"
+
+msgid "Some suggestions could not be sent. Check them for words a name may not hold."
+msgstr "部分建议未能提交，请检查其中是否含有名称不允许使用的词。"
+
+msgid "Accepted, waiting for the merge"
+msgstr "已接受，等待合并"
+
+msgid "Merged, listed at the next catalog update"
+msgstr "已合并，将在目录下次更新时上架"
+
+msgid "Not accepted"
+msgstr "未被接受"
+
+msgid "Suggest translations for plugins that welcome community translation. Accepted suggestions go to the plugin repository with you as a co-author."
+msgstr "为欢迎社区翻译的插件提交翻译建议。被接受的建议会以你为共同作者提交到插件仓库。"
+
+msgid "The page could not be loaded."
+msgstr "无法加载此页面。"
+
+msgid "My languages"
+msgstr "我的语言"
+
+msgid "Add a language"
+msgstr "添加语言"
+
+msgid "Most missing"
+msgstr "缺失最多"
+
+msgid "Recently updated"
+msgstr "最近更新"
+
+msgid "Add a language you translate to see the plugins that need it."
+msgstr "添加你翻译的语言，即可查看需要该语言的插件。"
+
+msgid "Plugins that need %{lang}"
+msgstr "需要 %{lang} 的插件"
+
+msgid "%{n} plugins welcome community translation"
+msgstr "%{n} 个插件欢迎社区翻译"
+
+msgid "No plugin is open to community translation in this language yet."
+msgstr "暂无插件在此语言开放社区翻译。"
+
+msgid "Fill in only what you add or change"
+msgstr "只需填写你新增或修改的内容"
+
+msgid "Current translation"
+msgstr "当前译文"
+
+msgid "Your suggestion"
+msgstr "你的建议"
+
+msgid "In review, no suggestions for now"
+msgstr "审核中，暂不接受建议"
+
+msgid "No change"
+msgstr "无改动"
+
+msgid "A translator or publisher of the plugin reviews your suggestions."
+msgstr "插件的译者或发布者会审核你的建议。"
+
+msgid "Send %{n} suggestions"
+msgstr "提交 %{n} 条建议"
+
+msgid "My contributions"
+msgstr "我的贡献"
+
+msgid "Accepted"
+msgstr "已接受"
+
+msgid "Pending"
+msgstr "待处理"
+
+msgid "As Nginx UI translates them"
+msgstr "Nginx UI 中的译法"
+
+msgid "Name suggestions"
+msgstr "名称建议"
+
+msgid "An accepted name still goes to a maintainer before it is listed."
+msgstr "被接受的名称在上架前仍需经维护者审核。"
+
+#~ msgid "Publishing"
+#~ msgstr "发布中"
+
+#~ msgid "In progress"
+#~ msgstr "进行中"
+
+#~ msgid "You have no role on any plugin of this account."
+#~ msgstr "你在该账号的插件上没有任何角色。"
+
+#~ msgid ""
+#~ "Plugins of this account you have a role on. Each role follows your "
+#~ "permission on that repository."
+#~ msgstr "该账号下你拥有角色的插件，角色按你在各仓库上的权限显示。"
+
+#~ msgid "Overview"
+#~ msgstr "概览"
+
+#~ msgid "Latest version"
+#~ msgstr "最新版本"
 
 #~ msgid "New listings and changes that need a review, highest risk first."
 #~ msgstr "新上架与需要审核的变更，按风险排序。"
