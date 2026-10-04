@@ -129,6 +129,7 @@ async function onUserMenu({ key }: { key: string | number }) {
           <span class="i-tabler-search text-4" />
           <span v-if="!isMobile" class="search-hint"><kbd>{{ palette.modifier }}</kbd><kbd>K</kbd></span>
         </AButton>
+        <NotificationBell v-if="session.user" />
         <ADropdown :menu="{ items: languageItems, selectable: true, selectedKeys: [gettext.current], onClick: onLanguageMenu }">
           <AButton type="text" :aria-label="$gettext('Language')">
             <span class="i-tabler-world text-4" />

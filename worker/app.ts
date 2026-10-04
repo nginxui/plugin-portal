@@ -11,6 +11,7 @@ import { community } from './routes/community'
 import { hooks } from './routes/hooks'
 import { maintain } from './routes/maintain'
 import { me } from './routes/me'
+import { notifications } from './routes/notifications'
 import { owners } from './routes/owners'
 import { partners } from './routes/partners'
 import { plugins } from './routes/plugins'
@@ -25,6 +26,7 @@ export const app = new Hono<AppEnv>().basePath('/api')
 app.use('*', security)
 app.route('/auth', auth)
 app.route('/me', me)
+app.route('/notifications', notifications)
 app.route('/media', media)
 app.route('/', store)
 app.route('/', community)

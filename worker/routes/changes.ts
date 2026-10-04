@@ -2,6 +2,7 @@ import type { AppEnv, Env, Session } from '../env'
 import type { ChangeRow } from '../lib/changes'
 import { Hono } from 'hono'
 import { repoAccess } from '../lib/access'
+import { audit } from '../lib/audit'
 import { loadCatalog } from '../lib/catalog'
 import { event, getChange } from '../lib/changes'
 import { dispatchApply, dispatchDeploy } from '../lib/deployApp'
@@ -124,6 +125,22 @@ function selfServiceRequest(payload: string | null): { operations?: Record<strin
   return parsed.kind === 'entry_update' ? { operations: parsed.operations, reason: parsed.reason || undefined } : {}
 }
 
+// Where a store change went: the author's repository by a pull request of
+// the bot or a patch, or the catalog; and its items.
+function storeRequest(env: Env, change: ChangeRow) {
+  if ((change.kind !== 'store' && change.kind !== 'translations') || !change.payload_json)
+    return {}
+  const payload = JSON.parse(change.payload_json) as { delivery?: string, pr_url?: string, repo?: string, items?: { field: string, locale?: string, label: string, review: boolean }[] }
+  const repoPr = payload.delivery === 'bot' && payload.pr_url
+  return {
+    delivery: payload.delivery ?? null,
+    repo: payload.repo ?? null,
+    items: payload.items ?? [],
+    ...(repoPr ? { prUrl: payload.pr_url } : {}),
+    ...(payload.delivery === 'patch' ? { patchUrl: `/api/changes/${change.id}/patch` } : {}),
+  }
+}
+
 export function present(env: Env, change: ChangeRow) {
   return {
     id: change.id,
@@ -140,6 +157,7 @@ export function present(env: Env, change: ChangeRow) {
     entry: change.entry_json ? JSON.parse(change.entry_json) : null,
     // What a self service change asked for, as the author sent it.
     ...selfServiceRequest(change.payload_json),
+    ...storeRequest(env, change),
     outcome: change.outcome_json ? JSON.parse(change.outcome_json) : null,
     createdAt: change.created_at,
     updatedAt: change.updated_at,
@@ -168,9 +186,14 @@ changes.get('/:id', async (c) => {
     `SELECT e.stage, e.detail_json, e.at, u.login AS actor FROM change_events e LEFT JOIN users u ON u.id = e.actor_id
      WHERE e.change_id = ? ORDER BY e.at, e.id`,
   ).bind(change.id).all<{ stage: string, detail_json: string | null, at: number, actor: string | null }>()
+  const others = await c.env.DB.prepare(
+    `SELECT * FROM changes WHERE author_id = ? AND id != ? AND state IN ('open', 'merged') ORDER BY updated_at DESC LIMIT 5`,
+  ).bind(session.user.id, change.id).all<ChangeRow>()
   return c.json({
     change: present(c.env, change),
     canRetry: change.author_id === session.user.id && retryable(change),
+    canWithdraw: change.author_id === session.user.id && change.state === 'open',
+    others: others.results.map(row => present(c.env, row)),
     events: results.map(e => ({ stage: e.stage, actor: e.actor, at: e.at, detail: e.detail_json ? JSON.parse(e.detail_json) : null })),
   })
 })
@@ -178,7 +201,8 @@ changes.get('/:id', async (c) => {
 // The author may run the checks again after they failed, or after a
 // maintainer asked for changes; the pull request is then updated in place.
 function retryable(change: ChangeRow): boolean {
-  if (change.state !== 'open')
+  // A store change in the author's repository is followed, not run again.
+  if (change.state !== 'open' || change.kind === 'store' || change.kind === 'translations')
     return false
   return (change.stage === 'checks' && change.waiting_on !== null) || (change.stage === 'review' && change.waiting_on === 'author')
 }
@@ -198,5 +222,37 @@ changes.post('/:id/retry', async (c) => {
     event(c.env, change.id, 'submitted', session.user.id, { retry: true }),
   ])
   await dispatchApply(c.env, change.id, JSON.parse(change.payload_json))
+  return c.json({ ok: true })
+})
+
+// The author withdraws a change still on its way. A pull request of the bot
+// on the author's repository is closed by the bot; one in the catalog by
+// apply.yml, since only its app may close it.
+changes.post('/:id/withdraw', async (c) => {
+  const session = c.get('session')
+  const change = await getChange(c.env, c.req.param('id'))
+  if (!change || change.author_id !== session.user.id)
+    return c.json({ error: 'not_found' }, 404)
+  if (change.state !== 'open')
+    return c.json({ error: 'not_open' }, 409)
+  const payload = change.payload_json ? JSON.parse(change.payload_json) as { delivery?: string, repo?: string } : {}
+  if ((change.kind === 'store' || change.kind === 'translations') && payload.delivery === 'bot' && change.pr_number && payload.repo && c.env.BOT_TOKEN) {
+    await github(`/repos/${payload.repo}/pulls/${change.pr_number}`, c.env.BOT_TOKEN, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ state: 'closed' }),
+    }).catch(error => console.error('closing the pull request failed', error))
+  }
+  else if (change.pr_number && change.stage === 'review') {
+    await dispatchApply(c.env, change.id, { kind: 'close', pr_number: change.pr_number, submitter: { login: session.user.login, id: session.user.id } })
+      .catch(error => console.error('dispatch failed', error))
+  }
+  const t = now()
+  await c.env.DB.batch([
+    c.env.DB.prepare(`UPDATE changes SET state = 'withdrawn', waiting_on = NULL, updated_at = ? WHERE id = ?`).bind(t, change.id),
+    event(c.env, change.id, 'withdrawn', session.user.id),
+    c.env.DB.prepare(`UPDATE suggestions SET change_id = NULL WHERE change_id = ? AND state = 'accepted'`).bind(change.id),
+  ])
+  await audit(c.env.DB, { actorId: session.user.id, action: 'change.withdraw', subject: change.plugin_id ?? undefined, detail: { change: change.id } })
   return c.json({ ok: true })
 })
