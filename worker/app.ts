@@ -12,6 +12,7 @@ import { hooks } from './routes/hooks'
 import { me } from './routes/me'
 import { owners } from './routes/owners'
 import { plugins } from './routes/plugins'
+import { preflight } from './routes/preflight'
 import { review } from './routes/review'
 import { selfService } from './routes/selfService'
 import { media, store } from './routes/store'
@@ -25,6 +26,7 @@ app.route('/me', me)
 app.route('/media', media)
 app.route('/', store)
 app.route('/', community)
+app.route('/', preflight)
 app.route('/plugins', selfService)
 app.route('/plugins', plugins)
 app.route('/owners', owners)
