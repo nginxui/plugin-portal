@@ -12,6 +12,16 @@ export interface Env {
   SESSION_KEY: string
   DEPLOY_APP_ID: string
   DEPLOY_APP_PRIVATE_KEY: string
+  // The machine user that forks plugin repositories and opens pull requests
+  // for store changes (spec 7.2). Without a token authors get a patch.
+  BOT_LOGIN?: string
+  BOT_TOKEN?: string
+  // Screenshot uploads and the mirror (spec 7.3). Without a bucket uploads
+  // are off and screenshots stay in repositories.
+  MEDIA?: R2Bucket
+  MEDIA_URL?: string
+  // Key for AI provider keys at rest, apart from the session key.
+  AI_KEY?: string
 }
 
 export interface SessionUser {

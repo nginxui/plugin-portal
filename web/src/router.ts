@@ -22,7 +22,8 @@ export const router = createRouter({
           path: 'plugins/:id',
           component: () => import('@/views/plugin/PluginLayout.vue'),
           children: [
-            { path: '', name: 'plugin', component: () => import('@/views/plugin/PluginOverview.vue') },
+            { path: '', name: 'plugin', component: () => import('@/views/plugin/PluginStore.vue') },
+            { path: 'screenshots', name: 'plugin-screenshots', component: () => import('@/views/plugin/PluginScreenshots.vue') },
             { path: 'versions', name: 'plugin-versions', component: () => import('@/views/plugin/PluginVersions.vue') },
             { path: 'signers', name: 'plugin-signers', component: () => import('@/views/plugin/PluginVersions.vue'), props: { section: 'signers' } },
             { path: 'access', name: 'plugin-access', component: () => import('@/views/plugin/PluginAccess.vue') },

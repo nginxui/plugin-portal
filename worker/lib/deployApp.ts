@@ -61,3 +61,13 @@ export async function dispatchApply(env: Env, change: string, payload: unknown):
     body: JSON.stringify({ ref: 'main', inputs: { change, payload: JSON.stringify(payload) } }),
   })
 }
+
+/** Starts the catalog deploy, so a merged store change is listed within minutes. */
+export async function dispatchDeploy(env: Env): Promise<void> {
+  const token = await actionsToken(env)
+  await github(`/repos/${env.CATALOG_REPO}/actions/workflows/${env.DEPLOY_WORKFLOW ?? 'deploy.yml'}/dispatches`, token, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ ref: 'main' }),
+  })
+}

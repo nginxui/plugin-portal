@@ -140,9 +140,13 @@ hooks.post('/deploy', async (c) => {
     if (!change.plugin_id)
       continue
     const published = entries[change.plugin_id]
+    // A store change has no entry to compare; the first deploy after its
+    // merge reads the store source again.
     const done = change.kind === 'delisting'
       ? published === undefined
-      : published !== undefined && listed.has(change.plugin_id) && !!change.entry_json && canonical(published) === canonical(JSON.parse(change.entry_json))
+      : change.kind === 'store' || change.kind === 'translations'
+        ? listed.has(change.plugin_id)
+        : published !== undefined && listed.has(change.plugin_id) && !!change.entry_json && canonical(published) === canonical(JSON.parse(change.entry_json))
     if (!done)
       continue
     live.push(change.id)

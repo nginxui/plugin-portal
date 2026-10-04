@@ -4,9 +4,10 @@ import { Hono } from 'hono'
 import { repoAccess } from '../lib/access'
 import { loadCatalog } from '../lib/catalog'
 import { event, getChange } from '../lib/changes'
-import { dispatchApply } from '../lib/deployApp'
+import { dispatchApply, dispatchDeploy } from '../lib/deployApp'
 import { github } from '../lib/github'
 import { userToken } from '../lib/session'
+import { headOf } from '../lib/store'
 import { now } from '../lib/time'
 import { checkMaintainer, requireSession } from '../middleware/auth'
 
@@ -19,9 +20,54 @@ interface PullResponse {
 
 // Moves a change along by what GitHub and the published catalog say now:
 // its pull request merged or closed, its plugin in the index.
+// A store change that went to the author's repository: merged once its pull
+// request is, or once the default branch holds the document by hand.
+async function refreshRepoStore(env: Env, token: string, change: ChangeRow): Promise<ChangeRow> {
+  const payload = JSON.parse(change.payload_json ?? '{}') as { repo?: string, delivery?: string, repo_doc?: unknown }
+  if (!payload.repo)
+    return change
+  const t = now()
+  let commit: string | null = null
+  if (payload.delivery === 'bot' && change.pr_number) {
+    const pr = await github<PullResponse>(`/repos/${payload.repo}/pulls/${change.pr_number}`, token)
+    if (!pr.merged && pr.state === 'closed') {
+      await env.DB.batch([
+        env.DB.prepare(`UPDATE changes SET state = 'withdrawn', waiting_on = NULL, updated_at = ? WHERE id = ?`).bind(t, change.id),
+        event(env, change.id, 'withdrawn', null, { reason: 'pull_request_closed' }),
+      ])
+      return { ...change, state: 'withdrawn', waiting_on: null }
+    }
+    commit = pr.merged ? pr.merge_commit_sha : null
+  }
+  else if (payload.delivery === 'patch') {
+    const head = await headOf(token, payload.repo).catch(() => null)
+    if (head) {
+      const response = await fetch(`https://raw.githubusercontent.com/${payload.repo}/${head.sha}/plugin.store.json`)
+      const text = response.ok ? await response.text() : ''
+      try {
+        const { $schema: _, ...doc } = JSON.parse(text) as Record<string, unknown>
+        if (JSON.stringify(doc) === JSON.stringify(payload.repo_doc))
+          commit = head.sha
+      }
+      catch {}
+    }
+  }
+  if (!commit)
+    return change
+  await env.DB.batch([
+    env.DB.prepare(`UPDATE changes SET state = 'merged', stage = 'merged', waiting_on = 'system', commit_sha = ?, updated_at = ? WHERE id = ?`).bind(commit, t, change.id),
+    event(env, change.id, 'merged', null, { commit, repo: payload.repo }),
+  ])
+  // The catalog reads the repository at its next build; start one now.
+  await dispatchDeploy(env).catch(error => console.error('deploy dispatch failed', error))
+  return { ...change, state: 'merged', stage: 'merged', waiting_on: 'system', commit_sha: commit }
+}
+
 export async function refresh(env: Env, token: string, change: ChangeRow): Promise<ChangeRow> {
   if (change.state !== 'open' && change.state !== 'merged')
     return change
+  if (change.kind === 'store' && change.state === 'open' && change.stage === 'review' && change.waiting_on === 'author')
+    return refreshRepoStore(env, token, change)
   const t = now()
   if (change.stage === 'review' && change.pr_number) {
     const pr = await github<PullResponse>(`/repos/${env.CATALOG_REPO}/pulls/${change.pr_number}`, token)

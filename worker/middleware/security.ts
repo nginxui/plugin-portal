@@ -16,7 +16,9 @@ export const security: MiddlewareHandler<AppEnv> = async (c, next) => {
       return c.json({ error: 'forbidden_origin' }, 403)
   }
   await next()
-  c.header('Cache-Control', 'no-store')
+  // Images named by their digest never change; everything else is private.
+  if (!c.res.headers.has('Cache-Control') || !c.req.path.startsWith('/api/media/'))
+    c.header('Cache-Control', 'no-store')
   c.header('X-Content-Type-Options', 'nosniff')
   c.header('Referrer-Policy', 'same-origin')
 }
