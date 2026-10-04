@@ -17,8 +17,7 @@
     {
       "binding": "DB",
       "database_name": "portal",
-      // Replace with the id printed by `wrangler d1 create portal`.
-      "database_id": "00000000-0000-0000-0000-000000000000",
+      "database_id": "aebdd686-03c1-4ef0-8146-adc51e848155",
       "migrations_dir": "migrations"
     }
   ],
