@@ -24,6 +24,8 @@ function routes(): Route[] {
         return undefined
       const body = JSON.parse(await new Response(init.body).text())
       prompts.push({ system: body.system, user: body.messages[0].content })
+      if (body.system.includes('review a change'))
+        return json({ content: [{ type: 'text', text: JSON.stringify({ findings: [{ severity: 'ok', text: 'The host matches.', sources: [{ label: 'src/geo.go line 2', path: 'src/geo.go', line: 2 }] }, { severity: 'warn', text: 'The README mentions statistics.', sources: [{ label: 'README.md line 1', path: 'README.md', line: 1 }, { label: 'bad', path: '../etc/passwd' }] }] }) }], usage: { input_tokens: 100, output_tokens: 50 } })
       return json({ content: [{ type: 'text', text: '国ごとにアクセスを許可または拒否します。' }], usage: { input_tokens: 10, output_tokens: 5 } })
     },
     url => url.pathname === `/repos/${env.CATALOG_REPO}/installation` ? json({ id: 9 }) : undefined,
@@ -34,6 +36,10 @@ function routes(): Route[] {
       dispatched.push(JSON.parse(await new Response(init.body).text()).inputs)
       return new Response(null, { status: 204 })
     },
+    url => url.href === `${RAW}/octo-author/geoip/v1.0.0/plugin.json` ? json({ version: '1.0.0', permissions: ['network'], network_hosts: ['api.geo.example'] }) : undefined,
+    url => url.href === `${RAW}/octo-author/geoip/v1.0.0/README.md` ? new Response('Sends anonymous statistics.') : undefined,
+    url => url.href === `${RAW}/octo-author/geoip/v1.0.0/src/geo.go` ? new Response('package geo\nconst api = "https://api.geo.example"\n') : undefined,
+    url => url.pathname === '/search/code' ? json({ items: [{ path: 'src/geo.go' }] }) : undefined,
     url => url.hostname === 'raw.githubusercontent.com' ? new Response('not found', { status: 404 }) : undefined,
   ]
 }
@@ -121,5 +127,26 @@ describe('community translation', () => {
     const cookie = await maintainer()
     await call(`/api/plugins/${ID}/community`, { method: 'PATCH', mutate: true, cookie, json: { enabled: true } })
     expect((await call(`/api/plugins/${ID}/suggestions`, { method: 'POST', mutate: true, cookie, json: { field: 'name', locale: 'ja_JP', text: '公式 GeoIP' } })).status).toBe(422)
+  })
+})
+
+describe('ai pre-review', () => {
+  it('summarizes a change for maintainers with sources in the repository', async () => {
+    const cookie = await maintainer()
+    await addProvider(cookie)
+    const t = Math.floor(Date.now() / 1000)
+    await env.DB.prepare(`INSERT INTO changes (id, plugin_id, author_id, kind, class, entry_json, state, stage, waiting_on, created_at, updated_at) VALUES ('c_ai000000000001', ?, 1, 'new_listing', 'reviewed', ?, 'open', 'review', 'maintainer', ?, ?)`)
+      .bind(ID, JSON.stringify({ id: ID, repo: 'octo-author/geoip', tag: 'v1.0.0' }), t, t)
+      .run()
+    expect(await (await call('/api/review/c_ai000000000001/ai?locale=en', { cookie })).json()).toEqual({ enabled: true, review: null })
+    const made = await (await call('/api/review/c_ai000000000001/ai', { method: 'POST', mutate: true, cookie, json: { locale: 'zh_CN' } })).json() as { review: { findings: { severity: string, sources: { label: string, url?: string }[] }[] } }
+    expect(made.review.findings.map(f => f.severity)).toEqual(['warn', 'ok'])
+    expect(made.review.findings[0].sources).toEqual([{ label: 'README.md line 1', url: 'https://github.com/octo-author/geoip/blob/v1.0.0/README.md#L1' }, { label: 'bad' }])
+    const sent = prompts.at(-1)!
+    expect(sent.system).toContain('Simplified Chinese')
+    expect(sent.user).toContain('src/geo.go:2: const api = "https://api.geo.example"')
+    expect(sent.user).toContain('1: Sends anonymous statistics.')
+    const kept = await (await call('/api/review/c_ai000000000001/ai?locale=zh_CN', { cookie })).json() as { review: { findings: unknown[] } }
+    expect(kept.review.findings).toHaveLength(2)
   })
 })

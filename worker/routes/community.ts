@@ -71,7 +71,7 @@ community.post('/ai/draft', requireSession, async (c) => {
 // user's quota left today.
 community.get('/ai/status', requireSession, async (c) => {
   const provider = await defaultProvider(c.env)
-  if (!provider || !c.env.AI_KEY)
+  if (!provider)
     return c.json({ enabled: false })
   const usage = await c.env.DB.prepare('SELECT requests FROM ai_usage WHERE user_id = ? AND day = ?').bind(c.get('session').user.id, new Date().toISOString().slice(0, 10)).first<{ requests: number }>()
   return c.json({ enabled: true, provider: presentProvider(provider).name, remaining: Math.max(0, provider.daily_quota - (usage?.requests ?? 0)) })
