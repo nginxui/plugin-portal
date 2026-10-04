@@ -132,6 +132,12 @@ const status = computed<{ type: 'success' | 'info' | 'warning' | 'error', text: 
   return null
 })
 
+// A maintainer who rejects leaves a reason; a pull request closed on GitHub has none.
+const rejectReason = computed(() => {
+  const found = [...(data.value?.events ?? [])].reverse().find(e => e.stage === 'rejected')
+  return typeof found?.detail?.comment === 'string' ? found.detail.comment : ''
+})
+
 const problems = computed(() => (change.value?.outcome?.problems ?? '').split('\n').map(line => line.replace(/^[-*]\s*/, '').trim()).filter(Boolean))
 
 function eventText(e: ChangeEvent): string {
@@ -143,7 +149,7 @@ function eventText(e: ChangeEvent): string {
       return e.detail?.outcome === 'rejected' || e.detail?.outcome === 'checks_failed' ? $gettext('Checks found problems') : $gettext('Checks could not finish')
     case 'review': return $gettext('Checks passed, pull request #%{n} opened', { n: String(e.detail?.prNumber ?? '') })
     case 'merged': return selfService.value ? $gettext('Committed to the catalog') : $gettext('Merged by a maintainer')
-    case 'rejected': return $gettext('Pull request closed')
+    case 'rejected': return e.detail?.comment ? $gettext('Rejected by a maintainer') : $gettext('Pull request closed')
     case 'live': return selfService.value ? $gettext('Live in the catalog') : $gettext('Listed in the catalog')
     default: return e.stage
   }
@@ -184,7 +190,10 @@ async function retry() {
       <div class="cols">
         <AFlex vertical gap="middle" class="col-main">
           <AAlert v-if="status" :type="status.type" show-icon :title="status.text">
-            <template v-if="problems.length || (change.outcome?.outcome === 'rejected' && change.outcome.message)" #description>
+            <template v-if="problems.length || rejectReason || (change.outcome?.outcome === 'rejected' && change.outcome.message)" #description>
+              <div v-if="rejectReason" class="mb-2 whitespace-pre-wrap">
+                {{ $gettext('Reason: %{reason}', { reason: rejectReason }) }}
+              </div>
               <div v-if="change.outcome?.outcome === 'rejected' && change.outcome.message" class="mb-2">
                 {{ change.outcome.message }}
               </div>

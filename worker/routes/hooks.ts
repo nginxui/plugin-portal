@@ -89,7 +89,7 @@ hooks.post('/apply', async (c) => {
     ),
     event(c.env, change.id, opened ? 'review' : 'checks', null, { outcome: report.outcome, prNumber: opened ? report.pr_number : undefined, runUrl: outcome.runUrl }),
   ])
-  await audit(c.env.DB, { actorId: null, action: 'change.applied', subject: change.plugin_id ?? undefined, detail: { change: change.id, outcome: report.outcome, run: claims.run_id } })
+  await audit(c.env.DB, { actorId: null, action: 'change.applied', subject: change.plugin_id ?? undefined, detail: { change: change.id, outcome: report.outcome, pr: opened ? report.pr_number : undefined, run: claims.run_id } })
   return c.json({ ok: true })
 })
 
@@ -154,6 +154,6 @@ hooks.post('/deploy', async (c) => {
   }
   if (statements.length)
     await c.env.DB.batch(statements)
-  await audit(c.env.DB, { actorId: null, action: 'catalog.deployed', subject: commit ?? undefined, detail: { live, run: claims.run_id } })
+  await audit(c.env.DB, { actorId: null, action: 'catalog.deployed', subject: commit ?? undefined, detail: { commit, live, run: claims.run_id } })
   return c.json({ live })
 })

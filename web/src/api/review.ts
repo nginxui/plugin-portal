@@ -19,8 +19,20 @@ export interface ReviewDetail {
   events: ChangeEvent[]
 }
 
+export interface RecentChange extends Change {
+  author: string | null
+}
+
 export function getQueue() {
-  return api<{ changes: QueueItem[] }>('/review/queue')
+  return api<{ changes: QueueItem[], recent: RecentChange[] }>('/review/queue')
+}
+
+export function approveBatch(ids: string[]) {
+  return api<{ results: Record<string, string> }>('/review/approve-batch', { method: 'POST', json: { ids } })
+}
+
+export function rejectChange(id: string, comment: string) {
+  return api<{ ok: boolean }>(`/review/${encodeURIComponent(id)}/reject`, { method: 'POST', json: { comment } })
 }
 
 export function getReview(id: string) {
@@ -37,4 +49,16 @@ export function requestChanges(id: string, comment: string) {
 
 export function commentOnChange(id: string, comment: string) {
   return api<{ ok: boolean }>(`/review/${encodeURIComponent(id)}/comment`, { method: 'POST', json: { comment } })
+}
+
+export interface CatalogItem {
+  id: string
+  name: Record<string, string> | null
+  owner: string | null
+  state: string
+  yanked: boolean
+}
+
+export function getCatalog() {
+  return api<{ plugins: CatalogItem[] }>('/review/catalog')
 }

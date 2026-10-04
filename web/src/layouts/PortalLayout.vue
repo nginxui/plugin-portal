@@ -1,11 +1,12 @@
 <script setup lang="ts">
 import type { MenuProps } from 'antdv-next'
-import { breakpointsAntDesign, useBreakpoints } from '@vueuse/core'
+import { breakpointsAntDesign, onKeyStroke, useBreakpoints } from '@vueuse/core'
 import { computed, h, ref, watch } from 'vue'
 import { useGettext } from 'vue3-gettext'
 import { useRoute, useRouter } from 'vue-router'
 import { $gettext, languages, setLanguage } from '@/lib/gettext'
 import { isDark, toggleTheme } from '@/lib/theme'
+import { usePaletteStore } from '@/stores/palette'
 import { useReviewStore } from '@/stores/review'
 import { useSessionStore } from '@/stores/session'
 
@@ -23,6 +24,14 @@ watch(() => route.fullPath, () => {
 function icon(name: string) {
   return h('span', { class: `${name} text-4` })
 }
+
+const palette = usePaletteStore()
+onKeyStroke('k', (e) => {
+  if (!(e.metaKey || e.ctrlKey) || e.altKey || e.shiftKey)
+    return
+  e.preventDefault()
+  palette.toggle()
+})
 
 const reviewStore = useReviewStore()
 watch(() => session.isMaintainer, (isMaintainer) => {
@@ -48,6 +57,7 @@ const menuItems = computed<MenuProps['items']>(() => {
       label: $gettext('Maintenance'),
       children: [
         { key: '/review', icon: icon('i-tabler-inbox'), label: withBadge($gettext('Review queue'), reviewStore.pending) },
+        { key: '/audit', icon: icon('i-tabler-history'), label: $gettext('Audit log') },
       ],
     })
   }
@@ -111,6 +121,10 @@ async function onUserMenu({ key }: { key: string | number }) {
         <AButton v-if="isMobile" type="text" class="mr-auto" :aria-label="$gettext('Open menu')" @click="drawerOpen = true">
           <span class="i-tabler-menu-2 text-5" />
         </AButton>
+        <AButton type="text" :aria-label="$gettext('Search and commands')" @click="palette.show()">
+          <span class="i-tabler-search text-4" />
+          <span v-if="!isMobile" class="search-hint"><kbd>{{ palette.modifier }}</kbd><kbd>K</kbd></span>
+        </AButton>
         <ADropdown :menu="{ items: languageItems, selectable: true, selectedKeys: [gettext.current], onClick: onLanguageMenu }">
           <AButton type="text" :aria-label="$gettext('Language')">
             <span class="i-tabler-world text-4" />
@@ -133,6 +147,7 @@ async function onUserMenu({ key }: { key: string | number }) {
       <ALayoutContent>
         <RouterView />
       </ALayoutContent>
+      <CommandPalette />
     </ALayout>
   </ALayout>
 </template>
@@ -174,5 +189,20 @@ async function onUserMenu({ key }: { key: string | number }) {
   top: 0;
   z-index: 10;
   border-bottom: 1px solid var(--portal-border);
+}
+.search-hint {
+  display: inline-flex;
+  gap: 2px;
+  opacity: 0.6;
+}
+
+.search-hint kbd {
+  display: inline-block;
+  min-width: 16px;
+  padding: 0 4px;
+  border: 1px solid var(--portal-border-strong);
+  border-radius: 4px;
+  font: 11px/16px ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  text-align: center;
 }
 </style>

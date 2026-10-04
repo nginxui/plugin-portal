@@ -23,6 +23,114 @@ msgstr "最多三个。推荐分类根据插件的能力得出。"
 msgid "%{n} of %{max} chosen"
 msgstr "已选 %{n}/%{max}"
 
+msgid "Reviews"
+msgstr "审核"
+
+msgid "Plugins"
+msgstr "插件"
+
+msgid "Authors"
+msgstr "作者"
+
+msgid "Actions"
+msgstr "操作"
+
+msgid "newest version yanked"
+msgstr "最新版本已撤回"
+
+msgid "listed"
+msgstr "已上架"
+
+msgid "delisted"
+msgstr "已下架"
+
+msgid "in review"
+msgstr "审核中"
+
+msgid "High risk"
+msgstr "高风险"
+
+msgid "Waiting for the author"
+msgstr "等待作者"
+
+msgid "Waiting for review"
+msgstr "待审核"
+
+msgid "%{name}: %{kind}"
+msgstr "%{name}：%{kind}"
+
+msgid "%{state}, waiting %{time}"
+msgstr "%{state}，已等待 %{time}"
+
+msgid "%{id}, %{state}"
+msgstr "%{id}，%{state}"
+
+msgid "%{n} plugins, their actions in the audit log"
+msgstr "%{n} 个插件，查看其在审计日志中的操作"
+
+msgid "My plugins"
+msgstr "我的插件"
+
+msgid "Plugins you manage"
+msgstr "你管理的插件"
+
+msgid "Submit a plugin"
+msgstr "提交插件"
+
+msgid "List a new plugin in the catalog"
+msgstr "将新插件上架到插件目录"
+
+msgid "Organizations"
+msgstr "组织"
+
+msgid "Owners of your plugins"
+msgstr "你的插件所属的所有者"
+
+msgid "Review queue"
+msgstr "审核队列"
+
+msgid "Changes waiting for a review"
+msgstr "等待审核的改动"
+
+msgid "Audit log"
+msgstr "审计日志"
+
+msgid "Every action in the developer portal"
+msgstr "开发者中心中的每项操作"
+
+msgid "Search the audit log for “%{q}”"
+msgstr "在审计日志中搜索“%{q}”"
+
+msgid "Reviews, self service changes and catalog updates"
+msgstr "包含审核、自助改动与目录更新"
+
+msgid "Command palette"
+msgstr "命令面板"
+
+msgid "Search reviews, plugins, authors and actions"
+msgstr "搜索审核、插件、作者与操作"
+
+msgid "Search plugins and actions"
+msgstr "搜索插件与操作"
+
+msgid "Search"
+msgstr "搜索"
+
+msgid "↵ Open"
+msgstr "↵ 打开"
+
+msgid "Nothing matches “%{q}”."
+msgstr "没有与“%{q}”匹配的结果。"
+
+msgid "Select"
+msgstr "选择"
+
+msgid "Open"
+msgstr "打开"
+
+msgid "Open in a new tab"
+msgstr "在新标签页打开"
+
 msgid ""
 "This is not a minisign public key. Paste the whole content of primary.pub."
 msgstr "这不是 minisign 公钥，请粘贴 primary.pub 的完整内容。"
@@ -167,20 +275,8 @@ msgstr "开发者文档"
 msgid "Plugin catalog"
 msgstr "插件目录"
 
-msgid "My plugins"
-msgstr "我的插件"
-
-msgid "Submit a plugin"
-msgstr "提交插件"
-
-msgid "Organizations"
-msgstr "组织"
-
 msgid "Maintenance"
 msgstr "维护"
-
-msgid "Review queue"
-msgstr "审核队列"
 
 msgid "GitHub profile"
 msgstr "GitHub 个人主页"
@@ -191,6 +287,9 @@ msgstr "退出登录"
 msgid "Open menu"
 msgstr "打开菜单"
 
+msgid "Search and commands"
+msgstr "搜索与命令"
+
 msgid "Language"
 msgstr "语言"
 
@@ -199,6 +298,69 @@ msgstr "切换深色模式"
 
 msgid "Account menu"
 msgstr "账户菜单"
+
+msgid "Review"
+msgstr "审核"
+
+msgid "Self service"
+msgstr "自助改动"
+
+msgid "Submission"
+msgstr "提交"
+
+msgid "System"
+msgstr "系统"
+
+msgid "Sign in"
+msgstr "登录"
+
+msgid "Opened pull request #%{n} for review"
+msgstr "已开启拉取请求 #%{n} 等待审核"
+
+msgid "Committed the change to the catalog"
+msgstr "已将改动提交到插件目录"
+
+msgid "The checks found problems"
+msgstr "检查发现问题"
+
+msgid "The change was refused by the catalog rules"
+msgstr "改动不符合插件目录的规则"
+
+msgid "The change is not supported yet"
+msgstr "暂不支持该改动"
+
+msgid "The checks could not finish"
+msgstr "检查未能完成"
+
+msgid "Signed in"
+msgstr "登录"
+
+msgid "Submitted the plugin for review"
+msgstr "提交插件审核"
+
+msgid "Published the catalog, %{n} changes went live"
+msgstr "发布插件目录，%{n} 项改动生效"
+
+msgid "Approved and merged #%{n}"
+msgstr "通过并合并 #%{n}"
+
+msgid "Requested changes on #%{n}"
+msgstr "要求修改 #%{n}"
+
+msgid "Rejected #%{n}"
+msgstr "拒绝 #%{n}"
+
+msgid "Yanked %{versions}"
+msgstr "撤回 %{versions}"
+
+msgid "Restored %{versions}"
+msgstr "恢复 %{versions}"
+
+msgid "Revoked signer %{ids}"
+msgstr "撤销签名者 %{ids}"
+
+msgid "Set the categories to %{list}"
+msgstr "将分类改为 %{list}"
 
 msgid "Certificates"
 msgstr "证书"
@@ -532,6 +694,9 @@ msgstr "检查通过，已创建拉取请求 #%{n}"
 msgid "Merged by a maintainer"
 msgstr "维护者已合并"
 
+msgid "Rejected by a maintainer"
+msgstr "维护者已拒绝"
+
 msgid "Pull request closed"
 msgstr "拉取请求已关闭"
 
@@ -543,6 +708,9 @@ msgstr "未找到该变更"
 
 msgid "Submitted %{time}"
 msgstr "%{time}提交"
+
+msgid "Reason: %{reason}"
+msgstr "原因：%{reason}"
 
 msgid "Run the checks again"
 msgstr "重新运行检查"
@@ -580,6 +748,98 @@ msgstr ""
 msgid "All"
 msgstr "全部"
 
+msgid "Last 7 days"
+msgstr "最近 7 天"
+
+msgid "Last 30 days"
+msgstr "最近 30 天"
+
+msgid "All time"
+msgstr "全部时间"
+
+msgid "%{n} records in the last 7 days"
+msgstr "最近 7 天共 %{n} 条"
+
+msgid "%{n} records in the last 30 days"
+msgstr "最近 30 天共 %{n} 条"
+
+msgid "%{n} records"
+msgstr "共 %{n} 条"
+
+msgid "Developer portal"
+msgstr "开发者中心"
+
+msgid ""
+"Every action in the developer portal. Actions that change the catalog link "
+"to a commit or pull request that can be checked on GitHub."
+msgstr ""
+"开发者中心中的每项操作。改动插件目录的操作都对应一个提交或拉取请求，可在 "
+"GitHub 上核对。"
+
+msgid "Export CSV"
+msgstr "导出 CSV"
+
+msgid "Export JSON"
+msgstr "导出 JSON"
+
+msgid "The audit log could not be loaded."
+msgstr "无法加载审计日志。"
+
+msgid "Actor"
+msgstr "操作者"
+
+msgid "Time range"
+msgstr "时间范围"
+
+msgid "Time"
+msgstr "时间"
+
+msgid "Kind"
+msgstr "类型"
+
+msgid "Action"
+msgstr "操作"
+
+msgid "Record"
+msgstr "记录"
+
+msgid "Portal"
+msgstr "开发者中心"
+
+msgid "No records match these filters."
+msgstr "没有符合筛选条件的记录。"
+
+msgid "Newer"
+msgstr "较新"
+
+msgid "Older"
+msgstr "较早"
+
+msgid "Record details"
+msgstr "记录详情"
+
+msgid "Subject"
+msgstr "对象"
+
+msgid "Change %{id}"
+msgstr "改动 %{id}"
+
+msgid "Select a record to see its details."
+msgstr "选择一条记录以查看详情。"
+
+msgid "Retention"
+msgstr "保存"
+
+msgid ""
+"The catalog follows its git history. Should this log be lost, every catalog "
+"change can still be traced from its commits and pull requests."
+msgstr ""
+"插件目录的改动以 git 历史为准，即使日志丢失，也可以从提交与拉取请求中追溯每项"
+"改动。"
+
+msgid "Sign ins and other portal actions are recorded only here."
+msgstr "登录等开发者中心内的操作只记录在此日志中。"
+
 msgid "Needs changes"
 msgstr "需修改"
 
@@ -607,9 +867,6 @@ msgstr "进行中"
 
 msgid "View"
 msgstr "查看"
-
-msgid "Plugins"
-msgstr "插件"
 
 msgid "Filter by owner"
 msgstr "按所有者筛选"
@@ -670,9 +927,6 @@ msgstr "个人账号"
 msgid "%{n} plugin"
 msgid_plural "%{n} plugins"
 msgstr[0] "%{n} 个插件"
-
-msgid "Open"
-msgstr "打开"
 
 msgid "Organization not found"
 msgstr "未找到该组织"
@@ -915,8 +1169,13 @@ msgid ""
 msgstr ""
 "签名密钥泄露或丢失时，请撤销对应的签名者。已撤销的签名者需要由维护者恢复。"
 
-msgid "Once yanked, these versions leave the catalog at its next update and can no longer be installed. All of them are changed in one update, and you can restore them at any time."
-msgstr "撤回后，这些版本会在目录下次更新时一并下架，无法再安装。它们在同一次更新中生效，之后可随时恢复。"
+msgid ""
+"Once yanked, these versions leave the catalog at its next update and can no "
+"longer be installed. All of them are changed in one update, and you can "
+"restore them at any time."
+msgstr ""
+"撤回后，这些版本会在目录下次更新时一并下架，无法再安装。它们在同一次更新中生"
+"效，之后可随时恢复。"
 
 msgid ""
 "Once yanked, this version leaves the catalog at its next update and can no "
@@ -924,7 +1183,9 @@ msgid ""
 msgstr ""
 "撤回后，该版本会在下次目录更新时下架，用户将无法再安装。你可以随时恢复。"
 
-msgid "Once restored, these versions return to the catalog together at its next update."
+msgid ""
+"Once restored, these versions return to the catalog together at its next "
+"update."
 msgstr "恢复后，这些版本会在目录下次更新时一并回到目录。"
 
 msgid "Once restored, this version returns to the catalog at its next update."
@@ -947,12 +1208,6 @@ msgstr "会随改动一并记录，例如：升级后配置文件无法读取，
 
 msgid "Closed"
 msgstr "已关闭"
-
-msgid "Waiting for the author"
-msgstr "等待作者"
-
-msgid "Waiting for review"
-msgstr "待审核"
 
 msgid "Author"
 msgstr "作者"
@@ -992,6 +1247,9 @@ msgstr "无法批准该变更，请重试。"
 msgid "The request could not be sent. Please try again."
 msgstr "请求发送失败，请重试。"
 
+msgid "The change could not be rejected. Please try again."
+msgstr "无法拒绝该改动，请重试。"
+
 msgid "approved"
 msgstr "已批准"
 
@@ -1003,6 +1261,9 @@ msgstr "高风险变更"
 
 msgid "submitted by @%{login} %{time}"
 msgstr "@%{login} %{time}提交"
+
+msgid "Reject"
+msgstr "拒绝"
 
 msgid "Request changes"
 msgstr "要求修改"
@@ -1098,6 +1359,19 @@ msgstr "作者会在 GitHub 和开发者中心看到这条意见，并可以在�
 msgid "What should the author change?"
 msgstr "需要作者修改什么？"
 
+msgid "Reject the change"
+msgstr "拒绝改动"
+
+msgid ""
+"Pull request #%{n} is closed with your reason as its last comment. The "
+"author cannot resubmit this change and starts a new submission instead."
+msgstr ""
+"拉取请求 #%{n} 将被关闭，你填写的原因会作为最后一条评论。作者无法重新提交此改"
+"动，需要发起新的提交。"
+
+msgid "Why is the change rejected?"
+msgstr "拒绝的原因是什么？"
+
 msgid "All in progress"
 msgstr "全部进行中"
 
@@ -1110,8 +1384,39 @@ msgstr "未通过"
 msgid "Passed"
 msgstr "已通过"
 
-msgid "New listings and changes that need a review, highest risk first."
-msgstr "新上架与需要审核的变更，按风险排序。"
+msgid "Approve %{n} changes"
+msgstr "通过 %{n} 项改动"
+
+msgid "Approve %{name}"
+msgstr "通过 %{name}"
+
+msgid "Request changes on %{name}"
+msgstr "要求修改 %{name}"
+
+msgid "Tell the author what to change."
+msgstr "请告诉作者需要修改什么。"
+
+msgid "Merged. The change takes effect at the next catalog update."
+msgstr "已合并，改动将在目录下次更新时生效。"
+
+msgid "The author was asked for changes."
+msgstr "已要求作者修改。"
+
+msgid "%{merged} merged, %{left} could not be merged and stay in the queue."
+msgstr "已合并 %{merged} 项，%{left} 项无法合并，仍留在队列中。"
+
+msgid "%{n} changes merged."
+msgstr "已合并 %{n} 项改动。"
+
+msgid "The action could not be completed. Please try again."
+msgstr "操作未能完成，请重试。"
+
+msgid ""
+"New listings and changes that need a review, highest risk first. Self "
+"service changes take effect directly and are kept in the audit log."
+msgstr ""
+"新上架与需要审核的改动，按风险从高到低排列。自助改动直接生效，记录在审计日志"
+"中。"
 
 msgid "The queue could not be loaded."
 msgstr "无法加载审核队列。"
@@ -1119,14 +1424,23 @@ msgstr "无法加载审核队列。"
 msgid "Plugin ID or author"
 msgstr "插件 ID 或作者"
 
-msgid "Search"
-msgstr "搜索"
+msgid "%{n} selected"
+msgstr "已选择 %{n} 项"
+
+msgid "All low risk with their checks passed"
+msgstr "均为低风险，检查已通过"
+
+msgid "Approve all"
+msgstr "全部通过"
+
+msgid "Select all low risk changes"
+msgstr "选择全部低风险改动"
 
 msgid "Risk"
 msgstr "风险"
 
-msgid "Change"
-msgstr "更换"
+msgid "Kind of change"
+msgstr "改动"
 
 msgid "Plugin"
 msgstr "插件"
@@ -1134,20 +1448,64 @@ msgstr "插件"
 msgid "Waiting"
 msgstr "等待"
 
+msgid "Select %{name}"
+msgstr "选择 %{name}"
+
 msgid "High"
 msgstr "高"
 
 msgid "Normal"
 msgstr "一般"
 
-msgid "Review"
-msgstr "审核"
-
 msgid "Nothing is waiting here."
 msgstr "这里没有待处理的变更。"
 
 msgid "Move"
 msgstr "上下移动"
+
+msgid "Approve"
+msgstr "通过"
+
+msgid "Approve selected"
+msgstr "批量通过"
+
+msgid "Recent self service changes"
+msgstr "最近的自助改动"
+
+msgid "@%{login}, %{time}"
+msgstr "@%{login}，%{time}"
+
+msgid "No self service changes yet."
+msgstr "暂无自助改动。"
+
+msgid "Approving together"
+msgstr "批量通过"
+
+msgid ""
+"Only low risk changes whose checks all passed can be selected and approved "
+"together, such as name translations."
+msgstr "只有低风险且检查全部通过的改动可以批量通过，例如名称翻译。"
+
+msgid ""
+"New listings, primary key rotations and repository moves are reviewed one by "
+"one on their own page."
+msgstr "新上架、主公钥轮换与仓库迁移需要在各自的页面逐项审核。"
+
+msgid ""
+"Each pull request is approved and merged as you, one after another. A change "
+"that cannot be merged stays in the queue."
+msgstr "将以你的身份依次通过并合并每个拉取请求。无法合并的改动会留在队列中。"
+
+msgid ""
+"Approve pull request #%{n} and merge it as you. The change takes effect at "
+"the next catalog update."
+msgstr "以你的身份通过并合并拉取请求 #%{n}，改动将在目录下次更新时生效。"
+
+msgid "Comment, optional"
+msgstr "评论（可选）"
+
+msgid "The author is notified on GitHub and can resubmit from the change page."
+msgstr "作者会在 GitHub 上收到通知，可在改动页面重新提交。"
 
 msgid "Sign in was cancelled on GitHub."
 msgstr "已在 GitHub 上取消登录。"
@@ -1248,6 +1606,9 @@ msgstr "已有带版本标签的 GitHub Release，其中包含签名的安装包
 msgid "The primary public key from nginx-ui plugin key init is at hand."
 msgstr "准备好 nginx-ui plugin key init 生成的主公钥。"
 
+msgid "Change"
+msgstr "更换"
+
 msgid ""
 "The content of primary.pub, created with nginx-ui plugin key init. It "
 "verifies the signer certificates of your releases."
@@ -1310,6 +1671,9 @@ msgstr ""
 
 msgid "Submit for review"
 msgstr "提交审核"
+
+#~ msgid "New listings and changes that need a review, highest risk first."
+#~ msgstr "新上架与需要审核的变更，按风险排序。"
 
 #~ msgid "Categories become %{list}"
 #~ msgstr "分类改为 %{list}"
