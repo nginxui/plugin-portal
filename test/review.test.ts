@@ -18,6 +18,8 @@ function pullRoutes(): Route[] {
       calls.push({ method, path: url.pathname, body })
       if (url.pathname === PR && method === 'GET')
         return json({ number: 12, state: 'open', merged: false, mergeable: true, mergeable_state: 'clean', html_url: 'https://github.com/x/pull/12', title: 'feat(plugins): list io.github.octo.hello', head: { sha: 'abc123' } })
+      if (url.pathname === PR && method === 'PATCH')
+        return json({ number: 12, state: 'closed' })
       if (url.pathname === `${PR}/reviews` && method === 'POST')
         return json({ id: 1 })
       if (url.pathname === `${PR}/reviews`)
@@ -45,15 +47,15 @@ async function maintainer() {
   return cookie
 }
 
-async function seedChange() {
+async function seedChange(kind = 'new_listing') {
   const t = Math.floor(Date.now() / 1000)
   await env.DB.batch([
     env.DB.prepare(`INSERT INTO users (id, login, created_at, last_seen_at) VALUES (77, 'octo', ?, ?)`).bind(t, t),
     env.DB.prepare(`INSERT INTO plugins (plugin_id, repo_full_name, state, created_by, created_at, updated_at) VALUES ('io.github.octo.hello', 'octo/hello', 'draft', 77, ?, ?)`).bind(t, t),
     env.DB.prepare(
       `INSERT INTO changes (id, plugin_id, author_id, kind, class, state, stage, waiting_on, pr_number, created_at, updated_at)
-       VALUES ('c_review00000001', 'io.github.octo.hello', 77, 'new_listing', 'reviewed', 'open', 'review', 'maintainer', 12, ?, ?)`,
-    ).bind(t, t),
+       VALUES ('c_review00000001', 'io.github.octo.hello', 77, ?, 'reviewed', 'open', 'review', 'maintainer', 12, ?, ?)`,
+    ).bind(kind, t, t),
   ])
 }
 
@@ -113,5 +115,30 @@ describe('review', () => {
     expect(response.status).toBe(200)
     expect(calls.find(c => c.method === 'POST' && c.path.endsWith('/reviews'))?.body).toMatchObject({ event: 'REQUEST_CHANGES', body: 'Please add a README.' })
     expect(await env.DB.prepare(`SELECT waiting_on FROM changes WHERE id = 'c_review00000001'`).first()).toEqual({ waiting_on: 'author' })
+  })
+
+  it('rejects with a reason and closes the pull request', async () => {
+    const cookie = await maintainer()
+    await seedChange()
+    expect((await call('/api/review/c_review00000001/reject', { method: 'POST', mutate: true, cookie, json: {} })).status).toBe(422)
+    const response = await call('/api/review/c_review00000001/reject', { method: 'POST', mutate: true, cookie, json: { comment: 'This copies another plugin.' } })
+    expect(response.status).toBe(200)
+    expect(calls.find(c => c.method === 'POST' && c.path.endsWith('/comments'))?.body).toEqual({ body: 'This copies another plugin.' })
+    expect(calls.find(c => c.method === 'PATCH')?.body).toEqual({ state: 'closed' })
+    expect(await env.DB.prepare(`SELECT state, waiting_on FROM changes WHERE id = 'c_review00000001'`).first()).toEqual({ state: 'rejected', waiting_on: null })
+    expect(await env.DB.prepare(`SELECT count(*) AS n FROM audit WHERE action = 'review.reject'`).first()).toEqual({ n: 1 })
+  })
+
+  it('approves together only low risk changes', async () => {
+    const cookie = await maintainer()
+    await seedChange()
+    const high = await (await call('/api/review/approve-batch', { method: 'POST', mutate: true, cookie, json: { ids: ['c_review00000001', 'c_missing'] } })).json()
+    expect(high).toEqual({ results: { c_review00000001: 'not_low_risk', c_missing: 'not_in_review' } })
+    expect(calls.some(c => c.path.endsWith('/merge'))).toBe(false)
+
+    await env.DB.prepare(`UPDATE changes SET kind = 'names' WHERE id = 'c_review00000001'`).run()
+    const low = await (await call('/api/review/approve-batch', { method: 'POST', mutate: true, cookie, json: { ids: ['c_review00000001'] } })).json()
+    expect(low).toEqual({ results: { c_review00000001: 'merged' } })
+    expect((await call('/api/review/approve-batch', { method: 'POST', mutate: true, cookie, json: { ids: [] } })).status).toBe(422)
   })
 })

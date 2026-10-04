@@ -26,7 +26,7 @@ export interface ChangeEvent {
   stage: string
   actor: string | null
   at: number
-  detail: { outcome?: string, prNumber?: number, retry?: boolean, commit?: string, runUrl?: string | null } | null
+  detail: { outcome?: string, prNumber?: number, retry?: boolean, commit?: string, runUrl?: string | null, comment?: string } | null
 }
 
 export function getChanges() {

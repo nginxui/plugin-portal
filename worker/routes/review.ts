@@ -2,6 +2,7 @@ import type { AppEnv, Env } from '../env'
 import type { ChangeRow } from '../lib/changes'
 import { Hono } from 'hono'
 import { audit } from '../lib/audit'
+import { loadCatalog, repoOf } from '../lib/catalog'
 import { event, getChange } from '../lib/changes'
 import { github, GitHubError } from '../lib/github'
 import { userToken } from '../lib/session'
@@ -68,6 +69,11 @@ export const review = new Hono<AppEnv>()
 review.use('*', requireSession, requireMaintainer)
 
 review.get('/queue', async (c) => {
+  const recent = c.env.DB.prepare(
+    `SELECT c.*, u.login AS author_login, NULL AS repo_full_name FROM changes c
+     LEFT JOIN users u ON u.id = c.author_id
+     WHERE c.class = 'self_service' ORDER BY c.created_at DESC LIMIT 5`,
+  ).all<QueueRow>()
   const { results } = await c.env.DB.prepare(
     `SELECT c.*, u.login AS author_login, p.repo_full_name FROM changes c
      LEFT JOIN users u ON u.id = c.author_id
@@ -82,7 +88,33 @@ review.get('/queue', async (c) => {
       repo: row.repo_full_name,
       risk: risk(row),
     })),
+    recent: (await recent).results.map(row => ({ ...present(c.env, row), author: row.author_login })),
   })
+})
+
+// Every plugin of the catalog and those still in review, for the command
+// palette.
+review.get('/catalog', async (c) => {
+  const [catalog, drafts] = await Promise.all([
+    loadCatalog(c.env),
+    c.env.DB.prepare(`SELECT plugin_id, repo_full_name, state FROM plugins WHERE state != 'listed'`).all<{ plugin_id: string, repo_full_name: string | null, state: string }>(),
+  ])
+  const listed = catalog.plugins.map(p => ({
+    id: p.id,
+    name: p.name,
+    owner: repoOf(p.repository_url)?.split('/')[0] ?? null,
+    state: 'listed',
+    yanked: !!p.releases?.length && p.releases.every(r => r.yanked),
+  }))
+  const known = new Set(listed.map(p => p.id))
+  const pending = drafts.results.filter(row => !known.has(row.plugin_id)).map(row => ({
+    id: row.plugin_id,
+    name: null,
+    owner: row.repo_full_name?.split('/')[0] ?? null,
+    state: row.state,
+    yanked: false,
+  }))
+  return c.json({ plugins: [...listed, ...pending] })
 })
 
 review.get('/:id', async (c) => {
@@ -159,15 +191,14 @@ function readBody(text: unknown): string {
 
 // Approves and squash merges the pull request as the maintainer. The head sha
 // pins the merge to the commit that was reviewed.
-review.post('/:id/approve', async (c) => {
-  const session = c.get('session')
-  const token = await userToken(c.env, session.id)
-  const found = await openPull(c.env, token, c.req.param('id'))
+async function approve(env: Env, token: string, actorId: number, id: string, comment: string, onlyLowRisk = false) {
+  const found = await openPull(env, token, id)
   if ('error' in found)
-    return c.json({ error: found.error }, 409)
+    return found
   const { change, pull } = found
-  const { comment } = await c.req.json<{ comment?: string }>().catch(() => ({ comment: '' }))
-  const repo = c.env.CATALOG_REPO
+  if (onlyLowRisk && (risk(change) === 'high' || change.waiting_on !== 'maintainer'))
+    return { error: 'not_low_risk' as const }
+  const repo = env.CATALOG_REPO
   try {
     await github(`/repos/${repo}/pulls/${pull.number}/reviews`, token, {
       method: 'POST',
@@ -180,19 +211,77 @@ review.post('/:id/approve', async (c) => {
       body: JSON.stringify({ merge_method: 'squash', sha: pull.head.sha, commit_title: `${pull.title} (#${pull.number})` }),
     })
     const t = now()
-    await c.env.DB.batch([
-      c.env.DB.prepare(`UPDATE changes SET state = 'merged', stage = 'merged', waiting_on = 'system', commit_sha = ?, updated_at = ? WHERE id = ?`)
+    await env.DB.batch([
+      env.DB.prepare(`UPDATE changes SET state = 'merged', stage = 'merged', waiting_on = 'system', commit_sha = ?, updated_at = ? WHERE id = ?`)
         .bind(merged.sha, t, change.id),
-      event(c.env, change.id, 'merged', session.user.id, { commit: merged.sha }),
+      event(env, change.id, 'merged', actorId, { commit: merged.sha }),
     ])
-    await audit(c.env.DB, { actorId: session.user.id, action: 'review.merge', subject: change.plugin_id ?? undefined, detail: { change: change.id, pr: pull.number, commit: merged.sha } })
-    return c.json({ ok: true, commit: merged.sha })
+    await audit(env.DB, { actorId, action: 'review.merge', subject: change.plugin_id ?? undefined, detail: { change: change.id, pr: pull.number, commit: merged.sha } })
+    return { ok: true as const, commit: merged.sha }
   }
   catch (error) {
     if (error instanceof GitHubError && (error.status === 405 || error.status === 409 || error.status === 422))
-      return c.json({ error: 'merge_refused', status: error.status }, 409)
+      return { error: 'merge_refused' as const, status: error.status }
     throw error
   }
+}
+
+review.post('/:id/approve', async (c) => {
+  const session = c.get('session')
+  const token = await userToken(c.env, session.id)
+  const { comment } = await c.req.json<{ comment?: string }>().catch(() => ({ comment: '' }))
+  const result = await approve(c.env, token, session.user.id, c.req.param('id'), comment ?? '')
+  return result.error ? c.json(result, 409) : c.json(result)
+})
+
+const BATCH_LIMIT = 20
+
+// Approves several low risk changes one after another. A change that turned
+// high risk or failed to merge is reported and the rest go on.
+review.post('/approve-batch', async (c) => {
+  const session = c.get('session')
+  const token = await userToken(c.env, session.id)
+  const { ids } = await c.req.json<{ ids?: unknown }>().catch(() => ({ ids: undefined }))
+  if (!Array.isArray(ids) || ids.length === 0 || ids.length > BATCH_LIMIT || !ids.every(id => typeof id === 'string'))
+    return c.json({ error: 'invalid_ids' }, 422)
+  const results: Record<string, string> = {}
+  for (const id of new Set(ids as string[])) {
+    const result = await approve(c.env, token, session.user.id, id, '', true)
+    results[id] = result.error ?? 'merged'
+  }
+  return c.json({ results })
+})
+
+// Closes the pull request with the reason as its last comment. The author
+// cannot resubmit it; a new submission starts a new change.
+review.post('/:id/reject', async (c) => {
+  const session = c.get('session')
+  const token = await userToken(c.env, session.id)
+  const found = await openPull(c.env, token, c.req.param('id'))
+  if ('error' in found)
+    return c.json({ error: found.error }, 409)
+  const { change, pull } = found
+  const { comment } = await c.req.json<{ comment?: string }>().catch(() => ({ comment: '' }))
+  const body = readBody(comment)
+  if (!body)
+    return c.json({ error: 'comment_required' }, 422)
+  const repo = c.env.CATALOG_REPO
+  await github(`/repos/${repo}/issues/${pull.number}/comments`, token, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ body }),
+  })
+  await github(`/repos/${repo}/pulls/${pull.number}`, token, {
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ state: 'closed' }),
+  })
+  await c.env.DB.batch([
+    c.env.DB.prepare(`UPDATE changes SET state = 'rejected', waiting_on = NULL, updated_at = ? WHERE id = ?`).bind(now(), change.id),
+    event(c.env, change.id, 'rejected', session.user.id, { comment: body.slice(0, 500) }),
+  ])
+  await audit(c.env.DB, { actorId: session.user.id, action: 'review.reject', subject: change.plugin_id ?? undefined, detail: { change: change.id, pr: pull.number, reason: body.slice(0, 500) } })
+  return c.json({ ok: true })
 })
 
 // Asks the author for changes; they resubmit from their change page.

@@ -3,7 +3,7 @@ import type { ReviewDetail } from '@/api/review'
 import { computed, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { ApiError } from '@/api/client'
-import { approveChange, commentOnChange, getReview, requestChanges } from '@/api/review'
+import { approveChange, commentOnChange, getReview, rejectChange, requestChanges } from '@/api/review'
 import { categoryLabel } from '@/lib/categories'
 import { kindLabel } from '@/lib/changeKinds'
 import { checkRunLabel } from '@/lib/checkRuns'
@@ -165,6 +165,29 @@ async function sendRequest() {
   }
 }
 
+const rejectOpen = ref(false)
+const rejectText = ref('')
+const rejecting = ref(false)
+
+async function sendReject() {
+  if (!rejectText.value.trim())
+    return
+  rejecting.value = true
+  actionError.value = ''
+  try {
+    await rejectChange(id.value, rejectText.value)
+    rejectOpen.value = false
+    rejectText.value = ''
+    await Promise.all([load(), reviewStore.refresh()])
+  }
+  catch {
+    actionError.value = $gettext('The change could not be rejected. Please try again.')
+  }
+  finally {
+    rejecting.value = false
+  }
+}
+
 async function sendComment() {
   if (!comment.value.trim())
     return
@@ -219,6 +242,9 @@ function reviewState(state: string | null) {
             </div>
           </div>
           <AFlex v-if="isOpen" gap="small" wrap>
+            <AButton danger @click="rejectOpen = true">
+              {{ $gettext('Reject') }}
+            </AButton>
             <AButton @click="requestOpen = true">
               {{ $gettext('Request changes') }}
             </AButton>
@@ -422,6 +448,18 @@ function reviewState(state: string | null) {
           {{ $gettext('The author sees this on GitHub and in the Developer Center, and can resubmit from their change page.') }}
         </p>
         <ATextarea v-model:value="requestText" :rows="5" :placeholder="$gettext('What should the author change?')" />
+      </AModal>
+
+      <AModal
+        v-model:open="rejectOpen"
+        :title="$gettext('Reject the change')"
+        :confirm-loading="rejecting"
+        :ok-text="$gettext('Reject')"
+        :ok-button-props="{ danger: true, disabled: !rejectText.trim() }"
+        @ok="sendReject"
+      >
+        <p>{{ $gettext('Pull request #%{n} is closed with your reason as its last comment. The author cannot resubmit this change and starts a new submission instead.', { n: String(detail.pull?.number ?? '') }) }}</p>
+        <ATextarea v-model:value="rejectText" :rows="5" :maxlength="4000" :placeholder="$gettext('Why is the change rejected?')" />
       </AModal>
     </template>
     <ASkeleton v-else active />

@@ -3,6 +3,7 @@ import { Hono } from 'hono'
 import { GitHubError } from './lib/github'
 import { SessionExpired } from './lib/session'
 import { security } from './middleware/security'
+import { audit } from './routes/audit'
 import { auth } from './routes/auth'
 import { changes } from './routes/changes'
 import { hooks } from './routes/hooks'
@@ -25,6 +26,7 @@ app.route('/submit', submit)
 app.route('/changes', changes)
 app.route('/hooks', hooks)
 app.route('/review', review)
+app.route('/audit', audit)
 
 app.notFound(c => c.json({ error: 'not_found' }, 404))
 

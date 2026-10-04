@@ -107,6 +107,6 @@ selfService.post('/:id/changes', async (c) => {
       event(c.env, change, 'checks', null, { outcome: 'dispatch_failed' }),
     ])
   }
-  await audit(c.env.DB, { actorId: session.user.id, action: 'change.self_service', subject: id, detail: { change, operations } })
+  await audit(c.env.DB, { actorId: session.user.id, action: 'change.self_service', subject: id, detail: { change, operations, reason: reason || undefined } })
   return c.json({ change }, 201)
 })
