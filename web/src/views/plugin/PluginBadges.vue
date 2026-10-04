@@ -79,7 +79,7 @@ const yankedSample = computed(() => {
           <table class="table">
             <thead>
               <tr>
-                <th class="w-12">
+                <th class="w-16 whitespace-nowrap">
                   {{ $gettext('Use') }}
                 </th>
                 <th>{{ $gettext('Shows') }}</th>

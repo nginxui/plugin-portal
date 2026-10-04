@@ -303,11 +303,11 @@ const SIGNS = { add: '+', del: '−', mod: '~' }
             <div v-else class="text-3 op-65 mt-3">
               {{ $gettext('Nothing new to approve.') }}
             </div>
-            <AFlex justify="flex-end" gap="small" class="mt-3">
-              <AButton size="small" disabled>
+            <AFlex justify="flex-end" gap="small" class="mt-3 mock-actions" aria-hidden="true">
+              <AButton size="small" tabindex="-1">
                 {{ $gettext('Later') }}
               </AButton>
-              <AButton size="small" type="primary" disabled>
+              <AButton size="small" type="primary" tabindex="-1">
                 {{ $gettext('Update') }}
               </AButton>
             </AFlex>
@@ -331,6 +331,11 @@ const SIGNS = { add: '+', del: '−', mod: '~' }
 </template>
 
 <style scoped>
+/* A picture of the dialog users get, so its buttons do nothing. */
+.mock-actions {
+  pointer-events: none;
+}
+
 .ref-select {
   width: 300px;
   max-width: 100%;

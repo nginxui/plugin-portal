@@ -1,6 +1,6 @@
 import { env } from 'cloudflare:workers'
 import { afterEach, describe, expect, it, vi } from 'vitest'
-import { mail, remind } from '../worker/jobs'
+import { daily, mail, remind } from '../worker/jobs'
 import { call, githubUser, json, mockFetch, signIn } from './helpers'
 
 afterEach(() => {
@@ -22,6 +22,19 @@ describe('tracker', () => {
     expect((await call('/api/changes/c_track0000001/withdraw', { method: 'POST', mutate: true, cookie })).status).toBe(200)
     expect(await env.DB.prepare(`SELECT state FROM changes WHERE id = 'c_track0000001'`).first()).toEqual({ state: 'withdrawn' })
     expect((await call('/api/changes/c_track0000001/withdraw', { method: 'POST', mutate: true, cookie })).status).toBe(409)
+  })
+
+  it('removes audit records past a year and reads the glossary once a day', async () => {
+    const t = Math.floor(Date.now() / 1000)
+    await env.DB.batch([
+      env.DB.prepare(`INSERT INTO audit (actor_id, action, at) VALUES (NULL, 'old', ?)`).bind(t - 400 * 86400),
+      env.DB.prepare(`INSERT INTO audit (actor_id, action, at) VALUES (NULL, 'recent', ?)`).bind(t - 10 * 86400),
+    ])
+    mockFetch(url => url.pathname.endsWith('.po') ? new Response('msgid "Site"\nmsgstr "サイト"\n') : undefined)
+    expect(await daily(env)).toBe(true)
+    expect((await env.DB.prepare(`SELECT action FROM audit WHERE action IN ('old', 'recent')`).all()).results).toEqual([{ action: 'recent' }])
+    expect(Number((await env.DB.prepare(`SELECT value FROM job_state WHERE name = 'glossary.locales'`).first<{ value: string }>())?.value)).toBeGreaterThan(0)
+    expect(await daily(env)).toBe(false)
   })
 
   it('reminds once after 18 hours of waiting on the author', async () => {

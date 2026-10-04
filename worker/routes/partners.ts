@@ -74,13 +74,31 @@ partners.get('/owners/:login', requireSession, async (c) => {
     ...listed.map(p => ({ id: p.id, name: p.name, iconUrl: p.icon_url ?? null, state: 'listed', version: p.releases?.[0]?.version ?? null, repo: repoOf(p.repository_url), role: roleOf(repoOf(p.repository_url)), trust: p.trust ?? null })),
     ...drafts.map(d => ({ id: d.plugin_id, name: { en: d.plugin_id }, iconUrl: null, state: d.state, version: null, repo: d.repo_full_name, role: roleOf(d.repo_full_name), trust: null })),
   ]
+  // What is going on with each plugin: a reviewed change in progress, and
+  // whether it welcomes community translation.
+  const ids = plugins.map(p => p.id)
+  const marks = ids.length
+    ? (await c.env.DB.prepare(`SELECT p.plugin_id, p.community_translation,
+        (SELECT ch.kind FROM changes ch WHERE ch.plugin_id = p.plugin_id AND ch.state = 'open' AND ch.class != 'self_service' ORDER BY ch.created_at DESC LIMIT 1) AS open_kind
+        FROM plugins p WHERE p.plugin_id IN (${ids.map(() => '?').join(',')})`)
+        .bind(...ids)
+        .all<{ plugin_id: string, community_translation: number, open_kind: string | null }>()).results
+    : []
+  const markOf = new Map(marks.map(m => [m.plugin_id, m]))
+  const catalogBase = c.env.CATALOG_URL.replace(/\/+$/, '')
+  const withMarks = plugins.map(p => ({
+    ...p,
+    openKind: markOf.get(p.id)?.open_kind ?? null,
+    community: !!markOf.get(p.id)?.community_translation,
+    catalogUrl: p.state === 'listed' ? `${catalogBase}/plugins/${p.id}/` : null,
+  }))
   const partner = partnerFiles.find(p => p.github_owner?.toLowerCase() === login.toLowerCase()) ?? null
   const application = await c.env.DB.prepare(`SELECT id, state, reason, created_at FROM partner_requests WHERE lower(owner_login) = ? AND kind = 'application' ORDER BY created_at DESC LIMIT 1`)
     .bind(login.toLowerCase())
     .first<{ id: string, state: string, reason: string | null, created_at: number }>()
   return c.json({
     owner: { login: owner.login, name: owner.name, avatarUrl: owner.avatar_url, kind: owner.type === 'Organization' ? 'organization' : 'user', url: owner.html_url },
-    plugins,
+    plugins: withMarks,
     canApply: owner.type === 'Organization' && plugins.some(p => p.role === 'admin') && !partner,
     partner: partner && { name: partner.name, displayName: partner.display_name ?? partner.name, keyId: keyIdOf(partner.public_key), expires: partner.expires ?? null, revoked: !!partner.revoked },
     application: application && { id: application.id, state: application.state, reason: application.reason, createdAt: application.created_at },
@@ -136,6 +154,7 @@ interface FeedStatus {
   ok: boolean
   latest: string | null
   releases: number
+  checkedAt: number
   error?: string
 }
 
@@ -145,13 +164,13 @@ async function feedStatus(url: string | undefined): Promise<FeedStatus | null> {
   try {
     const response = await fetch(url, { headers: { Accept: 'application/json' }, cf: { cacheTtl: 300 } } as RequestInit)
     if (!response.ok)
-      return { ok: false, latest: null, releases: 0, error: `HTTP ${response.status}` }
+      return { ok: false, latest: null, releases: 0, checkedAt: now(), error: `HTTP ${response.status}` }
     const feed = await response.json() as { releases?: { version?: string }[] }
     const releases = (feed.releases ?? []).filter(r => typeof r.version === 'string')
-    return { ok: true, latest: releases[0]?.version ?? null, releases: releases.length }
+    return { ok: true, latest: releases[0]?.version ?? null, releases: releases.length, checkedAt: now() }
   }
   catch (error) {
-    return { ok: false, latest: null, releases: 0, error: (error as Error).message }
+    return { ok: false, latest: null, releases: 0, checkedAt: now(), error: (error as Error).message }
   }
 }
 
@@ -183,6 +202,7 @@ partners.get('/vendors/:id', requireSession, async (c) => {
       commercial: entry?.commercial ?? null,
       feed: await feedStatus(releasesUrl),
       listedVersions: listing?.releases?.map(r => r.version) ?? [],
+      catalogUrl: listing ? `${c.env.CATALOG_URL.replace(/\/+$/, '')}/plugins/${row.plugin_id}/` : null,
     }
   })
   return c.json({

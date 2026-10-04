@@ -8,17 +8,21 @@ import { approveChange, commentOnChange, getQueue, getReview, rejectChange, requ
 import { categoryLabel } from '@/lib/categories'
 import { kindLabel } from '@/lib/changeKinds'
 import { checkRunLabel } from '@/lib/checkRuns'
-import { $gettext } from '@/lib/gettext'
+import gettext, { $gettext } from '@/lib/gettext'
 import { HOST_LOCALES } from '@/lib/hostLocales'
 import { localized, trustLabel } from '@/lib/labels'
 import { localeName } from '@/lib/locales'
+import { permissionText } from '@/lib/market'
 import { previewRows } from '@/lib/preview'
 import { formatDate, fromNow } from '@/lib/time'
+import { useCrumbs } from '@/stores/crumbs'
+import { usePaletteStore } from '@/stores/palette'
 import { useReviewStore } from '@/stores/review'
 
 const route = useRoute()
 const router = useRouter()
 const reviewStore = useReviewStore()
+const palette = usePaletteStore()
 const data = ref<ReviewDetail | null>(null)
 const missing = ref(false)
 const id = computed(() => String(route.params.id))
@@ -38,6 +42,10 @@ watch(id, load, { immediate: true })
 const change = computed(() => detail.value?.change ?? null)
 const entry = computed(() => (change.value?.entry ?? null) as Record<string, any> | null)
 const name = computed(() => localized(entry.value?.name) || change.value?.pluginId || '')
+useCrumbs(() => [
+  { title: $gettext('Review queue'), to: '/review' },
+  ...(change.value ? [{ title: name.value }, { title: kindLabel(change.value.kind) }] : []),
+])
 const isOpen = computed(() => change.value?.state === 'open' && change.value.stage === 'review' && detail.value?.pull?.state === 'open')
 
 const status = computed(() => {
@@ -105,6 +113,20 @@ const preview = computed(() => previewRows(change.value?.outcome && 'preview' in
 
 // Entry fields the preview does not show, for a new listing.
 const extraRows = computed(() => rows.value.filter(row => ['author', 'repository_url', 'author_public_key', 'trust'].includes(row.key)))
+
+// A new primary key ends the certificates the old one issued.
+const keyRotation = computed(() => !!detail.value?.before && rows.value.some(row => row.key === 'author_public_key' && row.changed))
+
+// The permissions of the listed release, as users read them.
+const permissions = computed(() => {
+  const manifest = detail.value?.listing?.manifest as { permissions?: string[], permission_reasons?: Record<string, string>, network_hosts?: string[] } | null | undefined
+  return (manifest?.permissions ?? []).map(p => ({
+    id: p,
+    ...permissionText(gettext.current, p),
+    reason: manifest?.permission_reasons?.[p] ?? '',
+    hosts: p === 'network' ? manifest?.network_hosts ?? [] : [],
+  }))
+})
 
 const claimText = computed(() => {
   const claim = detail.value?.claim ?? ''
@@ -334,15 +356,17 @@ onKeyStroke('k', e => !typing(e) && step(-1))
             </div>
           </div>
           <AFlex v-if="isOpen" gap="small" wrap>
-            <AButton danger @click="rejectOpen = true">
-              {{ $gettext('Reject') }}
-            </AButton>
             <AButton @click="requestOpen = true">
               {{ $gettext('Request changes') }}
+              <kbd class="keycap">r</kbd>
+            </AButton>
+            <AButton danger @click="rejectOpen = true">
+              {{ $gettext('Reject') }}
             </AButton>
             <AButton type="primary" @click="approveOpen = true">
               <span class="i-tabler-check" />
               {{ unchecked.length ? $gettext('Approve the checked names') : $gettext('Approve and merge') }}
+              <kbd class="keycap on-primary">a</kbd>
             </AButton>
           </AFlex>
         </div>
@@ -415,6 +439,9 @@ onKeyStroke('k', e => !typing(e) && step(-1))
                 </tbody>
               </table>
             </div>
+            <div v-if="HOST_LOCALES.length - nameRows.length > 0" class="text-3 op-65 px-4 py-3">
+              {{ $gettext('The other %{n} languages have no name and show the English one.', { n: String(HOST_LOCALES.length - nameRows.length) }) }}
+            </div>
           </ACard>
 
           <ACard v-if="!detail.before" :title="$gettext('Listing')">
@@ -475,6 +502,30 @@ onKeyStroke('k', e => !typing(e) && step(-1))
                 </tbody>
               </table>
             </div>
+            <AAlert v-if="keyRotation" type="warning" show-icon class="m-4" :title="$gettext('Once approved, signer certificates issued by the old primary key are no longer accepted.')" :description="$gettext('Versions signed under them stop installing until the author signs them with a certificate of the new key.')" />
+          </ACard>
+
+          <ACard v-if="permissions.length">
+            <template #title>
+              <span class="i-tabler-shield-check mr-2 op-65" />{{ $gettext('Permissions, as users see them') }}
+            </template>
+            <template #extra>
+              <span class="text-3 op-65">{{ $gettext('This change does not touch the permissions') }}</span>
+            </template>
+            <ul class="perm-list">
+              <li v-for="p in permissions" :key="p.id">
+                <span class="i-tabler-shield-check c-info" />
+                <div class="min-w-0">
+                  <div>{{ p.description }}</div>
+                  <div class="mono text-3 op-65">
+                    {{ p.id }}{{ p.hosts.length ? `: ${p.hosts.join(', ')}` : '' }}
+                  </div>
+                  <div v-if="p.reason" class="text-3 op-65">
+                    {{ $gettext('Note from the author: %{note}', { note: p.reason }) }}
+                  </div>
+                </div>
+              </li>
+            </ul>
           </ACard>
 
           <ACard v-if="detail.before && preview.length" :title="$gettext('Listing preview')">
@@ -563,6 +614,21 @@ onKeyStroke('k', e => !typing(e) && step(-1))
             </a>
           </ACard>
 
+          <ACard :title="$gettext('Shortcuts')">
+            <dl class="shortcuts">
+              <dt>{{ unchecked.length ? $gettext('Approve the checked names') : $gettext('Approve and merge') }}</dt>
+              <dd><kbd class="keycap">a</kbd></dd>
+              <dt>{{ $gettext('Request changes') }}</dt>
+              <dd><kbd class="keycap">r</kbd></dd>
+              <dt>{{ $gettext('Switch the comparison') }}</dt>
+              <dd><kbd class="keycap">v</kbd></dd>
+              <dt>{{ $gettext('Next and previous') }}</dt>
+              <dd><kbd class="keycap">j</kbd><kbd class="keycap">k</kbd></dd>
+              <dt>{{ $gettext('Command palette') }}</dt>
+              <dd><kbd class="keycap">{{ palette.modifier }}</kbd><kbd class="keycap">K</kbd></dd>
+            </dl>
+          </ACard>
+
           <ACard v-if="detail.author" :title="$gettext('Author')">
             <AFlex align="center" gap="middle">
               <AAvatar :src="detail.author.avatarUrl ?? undefined" :size="40">
@@ -626,6 +692,55 @@ onKeyStroke('k', e => !typing(e) && step(-1))
 </template>
 
 <style scoped>
+.keycap {
+  display: inline-block;
+  min-width: 16px;
+  margin-inline-start: 4px;
+  padding: 0 4px;
+  border: 1px solid var(--portal-border-strong);
+  border-radius: 4px;
+  font: 11px/16px ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  text-align: center;
+}
+
+.keycap.on-primary {
+  border-color: rgba(255, 255, 255, 0.5);
+}
+
+.shortcuts {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 10px 12px;
+  margin: 0;
+  font-size: 13px;
+}
+
+.shortcuts dd {
+  margin: 0;
+  text-align: end;
+}
+
+.perm-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.perm-list li {
+  display: flex;
+  gap: 10px;
+  padding: 10px 0;
+}
+
+.perm-list li + li {
+  border-top: 1px solid var(--portal-border);
+}
+
+.c-info {
+  color: var(--portal-primary);
+  margin-top: 3px;
+}
+
 .head {
   display: flex;
   align-items: center;

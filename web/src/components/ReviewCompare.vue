@@ -50,6 +50,30 @@ const onlyChanged = computed<PreviewDoc>(() => {
   }
 })
 
+// The parts of the new listing that changed, marked in its preview.
+const highlight = computed<Record<string, string>>(() => {
+  const b = props.before
+  if (!b)
+    return {}
+  const a = props.after
+  const out: Record<string, string> = {}
+  if (JSON.stringify(b.name ?? {}) !== JSON.stringify(a.name ?? {}))
+    out.name = $gettext('Name')
+  if (JSON.stringify(b.description ?? {}) !== JSON.stringify(a.description ?? {}))
+    out.description = $gettext('Description')
+  if ((b.homepage_url ?? '') !== (a.homepage_url ?? ''))
+    out.homepage_url = $gettext('Homepage')
+  const old = new Map((b.screenshots ?? []).map(s => [s.id, s]))
+  for (const shot of a.screenshots ?? []) {
+    const was = old.get(shot.id)
+    if (!was)
+      out[`shot:${shot.id}`] = $gettext('New screenshot')
+    else if (was.path !== shot.path || (was.dark_path ?? '') !== (shot.dark_path ?? ''))
+      out[`shot:${shot.id}`] = $gettext('Screenshot image changed')
+  }
+  return out
+})
+
 const common = computed(() => ({
   manifest: props.manifest,
   version: props.version,
@@ -75,7 +99,7 @@ const common = computed(() => ({
       </div>
       <div class="side after">
         <span class="label">{{ $gettext('After the change') }}</span>
-        <MarketPreview v-bind="common" :doc="after" />
+        <MarketPreview v-bind="common" :doc="after" :highlight="highlight" />
       </div>
     </div>
 
@@ -94,7 +118,7 @@ const common = computed(() => ({
     </div>
 
     <div v-else>
-      <MarketPreview v-bind="common" :doc="onlyChanged" />
+      <MarketPreview v-bind="common" :doc="onlyChanged" :highlight="highlight" />
     </div>
 
     <p class="text-3 op-65 mt-3 mb-0">
@@ -116,8 +140,8 @@ const common = computed(() => ({
 }
 
 .side.after :deep(.frame) {
-  box-shadow: 0 0 0 2px var(--portal-primary-bg);
-  border-color: var(--portal-primary);
+  box-shadow: 0 0 0 2px rgba(250, 173, 20, 0.25);
+  border-color: #faad14;
 }
 
 .label {

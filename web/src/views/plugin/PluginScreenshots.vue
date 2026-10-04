@@ -2,8 +2,9 @@
 import type { StoreState } from '@/api/store'
 import type { PreviewDoc } from '@/components/MarketPreview.vue'
 import { computed, onBeforeUnmount, ref, useTemplateRef, watch } from 'vue'
+import { aiDraft, aiStatus } from '@/api/community'
 import { uploadImage } from '@/api/store'
-import { $gettext } from '@/lib/gettext'
+import gettext, { $gettext } from '@/lib/gettext'
 import { HOST_LOCALES, RTL_LOCALES } from '@/lib/hostLocales'
 import { localeName } from '@/lib/locales'
 import { fromNow } from '@/lib/time'
@@ -188,6 +189,38 @@ function setCaption(locale: string, value: string) {
     draft.setText(`caption:${selected.value.id}`, locale, value.trim())
 }
 
+// AI drafts of the captions a language lacks.
+const ai = ref<{ enabled: boolean, remaining?: number }>({ enabled: false })
+aiStatus().then(value => (ai.value = value)).catch(() => {})
+const missingCaptions = computed(() => selected.value?.caption?.en ? HOST_LOCALES.filter(l => l !== 'en' && !selected.value?.caption?.[l]) : [])
+const drafting = ref<{ done: number, total: number } | null>(null)
+const aiError = ref('')
+async function draftCaptions() {
+  const shot = selected.value
+  if (!shot?.caption?.en)
+    return
+  const todo = [...missingCaptions.value]
+  drafting.value = { done: 0, total: todo.length }
+  aiError.value = ''
+  for (const locale of todo) {
+    try {
+      const result = await aiDraft(plugin.value.id, `caption:${shot.id}`, locale, shot.caption.en)
+      draft.setText(`caption:${shot.id}`, locale, result.text, true)
+      ai.value = { ...ai.value, remaining: result.remaining }
+      drafting.value.done++
+    }
+    catch (e) {
+      aiError.value = (e as { code?: string }).code === 'quota' ? $gettext('No AI drafts are left for today.') : $gettext('The AI draft could not be made. Please try again later.')
+      break
+    }
+  }
+  drafting.value = null
+}
+const isAiDraft = (id: string, locale: string) => draft.ai.value.includes(`caption:${id}.${locale}`)
+
+// A screenshot is named by its caption in the language of the portal.
+const titleOf = (shot: Shot) => shot.caption?.[gettext.current] || shot.caption?.en || shot.id
+
 const complete = (shot: Shot) => !!shot.dark_path
 const changedIds = computed(() => new Set(items.value.filter(i => i.field === 'screenshots' || i.field === 'caption').map(i => i.label.split('.')[1])))
 </script>
@@ -232,7 +265,7 @@ const changedIds = computed(() => new Set(items.value.filter(i => i.field === 's
               @drop.prevent="onDrop(shot.id)"
             >
               <AFlex justify="space-between" align="center" gap="small">
-                <span class="title"><span class="i-tabler-grip-vertical op-50" />{{ i + 1 }}. {{ shot.id }}</span>
+                <span class="title truncate"><span class="i-tabler-grip-vertical op-50" />{{ i + 1 }}. {{ titleOf(shot) }}</span>
                 <ATag v-if="changedIds.has(shot.id)" color="blue" class="m-0">
                   {{ $gettext('Changed') }}
                 </ATag>
@@ -243,8 +276,9 @@ const changedIds = computed(() => new Set(items.value.filter(i => i.field === 's
               <div class="pair">
                 <img v-if="imageOf(shot.path)" :src="imageOf(shot.path)!" alt="" referrerpolicy="no-referrer">
                 <img v-if="imageOf(shot.dark_path)" :src="imageOf(shot.dark_path)!" alt="" referrerpolicy="no-referrer">
-                <div v-else class="missing">
+                <div v-else class="missing" :class="{ clickable: canEdit && S.uploads }" @click.stop="canEdit && S.uploads && (selectedId = shot.id, side = 'dark', pick('dark'))">
                   {{ $gettext('No dark version') }}
+                  <span v-if="canEdit && S.uploads" class="block text-3">{{ $gettext('Click to upload') }}</span>
                 </div>
               </div>
               <div class="text-3 truncate">
@@ -274,7 +308,7 @@ const changedIds = computed(() => new Set(items.value.filter(i => i.field === 's
           <div v-if="savedAt" class="text-3 op-65 mt-3">
             {{ saving ? $gettext('Saving the draft') : $gettext('Draft saved %{time}. Submit it from the store page.', { time: fromNow(savedAt) }) }}
             <RouterLink :to="`/plugins/${plugin.id}`">
-              {{ $gettext('Store') }}
+              {{ $gettext('Store details') }}
             </RouterLink>
           </div>
         </ACard>
@@ -293,7 +327,7 @@ const changedIds = computed(() => new Set(items.value.filter(i => i.field === 's
             </AFlex>
           </ACard>
 
-          <ACard v-else-if="selected" :title="`${shots.indexOf(selected) + 1}. ${selected.id}`">
+          <ACard v-else-if="selected" :title="`${shots.indexOf(selected) + 1}. ${titleOf(selected)}`">
             <template #extra>
               <ASegmented v-model:value="side" size="small" :options="[{ value: 'light', label: $gettext('Light') }, { value: 'dark', label: $gettext('Dark') }]" />
             </template>
@@ -329,11 +363,19 @@ const changedIds = computed(() => new Set(items.value.filter(i => i.field === 's
                   :placeholder="l === 'en' ? '' : selected.caption?.en"
                   @change="(e: Event) => setCaption(l, (e.target as HTMLInputElement).value)"
                 />
+                <span v-if="isAiDraft(selected.id, l)" class="ai-line"><span class="ai-tag">{{ $gettext('AI draft') }}</span><span class="text-3 op-65">{{ $gettext('Waiting for confirmation') }}</span></span>
               </label>
               <AButton type="link" size="small" class="px-0" @click="showAll = !showAll">
                 <span :class="showAll ? 'i-tabler-chevron-up' : 'i-tabler-chevron-down'" />
                 {{ showAll ? $gettext('Show filled languages only') : $gettext('The other languages, %{n} of %{total} filled', { n: String(filledOthers), total: String(HOST_LOCALES.length - 1) }) }}
               </AButton>
+              <div v-if="ai.enabled && missingCaptions.length">
+                <AButton size="small" :loading="!!drafting" :disabled="!S.canEdit.texts" @click="draftCaptions">
+                  <span class="i-tabler-sparkles" />
+                  {{ drafting ? $gettext('Drafting %{done} of %{total}', { done: String(drafting.done), total: String(drafting.total) }) : $gettext('AI draft the caption in the %{n} missing languages', { n: String(missingCaptions.length) }) }}
+                </AButton>
+              </div>
+              <AAlert v-if="aiError" type="error" show-icon class="mt-2" :title="aiError" />
             </div>
             <AButton danger class="mt-3" :disabled="!canEdit" @click="remove">
               {{ $gettext('Delete this screenshot') }}
@@ -412,6 +454,38 @@ const changedIds = computed(() => new Set(items.value.filter(i => i.field === 's
   color: #d48806;
   font-size: 12px;
   text-align: center;
+}
+
+.missing.clickable {
+  cursor: pointer;
+  align-content: center;
+  background: #fffbe6;
+}
+
+:global(html.dark) .missing.clickable {
+  background: #2b2111;
+}
+
+.ai-line {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 4px;
+}
+
+.ai-tag {
+  padding: 0 6px;
+  border-radius: 4px;
+  font-size: 12px;
+  color: #722ed1;
+  background: #f9f0ff;
+  border: 1px solid #d3adf7;
+}
+
+:global(html.dark) .ai-tag {
+  color: #b37feb;
+  background: #1a1325;
+  border-color: #391085;
 }
 
 .missing.big {

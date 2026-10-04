@@ -3,7 +3,7 @@ import { api } from './client'
 
 export interface OrgPage {
   owner: { login: string, name: string | null, avatarUrl: string | null, kind: 'organization' | 'user', url: string }
-  plugins: { id: string, name: Record<string, string>, iconUrl: string | null, state: string, version: string | null, repo: string | null, role: Role | null, trust: string | null }[]
+  plugins: { id: string, name: Record<string, string>, iconUrl: string | null, state: string, version: string | null, repo: string | null, role: Role | null, trust: string | null, openKind?: string | null, community?: boolean, catalogUrl?: string | null }[]
   canApply: boolean
   partner: { name: string, displayName: string, keyId: string | null, expires: string | null, revoked: boolean } | null
   application: { id: string, state: string, reason: string | null, createdAt: number } | null
@@ -43,8 +43,9 @@ export interface VendorPage {
     version: string | null
     releasesUrl: string | null
     commercial: { pricing: Record<string, string>, purchase_url: string, trial_days?: number, license?: string } | null
-    feed: { ok: boolean, latest: string | null, releases: number, error?: string } | null
+    feed: { ok: boolean, latest: string | null, releases: number, checkedAt?: number, error?: string } | null
     listedVersions: string[]
+    catalogUrl?: string | null
   }[]
   partner: { name: string, keyId: string | null, expires: string | null, revoked: boolean } | null
   requests: { id: string, kind: string, state: string, reason: string | null, createdAt: number }[]

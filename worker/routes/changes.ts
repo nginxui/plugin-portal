@@ -1,8 +1,9 @@
 import type { AppEnv, Env, Session } from '../env'
 import type { ChangeRow } from '../lib/changes'
 import { Hono } from 'hono'
-import { repoAccess } from '../lib/access'
+import { mapLimit, repoAccess } from '../lib/access'
 import { audit } from '../lib/audit'
+import { cached } from '../lib/cache'
 import { loadCatalog } from '../lib/catalog'
 import { event, getChange } from '../lib/changes'
 import { dispatchApply, dispatchDeploy } from '../lib/deployApp'
@@ -130,12 +131,29 @@ function selfServiceRequest(payload: string | null): { operations?: Record<strin
 function storeRequest(env: Env, change: ChangeRow) {
   if ((change.kind !== 'store' && change.kind !== 'translations') || !change.payload_json)
     return {}
-  const payload = JSON.parse(change.payload_json) as { delivery?: string, pr_url?: string, repo?: string, items?: { field: string, locale?: string, label: string, review: boolean }[] }
+  const payload = JSON.parse(change.payload_json) as {
+    delivery?: string
+    pr_url?: string
+    repo?: string
+    items?: { field: string, locale?: string, label: string, review: boolean }[]
+    doc?: { name?: Record<string, string>, description?: Record<string, string>, screenshots?: { id: string, caption?: Record<string, string> }[] }
+  }
   const repoPr = payload.delivery === 'bot' && payload.pr_url
+  // The new text of a name or a caption, short enough to show in a row.
+  const valueOf = (item: { field: string, locale?: string, label: string }) => {
+    const doc = payload.doc
+    if (!doc || !item.locale)
+      return undefined
+    if (item.field === 'name')
+      return doc.name?.[item.locale]
+    if (item.field === 'caption')
+      return doc.screenshots?.find(s => s.id === item.label.split('.')[1])?.caption?.[item.locale]
+    return undefined
+  }
   return {
     delivery: payload.delivery ?? null,
     repo: payload.repo ?? null,
-    items: payload.items ?? [],
+    items: (payload.items ?? []).map(item => ({ ...item, value: valueOf(item)?.slice(0, 80) })),
     ...(repoPr ? { prUrl: payload.pr_url } : {}),
     ...(payload.delivery === 'patch' ? { patchUrl: `/api/changes/${change.id}/patch` } : {}),
   }
@@ -169,10 +187,28 @@ export const changes = new Hono<AppEnv>()
 changes.use('*', requireSession)
 
 changes.get('/', async (c) => {
+  const session = c.get('session')
   const { results } = await c.env.DB.prepare(
     `SELECT * FROM changes WHERE author_id = ? ORDER BY CASE WHEN state = 'open' THEN 0 ELSE 1 END, updated_at DESC LIMIT 50`,
-  ).bind(c.get('session').user.id).all<ChangeRow>()
-  return c.json({ changes: results.map(row => present(c.env, row)) })
+  ).bind(session.user.id).all<ChangeRow>()
+  // For a reviewed change in progress: how many comments its pull request
+  // holds, and what the maintainer asked for last.
+  const open = results.filter(row => row.state === 'open' && row.class !== 'self_service')
+  const token = open.some(row => row.pr_number) ? await userToken(c.env, session.id).catch(() => '') : ''
+  const extra = new Map(await mapLimit(open, 4, async (row) => {
+    const [comments, asked] = await Promise.all([
+      row.pr_number && token
+        ? cached(`pr-comments:${c.env.CATALOG_REPO}:${row.pr_number}`, 300, async () =>
+            (await github<{ comments?: number }>(`/repos/${c.env.CATALOG_REPO}/issues/${row.pr_number}`, token).catch(() => null))?.comments ?? null)
+        : Promise.resolve(null),
+      row.waiting_on === 'author'
+        ? c.env.DB.prepare(`SELECT detail_json FROM change_events WHERE change_id = ? AND stage = 'changes_requested' ORDER BY at DESC LIMIT 1`).bind(row.id).first<{ detail_json: string | null }>()
+        : Promise.resolve(null),
+    ])
+    const comment = asked?.detail_json ? (JSON.parse(asked.detail_json) as { comment?: string }).comment : undefined
+    return [row.id, { comments, askedFor: typeof comment === 'string' ? comment.slice(0, 300) : null }] as const
+  }))
+  return c.json({ changes: results.map(row => ({ ...present(c.env, row), ...extra.get(row.id) })) })
 })
 
 changes.get('/:id', async (c) => {

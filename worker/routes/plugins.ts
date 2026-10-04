@@ -1,8 +1,9 @@
 import type { AppEnv, Env, Session } from '../env'
 import type { RepoAccess, RepoOwner, Role } from '../lib/access'
 import type { CatalogPlugin, Localized } from '../lib/catalog'
+import type { RepoPermission } from '../lib/github'
 import { Hono } from 'hono'
-import { mapLimit, repoAccess } from '../lib/access'
+import { mapLimit, repoAccess, roleOf } from '../lib/access'
 import { catalogEntry, latestRelease, loadCatalog, repoOf } from '../lib/catalog'
 import { github, GitHubError } from '../lib/github'
 import { insightsOf } from '../lib/insights'
@@ -234,7 +235,7 @@ plugins.get('/:id', async (c) => {
   }
   if (!summary.role && !await checkMaintainer(c.env, session.id))
     return c.json({ error: 'no_access' }, 403)
-  const [entry, pending, open] = await Promise.all([
+  const [entry, pending, open, people, community] = await Promise.all([
     catalogEntry(c.env, id),
     c.env.DB.prepare(`SELECT id, kind FROM changes WHERE plugin_id = ? AND class = 'self_service' AND state IN ('open', 'merged') ORDER BY created_at DESC LIMIT 1`)
       .bind(id)
@@ -243,6 +244,14 @@ plugins.get('/:id', async (c) => {
       WHERE plugin_id = ? AND state IN ('open', 'merged') ORDER BY created_at DESC LIMIT 5`)
       .bind(id)
       .all<{ id: string, kind: string, class: string, stage: string, waiting_on: string | null, pr_number: number | null, payload_json: string | null, created_at: number, updated_at: number }>(),
+    // Portal users whose permission on the repository was read lately.
+    summary.repo
+      ? c.env.DB.prepare(`SELECT u.login, u.avatar_url, r.permission, r.checked_at FROM repo_permissions r JOIN users u ON u.id = r.user_id
+          WHERE r.repo_full_name = ? AND r.permission != 'other' ORDER BY r.checked_at DESC LIMIT 20`)
+          .bind(summary.repo)
+          .all<{ login: string, avatar_url: string | null, permission: RepoPermission, checked_at: number }>()
+      : Promise.resolve({ results: [] as { login: string, avatar_url: string | null, permission: RepoPermission, checked_at: number }[] }),
+    c.env.DB.prepare('SELECT community_translation FROM plugins WHERE plugin_id = ?').bind(id).first<{ community_translation: number }>(),
   ])
   const yanked = new Set(entry?.yanked ?? [])
   const revoked = new Set((entry?.revoked_signers ?? []).map(s => s.toUpperCase()))
@@ -282,6 +291,8 @@ plugins.get('/:id', async (c) => {
       checkedAt: access?.checkedAt ?? null,
       source: 'repository',
       manageUrl: summary.repo ? `https://github.com/${summary.repo}/settings/access` : null,
+      people: people.results.map(p => ({ login: p.login, avatarUrl: p.avatar_url, permission: p.permission, role: roleOf(p.permission), checkedAt: p.checked_at })),
     },
+    community: !!community?.community_translation,
   })
 })

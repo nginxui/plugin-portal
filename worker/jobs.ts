@@ -1,5 +1,6 @@
 import type { Env } from './env'
 import { event } from './lib/changes'
+import { syncGlossary } from './lib/glossary'
 import { sendMail } from './lib/mail'
 import { now } from './lib/time'
 
@@ -56,7 +57,23 @@ export async function mail(env: Env): Promise<number> {
   return sent
 }
 
+const DAY = 86400
+const AUDIT_KEEP = 365 * DAY
+
+/** Daily work: the glossary read again, audit records past a year removed. */
+export async function daily(env: Env): Promise<boolean> {
+  const t = now()
+  const last = Number(await state(env, 'daily.ran') ?? 0)
+  if (t - last < DAY)
+    return false
+  await setState(env, 'daily.ran', String(t))
+  await env.DB.prepare('DELETE FROM audit WHERE at < ?').bind(t - AUDIT_KEEP).run()
+  await syncGlossary(env).catch(error => console.error('glossary sync failed', error))
+  return true
+}
+
 export async function scheduled(env: Env) {
   await remind(env)
   await mail(env)
+  await daily(env)
 }

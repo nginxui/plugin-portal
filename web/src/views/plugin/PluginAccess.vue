@@ -12,11 +12,13 @@ const session = useSessionStore()
 const plugin = computed(() => store.detail!.plugin)
 const access = computed(() => store.detail!.access)
 
-const mapping = computed<{ permission: string, role: Role }[]>(() => [
-  { permission: 'admin', role: 'admin' },
-  { permission: 'maintain, write', role: 'publisher' },
-  { permission: 'triage', role: 'translator' },
+const mapping = computed<{ permission: string, role: Role | null, allows: string }[]>(() => [
+  { permission: 'admin', role: 'admin', allows: roleDescription('admin') },
+  { permission: 'maintain, write', role: 'publisher', allows: roleDescription('publisher') },
+  { permission: 'triage', role: 'translator', allows: roleDescription('translator') },
+  { permission: $gettext('read or none'), role: null, allows: $gettext('Can suggest translations while community translation is on.') },
 ])
+const people = computed(() => store.detail?.access.people ?? [])
 </script>
 
 <template>
@@ -68,20 +70,39 @@ const mapping = computed<{ permission: string, role: Role }[]>(() => [
               </tr>
             </thead>
             <tbody>
-              <tr v-for="row in mapping" :key="row.role">
-                <td class="mono">
+              <tr v-for="row in mapping" :key="row.permission">
+                <td :class="{ mono: row.role }">
                   {{ row.permission }}
                 </td>
                 <td class="whitespace-nowrap">
                   {{ roleLabel(row.role) }}
                 </td>
-                <td>{{ roleDescription(row.role) }}</td>
+                <td>{{ row.allows }}</td>
               </tr>
             </tbody>
           </table>
         </div>
-        <ATypographyParagraph type="secondary" class="mt-4 mb-0 text-3">
+        <ATypographyParagraph v-if="!people.length" type="secondary" class="mt-4 mb-0 text-3">
           {{ $gettext('When someone loses their permission on GitHub, their role in the Developer Center ends with it.') }}
+        </ATypographyParagraph>
+      </ACard>
+      <ACard v-if="people.length" :title="$gettext('People who used the Developer Center')">
+        <div v-for="person in people" :key="person.login" class="person">
+          <AAvatar :src="person.avatarUrl ?? undefined" :size="32">
+            {{ person.login.slice(0, 1).toUpperCase() }}
+          </AAvatar>
+          <div class="min-w-0 flex-1">
+            <div>{{ person.login }}</div>
+            <div class="text-3 op-65">
+              {{ $gettext('Repository permission %{permission}, %{time}', { permission: person.permission, time: fromNow(person.checkedAt) }) }}
+            </div>
+          </div>
+          <ATag :color="person.role === 'admin' ? 'blue' : 'default'" class="m-0">
+            {{ roleLabel(person.role) }}
+          </ATag>
+        </div>
+        <ATypographyParagraph type="secondary" class="mt-4 mb-0 text-3">
+          {{ $gettext('Others with a repository permission show here once they sign in. When someone loses their permission on GitHub, their role in the Developer Center ends with it.') }}
         </ATypographyParagraph>
       </ACard>
     </AFlex>
@@ -104,11 +125,35 @@ const mapping = computed<{ permission: string, role: Role }[]>(() => [
           {{ $gettext('The owner is the owner of the repository. When the repository moves to another owner on GitHub, the plugin moves with it after review.') }}
         </ATypographyParagraph>
       </ACard>
+      <ACard :title="$gettext('Community translation')">
+        <template #extra>
+          <ATag :color="store.detail?.community ? 'success' : 'default'" class="m-0">
+            {{ store.detail?.community ? $gettext('On') : $gettext('Off') }}
+          </ATag>
+        </template>
+        <div class="text-3">
+          {{ $gettext('Admins turn it on or off in the translation workbench.') }}
+        </div>
+        <RouterLink :to="`/plugins/${plugin.id}/translations`" class="text-3 mt-2 inline-block">
+          {{ $gettext('Open the translation workbench') }}
+        </RouterLink>
+      </ACard>
     </AFlex>
   </div>
 </template>
 
 <style scoped>
+.person {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 0;
+}
+
+.person + .person {
+  border-top: 1px solid var(--portal-border);
+}
+
 .role-table {
   width: 100%;
   border-collapse: collapse;

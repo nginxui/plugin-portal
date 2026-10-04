@@ -8,9 +8,10 @@ import { ApiError } from '@/api/client'
 import { getMyPlugins } from '@/api/plugins'
 import { checkRepository, getCategories, submitPlugin } from '@/api/submit'
 import { categoryLabel } from '@/lib/categories'
-import { $gettext } from '@/lib/gettext'
+import gettext, { $gettext } from '@/lib/gettext'
 import { keyState } from '@/lib/keys'
 import { localeName } from '@/lib/locales'
+import { forgetDraft, rememberDraft } from '@/lib/submitDrafts'
 
 const route = useRoute()
 const router = useRouter()
@@ -27,7 +28,8 @@ const preview = ref<Preview | null>(null)
 
 const publicKey = ref('')
 const guideOpen = ref(false)
-const checksOpen = ref(false)
+const checksOpen = ref(true)
+const previewMode = ref<'card' | 'detail'>('card')
 const chosen = ref<string[]>([])
 const submitting = ref(false)
 const submitError = ref('')
@@ -54,7 +56,23 @@ const checkSummary = computed(() => {
 // A warning is worth a look before submitting, so the list opens for it.
 watch(step, (value) => {
   if (value === 2)
-    checksOpen.value = warnings.value > 0
+    checksOpen.value = true
+})
+
+// Keep a started submission so it can be continued later.
+watch([step, preview], () => {
+  const repo = preview.value?.draft?.repo ?? (typeof route.query.repo === 'string' ? route.query.repo : '')
+  if (!repo || submitting.value)
+    return
+  const failed = preview.value?.checks.find(c => c.status === 'fail')
+  rememberDraft({
+    repo,
+    id: preview.value?.draft?.id ?? null,
+    name: preview.value?.draft?.name ?? {},
+    step: step.value + 1,
+    at: Math.floor(Date.now() / 1000),
+    problem: failed ?? null,
+  })
 })
 const missingCertificate = computed(() => !draft.value?.signer?.signingKeyId || !draft.value?.signer?.primaryKeyId)
 
@@ -64,7 +82,8 @@ const drawerSize = computed(() => isNarrow.value ? '100%' : 640)
 const steps = computed(() => [
   { title: $gettext('Choose a repository') },
   { title: $gettext('Fill in the details') },
-  { title: $gettext('Check and submit') },
+  { title: $gettext('Check and preview') },
+  { title: $gettext('Submit for review') },
 ])
 
 async function pick(repo: string) {
@@ -99,6 +118,7 @@ async function submit() {
   submitError.value = ''
   try {
     const { change } = await submitPlugin({ repo: draft.value.repo, authorPublicKey: publicKey.value, categories: chosen.value })
+    forgetDraft(draft.value.repo)
     router.push(`/changes/${change}`)
   }
   catch (e) {
@@ -306,8 +326,30 @@ onMounted(async () => {
         </ACard>
 
         <AFlex vertical gap="middle" class="col-side">
-          <ACard :title="$gettext('Catalog preview')">
-            <ListingCard :draft="draft" :categories="chosen" />
+          <ACard>
+            <template #title>
+              <span class="i-tabler-eye mr-2 align-[-2px]" />{{ $gettext('Catalog preview') }}
+            </template>
+            <template #extra>
+              <ASegmented v-model:value="previewMode" size="small" :options="[{ value: 'card', label: $gettext('Card') }, { value: 'detail', label: $gettext('Details page') }]" />
+            </template>
+            <ListingCard v-if="previewMode === 'card'" :draft="draft" :categories="chosen" />
+            <MarketPreview
+              v-else
+              :doc="{ name: draft.name, description: draft.description }"
+              :locale="gettext.current"
+              :version="draft.version"
+              :author="draft.repo.split('/')[0]"
+              trust="community"
+              :categories="chosen"
+              :repository="`https://github.com/${draft.repo}`"
+              device="phone"
+            />
+            <div class="shot-slots mt-4">
+              <div v-for="n in 2" :key="n" class="shot-slot">
+                {{ $gettext('No screenshot yet') }}
+              </div>
+            </div>
             <ATypographyParagraph type="secondary" class="mt-4 mb-0 text-3">
               {{ $gettext('Names in every language are reviewed with the submission. The description and screenshots come from plugin.json and update with every release.') }}
             </ATypographyParagraph>
@@ -333,6 +375,23 @@ onMounted(async () => {
 </template>
 
 <style scoped>
+.shot-slots {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.shot-slot {
+  display: grid;
+  place-items: center;
+  aspect-ratio: 16 / 10;
+  border: 1px dashed var(--portal-border-strong);
+  border-radius: 6px;
+  background: var(--portal-faint);
+  font-size: 12px;
+  opacity: 0.65;
+}
+
 .tips {
   margin: 0 0 16px;
   padding-left: 20px;

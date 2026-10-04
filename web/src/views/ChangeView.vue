@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { Change, ChangeEvent } from '@/api/changes'
 import { computed, h, onBeforeUnmount, ref, watch } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
+import { useRoute } from 'vue-router'
 import { getChange, retryChange, withdrawChange } from '@/api/changes'
 import { getPrefs, savePrefs } from '@/api/notifications'
 import { categoryLabel } from '@/lib/categories'
@@ -9,10 +9,11 @@ import { kindLabel } from '@/lib/changeKinds'
 import { $gettext } from '@/lib/gettext'
 import { localized } from '@/lib/labels'
 import { itemLabel } from '@/lib/storeDiff'
-import { fromNow } from '@/lib/time'
+import { formatTime, fromNow, waited } from '@/lib/time'
+import { useCrumbs } from '@/stores/crumbs'
+import { usePluginStore } from '@/stores/plugin'
 
 const route = useRoute()
-const router = useRouter()
 const data = ref<{ change: Change, canRetry: boolean, canWithdraw: boolean, others: Change[], events: ChangeEvent[] } | null>(null)
 const missing = ref(false)
 const retrying = ref(false)
@@ -39,12 +40,24 @@ async function load() {
 watch(id, load, { immediate: true })
 onBeforeUnmount(() => clearTimeout(timer))
 
+// The plugin the change belongs to, for the plugin head; a new listing the
+// user cannot open yet has none.
+const pluginStore = usePluginStore()
+watch(() => change.value?.pluginId, (pluginId) => {
+  if (pluginId)
+    pluginStore.open(pluginId)
+}, { immediate: true })
+const headPlugin = computed(() => {
+  const plugin = pluginStore.detail?.plugin
+  return plugin && plugin.id === change.value?.pluginId ? plugin : null
+})
+
 // A self service change skips the review; a store change that went to the
 // author's repository waits for the author's merge instead.
 const selfService = computed(() => change.value?.class === 'self_service')
 const repoStore = computed(() => change.value?.delivery === 'bot' || change.value?.delivery === 'patch')
 const stages = computed(() => repoStore.value
-  ? ['submitted', 'review', 'merged', 'live']
+  ? ['submitted', 'checks', 'review', 'merged', 'live']
   : selfService.value
     ? ['submitted', 'checks', 'merged', 'live']
     : ['submitted', 'checks', 'review', 'merged', 'live'])
@@ -67,7 +80,7 @@ const stepStatus = computed<'process' | 'error' | 'finish'>(() => {
 
 const steps = computed(() => {
   const titles = repoStore.value
-    ? [$gettext('Submitted'), $gettext('Merge the pull request'), $gettext('Catalog updated'), $gettext('Visible to users')]
+    ? [$gettext('Submitted'), $gettext('Automatic checks'), $gettext('Merge the pull request'), $gettext('Catalog updated'), $gettext('Visible to users')]
     : selfService.value
       ? [$gettext('Submitted'), $gettext('Checks'), $gettext('Committed to the catalog'), $gettext('Live in the catalog')]
       : [$gettext('Submitted'), $gettext('Checks'), $gettext('Maintainer review'), $gettext('Merged'), $gettext('Live in the catalog')]
@@ -76,28 +89,77 @@ const steps = computed(() => {
     // The steps component draws a check for an error too, so draw a cross.
     const icon = status === 'error' ? h('span', { class: 'i-tabler-circle-x-filled step-error' }) : undefined
     // When each stage was reached and by whom, from the history.
-    const reached = [...(data.value?.events ?? [])].reverse().find(e => e.stage === stages.value[index])
-    const description = reached ? `${fromNow(reached.at)}${reached.actor ? `, @${reached.actor}` : ''}` : index === current.value && change.value?.waitingOn === 'author' ? $gettext('Waiting for you') : undefined
+    const stage = stages.value[index]
+    const reached = [...(data.value?.events ?? [])].reverse().find(e => e.stage === stage)
+    const lines: string[] = []
+    if (reached)
+      lines.push(formatTime(reached.at))
+    if (reached?.actor)
+      lines.push(`@${reached.actor}`)
+    if (index === current.value && change.value?.state === 'open') {
+      if (!reached && change.value.updatedAt)
+        lines.push($gettext('Waited %{time}', { time: waited(change.value.updatedAt) }))
+      if (change.value.waitingOn === 'author')
+        lines.push($gettext('Waiting for you'))
+    }
+    else if (index < current.value && !reached && stage === 'checks') {
+      lines.push($gettext('Passed'))
+    }
+    else if (index > current.value) {
+      if (stage === 'merged' && repoStore.value)
+        lines.push($gettext('Within minutes of the merge'))
+      else if (stage === 'live')
+        lines.push($gettext('Once Nginx UI refreshes its marketplace'))
+    }
+    const description = lines.length ? h('div', { class: 'step-lines' }, lines.map(line => h('div', line))) : undefined
     return { title, status, icon, description }
   })
 })
 
-const title = computed(() => localized(change.value?.entry?.name) || change.value?.pluginId || '')
+const title = computed(() => localized(headPlugin.value?.name) || localized(change.value?.entry?.name) || change.value?.pluginId || '')
 
-const crumbs = computed(() => {
-  const link = (text: string, to: string) => ({
-    title: text,
-    href: to,
-    onClick: (e: MouseEvent) => {
-      e.preventDefault()
-      router.push(to)
-    },
-  })
-  const items = [link($gettext('My plugins'), '/plugins')]
-  if (change.value?.pluginId)
-    items.push(link(title.value, `/plugins/${change.value.pluginId}`))
-  return [...items, { title: change.value ? kindLabel(change.value.kind) : '' }]
+useCrumbs(() => [
+  { title: $gettext('My plugins'), to: '/plugins' },
+  ...(change.value?.pluginId ? [{ title: title.value, to: `/plugins/${change.value.pluginId}` }] : []),
+  { title: $gettext('Change progress') },
+])
+
+// Where each item of a store change stands.
+function itemState(item: { review: boolean }): string {
+  const c = change.value
+  if (!c)
+    return ''
+  if (c.state === 'withdrawn' || c.state === 'rejected')
+    return $gettext('Stopped')
+  if (c.stage === 'live')
+    return item.review ? $gettext('Waiting for name review') : $gettext('Live')
+  if (c.stage === 'merged')
+    return item.review ? $gettext('Waiting for name review') : $gettext('Takes effect at the next catalog update')
+  return $gettext('Waiting for the merge')
+}
+
+// The title of the main card: the kind of change and how many items it holds.
+const cardTitle = computed(() => {
+  const c = change.value
+  if (!c)
+    return ''
+  return c.items?.length ? $gettext('%{kind}, %{n} items', { kind: kindLabel(c.kind), n: String(c.items.length) }) : kindLabel(c.kind)
 })
+const submittedBy = computed(() => {
+  const first = data.value?.events.find(e => e.stage === 'submitted')
+  return first ? $gettext('Submitted by @%{login} %{time}', { login: first.actor ?? '', time: formatTime(first.at) }) : ''
+})
+
+// Dot colors of the history.
+function eventTone(e: ChangeEvent): string {
+  if (e.stage === 'rejected' || (e.stage === 'checks' && e.detail?.outcome))
+    return 'bad'
+  if (e.stage === 'reminder' || e.stage === 'changes_requested' || e.stage === 'withdrawn')
+    return 'muted'
+  if (e.stage === 'merged' || e.stage === 'live')
+    return 'ok'
+  return 'info'
+}
 
 // What a self service change asked for, one row per operation.
 const requested = computed(() => {
@@ -237,71 +299,73 @@ async function retry() {
   <div class="page">
     <AResult v-if="missing" status="404" :title="$gettext('Change not found')" />
     <template v-else-if="change && data">
-      <ABreadcrumb :items="crumbs" />
-      <div>
+      <PluginHeader v-if="headPlugin" :plugin="headPlugin" />
+      <div v-else>
         <h1 class="page-title">
           {{ kindLabel(change.kind) }}
         </h1>
         <AFlex gap="small" wrap class="text-3 op-65">
-          <span>{{ title }}</span>
+          <span v-if="title !== change.pluginId">{{ title }}</span>
           <span class="mono">{{ change.pluginId }}</span>
           <span>{{ $gettext('Submitted %{time}', { time: fromNow(change.createdAt) }) }}</span>
         </AFlex>
       </div>
 
-      <ACard>
-        <ASteps :current="current" :items="steps" responsive />
-      </ACard>
-
       <div class="cols">
         <AFlex vertical gap="middle" class="col-main">
-          <div v-if="repoStore && change.state === 'open' && change.stage === 'review'" class="callout">
-            <span class="i-tabler-clock text-6 c-warn" />
-            <div class="min-w-0 flex-1">
-              <div class="font-600">
-                {{ change.delivery === 'bot' ? $gettext('Waiting for you to merge pull request #%{n} on GitHub', { n: String(change.prNumber ?? '') }) : $gettext('Waiting for you to commit the files to %{repo}', { repo: change.repo ?? '' }) }}
-              </div>
-              <div class="text-3 op-65 mt-1">
-                {{ change.delivery === 'bot' ? $gettext('The pull request is on %{repo}. Once it is merged, the change shows in the catalog within minutes.', { repo: change.repo ?? '' }) : $gettext('Unpack the patch at the root of the repository and commit it to the default branch. The portal notices the commit by itself.') }}
-              </div>
-            </div>
-            <AFlex gap="small" wrap>
-              <AButton v-if="data.canWithdraw" @click="withdrawOpen = true">
-                {{ $gettext('Withdraw the change') }}
-              </AButton>
-              <AButton v-if="change.delivery === 'bot' && change.prUrl" type="primary" :href="change.prUrl" target="_blank">
-                <span class="i-tabler-brand-github" />{{ $gettext('Merge on GitHub') }}
-              </AButton>
-              <AButton v-if="change.patchUrl" type="primary" :href="change.patchUrl">
-                <span class="i-tabler-download" />{{ $gettext('Download the patch') }}
-              </AButton>
-            </AFlex>
-          </div>
-          <AAlert v-if="status && !(repoStore && change.state === 'open' && change.stage === 'review')" :type="status.type" show-icon :title="status.text">
-            <template v-if="problems.length || rejectReason || (change.outcome?.outcome === 'rejected' && change.outcome.message)" #description>
-              <div v-if="rejectReason" class="mb-2 whitespace-pre-wrap">
-                {{ $gettext('Reason: %{reason}', { reason: rejectReason }) }}
-              </div>
-              <div v-if="change.outcome?.outcome === 'rejected' && change.outcome.message" class="mb-2">
-                {{ change.outcome.message }}
-              </div>
-              <ul v-if="problems.length" class="m-0 pl-5">
-                <li v-for="(line, index) in problems" :key="index">
-                  {{ line }}
-                </li>
-              </ul>
+          <ACard :title="cardTitle">
+            <template #extra>
+              <span class="text-3 op-65">{{ submittedBy }}</span>
             </template>
-            <template v-if="data.canRetry || data.canWithdraw" #action>
+            <ASteps :current="current" :items="steps" label-placement="vertical" responsive class="change-steps" />
+            <div v-if="repoStore && change.state === 'open' && change.stage === 'review'" class="callout mt-5">
+              <span class="i-tabler-clock text-6 c-warn" />
+              <div class="min-w-0 flex-1">
+                <div class="font-600">
+                  {{ change.delivery === 'bot' ? $gettext('Waiting for you to merge pull request #%{n} on GitHub', { n: String(change.prNumber ?? '') }) : $gettext('Waiting for you to commit the files to %{repo}', { repo: change.repo ?? '' }) }}
+                </div>
+                <div class="text-3 op-65 mt-1">
+                  {{ change.delivery === 'bot' ? $gettext('The pull request is on %{repo}. Once it is merged, the change shows in the catalog within minutes.', { repo: change.repo ?? '' }) : $gettext('Unpack the patch at the root of the repository and commit it to the default branch. The portal notices the commit by itself.') }}
+                </div>
+              </div>
               <AFlex gap="small" wrap>
-                <AButton v-if="data.canRetry" size="small" :loading="retrying" @click="retry">
-                  {{ $gettext('Run the checks again') }}
+                <AButton v-if="data.canWithdraw" @click="withdrawOpen = true">
+                  {{ $gettext('Withdraw the change') }}
                 </AButton>
-                <AButton v-if="data.canWithdraw" size="small" @click="withdrawOpen = true">
-                  {{ $gettext('Withdraw') }}
+                <AButton v-if="change.delivery === 'bot' && change.prUrl" type="primary" :href="change.prUrl" target="_blank">
+                  <span class="i-tabler-brand-github" />{{ $gettext('Merge on GitHub') }}
+                </AButton>
+                <AButton v-if="change.patchUrl" type="primary" :href="change.patchUrl">
+                  <span class="i-tabler-download" />{{ $gettext('Download the patch') }}
                 </AButton>
               </AFlex>
-            </template>
-          </AAlert>
+            </div>
+            <AAlert v-if="status && !(repoStore && change.state === 'open' && change.stage === 'review')" :type="status.type" show-icon :title="status.text" class="mt-5">
+              <template v-if="problems.length || rejectReason || (change.outcome?.outcome === 'rejected' && change.outcome.message)" #description>
+                <div v-if="rejectReason" class="mb-2 whitespace-pre-wrap">
+                  {{ $gettext('Reason: %{reason}', { reason: rejectReason }) }}
+                </div>
+                <div v-if="change.outcome?.outcome === 'rejected' && change.outcome.message" class="mb-2">
+                  {{ change.outcome.message }}
+                </div>
+                <ul v-if="problems.length" class="m-0 pl-5">
+                  <li v-for="(line, index) in problems" :key="index">
+                    {{ line }}
+                  </li>
+                </ul>
+              </template>
+              <template v-if="data.canRetry || data.canWithdraw" #action>
+                <AFlex gap="small" wrap>
+                  <AButton v-if="data.canRetry" size="small" :loading="retrying" @click="retry">
+                    {{ $gettext('Run the checks again') }}
+                  </AButton>
+                  <AButton v-if="data.canWithdraw" size="small" @click="withdrawOpen = true">
+                    {{ $gettext('Withdraw') }}
+                  </AButton>
+                </AFlex>
+              </template>
+            </AAlert>
+          </ACard>
           <ACard v-if="requested.length" :title="$gettext('What was asked')">
             <div v-for="row in requested" :key="row.key" class="op">
               <span class="op-icon" :class="row.tone"><span :class="row.icon" /></span>
@@ -330,11 +394,15 @@ async function retry() {
                   <th>{{ $gettext('Item') }}</th>
                   <th>{{ $gettext('Review') }}</th>
                   <th>{{ $gettext('Progress') }}</th>
+                  <th>{{ $gettext('Current state') }}</th>
                 </tr>
               </thead>
               <tbody>
                 <tr v-for="item in change.items" :key="item.label">
-                  <td>{{ itemLabel(item, (change.entry ?? {}) as never) }}</td>
+                  <td>
+                    {{ itemLabel(item, (change.entry ?? {}) as never) }}
+                    <span v-if="item.value" class="text-3 op-65 ml-1">{{ item.value }}</span>
+                  </td>
                   <td>
                     <ATag v-if="item.review" color="blue" class="m-0">
                       {{ $gettext('Name review after the merge') }}
@@ -344,17 +412,26 @@ async function retry() {
                   <td>
                     <span class="mini-track"><span v-for="(st, i) in miniTrack(change)" :key="i" :class="st" /></span>
                   </td>
+                  <td>{{ itemState(item) }}</td>
                 </tr>
               </tbody>
             </table>
           </ACard>
-          <ACard :title="$gettext('History')">
-            <AFlex vertical gap="small">
-              <AFlex v-for="(e, index) in data.events" :key="index" justify="space-between" gap="middle" class="event">
-                <span>{{ eventText(e) }}<span v-if="e.actor" class="op-65"> (@{{ e.actor }})</span></span>
-                <span class="op-65 text-3 whitespace-nowrap">{{ fromNow(e.at) }}</span>
-              </AFlex>
-            </AFlex>
+          <ACard>
+            <template #title>
+              <span class="i-tabler-history mr-2 align-[-2px]" />{{ $gettext('History') }}
+            </template>
+            <div class="timeline">
+              <div v-for="(e, index) in [...data.events].reverse()" :key="index" class="tl-item">
+                <span class="tl-dot" :class="eventTone(e)" />
+                <div class="min-w-0">
+                  <div>{{ eventText(e) }}<span v-if="e.actor" class="op-65"> (@{{ e.actor }})</span></div>
+                  <div class="text-3 op-65 mt-1">
+                    {{ formatTime(e.at) }}
+                  </div>
+                </div>
+              </div>
+            </div>
           </ACard>
         </AFlex>
         <AFlex vertical gap="middle" class="col-side">
@@ -382,13 +459,16 @@ async function retry() {
           </ACard>
           <ACard v-if="data.others.length" :title="$gettext('Your other changes in progress')">
             <RouterLink v-for="o in data.others" :key="o.id" :to="`/changes/${o.id}`" class="other">
-              <div class="font-500">
-                {{ localized(o.entry?.name) || o.pluginId }}, {{ kindLabel(o.kind) }}
+              <PluginIcon :src="null" :name="localized(o.entry?.name) || o.pluginId || ''" :size="36" />
+              <div class="min-w-0 flex-1">
+                <div class="font-500">
+                  {{ localized(o.entry?.name) || o.pluginId }}, {{ kindLabel(o.kind) }}
+                </div>
+                <AFlex align="center" gap="small" class="text-3 op-65 mt-1">
+                  <span class="mini-track"><span v-for="(st, i) in miniTrack(o)" :key="i" :class="st" /></span>
+                  <span :class="{ 'c-warn-text': o.waitingOn === 'author' }">{{ otherText(o) }}</span>
+                </AFlex>
               </div>
-              <AFlex align="center" gap="small" class="text-3 op-65 mt-1">
-                <span class="mini-track"><span v-for="(st, i) in miniTrack(o)" :key="i" :class="st" /></span>
-                <span>{{ otherText(o) }}</span>
-              </AFlex>
             </RouterLink>
           </ACard>
           <ACard v-if="prefs" :title="$gettext('Notifications')">
@@ -408,6 +488,14 @@ async function retry() {
               <AInput v-if="prefs.mail && (prefs.emailOnAction || prefs.emailOnLive)" :value="prefs.email ?? ''" size="small" :placeholder="$gettext('Email address')" @change="(e: Event) => setEmail((e.target as HTMLInputElement).value)" />
               <span v-if="!prefs.mail" class="op-65">{{ $gettext('Email is not available yet.') }}</span>
             </AFlex>
+          </ACard>
+          <ACard>
+            <div class="font-600 text-3">
+              {{ $gettext('Every plugin page shows the progress at the top') }}
+            </div>
+            <div class="text-3 op-65 mt-2">
+              {{ $gettext('A change in progress shows as one line at the top of its plugin page. Click it to open this page.') }}
+            </div>
           </ACard>
         </AFlex>
       </div>
@@ -472,11 +560,11 @@ async function retry() {
 }
 
 .mini-track .done {
-  background: #52c41a;
+  background: var(--portal-primary);
 }
 
 .mini-track .cur {
-  background: var(--portal-primary);
+  background: #faad14;
 }
 
 .mini-track .warn {
@@ -484,9 +572,52 @@ async function retry() {
 }
 
 .other {
-  display: block;
-  padding: 8px 0;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 0;
   color: inherit;
+}
+
+.c-warn-text {
+  color: #d48806;
+}
+
+.change-steps :deep(.step-lines) {
+  font-size: 12px;
+  line-height: 18px;
+}
+
+.timeline {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.tl-item {
+  display: flex;
+  gap: 12px;
+}
+
+.tl-dot {
+  flex: none;
+  width: 8px;
+  height: 8px;
+  margin-top: 6px;
+  border-radius: 50%;
+  border: 2px solid var(--portal-primary);
+}
+
+.tl-dot.ok {
+  border-color: #52c41a;
+}
+
+.tl-dot.bad {
+  border-color: #ff4d4f;
+}
+
+.tl-dot.muted {
+  border-color: var(--portal-border-strong);
 }
 
 .other + .other {
@@ -586,14 +717,5 @@ async function retry() {
   font-size: 13px;
   white-space: pre-wrap;
   overflow-wrap: anywhere;
-}
-
-.event {
-  padding: 8px 0;
-  border-bottom: 1px solid var(--portal-border);
-}
-
-.event:last-child {
-  border-bottom: 0;
 }
 </style>

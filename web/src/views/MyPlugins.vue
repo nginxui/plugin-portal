@@ -9,6 +9,7 @@ import { kindLabel } from '@/lib/changeKinds'
 import { $gettext } from '@/lib/gettext'
 import { localized } from '@/lib/labels'
 import { localeName } from '@/lib/locales'
+import { loadDrafts } from '@/lib/submitDrafts'
 import { formatDate, fromNow, waited } from '@/lib/time'
 
 const plugins = ref<PluginSummary[]>([])
@@ -19,6 +20,9 @@ const installUrl = ref('')
 const loading = ref(true)
 const failed = ref(false)
 const ownerFilter = ref('all')
+
+// Submissions started in this browser whose plugin is not here yet.
+const drafts = computed(() => loadDrafts().filter(d => !plugins.value.some(p => p.repo?.toLowerCase() === d.repo.toLowerCase() || p.id === d.id)))
 
 async function load() {
   loading.value = true
@@ -192,7 +196,7 @@ const activity = computed(() => plugins.value
         </ACard>
 
         <ASkeleton v-if="loading" active />
-        <ACard v-else-if="shown.length === 0">
+        <ACard v-else-if="shown.length === 0 && !drafts.length">
           <AEmpty :description="$gettext('You have no role on any listed plugin yet.')">
             <ATypographyText type="secondary" class="text-3">
               {{ $gettext('Plugins appear here when you have admin, maintain, write or triage permission on their repository.') }}
@@ -201,6 +205,7 @@ const activity = computed(() => plugins.value
         </ACard>
         <div v-else class="grid">
           <PluginCard v-for="plugin in shown" :key="plugin.id" :plugin="plugin" :insights="insights[plugin.id]" :change="changeOf(plugin.id)" />
+          <SubmitDraftCard v-for="draft in ownerFilter === 'all' ? drafts : []" :key="draft.repo" :draft="draft" />
         </div>
 
         <ACard :title="$gettext('Repositories you can submit')" :loading="loading">
@@ -241,13 +246,24 @@ const activity = computed(() => plugins.value
         <ACard :title="$gettext('Recent releases')">
           <div v-if="recentReleases.length" class="timeline">
             <div v-for="release in recentReleases" :key="`${release.id}@${release.version}`" class="tl-item">
-              <span class="tl-dot" :class="release.yanked ? 'warn' : 'ok'" />
+              <span class="tl-dot" :class="release.yanked ? 'warn' : release.listed === false ? 'info' : 'ok'" />
               <div class="min-w-0">
                 <div>
                   {{ release.yanked ? $gettext('%{name} v%{version} yanked', { name: release.plugin, version: release.version }) : $gettext('%{name} v%{version}', { name: release.plugin, version: release.version }) }}
                 </div>
                 <div class="text-3 op-65">
-                  {{ $gettext('Released %{time}', { time: fromNow(release.publishedAt) }) }}
+                  <template v-if="release.yanked && release.yankReason">
+                    {{ $gettext('%{time}, reason: %{reason}', { time: fromNow(release.publishedAt), reason: release.yankReason }) }}
+                  </template>
+                  <template v-else-if="release.yanked">
+                    {{ $gettext('Released %{time}, yanked', { time: fromNow(release.publishedAt) }) }}
+                  </template>
+                  <template v-else-if="release.listed === false">
+                    {{ $gettext('Released %{time}, not listed yet', { time: fromNow(release.publishedAt) }) }}
+                  </template>
+                  <template v-else>
+                    {{ $gettext('Released %{time}, listed in the catalog', { time: fromNow(release.publishedAt) }) }}
+                  </template>
                 </div>
               </div>
             </div>

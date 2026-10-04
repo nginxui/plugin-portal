@@ -2,7 +2,7 @@
 import type { TranslatePlugin, TranslatorOverview } from '@/api/community'
 import { computed, onMounted, ref, watch } from 'vue'
 import { getGlossary, getTranslatePlugin, getTranslator, setTranslatorLangs, suggest } from '@/api/community'
-import { $gettext } from '@/lib/gettext'
+import gettext, { $gettext } from '@/lib/gettext'
 import { HOST_LOCALES, RTL_LOCALES } from '@/lib/hostLocales'
 import { localized } from '@/lib/labels'
 import { localeName } from '@/lib/locales'
@@ -14,7 +14,7 @@ import { fromNow } from '@/lib/time'
 
 const overview = ref<TranslatorOverview | null>(null)
 const failed = ref(false)
-const sort = ref<'missing' | 'updated'>('missing')
+const sort = ref<'missing' | 'installs' | 'updated'>('missing')
 const lang = ref<string | null>(null)
 
 async function load() {
@@ -42,8 +42,10 @@ async function setLangs(locales: string[]) {
 
 const plugins = computed(() => {
   const list = (overview.value?.open ?? []).filter(p => !lang.value || !p.locales || p.locales.includes(lang.value))
-  return [...list].sort((a, b) => sort.value === 'missing' ? b.missing - a.missing : b.updatedAt - a.updatedAt)
+  return [...list].sort((a, b) => sort.value === 'missing' ? b.missing - a.missing : sort.value === 'installs' ? b.installs - a.installs : b.updatedAt - a.updatedAt)
 })
+
+const missingText = (n: number) => $gettext('%{n} missing', { n: String(n) })
 
 function speed(hours: number | null) {
   if (hours === null)
@@ -110,11 +112,18 @@ watch(lang, async (value) => {
   terms.value = value ? (await getGlossary(value).catch(() => ({ terms: {} }))).terms : {}
 }, { immediate: true })
 
-const STATE: Record<string, { text: () => string, dot: string }> = {
-  pending: { text: () => $gettext('Waiting for review'), dot: '' },
-  accepted: { text: () => $gettext('Accepted, waiting for the merge'), dot: 'info' },
-  merged: { text: () => $gettext('Merged, listed at the next catalog update'), dot: 'ok' },
-  declined: { text: () => $gettext('Not accepted'), dot: 'gray' },
+// The glossary is keyed by the English terms; show them in the language of
+// the portal when Nginx UI translates them.
+const uiTerms = ref<Record<string, string>>({})
+watch(() => gettext.current, async (value) => {
+  uiTerms.value = value !== 'en' ? (await getGlossary(value).catch(() => ({ terms: {} }))).terms : {}
+}, { immediate: true })
+
+const PROGRESS: Record<string, { text: (n: number | null) => string, track: string[] }> = {
+  pending: { text: () => $gettext('Waiting for review'), track: ['done', 'cur', '', '', ''] },
+  accepted: { text: n => n ? $gettext('Accepted, waiting for the merge in pull request #%{n}', { n: String(n) }) : $gettext('Accepted, waiting for the merge'), track: ['done', 'done', 'done', 'cur', ''] },
+  merged: { text: () => $gettext('Merged, listed at the next catalog update'), track: ['done', 'done', 'done', 'done', 'cur'] },
+  live: { text: () => $gettext('Listed'), track: ['done', 'done', 'done', 'done', 'done'] },
 }
 </script>
 
@@ -122,7 +131,7 @@ const STATE: Record<string, { text: () => string, dot: string }> = {
   <div class="page">
     <div>
       <h1 class="page-title">
-        {{ $gettext('Translate') }}
+        {{ $gettext('Contribute translations') }}
       </h1>
       <ATypographyText type="secondary">
         {{ $gettext('Suggest translations for plugins that welcome community translation. Accepted suggestions go to the plugin repository with you as a co-author.') }}
@@ -159,7 +168,7 @@ const STATE: Record<string, { text: () => string, dot: string }> = {
             <span class="i-tabler-plus" />{{ $gettext('Add') }}
           </AButton>
         </AFlex>
-        <ASegmented v-model:value="sort" :options="[{ value: 'missing', label: $gettext('Most missing') }, { value: 'updated', label: $gettext('Recently updated') }]" />
+        <ASegmented v-model:value="sort" :options="[{ value: 'missing', label: $gettext('Most missing') }, { value: 'installs', label: $gettext('Most installed') }, { value: 'updated', label: $gettext('Recently updated') }]" />
       </AFlex>
     </ACard>
 
@@ -183,7 +192,7 @@ const STATE: Record<string, { text: () => string, dot: string }> = {
               </div>
             </div>
             <ATag v-if="p.missing" color="warning" class="m-0">
-              {{ $gettext('%{n} missing', { n: String(p.missing) }) }}
+              {{ missingText(p.missing) }}
             </ATag>
             <ATag v-else color="success" class="m-0">
               {{ $gettext('Complete') }}
@@ -199,7 +208,7 @@ const STATE: Record<string, { text: () => string, dot: string }> = {
             <span class="text-3 op-65">{{ $gettext('Fill in only what you add or change') }}</span>
           </template>
           <div class="overflow-x-auto">
-            <table class="grid">
+            <table class="tr-table">
               <thead>
                 <tr>
                   <th class="w-30">
@@ -263,22 +272,34 @@ const STATE: Record<string, { text: () => string, dot: string }> = {
             </div>
           </div>
           <div class="timeline mt-4">
-            <div v-for="s in (overview?.suggestions ?? []).slice(0, 8)" :key="s.id" class="tl-item">
-              <span class="tl-dot" :class="STATE[s.state]?.dot" />
+            <div v-for="(d, i) in overview?.decisions ?? []" :key="i" class="tl-item">
+              <span class="tl-dot" :class="d.state === 'accepted' ? 'ok' : 'gray'" />
               <div class="min-w-0">
-                <div class="truncate">
-                  {{ s.text }}
+                <div>
+                  {{ d.state === 'accepted'
+                    ? $gettext('@%{login} accepted %{n} of your suggestions for %{name}', { login: d.decider ?? '', n: String(d.count), name: localized(d.name) })
+                    : $gettext('@%{login} did not accept %{n} of your suggestions for %{name}', { login: d.decider ?? '', n: String(d.count), name: localized(d.name) }) }}
                 </div>
                 <div class="text-3 op-65">
-                  {{ localeName(s.locale) }}, {{ STATE[s.state]?.text() }}, {{ fromNow(s.decidedAt ?? s.createdAt) }}
+                  {{ fromNow(d.at) }}<template v-if="d.state === 'declined' && d.reason">
+                    , {{ $gettext('Reason: %{reason}', { reason: d.reason }) }}
+                  </template>
                 </div>
-                <div v-if="s.state === 'declined' && s.reason" class="text-3 op-65">
-                  {{ $gettext('Reason: %{reason}', { reason: s.reason }) }}
-                </div>
-                <RouterLink v-if="s.change" :to="`/changes/${s.change}`" class="text-3">
-                  {{ $gettext('View progress') }}
-                </RouterLink>
               </div>
+            </div>
+          </div>
+        </ACard>
+        <ACard v-if="overview?.progress.length" :title="$gettext('Suggestion progress')">
+          <div v-for="p in overview.progress" :key="p.pluginId" class="prog">
+            <PluginIcon :src="p.iconUrl" :name="localized(p.name)" :size="36" />
+            <div class="min-w-0 flex-1">
+              <div class="font-500">
+                {{ $gettext('%{name}, %{n}', { name: localized(p.name), n: String(p.count) }) }}
+              </div>
+              <AFlex align="center" gap="small" class="text-3 mt-1">
+                <span class="mini-track"><span v-for="(st, i) in PROGRESS[p.state].track" :key="i" :class="st" /></span>
+                <span :class="p.state === 'live' ? 'c-ok' : 'op-65'">{{ PROGRESS[p.state].text(p.prNumber) }}</span>
+              </AFlex>
             </div>
           </div>
         </ACard>
@@ -288,7 +309,7 @@ const STATE: Record<string, { text: () => string, dot: string }> = {
           </template>
           <dl class="kv">
             <template v-for="(tr, en) in terms" :key="en">
-              <dt>{{ en }}</dt>
+              <dt>{{ uiTerms[en] ?? en }}</dt>
               <dd>{{ tr }}</dd>
             </template>
           </dl>
@@ -311,6 +332,42 @@ const STATE: Record<string, { text: () => string, dot: string }> = {
   cursor: pointer;
 }
 
+.prog {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 0;
+}
+
+.prog + .prog {
+  border-top: 1px solid var(--portal-border);
+}
+
+.mini-track {
+  display: inline-flex;
+  gap: 3px;
+  flex: none;
+}
+
+.mini-track span {
+  width: 14px;
+  height: 4px;
+  border-radius: 2px;
+  background: var(--portal-border-strong);
+}
+
+.mini-track .done {
+  background: var(--portal-primary);
+}
+
+.mini-track .cur {
+  background: #faad14;
+}
+
+.c-ok {
+  color: #389e0d;
+}
+
 .need {
   display: flex;
   align-items: center;
@@ -322,14 +379,14 @@ const STATE: Record<string, { text: () => string, dot: string }> = {
   border-top: 1px solid var(--portal-border);
 }
 
-.grid {
+.tr-table {
   width: 100%;
   min-width: 720px;
   border-collapse: collapse;
   font-size: 13px;
 }
 
-.grid th {
+.tr-table th {
   text-align: start;
   font-weight: 500;
   padding: 10px 12px;
@@ -337,7 +394,7 @@ const STATE: Record<string, { text: () => string, dot: string }> = {
   border-bottom: 1px solid var(--portal-border);
 }
 
-.grid td {
+.tr-table td {
   padding: 10px 12px;
   border-bottom: 1px solid var(--portal-border);
   vertical-align: top;

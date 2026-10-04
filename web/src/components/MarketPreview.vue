@@ -53,6 +53,8 @@ const props = withDefaults(defineProps<{
   progress?: string
   // Unconfirmed AI drafts, as key.locale.
   aiKeys?: string[]
+  // Parts to mark as changed, by key ("name", "shot:<id>") with a label.
+  highlight?: Record<string, string>
 }>(), {
   theme: 'light',
   device: 'desktop',
@@ -75,6 +77,7 @@ const props = withDefaults(defineProps<{
   draft: null,
   progress: '',
   aiKeys: () => [],
+  highlight: () => ({}),
 })
 
 const emit = defineEmits<{
@@ -203,12 +206,13 @@ function editableClass(key: string, missing = false) {
     editable: props.editable && !props.locked[key] && (key !== 'readme' || props.readmeEditable),
     missing: props.outline && missing,
     on: isEditing(key),
+    hl: !!props.highlight[key],
   }
 }
 </script>
 
 <template>
-  <div class="frame" :class="[theme, device]">
+  <div class="frame" :class="[theme, device, { outlined: outline && editable }]">
     <div class="chrome">
       <span class="dots" aria-hidden="true"><i /><i /><i /></span>
       <span>{{ $gettext('Nginx UI marketplace, as users see it') }}</span>
@@ -221,7 +225,7 @@ function editableClass(key: string, missing = false) {
             <span v-if="trust" class="pill" :class="trust === 'official' ? 'is-accent' : ''">{{ trustText(locale, trust) }}</span>
             <span v-for="cap in manifest?.capabilities ?? []" :key="cap" class="pill is-accent">{{ capabilityText(locale, cap) }}</span>
           </div>
-          <div :class="editableClass('name', name.fallback)" class="name-row" role="button" :tabindex="editable ? 0 : -1" @click="edit('name')" @keydown.enter="edit('name')">
+          <div :class="editableClass('name', name.fallback)" :data-hl="highlight.name" class="name-row" role="button" :tabindex="editable ? 0 : -1" @click="edit('name')" @keydown.enter="edit('name')">
             <h2 class="name">
               {{ name.text }}
             </h2>
@@ -236,7 +240,7 @@ function editableClass(key: string, missing = false) {
         </button>
       </div>
 
-      <div v-if="isEditing('name')" class="editor" @keydown="onKey">
+      <div v-if="isEditing('name')" class="editor" :class="{ pop: editing!.source }" @keydown="onKey">
         <div v-if="progress && editing!.source" class="progress">
           {{ progress }}
         </div>
@@ -260,10 +264,10 @@ function editableClass(key: string, missing = false) {
         </div>
       </div>
 
-      <p v-if="!isEditing('description')" :class="editableClass('description', description.fallback)" class="description" role="button" :tabindex="editable ? 0 : -1" @click="edit('description')" @keydown.enter="edit('description')">
+      <p v-if="!isEditing('description') || editing!.source" :class="editableClass('description', description.fallback)" :data-hl="highlight.description" class="description" role="button" :tabindex="editable ? 0 : -1" @click="edit('description')" @keydown.enter="edit('description')">
         {{ description.text || (editable ? $gettext('Add a description') : '') }}
       </p>
-      <div v-else class="editor" @keydown="onKey">
+      <div v-if="isEditing('description')" class="editor" :class="{ pop: editing!.source }" @keydown="onKey">
         <div v-if="progress && editing!.source" class="progress">
           {{ progress }}
         </div>
@@ -304,7 +308,7 @@ function editableClass(key: string, missing = false) {
         <div v-if="doc.homepage_url || repository || editable" class="row">
           <dt>{{ L('homepage') }}</dt>
           <dd>
-            <span v-if="!isEditing('homepage_url')" :class="editableClass('homepage_url')" class="link" role="button" :tabindex="editable ? 0 : -1" @click="edit('homepage_url')" @keydown.enter="edit('homepage_url')">
+            <span v-if="!isEditing('homepage_url')" :class="editableClass('homepage_url')" :data-hl="highlight.homepage_url" class="link" role="button" :tabindex="editable ? 0 : -1" @click="edit('homepage_url')" @keydown.enter="edit('homepage_url')">
               {{ doc.homepage_url || (editable ? $gettext('Add a homepage') : '') }}
             </span>
             <div v-else class="editor" @keydown="onKey">
@@ -337,7 +341,7 @@ function editableClass(key: string, missing = false) {
           </button>
         </div>
         <div class="strip">
-          <figure v-for="shot in shots" :key="shot.id" class="shot">
+          <figure v-for="shot in shots" :key="shot.id" class="shot" :class="{ hl: highlight[`shot:${shot.id}`] }" :data-hl="highlight[`shot:${shot.id}`]">
             <img v-if="shot.url" :src="shot.url" :alt="shot.caption.text" loading="lazy" referrerpolicy="no-referrer">
             <div v-else class="shot-missing">
               {{ shot.path }}
@@ -347,7 +351,7 @@ function editableClass(key: string, missing = false) {
             </figcaption>
           </figure>
         </div>
-        <div v-if="editing?.key.startsWith('caption:')" class="editor" @keydown="onKey">
+        <div v-if="editing?.key.startsWith('caption:')" class="editor" :class="{ pop: editing.source }" @keydown="onKey">
           <div v-if="progress && editing.source" class="progress">
             {{ progress }}
           </div>
@@ -811,6 +815,59 @@ function editableClass(key: string, missing = false) {
   border-radius: 8px;
   background: var(--p-bg);
   box-shadow: 0 0 0 3px var(--p-accent-bg);
+}
+
+/* A translation opens over the page, so the text it translates stays in view. */
+.editor.pop {
+  position: absolute;
+  z-index: 5;
+  width: min(460px, 100%);
+  box-sizing: border-box;
+  margin-top: 8px;
+  border-color: var(--p-border);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.12), 0 3px 6px -4px rgba(0, 0, 0, 0.12);
+}
+
+.body,
+.section {
+  position: relative;
+}
+
+/* The caption editor opens below the captions of the strip. */
+.section > .editor.pop {
+  top: calc(100% - 8px);
+  left: 0;
+}
+
+.hl {
+  position: relative;
+  border-radius: 6px;
+  outline: 2px solid #faad14;
+  outline-offset: 4px;
+}
+
+.hl::after {
+  content: attr(data-hl);
+  position: absolute;
+  top: -14px;
+  inset-inline-end: 0;
+  padding: 0 6px;
+  border-radius: 8px;
+  background: #faad14;
+  color: #fff;
+  font-size: 11px;
+  font-weight: 500;
+  line-height: 18px;
+  white-space: nowrap;
+}
+
+.editable.on {
+  outline: 2px solid var(--p-accent);
+  outline-offset: 4px;
+}
+
+.frame.outlined .editable:not(:hover, :focus-visible, .on, .missing) {
+  outline-color: var(--p-border);
 }
 
 .source {

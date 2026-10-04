@@ -24,7 +24,11 @@ export interface ProviderInput {
 }
 
 export function getProviders() {
-  return api<{ keyConfigured: boolean, providers: Provider[], today: { authors: number, requests: number, inputTokens: number, outputTokens: number } }>('/ai/admin/providers')
+  return api<{ keyConfigured: boolean, providers: Provider[], today: { authors: number, requests: number, inputTokens: number, outputTokens: number }, glossary?: { locales: number, syncedAt: number | null } }>('/ai/admin/providers')
+}
+
+export function syncGlossary() {
+  return api<{ locales: number, syncedAt: number }>('/ai/admin/glossary/sync', { method: 'POST' })
 }
 
 export function addProvider(input: ProviderInput) {

@@ -1,14 +1,16 @@
 import type { AppEnv } from '../env'
 import type { SuggestionRow } from '../lib/translations'
 import { Hono } from 'hono'
-import { atLeast } from '../lib/access'
+import { atLeast, mapLimit } from '../lib/access'
 import { AiError, defaultProvider, draft, presentProvider } from '../lib/ai'
 import { audit } from '../lib/audit'
 import { loadCatalog, repoOf } from '../lib/catalog'
 import { glossary } from '../lib/glossary'
+import { insightsOf } from '../lib/insights'
 import { isHostLocale } from '../lib/locales'
 import { pluginContext } from '../lib/pluginContext'
 import { reservedWord } from '../lib/rules'
+import { userToken } from '../lib/session'
 import { readStore } from '../lib/store'
 import { now } from '../lib/time'
 import { flushAccepted, textOf, validField } from '../lib/translations'
@@ -196,9 +198,10 @@ community.get('/translate', requireSession, async (c) => {
   const [counts, recent, open] = await Promise.all([
     c.env.DB.prepare(`SELECT state, count(*) AS n FROM suggestions WHERE author_id = ? GROUP BY state`).bind(session.user.id).all<{ state: string, n: number }>(),
     c.env.DB.prepare(
-      `SELECT s.*, c.state AS change_state, c.stage AS change_stage FROM suggestions s LEFT JOIN changes c ON c.id = s.change_id
-       WHERE s.author_id = ? ORDER BY coalesce(s.decided_at, s.created_at) DESC LIMIT 30`,
-    ).bind(session.user.id).all<SuggestionRow & { change_state: string | null, change_stage: string | null }>(),
+      `SELECT s.*, c.state AS change_state, c.stage AS change_stage, c.pr_number AS change_pr, u.login AS decider
+       FROM suggestions s LEFT JOIN changes c ON c.id = s.change_id LEFT JOIN users u ON u.id = s.decided_by
+       WHERE s.author_id = ? ORDER BY coalesce(s.decided_at, s.created_at) DESC LIMIT 60`,
+    ).bind(session.user.id).all<SuggestionRow & { change_state: string | null, change_stage: string | null, change_pr: number | null, decider: string | null }>(),
     c.env.DB.prepare(
       `SELECT p.plugin_id, p.community_locales, p.updated_at,
          (SELECT avg(s.decided_at - s.created_at) FROM suggestions s WHERE s.plugin_id = p.plugin_id AND s.decided_at IS NOT NULL) AS review_seconds
@@ -207,7 +210,7 @@ community.get('/translate', requireSession, async (c) => {
   ])
   // What each open plugin lacks in the user's languages, as listed.
   const catalog = await loadCatalog(c.env)
-  const byId = new Map(catalog.plugins.map(p => [p.id, p as typeof p & { screenshots?: { caption?: Record<string, string> }[] }]))
+  const byId = new Map(catalog.plugins.map(p => [p.id, p as typeof p & { screenshots?: { caption?: Record<string, string>, dark_url?: string }[] }]))
   const missingIn = (id: string, locales: string[] | null) => {
     const listing = byId.get(id)
     if (!listing)
@@ -216,10 +219,52 @@ community.get('/translate', requireSession, async (c) => {
     const wanted = langs.filter(l => !locales || locales.includes(l))
     return texts.reduce((n, t) => n + wanted.filter(l => !t[l]).length, 0)
   }
+  // Downloads of the recent releases, for sorting by installs.
+  const token = await userToken(c.env, session.id).catch(() => '')
+  const installs = new Map(await mapLimit(open.results, 6, async (p) => {
+    const listing = byId.get(p.plugin_id)
+    if (!listing || !token)
+      return [p.plugin_id, 0] as const
+    const insights = await insightsOf(c.env, token, listing).catch(() => null)
+    return [p.plugin_id, (insights?.downloads ?? []).reduce((n, d) => n + d.count, 0)] as const
+  }))
+  const nameOf = (id: string) => byId.get(id)?.name ?? { en: id }
+  // Decisions on the user's suggestions, one per batch a reviewer decided.
+  const decisions: { pluginId: string, name: Record<string, string>, state: string, count: number, decider: string | null, reason: string | null, at: number }[] = []
+  for (const s of recent.results) {
+    if (!s.decided_at || s.state === 'pending')
+      continue
+    const state = s.state === 'declined' ? 'declined' : 'accepted'
+    const last = decisions.find(d => d.pluginId === s.plugin_id && d.state === state && d.at === s.decided_at)
+    if (last)
+      last.count++
+    else if (decisions.length < 8)
+      decisions.push({ pluginId: s.plugin_id, name: nameOf(s.plugin_id), state, count: 1, decider: s.decider, reason: s.reason, at: s.decided_at })
+  }
+  // Where the user's suggestions stand, per plugin.
+  const progress: { pluginId: string, name: Record<string, string>, iconUrl: string | null, count: number, state: string, prNumber: number | null }[] = []
+  const rank = ['pending', 'accepted', 'merged', 'live']
+  for (const s of recent.results) {
+    if (s.state === 'declined')
+      continue
+    const state = s.change_state === 'live' ? 'live' : s.change_state === 'merged' || s.state === 'merged' ? 'merged' : s.state === 'accepted' ? 'accepted' : 'pending'
+    const found = progress.find(p => p.pluginId === s.plugin_id)
+    if (found) {
+      found.count++
+      if (rank.indexOf(state) < rank.indexOf(found.state))
+        found.state = state
+      found.prNumber ??= s.change_pr
+    }
+    else if (progress.length < 6) {
+      progress.push({ pluginId: s.plugin_id, name: nameOf(s.plugin_id), iconUrl: byId.get(s.plugin_id)?.icon_url ?? null, count: 1, state, prNumber: s.change_pr })
+    }
+  }
   return c.json({
     langs,
     counts: Object.fromEntries(counts.results.map(r => [r.state, r.n])),
-    suggestions: recent.results.map(s => ({ id: s.id, pluginId: s.plugin_id, field: s.field, locale: s.locale, text: s.text, state: s.state, reason: s.reason, decidedAt: s.decided_at, createdAt: s.created_at, change: s.change_id, changeState: s.change_state, changeStage: s.change_stage })),
+    decisions,
+    progress,
+    suggestions: recent.results.slice(0, 30).map(s => ({ id: s.id, pluginId: s.plugin_id, field: s.field, locale: s.locale, text: s.text, state: s.state, reason: s.reason, decidedAt: s.decided_at, createdAt: s.created_at, change: s.change_id, changeState: s.change_state, changeStage: s.change_stage })),
     open: open.results.map((p) => {
       const locales = p.community_locales ? JSON.parse(p.community_locales) as string[] : null
       const listing = byId.get(p.plugin_id)
@@ -231,6 +276,7 @@ community.get('/translate', requireSession, async (c) => {
         locales,
         missing: missingIn(p.plugin_id, locales),
         updatedAt: p.updated_at,
+        installs: installs.get(p.plugin_id) ?? 0,
         reviewHours: p.review_seconds === null ? null : Math.round(p.review_seconds / 3600),
       }
     }),
