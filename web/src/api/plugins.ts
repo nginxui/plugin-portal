@@ -28,8 +28,9 @@ export interface PluginSummary {
 
 export interface Installable {
   repo: string
-  repoId: number
-  installedAt: number
+  description: string | null
+  source: 'installation' | 'admin'
+  at: number | null
 }
 
 export interface Release {

@@ -26,6 +26,7 @@ function icon(name: string) {
 const menuItems = computed<MenuProps['items']>(() => {
   const items: MenuProps['items'] = [
     { key: '/plugins', icon: icon('i-tabler-layout-grid'), label: $gettext('My plugins') },
+    { key: '/submit', icon: icon('i-tabler-plus'), label: $gettext('Submit a plugin') },
     { key: '/owners', icon: icon('i-tabler-building'), label: $gettext('Organizations') },
   ]
   return items

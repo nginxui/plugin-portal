@@ -4,6 +4,7 @@ import type { CatalogPlugin, Localized } from '../lib/catalog'
 import { Hono } from 'hono'
 import { mapLimit, repoAccess } from '../lib/access'
 import { latestRelease, loadCatalog, repoOf } from '../lib/catalog'
+import { github, GitHubError } from '../lib/github'
 import { userToken } from '../lib/session'
 import { checkMaintainer, requireSession } from '../middleware/auth'
 
@@ -25,8 +26,58 @@ export interface PluginSummary {
 
 export interface Installable {
   repo: string
-  repoId: number
-  installedAt: number
+  description: string | null
+  // How the user may claim it: they installed the Catalog App, or administer it.
+  source: 'installation' | 'admin'
+  at: number | null
+}
+
+interface UserRepo {
+  full_name: string
+  description: string | null
+  private: boolean
+  archived: boolean
+  fork: boolean
+  pushed_at: string | null
+  permissions?: { admin?: boolean }
+}
+
+// Public repositories the user may submit: the ones they installed the
+// Catalog App on, as the release webhook recorded, and the ones they
+// administer, read with their own token. Listed repositories are left out.
+async function submittable(env: Env, session: Session, token: string, taken: Set<string>): Promise<Installable[]> {
+  const out = new Map<string, Installable>()
+  const installed = await env.DB.prepare(
+    `SELECT repo_full_name AS repo, max(added_at) AS at FROM installations
+     WHERE installed_by = ? AND removed_at IS NULL GROUP BY repo_id ORDER BY at DESC`,
+  ).bind(session.user.id).all<{ repo: string, at: number }>()
+  for (const row of installed.results)
+    out.set(row.repo.toLowerCase(), { repo: row.repo, description: null, source: 'installation', at: row.at })
+
+  // A GitHub App user token may list only repositories the app is installed
+  // on, so the user's own public repositories are read as well; owning one
+  // makes them its admin.
+  const [listed, owned] = await Promise.all([
+    github<UserRepo[]>('/user/repos?affiliation=owner,collaborator,organization_member&visibility=public&sort=pushed&per_page=100', token)
+      .catch((error) => {
+        if (error instanceof GitHubError)
+          return [] as UserRepo[]
+        throw error
+      }),
+    github<UserRepo[]>(`/users/${session.user.login}/repos?type=owner&sort=pushed&per_page=100`, token),
+  ])
+  const repos = [...listed, ...owned.map(r => ({ ...r, permissions: { admin: true } }))]
+  for (const r of repos) {
+    const key = r.full_name.toLowerCase()
+    if (r.private || r.archived || r.fork || !r.permissions?.admin)
+      continue
+    const existing = out.get(key)
+    if (existing)
+      existing.description = r.description
+    else
+      out.set(key, { repo: r.full_name, description: r.description, source: 'admin', at: r.pushed_at ? Math.floor(Date.parse(r.pushed_at) / 1000) : null })
+  }
+  return [...out.values()].filter(item => !taken.has(item.repo.toLowerCase()))
 }
 
 interface PluginRow {
@@ -108,11 +159,7 @@ export async function collectMine(env: Env, session: Session) {
       plugins.push(summarizeDraft(row, a))
   }
 
-  const taken = new Set([...repos])
-  const installable = (await env.DB.prepare(
-    `SELECT repo_full_name AS repo, repo_id AS repoId, max(added_at) AS installedAt FROM installations
-     WHERE installed_by = ? AND removed_at IS NULL GROUP BY repo_id ORDER BY installedAt DESC`,
-  ).bind(session.user.id).all<Installable>()).results.filter(i => !taken.has(i.repo.toLowerCase()))
+  const installable = await submittable(env, session, token, repos)
 
   return { plugins, installable }
 }

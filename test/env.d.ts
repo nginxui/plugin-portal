@@ -10,5 +10,7 @@ declare namespace Cloudflare {
     CATALOG_APP_SLUG: string
     GITHUB_CLIENT_SECRET: string
     SESSION_KEY: string
+    DEPLOY_APP_ID: string
+    DEPLOY_APP_PRIVATE_KEY: string
   }
 }

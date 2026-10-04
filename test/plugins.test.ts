@@ -20,6 +20,18 @@ const repos: Record<string, { id: number, owner: { id: number, login: string, ty
 function catalogAndRepos() {
   return mockFetch(
     url => url.href === `${env.CATALOG_URL}/v1/index.json` ? json(catalog) : undefined,
+    url => url.pathname === '/users/octo-author/repos'
+      ? json([{ full_name: 'octo-author/owned-only', description: 'Mine', private: false, archived: false, fork: false, pushed_at: null }])
+      : undefined,
+    url => url.pathname === '/user/repos'
+      ? json([
+          { full_name: 'octo-author/admin-only', description: null, private: false, archived: false, fork: false, pushed_at: '2026-10-01T00:00:00Z', permissions: { admin: true } },
+          { full_name: 'octo-author/geoip', description: 'GeoIP', private: false, archived: false, fork: false, pushed_at: null, permissions: { admin: true } },
+          { full_name: 'octo-author/secret', description: null, private: true, archived: false, fork: false, pushed_at: null, permissions: { admin: true } },
+          { full_name: 'octo-author/fork', description: null, private: false, archived: false, fork: true, pushed_at: null, permissions: { admin: true } },
+          { full_name: 'someone/contrib', description: null, private: false, archived: false, fork: false, pushed_at: null, permissions: { admin: false, push: true } },
+        ])
+      : undefined,
     (url) => {
       const match = /^\/repos\/([^/]+\/[^/]+)$/.exec(url.pathname)
       if (url.hostname !== 'api.github.com' || !match)
@@ -93,8 +105,12 @@ describe('my plugins', () => {
       insert.bind(2, 52, 'someone/else', 7, 'someone', 100, null),
     ])
     catalogAndRepos()
-    const body = await (await call('/api/plugins/mine', { cookie })).json() as { installable: { repo: string }[], installUrl: string }
-    expect(body.installable.map(i => i.repo)).toEqual(['octo-author/new-plugin'])
+    const body = await (await call('/api/plugins/mine', { cookie })).json() as { installable: { repo: string, source: string }[], installUrl: string }
+    expect(body.installable.map(i => [i.repo, i.source])).toEqual([
+      ['octo-author/new-plugin', 'installation'],
+      ['octo-author/admin-only', 'admin'],
+      ['octo-author/owned-only', 'admin'],
+    ])
     expect(body.installUrl).toBe('https://github.com/apps/nginx-ui-plugin-catalog/installations/new')
   })
 

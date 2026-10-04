@@ -1,11 +1,15 @@
 <script setup lang="ts">
+import type { Change } from '@/api/changes'
 import type { Installable, PluginSummary } from '@/api/plugins'
 import { computed, onMounted, ref } from 'vue'
+import { getChanges } from '@/api/changes'
 import { getMyPlugins } from '@/api/plugins'
 import { $gettext } from '@/lib/gettext'
+import { localized } from '@/lib/labels'
 import { fromNow } from '@/lib/time'
 
 const plugins = ref<PluginSummary[]>([])
+const changes = ref<Change[]>([])
 const installable = ref<Installable[]>([])
 const installUrl = ref('')
 const loading = ref(true)
@@ -16,7 +20,8 @@ async function load() {
   loading.value = true
   failed.value = false
   try {
-    const data = await getMyPlugins()
+    const [data, mine] = await Promise.all([getMyPlugins(), getChanges().catch(() => ({ changes: [] }))])
+    changes.value = mine.changes.filter(c => c.state === 'open' || c.state === 'merged')
     plugins.value = data.plugins
     installable.value = data.installable
     installUrl.value = data.installUrl
@@ -44,6 +49,16 @@ const ownerOptions = computed(() => {
   ]
 })
 
+function stageLabel(change: Change): string {
+  if (change.stage === 'checks')
+    return change.waitingOn === 'author' ? $gettext('Needs changes') : $gettext('Checking')
+  if (change.stage === 'review')
+    return $gettext('In review')
+  if (change.stage === 'merged')
+    return $gettext('Publishing')
+  return $gettext('Submitted')
+}
+
 const shown = computed(() => ownerFilter.value === 'all'
   ? plugins.value
   : plugins.value.filter(p => p.owner?.login === ownerFilter.value))
@@ -51,14 +66,22 @@ const shown = computed(() => ownerFilter.value === 'all'
 
 <template>
   <div class="page">
-    <div>
-      <h1 class="page-title">
-        {{ $gettext('My plugins') }}
-      </h1>
-      <ATypographyText type="secondary">
-        {{ $gettext('Manage the plugins you list in the catalog and follow changes under review.') }}
-      </ATypographyText>
-    </div>
+    <AFlex justify="space-between" align="flex-start" gap="middle" wrap>
+      <div>
+        <h1 class="page-title">
+          {{ $gettext('My plugins') }}
+        </h1>
+        <ATypographyText type="secondary">
+          {{ $gettext('Manage the plugins you list in the catalog and follow changes under review.') }}
+        </ATypographyText>
+      </div>
+      <RouterLink to="/submit">
+        <AButton type="primary">
+          <span class="i-tabler-plus" />
+          {{ $gettext('Submit a plugin') }}
+        </AButton>
+      </RouterLink>
+    </AFlex>
 
     <AAlert
       v-if="failed"
@@ -72,6 +95,25 @@ const shown = computed(() => ownerFilter.value === 'all'
         </AButton>
       </template>
     </AAlert>
+
+    <ACard v-if="changes.length" :title="$gettext('In progress')">
+      <AFlex v-for="change in changes" :key="change.id" align="center" gap="middle" class="py-2">
+        <div class="flex-1 min-w-0">
+          <div class="font-600">
+            {{ localized(change.entry?.name) || change.pluginId }}
+          </div>
+          <div class="mono text-3 op-65">
+            {{ change.pluginId }}
+          </div>
+        </div>
+        <ATag :color="change.waitingOn === 'author' ? 'warning' : 'processing'" class="m-0">
+          {{ stageLabel(change) }}
+        </ATag>
+        <RouterLink :to="`/changes/${change.id}`">
+          <AButton>{{ $gettext('View') }}</AButton>
+        </RouterLink>
+      </AFlex>
+    </ACard>
 
     <ACard :title="$gettext('Plugins')" :loading="loading">
       <div v-if="ownerOptions.length > 2" class="overflow-x-auto pb-2">
@@ -87,17 +129,28 @@ const shown = computed(() => ownerFilter.value === 'all'
 
     <ACard :title="$gettext('Repositories you can submit')" :loading="loading">
       <ATypographyParagraph type="secondary">
-        {{ $gettext('These repositories have the Nginx UI Plugin Catalog app installed by you. With the app installed, new releases reach the catalog within minutes.') }}
+        {{ $gettext('Public repositories you administer or installed the Nginx UI Plugin Catalog app on. With the app installed, new releases reach the catalog within minutes.') }}
       </ATypographyParagraph>
       <AEmpty v-if="installable.length === 0" :description="$gettext('No repository is waiting to be submitted.')" />
-      <AFlex v-for="repo in installable" :key="repo.repoId" align="center" gap="middle" class="py-3">
+      <AFlex v-for="repo in installable" :key="repo.repo" align="center" gap="middle" class="py-3">
         <span class="i-tabler-brand-github text-6 op-65" />
         <div class="flex-1 min-w-0">
           <a :href="`https://github.com/${repo.repo}`" target="_blank" rel="noopener" class="font-600">{{ repo.repo }}</a>
           <div class="text-3 op-65">
-            {{ $gettext('App installed %{time}', { time: fromNow(repo.installedAt) }) }}
+            <template v-if="repo.description">
+              {{ repo.description }}
+            </template>
+            <template v-else-if="repo.source === 'installation'">
+              {{ $gettext('App installed %{time}', { time: fromNow(repo.at) }) }}
+            </template>
+            <template v-else>
+              {{ $gettext('You administer this repository') }}
+            </template>
           </div>
         </div>
+        <RouterLink :to="{ path: '/submit', query: { repo: repo.repo } }">
+          <AButton>{{ $gettext('Submit as plugin') }}</AButton>
+        </RouterLink>
       </AFlex>
       <a :href="installUrl" target="_blank" rel="noopener" class="inline-block mt-2">
         {{ $gettext('Install the app on another repository') }}

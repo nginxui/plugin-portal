@@ -1,8 +1,8 @@
 {
   "name": "nginxui-plugin-portal",
+  "type": "module",
   "private": true,
   "license": "AGPL-3.0-only",
-  "type": "module",
   "scripts": {
     "dev": "vite",
     "build": "vite build",
@@ -14,7 +14,10 @@
     "test": "vitest run",
     "db:migrate:local": "wrangler d1 migrations apply portal --local",
     "cf-typegen": "wrangler types worker/worker-configuration.d.ts",
-    "gettext:extract": "vue-gettext-extract"
+    "gettext:extract": "vue-gettext-extract",
+    "deploy:staging": "CLOUDFLARE_ENV=staging vite build && wrangler deploy",
+    "db:migrate:staging": "wrangler d1 migrations apply portal-staging --remote --env staging",
+    "db:migrate": "wrangler d1 migrations apply portal --remote"
   },
   "dependencies": {
     "@antdv-next/icons": "^1.1.2",

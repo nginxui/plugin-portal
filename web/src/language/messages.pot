@@ -21,39 +21,181 @@ msgid "Plugin catalog"
 msgstr ""
 
 #: web/src/layouts/PortalLayout.vue:28
-#: web/src/views/MyPlugins.vue:56
+#: web/src/views/MyPlugins.vue:72
 #: web/src/views/plugin/PluginLayout.vue:20
 msgid "My plugins"
 msgstr ""
 
 #: web/src/layouts/PortalLayout.vue:29
+#: web/src/views/MyPlugins.vue:81
+#: web/src/views/SubmitPlugin.vue:88
+msgid "Submit a plugin"
+msgstr ""
+
+#: web/src/layouts/PortalLayout.vue:30
 #: web/src/views/owners/OwnerList.vue:29
 #: web/src/views/owners/OwnerPage.vue:19
 msgid "Organizations"
 msgstr ""
 
-#: web/src/layouts/PortalLayout.vue:48
+#: web/src/layouts/PortalLayout.vue:49
 msgid "GitHub profile"
 msgstr ""
 
-#: web/src/layouts/PortalLayout.vue:50
+#: web/src/layouts/PortalLayout.vue:51
 msgid "Sign out"
 msgstr ""
 
-#: web/src/layouts/PortalLayout.vue:78
+#: web/src/layouts/PortalLayout.vue:79
 msgid "Open menu"
 msgstr ""
 
-#: web/src/layouts/PortalLayout.vue:82
+#: web/src/layouts/PortalLayout.vue:83
 msgid "Language"
 msgstr ""
 
-#: web/src/layouts/PortalLayout.vue:87
+#: web/src/layouts/PortalLayout.vue:88
 msgid "Toggle dark mode"
 msgstr ""
 
-#: web/src/layouts/PortalLayout.vue:91
+#: web/src/layouts/PortalLayout.vue:92
 msgid "Account menu"
+msgstr ""
+
+#: web/src/lib/checks.ts:6
+#: web/src/views/plugin/PluginLayout.vue:79
+#: web/src/views/plugin/PluginOverview.vue:34
+#: web/src/views/SubmitPlugin.vue:95
+msgid "Repository"
+msgstr ""
+
+#: web/src/lib/checks.ts:7
+msgid "Permission to submit"
+msgstr ""
+
+#: web/src/lib/checks.ts:8
+msgid "Release"
+msgstr ""
+
+#: web/src/lib/checks.ts:9
+msgid "plugin.json"
+msgstr ""
+
+#: web/src/lib/checks.ts:10
+msgid "Plugin ID"
+msgstr ""
+
+#: web/src/lib/checks.ts:11
+msgid "Name"
+msgstr ""
+
+#: web/src/lib/checks.ts:12
+msgid "Packages"
+msgstr ""
+
+#: web/src/lib/checks.ts:13
+#: web/src/views/SubmitPlugin.vue:140
+msgid "License"
+msgstr ""
+
+#: web/src/lib/checks.ts:22
+msgid "%{repo} is a public repository."
+msgstr ""
+
+#: web/src/lib/checks.ts:23
+msgid "The repository does not exist or is not public."
+msgstr ""
+
+#: web/src/lib/checks.ts:24
+msgid "The repository is private. The catalog lists public repositories only."
+msgstr ""
+
+#: web/src/lib/checks.ts:25
+msgid "This repository may not be listed. Contact the maintainers if you think this is a mistake."
+msgstr ""
+
+#: web/src/lib/checks.ts:26
+msgid "The repository is archived."
+msgstr ""
+
+#: web/src/lib/checks.ts:27
+msgid "You installed the Nginx UI Plugin Catalog app on this repository."
+msgstr ""
+
+#: web/src/lib/checks.ts:28
+msgid "You have admin permission on this repository."
+msgstr ""
+
+#: web/src/lib/checks.ts:29
+msgid "Only an admin of the repository can submit it. Ask an admin to submit it, or to install the Nginx UI Plugin Catalog app."
+msgstr ""
+
+#: web/src/lib/checks.ts:30
+msgid "Version %{version}, the newest stable release."
+msgstr ""
+
+#: web/src/lib/checks.ts:31
+msgid "Version %{version} is a prerelease. The listing starts with it until a stable release is published."
+msgstr ""
+
+#: web/src/lib/checks.ts:32
+msgid "The repository has no GitHub Release with a version tag such as v1.0.0 yet."
+msgstr ""
+
+#: web/src/lib/checks.ts:33
+msgid "Read from the release %{tag}."
+msgstr ""
+
+#: web/src/lib/checks.ts:34
+msgid "There is no plugin.json at the root of the repository at %{tag}."
+msgstr ""
+
+#: web/src/lib/checks.ts:35
+msgid "plugin.json at %{tag} is not valid JSON."
+msgstr ""
+
+#: web/src/lib/checks.ts:37
+msgid "The plugin ID %{id} does not follow the naming rule, for example io.github.<owner>.<name>."
+msgstr ""
+
+#: web/src/lib/checks.ts:38
+msgid "The com.nginxui namespace is reserved for the plugins of the Nginx UI project."
+msgstr ""
+
+#: web/src/lib/checks.ts:39
+msgid "The plugin ID %{id} names another GitHub owner than %{owner}."
+msgstr ""
+
+#: web/src/lib/checks.ts:40
+msgid "This plugin ID may not be listed. Contact the maintainers if you think this is a mistake."
+msgstr ""
+
+#: web/src/lib/checks.ts:41
+msgid "A plugin with this ID is listed already."
+msgstr ""
+
+#: web/src/lib/checks.ts:42
+msgid "A submission of this plugin is already under review."
+msgstr ""
+
+#: web/src/lib/checks.ts:44
+msgid "plugin.json has no name."
+msgstr ""
+
+#: web/src/lib/checks.ts:45
+msgid "The name holds \"%{word}\", which no name may hold. Only the plugins of the Nginx UI project are official."
+msgstr ""
+
+#: web/src/lib/checks.ts:46
+msgid "%{count} packages in the release."
+msgstr ""
+
+#: web/src/lib/checks.ts:47
+msgid "The release has no package named %{name} or one per platform."
+msgstr ""
+
+#: web/src/lib/checks.ts:49
+msgid "GitHub detects no license in the repository. The listing shows none."
 msgstr ""
 
 #: web/src/lib/labels.ts:14
@@ -108,57 +250,217 @@ msgstr ""
 msgid "Delisted"
 msgstr ""
 
-#: web/src/views/MyPlugins.vue:42
+#: web/src/views/ChangeView.vue:56
+#: web/src/views/ChangeView.vue:94
+#: web/src/views/MyPlugins.vue:59
+msgid "Submitted"
+msgstr ""
+
+#: web/src/views/ChangeView.vue:56
+#: web/src/views/SubmitPlugin.vue:165
+msgid "Checks"
+msgstr ""
+
+#: web/src/views/ChangeView.vue:56
+msgid "Maintainer review"
+msgstr ""
+
+#: web/src/views/ChangeView.vue:56
+msgid "Merged"
+msgstr ""
+
+#: web/src/views/ChangeView.vue:56
+msgid "Live in the catalog"
+msgstr ""
+
+#: web/src/views/ChangeView.vue:72
+msgid "The plugin is listed in the catalog."
+msgstr ""
+
+#: web/src/views/ChangeView.vue:74
+msgid "The pull request was closed without merging."
+msgstr ""
+
+#: web/src/views/ChangeView.vue:76
+msgid "The checks found problems. Fix them in a new release, then run the checks again."
+msgstr ""
+
+#: web/src/views/ChangeView.vue:78
+msgid "The checks could not be started. Please try again later."
+msgstr ""
+
+#: web/src/views/ChangeView.vue:80
+msgid "The checks could not finish. A maintainer will look into it."
+msgstr ""
+
+#: web/src/views/ChangeView.vue:82
+msgid "The packages, signatures and listing are being checked. This takes a few minutes."
+msgstr ""
+
+#: web/src/views/ChangeView.vue:84
+msgid "Waiting for a maintainer to review the submission."
+msgstr ""
+
+#: web/src/views/ChangeView.vue:86
+msgid "Approved. The plugin appears in the catalog after the next deploy, usually within minutes."
+msgstr ""
+
+#: web/src/views/ChangeView.vue:94
+msgid "Checks started again"
+msgstr ""
+
+#: web/src/views/ChangeView.vue:97
+msgid "The checks could not be started"
+msgstr ""
+
+#: web/src/views/ChangeView.vue:98
+msgid "Checks found problems"
+msgstr ""
+
+#: web/src/views/ChangeView.vue:98
+msgid "Checks could not finish"
+msgstr ""
+
+#: web/src/views/ChangeView.vue:99
+msgid "Checks passed, pull request #%{n} opened"
+msgstr ""
+
+#: web/src/views/ChangeView.vue:100
+msgid "Merged by a maintainer"
+msgstr ""
+
+#: web/src/views/ChangeView.vue:101
+msgid "Pull request closed"
+msgstr ""
+
+#: web/src/views/ChangeView.vue:102
+msgid "Listed in the catalog"
+msgstr ""
+
+#: web/src/views/ChangeView.vue:121
+msgid "Change not found"
+msgstr ""
+
+#: web/src/views/ChangeView.vue:128
+msgid "New listing"
+msgstr ""
+
+#: web/src/views/ChangeView.vue:130
+msgid "Submitted %{time}"
+msgstr ""
+
+#: web/src/views/ChangeView.vue:153
+msgid "Run the checks again"
+msgstr ""
+
+#: web/src/views/ChangeView.vue:157
+msgid "History"
+msgstr ""
+
+#: web/src/views/ChangeView.vue:166
+msgid "Links"
+msgstr ""
+
+#: web/src/views/ChangeView.vue:169
+msgid "Pull request #%{n}"
+msgstr ""
+
+#: web/src/views/ChangeView.vue:173
+msgid "Log of the checks"
+msgstr ""
+
+#: web/src/views/ChangeView.vue:177
+msgid "Manage the plugin"
+msgstr ""
+
+#: web/src/views/ChangeView.vue:181
+msgid "The review is public on GitHub. You are mentioned in the pull request, so GitHub notifies you of comments."
+msgstr ""
+
+#: web/src/views/MyPlugins.vue:47
 msgid "All"
 msgstr ""
 
-#: web/src/views/MyPlugins.vue:59
+#: web/src/views/MyPlugins.vue:54
+#: web/src/views/SubmitPlugin.vue:171
+msgid "Needs changes"
+msgstr ""
+
+#: web/src/views/MyPlugins.vue:54
+msgid "Checking"
+msgstr ""
+
+#: web/src/views/MyPlugins.vue:56
+msgid "In review"
+msgstr ""
+
+#: web/src/views/MyPlugins.vue:58
+msgid "Publishing"
+msgstr ""
+
+#: web/src/views/MyPlugins.vue:75
 msgid "Manage the plugins you list in the catalog and follow changes under review."
 msgstr ""
 
-#: web/src/views/MyPlugins.vue:67
+#: web/src/views/MyPlugins.vue:90
 msgid "Your plugins could not be loaded."
 msgstr ""
 
-#: web/src/views/MyPlugins.vue:71
+#: web/src/views/MyPlugins.vue:94
 msgid "Retry"
 msgstr ""
 
-#: web/src/views/MyPlugins.vue:76
-#: web/src/views/owners/OwnerPage.vue:67
+#: web/src/views/MyPlugins.vue:99
+msgid "In progress"
+msgstr ""
+
+#: web/src/views/MyPlugins.vue:113
+msgid "View"
+msgstr ""
+
+#: web/src/views/MyPlugins.vue:118
+#: web/src/views/owners/OwnerPage.vue:69
 msgid "Plugins"
 msgstr ""
 
-#: web/src/views/MyPlugins.vue:78
+#: web/src/views/MyPlugins.vue:120
 msgid "Filter by owner"
 msgstr ""
 
-#: web/src/views/MyPlugins.vue:80
+#: web/src/views/MyPlugins.vue:122
 #: web/src/views/owners/OwnerList.vue:37
 msgid "You have no role on any listed plugin yet."
 msgstr ""
 
-#: web/src/views/MyPlugins.vue:82
+#: web/src/views/MyPlugins.vue:124
 msgid "Plugins appear here when you have admin, maintain, write or triage permission on their repository."
 msgstr ""
 
-#: web/src/views/MyPlugins.vue:88
+#: web/src/views/MyPlugins.vue:130
 msgid "Repositories you can submit"
 msgstr ""
 
-#: web/src/views/MyPlugins.vue:90
-msgid "These repositories have the Nginx UI Plugin Catalog app installed by you. With the app installed, new releases reach the catalog within minutes."
+#: web/src/views/MyPlugins.vue:132
+msgid "Public repositories you administer or installed the Nginx UI Plugin Catalog app on. With the app installed, new releases reach the catalog within minutes."
 msgstr ""
 
-#: web/src/views/MyPlugins.vue:92
+#: web/src/views/MyPlugins.vue:134
 msgid "No repository is waiting to be submitted."
 msgstr ""
 
-#: web/src/views/MyPlugins.vue:98
+#: web/src/views/MyPlugins.vue:144
 msgid "App installed %{time}"
 msgstr ""
 
-#: web/src/views/MyPlugins.vue:103
+#: web/src/views/MyPlugins.vue:147
+msgid "You administer this repository"
+msgstr ""
+
+#: web/src/views/MyPlugins.vue:152
+msgid "Submit as plugin"
+msgstr ""
+
+#: web/src/views/MyPlugins.vue:156
 msgid "Install the app on another repository"
 msgstr ""
 
@@ -182,23 +484,23 @@ msgstr ""
 msgid "The organizations could not be loaded."
 msgstr ""
 
-#: web/src/views/owners/OwnerList.vue:45
-#: web/src/views/plugin/PluginAccess.vue:97
+#: web/src/views/owners/OwnerList.vue:47
+#: web/src/views/plugin/PluginAccess.vue:99
 msgid "GitHub organization"
 msgstr ""
 
-#: web/src/views/owners/OwnerList.vue:45
-#: web/src/views/plugin/PluginAccess.vue:97
+#: web/src/views/owners/OwnerList.vue:47
+#: web/src/views/plugin/PluginAccess.vue:99
 msgid "Personal account"
 msgstr ""
 
-#: web/src/views/owners/OwnerList.vue:46
+#: web/src/views/owners/OwnerList.vue:48
 msgid "%{n} plugin"
 msgid_plural "%{n} plugins"
 msgstr[0] ""
 msgstr[1] ""
 
-#: web/src/views/owners/OwnerList.vue:51
+#: web/src/views/owners/OwnerList.vue:53
 msgid "Open"
 msgstr ""
 
@@ -210,31 +512,31 @@ msgstr ""
 msgid "You have no role on any plugin of this account."
 msgstr ""
 
-#: web/src/views/owners/OwnerPage.vue:58
+#: web/src/views/owners/OwnerPage.vue:60
 msgid "Name, avatar and members come from GitHub"
 msgstr ""
 
-#: web/src/views/owners/OwnerPage.vue:63
+#: web/src/views/owners/OwnerPage.vue:65
 msgid "View organization on GitHub"
 msgstr ""
 
-#: web/src/views/owners/OwnerPage.vue:63
+#: web/src/views/owners/OwnerPage.vue:65
 msgid "View account on GitHub"
 msgstr ""
 
-#: web/src/views/owners/OwnerPage.vue:69
+#: web/src/views/owners/OwnerPage.vue:71
 msgid "Plugins of this account you have a role on. Each role follows your permission on that repository."
 msgstr ""
 
-#: web/src/views/owners/OwnerPage.vue:73
+#: web/src/views/owners/OwnerPage.vue:75
 msgid "Members and access"
 msgstr ""
 
-#: web/src/views/owners/OwnerPage.vue:75
+#: web/src/views/owners/OwnerPage.vue:77
 msgid "Members and permissions are managed on GitHub. The Developer Center decides what each person may do from their repository permission."
 msgstr ""
 
-#: web/src/views/owners/OwnerPage.vue:78
+#: web/src/views/owners/OwnerPage.vue:80
 msgid "Manage teams and repository access on GitHub"
 msgstr ""
 
@@ -287,7 +589,7 @@ msgstr ""
 msgid "Owner"
 msgstr ""
 
-#: web/src/views/plugin/PluginAccess.vue:102
+#: web/src/views/plugin/PluginAccess.vue:104
 msgid "The owner is the owner of the repository. When the repository moves to another owner on GitHub, the plugin moves with it after review."
 msgstr ""
 
@@ -319,16 +621,12 @@ msgstr ""
 msgid "View in catalog"
 msgstr ""
 
-#: web/src/views/plugin/PluginLayout.vue:79
-#: web/src/views/plugin/PluginOverview.vue:34
-msgid "Repository"
-msgstr ""
-
 #: web/src/views/plugin/PluginLayout.vue:83
 msgid "Plugin sections"
 msgstr ""
 
 #: web/src/views/plugin/PluginOverview.vue:14
+#: web/src/views/SubmitPlugin.vue:132
 msgid "Version"
 msgstr ""
 
@@ -345,14 +643,17 @@ msgid "Release notes"
 msgstr ""
 
 #: web/src/views/plugin/PluginOverview.vue:29
+#: web/src/views/SubmitPlugin.vue:116
 msgid "Listing"
 msgstr ""
 
 #: web/src/views/plugin/PluginOverview.vue:31
+#: web/src/views/SubmitPlugin.vue:129
 msgid "Description"
 msgstr ""
 
 #: web/src/views/plugin/PluginOverview.vue:42
+#: web/src/views/SubmitPlugin.vue:154
 msgid "Categories"
 msgstr ""
 
@@ -414,4 +715,72 @@ msgstr ""
 
 #: web/src/views/SignIn.vue:63
 msgid "Signing in only confirms your GitHub identity. It grants no write access to your repositories."
+msgstr ""
+
+#: web/src/views/SubmitPlugin.vue:65
+msgid "The primary public key is not a minisign public key. Paste the content of primary.pub."
+msgstr ""
+
+#: web/src/views/SubmitPlugin.vue:67
+msgid "The checks no longer pass. Check the repository again."
+msgstr ""
+
+#: web/src/views/SubmitPlugin.vue:68
+msgid "The submission could not be sent. Please try again."
+msgstr ""
+
+#: web/src/views/SubmitPlugin.vue:91
+msgid "Once the checks pass, submit the plugin. It is listed after a maintainer approves it."
+msgstr ""
+
+#: web/src/views/SubmitPlugin.vue:100
+msgid "owner/repository"
+msgstr ""
+
+#: web/src/views/SubmitPlugin.vue:105
+msgid "Check"
+msgstr ""
+
+#: web/src/views/SubmitPlugin.vue:109
+msgid "You need admin permission on the repository. The newest release, its plugin.json and its packages are read from GitHub."
+msgstr ""
+
+#: web/src/views/SubmitPlugin.vue:111
+msgid "The repository could not be checked. Please try again."
+msgstr ""
+
+#: web/src/views/SubmitPlugin.vue:135
+msgid "Name translations"
+msgstr ""
+
+#: web/src/views/SubmitPlugin.vue:145
+msgid "Names in every language are reviewed with the submission."
+msgstr ""
+
+#: web/src/views/SubmitPlugin.vue:149
+msgid "Details"
+msgstr ""
+
+#: web/src/views/SubmitPlugin.vue:151
+msgid "Primary public key"
+msgstr ""
+
+#: web/src/views/SubmitPlugin.vue:151
+msgid "The content of primary.pub, created with nginx-ui plugin key init. It verifies the signer certificates of your releases."
+msgstr ""
+
+#: web/src/views/SubmitPlugin.vue:154
+msgid "Up to three. Suggested from the capabilities of the plugin."
+msgstr ""
+
+#: web/src/views/SubmitPlugin.vue:160
+msgid "Submit for review"
+msgstr ""
+
+#: web/src/views/SubmitPlugin.vue:168
+msgid "Passed"
+msgstr ""
+
+#: web/src/views/SubmitPlugin.vue:176
+msgid "After you submit, the packages, their signatures and the signer certificate are verified in the catalog repository."
 msgstr ""
