@@ -1,6 +1,6 @@
 # Copy to .dev.vars for `bun run dev`. Never commit .dev.vars.
 PORTAL_ORIGIN=http://localhost:5173
-GITHUB_CLIENT_ID=
+GITHUB_CLIENT_ID=Iv23liIZ9byWbTtC8v83
 GITHUB_CLIENT_SECRET=
 # openssl rand -base64 32
 SESSION_KEY=

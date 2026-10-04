@@ -27,7 +27,7 @@
     "CATALOG_URL": "https://plugins.nginxui.com",
     "CATALOG_REPO": "nginxui/plugins",
     "CATALOG_APP_SLUG": "nginx-ui-plugin-catalog",
-    "GITHUB_CLIENT_ID": ""
+    "GITHUB_CLIENT_ID": "Iv23liIZ9byWbTtC8v83"
   }
   // Secrets, set with `wrangler secret put <NAME>`:
   //   GITHUB_CLIENT_SECRET  client secret of the Portal GitHub App

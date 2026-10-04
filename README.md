@@ -19,9 +19,10 @@ bun run db:migrate:local
 bun run dev
 ```
 
-Sign in needs a GitHub App with user authorization: set its callback URL to
-`http://localhost:5173/api/auth/callback` for local work and put its client
-id and secret in `.dev.vars`.
+Sign in uses the GitHub App NGINX UI Plugin Portal, whose callback URLs are
+`https://portal.nginxui.com/api/auth/callback` and
+`http://localhost:5173/api/auth/callback`. Put its client secret in
+`.dev.vars` for local work.
 
 ```bash
 bun run test
@@ -37,7 +38,7 @@ custom domain `portal.nginxui.com`.
 
 1. `wrangler d1 create portal` and put the id into `wrangler.jsonc`.
 2. `wrangler d1 migrations apply portal --remote`
-3. Set `GITHUB_CLIENT_ID` in `wrangler.jsonc`, then the secrets:
+3. Set the secrets:
    `wrangler secret put GITHUB_CLIENT_SECRET` and
    `wrangler secret put SESSION_KEY` (`openssl rand -base64 32`).
 4. `bun run deploy`
