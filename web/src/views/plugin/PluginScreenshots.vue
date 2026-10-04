@@ -1,0 +1,459 @@
+<script setup lang="ts">
+import type { StoreState } from '@/api/store'
+import type { PreviewDoc } from '@/components/MarketPreview.vue'
+import { computed, onBeforeUnmount, ref, useTemplateRef, watch } from 'vue'
+import { uploadImage } from '@/api/store'
+import { $gettext } from '@/lib/gettext'
+import { HOST_LOCALES, RTL_LOCALES } from '@/lib/hostLocales'
+import { localeName } from '@/lib/locales'
+import { fromNow } from '@/lib/time'
+import { useStoreDraft } from '@/lib/useStoreDraft'
+import { usePluginStore } from '@/stores/plugin'
+
+type Shot = NonNullable<PreviewDoc['screenshots']>[number]
+
+const pluginStore = usePluginStore()
+const plugin = computed(() => pluginStore.detail!.plugin)
+const draft = useStoreDraft(() => plugin.value.id)
+const { state, failed, doc, items, savedAt, saving } = draft
+watch(() => plugin.value.id, draft.load, { immediate: true })
+
+const S = computed(() => state.value as StoreState)
+const shots = computed(() => doc.value.screenshots ?? [])
+const canEdit = computed(() => !!state.value?.canEdit.all && !('screenshots' in (state.value?.overrides ?? {})))
+const imageOf = (path: string | undefined) => path ? (state.value?.images[path] ?? (path.startsWith('media:') ? `/api/media/${path.slice(6)}` : null)) : null
+
+const selectedId = ref<string | null>(null)
+const selected = computed(() => shots.value.find(s => s.id === selectedId.value) ?? null)
+watch(shots, (list) => {
+  if (!selectedId.value || !list.some(s => s.id === selectedId.value))
+    selectedId.value = list[0]?.id ?? null
+}, { immediate: true })
+
+function setShots(list: Shot[]) {
+  draft.update({ ...doc.value, screenshots: list.length ? list : undefined })
+}
+
+// Reordering by drag.
+const dragging = ref<string | null>(null)
+function onDrop(target: string) {
+  const from = dragging.value
+  dragging.value = null
+  if (!from || from === target)
+    return
+  const list = [...shots.value]
+  const item = list.splice(list.findIndex(s => s.id === from), 1)[0]
+  list.splice(list.findIndex(s => s.id === target), 0, item)
+  setShots(list)
+}
+
+function move(id: string, step: number) {
+  const list = [...shots.value]
+  const at = list.findIndex(s => s.id === id)
+  const to = at + step
+  if (to < 0 || to >= list.length)
+    return
+  const item = list[at]
+  list[at] = list[to]
+  list[to] = item
+  setShots(list)
+}
+
+// Cropping a picked file, or the current image again.
+const side = ref<'light' | 'dark'>('light')
+const pending = ref<{ url: string, target: 'new' | 'light' | 'dark', name: string } | null>(null)
+const cropper = useTemplateRef<{ crop: () => Promise<Blob | null> }>('cropper')
+const uploading = ref(false)
+const uploadError = ref('')
+const fileInput = useTemplateRef<HTMLInputElement>('fileInput')
+let fileTarget: 'new' | 'light' | 'dark' = 'new'
+
+function slug(name: string) {
+  const base = name.replace(/\.[^.]+$/, '').toLowerCase().replace(/^\d+[-_\s]*/, '').replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '').slice(0, 24) || 'shot'
+  let id = base
+  for (let n = 2; shots.value.some(s => s.id === id); n++)
+    id = `${base}-${n}`
+  return id
+}
+
+function pick(target: 'new' | 'light' | 'dark') {
+  fileTarget = target
+  fileInput.value?.click()
+}
+
+function openFile(file: File | undefined, target: 'new' | 'light' | 'dark') {
+  uploadError.value = ''
+  if (!file)
+    return
+  if (!/^image\/(?:png|jpeg|webp)$/.test(file.type)) {
+    uploadError.value = $gettext('Use a PNG, JPEG or WebP image.')
+    return
+  }
+  if (file.size > 20 * 1024 * 1024) {
+    uploadError.value = $gettext('The image is larger than 20 MB.')
+    return
+  }
+  if (pending.value)
+    URL.revokeObjectURL(pending.value.url)
+  pending.value = { url: URL.createObjectURL(file), target, name: file.name }
+}
+
+function onFile(e: Event) {
+  const input = e.target as HTMLInputElement
+  openFile(input.files?.[0], fileTarget)
+  input.value = ''
+}
+
+const dropping = ref(false)
+function onDropFile(e: DragEvent) {
+  dropping.value = false
+  openFile(e.dataTransfer?.files?.[0], 'new')
+}
+
+function recrop() {
+  const url = imageOf(side.value === 'dark' ? selected.value?.dark_path : selected.value?.path)
+  if (url)
+    pending.value = { url, target: side.value, name: selected.value!.id }
+}
+
+async function applyCrop() {
+  const p = pending.value
+  if (!p)
+    return
+  uploading.value = true
+  uploadError.value = ''
+  try {
+    const blob = await cropper.value?.crop()
+    if (!blob) {
+      uploadError.value = $gettext('The image could not be encoded under 2 MB.')
+      return
+    }
+    const { path, url } = await uploadImage(blob)
+    if (state.value)
+      state.value.images[path] = url
+    if (p.target === 'new') {
+      const id = slug(p.name)
+      setShots([...shots.value, { id, path }])
+      selectedId.value = id
+      side.value = 'light'
+    }
+    else if (selected.value) {
+      const key = p.target === 'dark' ? 'dark_path' : 'path'
+      setShots(shots.value.map(s => s.id === selected.value!.id ? { ...s, [key]: path } : s))
+    }
+    URL.revokeObjectURL(p.url)
+    pending.value = null
+  }
+  catch (e) {
+    const code = (e as Error).message
+    uploadError.value = code === 'bad_ratio' || code === 'bad_size'
+      ? $gettext('The image was refused: it must be 16:10 and between 640 and 3840 pixels wide.')
+      : code === 'uploads_off'
+        ? $gettext('Uploads are not available yet.')
+        : $gettext('The image could not be uploaded. Please try again.')
+  }
+  finally {
+    uploading.value = false
+  }
+}
+
+function cancelCrop() {
+  if (pending.value?.url.startsWith('blob:'))
+    URL.revokeObjectURL(pending.value.url)
+  pending.value = null
+}
+
+onBeforeUnmount(cancelCrop)
+
+function removeDark() {
+  if (selected.value)
+    setShots(shots.value.map(s => s.id === selected.value!.id ? { id: s.id, path: s.path, ...(s.caption ? { caption: s.caption } : {}) } : s))
+}
+
+function remove() {
+  if (selected.value)
+    setShots(shots.value.filter(s => s.id !== selected.value!.id))
+}
+
+// Captions.
+const showAll = ref(false)
+const captionLocales = computed(() => {
+  const filled = HOST_LOCALES.filter(l => l === 'en' || selected.value?.caption?.[l])
+  return showAll.value ? HOST_LOCALES : filled
+})
+const filledOthers = computed(() => HOST_LOCALES.filter(l => l !== 'en' && selected.value?.caption?.[l]).length)
+
+function setCaption(locale: string, value: string) {
+  if (selected.value)
+    draft.setText(`caption:${selected.value.id}`, locale, value.trim())
+}
+
+const complete = (shot: Shot) => !!shot.dark_path
+const changedIds = computed(() => new Set(items.value.filter(i => i.field === 'screenshots' || i.field === 'caption').map(i => i.label.split('.')[1])))
+</script>
+
+<template>
+  <AFlex vertical gap="middle">
+    <AAlert v-if="failed" type="error" show-icon :title="$gettext('The store texts could not be loaded.')" />
+    <ASkeleton v-else-if="!state" active />
+    <template v-else>
+      <AAlert v-if="!S.uploads" type="info" show-icon :title="$gettext('Uploads are not available yet. You can reorder the screenshots and edit their captions.')" />
+      <AAlert v-if="'screenshots' in S.overrides" type="warning" show-icon :title="$gettext('The catalog entry sets the screenshots of this plugin, so they cannot be changed here.')" />
+
+      <div class="cols">
+        <ACard class="col-main" :title="$gettext('Screenshots')">
+          <template #extra>
+            <AFlex align="center" gap="middle">
+              <span class="text-3 op-65">{{ $gettext('16:10, light and dark in pairs') }}</span>
+              <AButton type="primary" :disabled="!canEdit || !S.uploads || shots.length >= 8" @click="pick('new')">
+                <span class="i-tabler-upload" />
+                {{ $gettext('Add a screenshot') }}
+              </AButton>
+            </AFlex>
+          </template>
+          <input ref="fileInput" type="file" accept="image/png,image/jpeg,image/webp" hidden @change="onFile">
+          <div class="grid">
+            <div
+              v-for="(shot, i) in shots"
+              :key="shot.id"
+              class="shot-card"
+              :class="{ on: shot.id === selectedId, dragging: dragging === shot.id }"
+              :draggable="canEdit"
+              role="button"
+              tabindex="0"
+              :aria-label="$gettext('Screenshot %{n}', { n: String(i + 1) })"
+              @click="selectedId = shot.id"
+              @keydown.enter="selectedId = shot.id"
+              @keydown.alt.up.prevent="move(shot.id, -1)"
+              @keydown.alt.down.prevent="move(shot.id, 1)"
+              @dragstart="dragging = shot.id"
+              @dragend="dragging = null"
+              @dragover.prevent
+              @drop.prevent="onDrop(shot.id)"
+            >
+              <AFlex justify="space-between" align="center" gap="small">
+                <span class="title"><span class="i-tabler-grip-vertical op-50" />{{ i + 1 }}. {{ shot.id }}</span>
+                <ATag v-if="changedIds.has(shot.id)" color="blue" class="m-0">
+                  {{ $gettext('Changed') }}
+                </ATag>
+                <ATag v-else :color="complete(shot) ? 'success' : 'warning'" class="m-0">
+                  {{ complete(shot) ? $gettext('Complete') : $gettext('No dark version') }}
+                </ATag>
+              </AFlex>
+              <div class="pair">
+                <img v-if="imageOf(shot.path)" :src="imageOf(shot.path)!" alt="" referrerpolicy="no-referrer">
+                <img v-if="imageOf(shot.dark_path)" :src="imageOf(shot.dark_path)!" alt="" referrerpolicy="no-referrer">
+                <div v-else class="missing">
+                  {{ $gettext('No dark version') }}
+                </div>
+              </div>
+              <div class="text-3 truncate">
+                {{ shot.caption?.en || $gettext('No caption') }}
+              </div>
+            </div>
+          </div>
+          <div
+            v-if="canEdit && S.uploads"
+            class="dropzone"
+            :class="{ over: dropping }"
+            role="button"
+            tabindex="0"
+            @click="pick('new')"
+            @keydown.enter="pick('new')"
+            @dragover.prevent="dropping = true"
+            @dragleave="dropping = false"
+            @drop.prevent="onDropFile"
+          >
+            <span class="i-tabler-upload text-6 op-50" />
+            <div>{{ $gettext('Drop a PNG, JPEG or WebP image here') }}</div>
+            <div class="text-3 op-65">
+              {{ $gettext('Cropped to 16:10 and converted to WebP, up to 2 MB') }}
+            </div>
+          </div>
+          <AEmpty v-if="!shots.length && !(canEdit && S.uploads)" :description="$gettext('No screenshots yet.')" />
+          <div v-if="savedAt" class="text-3 op-65 mt-3">
+            {{ saving ? $gettext('Saving the draft') : $gettext('Draft saved %{time}. Submit it from the store page.', { time: fromNow(savedAt) }) }}
+            <RouterLink :to="`/plugins/${plugin.id}`">
+              {{ $gettext('Store') }}
+            </RouterLink>
+          </div>
+        </ACard>
+
+        <AFlex vertical gap="middle" class="col-side">
+          <ACard v-if="pending" :title="pending.target === 'new' ? $gettext('New screenshot') : pending.target === 'dark' ? $gettext('Dark version') : $gettext('Light version')">
+            <ImageCropper ref="cropper" :src="pending.url" />
+            <AAlert v-if="uploadError" type="error" show-icon class="mt-3" :title="uploadError" />
+            <AFlex justify="flex-end" gap="small" class="mt-4">
+              <AButton @click="cancelCrop">
+                {{ $gettext('Cancel') }}
+              </AButton>
+              <AButton type="primary" :loading="uploading" @click="applyCrop">
+                {{ pending.target === 'new' ? $gettext('Add the screenshot') : $gettext('Use this crop') }}
+              </AButton>
+            </AFlex>
+          </ACard>
+
+          <ACard v-else-if="selected" :title="`${shots.indexOf(selected) + 1}. ${selected.id}`">
+            <template #extra>
+              <ASegmented v-model:value="side" size="small" :options="[{ value: 'light', label: $gettext('Light') }, { value: 'dark', label: $gettext('Dark') }]" />
+            </template>
+            <div class="preview">
+              <img v-if="imageOf(side === 'dark' ? selected.dark_path : selected.path)" :src="imageOf(side === 'dark' ? selected.dark_path : selected.path)!" alt="" referrerpolicy="no-referrer">
+              <div v-else class="missing big">
+                {{ $gettext('No dark version') }}
+              </div>
+            </div>
+            <AFlex gap="small" wrap class="mt-3">
+              <AButton size="small" :disabled="!canEdit || !S.uploads" @click="pick(side)">
+                {{ side === 'dark' && !selected.dark_path ? $gettext('Upload the dark version') : $gettext('Replace the image') }}
+              </AButton>
+              <AButton v-if="imageOf(side === 'dark' ? selected.dark_path : selected.path)" size="small" :disabled="!canEdit || !S.uploads" @click="recrop">
+                {{ $gettext('Crop again') }}
+              </AButton>
+              <AButton v-if="side === 'dark' && selected.dark_path" size="small" :disabled="!canEdit" @click="removeDark">
+                {{ $gettext('Remove the dark version') }}
+              </AButton>
+            </AFlex>
+
+            <div class="captions">
+              <div class="font-500 mb-2">
+                {{ $gettext('Caption') }}
+              </div>
+              <label v-for="l in captionLocales" :key="l" class="caption">
+                <span class="text-3 op-65">{{ localeName(l) }}</span>
+                <AInput
+                  :value="selected.caption?.[l] ?? ''"
+                  :dir="RTL_LOCALES.includes(l) ? 'rtl' : 'auto'"
+                  :maxlength="200"
+                  :disabled="!S.canEdit.texts"
+                  :placeholder="l === 'en' ? '' : selected.caption?.en"
+                  @change="(e: Event) => setCaption(l, (e.target as HTMLInputElement).value)"
+                />
+              </label>
+              <AButton type="link" size="small" class="px-0" @click="showAll = !showAll">
+                <span :class="showAll ? 'i-tabler-chevron-up' : 'i-tabler-chevron-down'" />
+                {{ showAll ? $gettext('Show filled languages only') : $gettext('The other languages, %{n} of %{total} filled', { n: String(filledOthers), total: String(HOST_LOCALES.length - 1) }) }}
+              </AButton>
+            </div>
+            <AButton danger class="mt-3" :disabled="!canEdit" @click="remove">
+              {{ $gettext('Delete this screenshot') }}
+            </AButton>
+          </ACard>
+          <AAlert v-if="uploadError && !pending" type="error" show-icon :title="uploadError" />
+        </AFlex>
+      </div>
+    </template>
+  </AFlex>
+</template>
+
+<style scoped>
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 12px;
+}
+
+.shot-card {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 12px;
+  border: 1px solid var(--portal-border-strong);
+  border-radius: 8px;
+  background: var(--portal-card);
+  cursor: pointer;
+}
+
+.shot-card.on {
+  border-color: var(--portal-primary);
+  box-shadow: 0 0 0 2px var(--portal-primary-bg);
+}
+
+.shot-card.dragging {
+  opacity: 0.5;
+}
+
+.shot-card:focus-visible {
+  outline: 2px solid var(--portal-primary);
+}
+
+.title {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-weight: 500;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.pair {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px;
+}
+
+.pair img,
+.missing {
+  width: 100%;
+  aspect-ratio: 16 / 10;
+  object-fit: cover;
+  border-radius: 4px;
+  border: 1px solid var(--portal-border);
+  background: var(--portal-faint);
+}
+
+.missing {
+  display: grid;
+  place-items: center;
+  box-sizing: border-box;
+  border: 1px dashed #faad14;
+  color: #d48806;
+  font-size: 12px;
+  text-align: center;
+}
+
+.missing.big {
+  font-size: 13px;
+}
+
+.preview img {
+  display: block;
+  width: 100%;
+  aspect-ratio: 16 / 10;
+  object-fit: cover;
+  border-radius: 8px;
+  border: 1px solid var(--portal-border);
+}
+
+.dropzone {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  margin-top: 16px;
+  padding: 24px;
+  border: 1px dashed var(--portal-border-strong);
+  border-radius: 8px;
+  text-align: center;
+  cursor: pointer;
+}
+
+.dropzone.over,
+.dropzone:hover {
+  border-color: var(--portal-primary);
+  background: var(--portal-primary-bg);
+}
+
+.captions {
+  margin-top: 20px;
+}
+
+.caption {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-bottom: 10px;
+}
+</style>
