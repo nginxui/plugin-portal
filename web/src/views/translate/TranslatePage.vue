@@ -4,7 +4,7 @@ import { computed, onMounted, ref, watch } from 'vue'
 import { getGlossary, getTranslatePlugin, getTranslator, setTranslatorLangs, suggest } from '@/api/community'
 import gettext, { $gettext } from '@/lib/gettext'
 import { HOST_LOCALES, RTL_LOCALES } from '@/lib/hostLocales'
-import { localized } from '@/lib/labels'
+import { joinClauses, localized } from '@/lib/labels'
 import { localeName } from '@/lib/locales'
 import { fromNow } from '@/lib/time'
 
@@ -46,6 +46,7 @@ const plugins = computed(() => {
 })
 
 const missingText = (n: number) => $gettext('%{n} missing', { n: String(n) })
+const translateLabel = () => $gettext('Translate')
 
 function speed(hours: number | null) {
   if (hours === null)
@@ -188,7 +189,7 @@ const PROGRESS: Record<string, { text: (n: number | null) => string, track: stri
                 {{ localized(p.name) }}
               </div>
               <div class="text-3 op-65">
-                {{ p.owner ? `@${p.owner}, ` : '' }}{{ speed(p.reviewHours) }}
+                {{ joinClauses([p.owner ? `@${p.owner}` : '', speed(p.reviewHours)].filter(Boolean)) }}
               </div>
             </div>
             <ATag v-if="p.missing" color="warning" class="m-0">
@@ -198,7 +199,7 @@ const PROGRESS: Record<string, { text: (n: number | null) => string, track: stri
               {{ $gettext('Complete') }}
             </ATag>
             <AButton size="small" :type="current?.pluginId === p.pluginId ? 'primary' : 'default'" @click="open(p.pluginId)">
-              {{ $gettext('Translate') }}
+              {{ translateLabel() }}
             </AButton>
           </div>
         </ACard>
@@ -289,7 +290,7 @@ const PROGRESS: Record<string, { text: (n: number | null) => string, track: stri
             </div>
           </div>
         </ACard>
-        <ACard v-if="overview?.progress.length" :title="$gettext('Suggestion progress')">
+        <ACard v-if="overview?.progress?.length" :title="$gettext('Suggestion progress')">
           <div v-for="p in overview.progress" :key="p.pluginId" class="prog">
             <PluginIcon :src="p.iconUrl" :name="localized(p.name)" :size="36" />
             <div class="min-w-0 flex-1">

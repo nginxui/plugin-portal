@@ -72,12 +72,29 @@ export function storeSourceLabel(source: string): string {
 export function storeSourceShort(source: string): string {
   switch (source) {
     case 'repo-branch':
-      return $gettext('Repository, branch')
+      return $gettext('Repository, default branch')
     case 'repo-release':
-      return $gettext('Repository, releases')
+      return $gettext('Repository, with releases')
     case 'catalog':
-      return $gettext('Catalog')
+      return $gettext('Catalog hosted')
     default:
-      return $gettext('Manifest')
+      return $gettext('Release manifest')
   }
+}
+
+/** Items of a list joined the way the language of the portal writes them. */
+export function joinList(items: string[]): string {
+  return items.join(gettext.current.startsWith('zh') ? '、' : ', ')
+}
+
+/** Clauses of a sentence joined the way the language of the portal writes them. */
+export function joinClauses(items: string[]): string {
+  return items.join(gettext.current.startsWith('zh') ? '，' : ', ')
+}
+
+/** Two letters for an avatar: the first letters of the first two words, or the first two letters. */
+export function initials(name: string | null | undefined): string {
+  const words = (name ?? '?').split(/[\s._-]+/).filter(Boolean)
+  const text = words.length > 1 ? words[0][0] + words[1][0] : (words[0] ?? '?').slice(0, 2)
+  return text.toUpperCase()
 }

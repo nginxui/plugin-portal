@@ -105,6 +105,17 @@ function actorName(entry: AuditEntry) {
 }
 
 const isExternal = (url: string) => url.startsWith('https://')
+
+// A GitHub link as a reader names it: the repository and the commit or pull request.
+function recordText(url: string): string {
+  const commit = /^https:\/\/github\.com\/([^/]+\/[^/]+)\/commit\/([0-9a-f]+)/.exec(url)
+  if (commit)
+    return $gettext('%{repo} commit %{sha}', { repo: commit[1], sha: commit[2].slice(0, 7) })
+  const pull = /^https:\/\/github\.com\/([^/]+\/[^/]+)\/pull\/(\d+)/.exec(url)
+  if (pull)
+    return $gettext('%{repo} pull request #%{n}', { repo: pull[1], n: pull[2] })
+  return url.replace('https://github.com/', '')
+}
 const detailText = computed(() => selected.value ? auditDetailLines(selected.value).join('\n') : '')
 </script>
 
@@ -136,8 +147,8 @@ const detailText = computed(() => selected.value ? auditDetailLines(selected.val
         <div class="toolbar">
           <ASegmented v-model:value="kind" :options="kinds" />
           <AFlex gap="small" wrap>
-            <AInput v-model:value="actor" allow-clear class="w-36" :placeholder="$gettext('Actor')" :aria-label="$gettext('Actor')" />
-            <AInput v-model:value="subject" allow-clear class="w-48" :placeholder="$gettext('Plugin ID')" :aria-label="$gettext('Plugin ID')" />
+            <AInput v-model:value="actor" allow-clear class="w-28" :placeholder="$gettext('Actor')" :aria-label="$gettext('Actor')" />
+            <AInput v-model:value="subject" allow-clear class="w-36" :placeholder="$gettext('Plugin ID')" :aria-label="$gettext('Plugin ID')" />
             <ASelect v-model:value="days" :options="ranges" class="w-32" :aria-label="$gettext('Time range')" />
           </AFlex>
         </div>
@@ -163,13 +174,13 @@ const detailText = computed(() => selected.value ? auditDetailLines(selected.val
                   @keydown.enter="selected = entry"
                 >
                   <td class="nowrap">
-                    <span class="op-65">{{ dayjs.unix(entry.at).format('MM-DD HH:mm') }}</span>
+                    <span class="op-85">{{ dayjs.unix(entry.at).format('MM-DD HH:mm') }}</span>
                   </td>
                   <td class="nowrap">
                     <span class="actor">
                       <AAvatar v-if="entry.actor" :src="entry.actorAvatar ?? undefined" :size="20">{{ entry.actor.slice(0, 1).toUpperCase() }}</AAvatar>
                       <span v-else class="portal-mark"><span class="i-tabler-refresh" /></span>
-                      {{ actorName(entry) }}
+                      {{ entry.actor ?? actorName(entry) }}
                     </span>
                   </td>
                   <td class="nowrap">
@@ -181,7 +192,10 @@ const detailText = computed(() => selected.value ? auditDetailLines(selected.val
                     <div v-for="line in auditLines(entry)" :key="line">
                       {{ line }}
                     </div>
-                    <div v-if="entry.subject" class="text-3 op-65 mono">
+                    <div v-if="entry.action === 'catalog.deployed' && entry.detail?.run" class="text-3 op-65">
+                      {{ $gettext('deploy run #%{run}', { run: String(entry.detail.run) }) }}
+                    </div>
+                    <div v-else-if="entry.subject" class="text-3 op-65 mono">
                       {{ entry.subject }}
                     </div>
                     <div v-if="auditNote(entry)" class="text-3 op-65">
@@ -233,7 +247,7 @@ const detailText = computed(() => selected.value ? auditDetailLines(selected.val
               <template v-if="selected.record">
                 <dt>{{ $gettext('Record') }}</dt>
                 <dd class="break-all">
-                  <a v-if="isExternal(selected.record.url)" :href="selected.record.url" target="_blank" rel="noopener">{{ selected.record.url.replace('https://github.com/', '') }}</a>
+                  <a v-if="isExternal(selected.record.url)" :href="selected.record.url" target="_blank" rel="noopener">{{ recordText(selected.record.url) }}</a>
                   <RouterLink v-else :to="selected.record.url">
                     {{ $gettext('Change %{id}', { id: selected.record.label }) }}
                   </RouterLink>

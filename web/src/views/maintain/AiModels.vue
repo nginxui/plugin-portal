@@ -9,7 +9,6 @@ import { formatTime } from '@/lib/time'
 // neither see nor change anything here.
 
 const providers = ref<Provider[]>([])
-const keyConfigured = ref(true)
 const usage = ref({ authors: 0, requests: 0, inputTokens: 0, outputTokens: 0 })
 const loading = ref(true)
 const glossary = ref<{ locales: number, syncedAt: number | null }>({ locales: 0, syncedAt: null })
@@ -30,7 +29,6 @@ async function load() {
   try {
     const data = await getProviders()
     providers.value = data.providers
-    keyConfigured.value = data.keyConfigured
     usage.value = data.today
     if (data.glossary)
       glossary.value = data.glossary
@@ -138,8 +136,6 @@ const host = (url: string | null, kind: string) => url ? url.replace(/^https:\/\
       </AButton>
     </AFlex>
 
-    <AAlert v-if="!keyConfigured" type="warning" show-icon :title="$gettext('The Worker secret AI_KEY is not set, so provider keys cannot be saved yet.')" />
-
     <div class="cols">
       <AFlex vertical gap="middle" class="col-main">
         <ACard :loading="loading" :styles="{ body: { padding: 0 } }">
@@ -202,7 +198,7 @@ const host = (url: string | null, kind: string) => url ? url.replace(/^https:\/\
             <AFormItem :label="$gettext('Endpoint')" :extra="$gettext('For an OpenAI compatible endpoint, its base URL, for example https://llm.example.com/v1.')">
               <AInput v-model:value="form.base_url" class="mono" :placeholder="form.kind === 'anthropic' ? 'https://api.anthropic.com' : 'https://'" />
             </AFormItem>
-            <AFormItem :label="$gettext('API key')" :required="selectedId === 'new'" :extra="$gettext('Kept encrypted and never sent to a browser.')">
+            <AFormItem :label="$gettext('API key')" required :extra="$gettext('Kept encrypted and never sent to a browser.')">
               <AInputPassword v-model:value="form.key" :placeholder="selectedId === 'new' ? '' : $gettext('Saved, can only be replaced')" autocomplete="off" />
             </AFormItem>
             <ARow :gutter="16">
@@ -212,7 +208,7 @@ const host = (url: string | null, kind: string) => url ? url.replace(/^https:\/\
                 </AFormItem>
               </ACol>
               <ACol :xs="24" :md="12">
-                <AFormItem :label="$gettext('On')">
+                <AFormItem :label="$gettext('Enabled')">
                   <ASwitch v-model:checked="form.enabled" />
                 </AFormItem>
               </ACol>
@@ -229,7 +225,7 @@ const host = (url: string | null, kind: string) => url ? url.replace(/^https:\/\
               {{ $gettext('Remove') }}
             </AButton>
             <span v-if="test" class="text-3" :class="test.ok ? 'c-ok' : 'c-err'">
-              <span :class="test.ok ? 'i-tabler-check' : 'i-tabler-alert-circle'" /> {{ test.text }}
+              <span :class="test.ok ? 'i-tabler-circle-check' : 'i-tabler-alert-circle'" /> {{ test.text }}
             </span>
           </AFlex>
           <AAlert v-if="error" type="error" show-icon class="mt-3" :title="error" />
@@ -253,8 +249,8 @@ const host = (url: string | null, kind: string) => url ? url.replace(/^https:\/\
           </ATypographyParagraph>
           <dl class="kv">
             <dt>{{ $gettext('Languages') }}</dt>
-            <dd>{{ glossary.locales }}</dd>
-            <dt>{{ $gettext('Last read') }}</dt>
+            <dd>{{ $gettext('%{n} languages', { n: String(glossary.locales) }) }}</dd>
+            <dt>{{ $gettext('Last synced') }}</dt>
             <dd>{{ glossary.syncedAt ? formatTime(glossary.syncedAt) : $gettext('Not yet') }}</dd>
           </dl>
           <AButton size="small" class="mt-3" :loading="syncing" @click="syncNow">
@@ -263,9 +259,9 @@ const host = (url: string | null, kind: string) => url ? url.replace(/^https:\/\
         </ACard>
         <ACard :title="$gettext('Rules')">
           <AFlex vertical gap="8" class="text-3">
-            <span><span class="i-tabler-check c-ok" /> {{ $gettext('An AI translation is a draft until an author confirms it.') }}</span>
-            <span><span class="i-tabler-check c-ok" /> {{ $gettext('A confirmed name still goes to name review.') }}</span>
-            <span><span class="i-tabler-check c-ok" /> {{ $gettext('Past the daily number, an author cannot draft until the next day.') }}</span>
+            <span><span class="i-tabler-circle-check c-ok" /> {{ $gettext('An AI translation is a draft until an author confirms it.') }}</span>
+            <span><span class="i-tabler-circle-check c-ok" /> {{ $gettext('A confirmed name still goes to name review.') }}</span>
+            <span><span class="i-tabler-circle-check c-ok" /> {{ $gettext('Past the daily number, an author cannot draft until the next day.') }}</span>
           </AFlex>
         </ACard>
       </AFlex>

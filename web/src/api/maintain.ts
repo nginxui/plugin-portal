@@ -6,6 +6,7 @@ export interface AdminPlugin {
   iconUrl: string | null
   owner: string | null
   ownerKind: 'github' | 'vendor'
+  ownerType?: string | null
   repo: string | null
   trust: string | null
   version: string | null

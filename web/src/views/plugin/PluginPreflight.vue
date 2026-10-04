@@ -103,7 +103,7 @@ function detail(row: DiffRow): string {
   if (row.kind === 'permission' && row.sign === 'add')
     return row.note ? $gettext('Note from the author: %{note}', { note: row.note }) : $gettext('The manifest gives no reason for it. Add one in permission_reasons.')
   if (row.kind === 'min_nginx_ui_version')
-    return $gettext('Users of an older Nginx UI stay on v%{version}', { version: result.value?.listed.version ?? '' })
+    return row.to ? $gettext('Users below Nginx UI %{min} stay on v%{version}', { min: row.to, version: result.value?.listed.version ?? '' }) : $gettext('Users of an older Nginx UI stay on v%{version}', { version: result.value?.listed.version ?? '' })
   if (row.kind === 'name' && row.attention === 'review')
     return $gettext('Goes to name review once released, the listed name shows until it is approved')
   if (row.attention === 'left_out')
@@ -165,7 +165,7 @@ const SIGNS = { add: '+', del: '−', mod: '~' }
           <span class="text-3 op-65">{{ $gettext('Compare') }}</span>
           <ASelect v-model:value="target" class="ref-select" show-search :options="options" :aria-label="$gettext('Branch or tag')" @change="run" />
           <span class="i-tabler-arrow-right op-50" />
-          <span class="text-3 op-65">{{ $gettext('Listed') }}</span>
+          <span class="text-3 op-65">{{ $gettext('Listed now') }}</span>
           <ATag class="m-0">
             {{ refs?.listed.version ? `v${refs.listed.version}` : $gettext('Nothing listed') }}
           </ATag>

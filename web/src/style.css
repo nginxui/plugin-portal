@@ -9,6 +9,7 @@
   --portal-card: #ffffff;
   --portal-warn-bg: #fffbe6;
   --portal-warn-border: #ffe58f;
+  --portal-icon-muted: rgba(0, 0, 0, 0.45);
 }
 
 html.dark {
@@ -22,6 +23,7 @@ html.dark {
   --portal-card: #141414;
   --portal-warn-bg: #2b2111;
   --portal-warn-border: #594214;
+  --portal-icon-muted: rgba(255, 255, 255, 0.45);
 }
 
 html,

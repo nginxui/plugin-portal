@@ -59,7 +59,7 @@ function recordOf(env: Env, detail: Record<string, unknown> | null) {
   if (typeof detail?.commit === 'string')
     return { label: detail.commit.slice(0, 7), url: `https://github.com/${repo}/commit/${detail.commit}` }
   if (typeof detail?.pr === 'number')
-    return { label: `#${detail.pr}`, url: `https://github.com/${repo}/pull/${detail.pr}` }
+    return { label: `PR #${detail.pr}`, url: `https://github.com/${repo}/pull/${detail.pr}` }
   if (typeof detail?.change === 'string')
     return { label: detail.change, url: `/changes/${detail.change}` }
   return null

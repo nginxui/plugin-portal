@@ -9,7 +9,8 @@ export interface QueueItem extends Change {
 
 export interface ReviewDetail {
   change: Change & { risk: 'high' | 'normal' }
-  author: { login: string, avatarUrl: string | null, changes: number, merged: number } | null
+  author: { login: string, avatarUrl: string | null, changes: number, merged: number, plugins?: { id: string, name: string }[], firstListed?: string | null } | null
+  rotation?: { oldId: string | null, newId: string | null, versions: string[], seenIn: string[] } | null
   claim: string | null
   repository: string | null
   repositoryCreatedAt?: string | null
@@ -17,7 +18,7 @@ export interface ReviewDetail {
   listing: { description: Record<string, string> | null, screenshots: { url: string, dark_url?: string, caption?: Record<string, string> }[], iconUrl: string | null, capabilities: string[], manifest: Record<string, any> | null, version: string | null } | null
   pull: { number: number, state: string, merged: boolean, mergeable: boolean | null, mergeableState: string, url: string, title: string } | null
   checks: { name: string, status: string, conclusion: string | null, url: string }[]
-  conversation: { kind: 'review' | 'comment', state: string | null, author: string | null, body: string, at: string }[]
+  conversation: { kind: 'review' | 'comment', state: string | null, author: string | null, role: 'maintainer' | null, body: string, at: string }[]
   events: ChangeEvent[]
 }
 

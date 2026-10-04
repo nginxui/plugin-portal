@@ -4,6 +4,7 @@ import { computed, onMounted, ref, useTemplateRef } from 'vue'
 import { useRouter } from 'vue-router'
 import { approveRequest, createVendor, declineRequest, getPartnersAdmin, revokePartner } from '@/api/maintain'
 import { $gettext } from '@/lib/gettext'
+import { initials } from '@/lib/labels'
 import { fromNow } from '@/lib/time'
 
 // Partners for maintainers (spec 11.5): pending applications and key
@@ -134,7 +135,7 @@ function stateTag(state: string, expires: string | null) {
           <AEmpty v-if="!data.requests.length" :image-style="{ height: '40px' }" :description="$gettext('Nothing is waiting.')" />
           <div v-for="r in data.requests" :key="r.id" class="request">
             <AAvatar :size="36" shape="square">
-              {{ (r.owner ?? r.partner).slice(0, 2).toUpperCase() }}
+              {{ initials(r.owner ?? r.partner) }}
             </AAvatar>
             <div class="min-w-0 flex-1">
               <AFlex align="center" gap="small" wrap>
@@ -180,7 +181,7 @@ function stateTag(state: string, expires: string | null) {
                 {{ $gettext('Decline') }}
               </AButton>
               <AButton size="small" type="primary" :loading="busy === r.id" @click="approve(r)">
-                {{ $gettext('Approve') }}
+                {{ $gettext('Approve the request') }}
               </AButton>
             </AFlex>
           </div>
@@ -210,7 +211,7 @@ function stateTag(state: string, expires: string | null) {
                   <td>
                     <AFlex align="center" gap="small">
                       <AAvatar :size="24" shape="square">
-                        {{ p.displayName.slice(0, 2).toUpperCase() }}
+                        {{ initials(p.displayName) }}
                       </AAvatar>
                       <span class="font-500">{{ p.displayName }}</span>
                     </AFlex>

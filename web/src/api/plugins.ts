@@ -117,6 +117,11 @@ export function getMyPlugins() {
   return api<{ plugins: PluginSummary[], installable: Installable[], installUrl: string }>('/plugins/mine')
 }
 
+/** The other public repositories the user administers. */
+export function getMoreRepositories() {
+  return api<{ repos: Installable[] }>('/plugins/repositories')
+}
+
 export function getInsights() {
   return api<{ insights: Insights[] }>('/plugins/insights')
 }

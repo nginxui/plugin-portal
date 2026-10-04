@@ -204,11 +204,11 @@ changes.get('/', async (c) => {
             (await github<{ comments?: number }>(`/repos/${c.env.CATALOG_REPO}/issues/${row.pr_number}`, token).catch(() => null))?.comments ?? null)
         : Promise.resolve(null),
       row.waiting_on === 'author'
-        ? c.env.DB.prepare(`SELECT detail_json FROM change_events WHERE change_id = ? AND stage = 'changes_requested' ORDER BY at DESC LIMIT 1`).bind(row.id).first<{ detail_json: string | null }>()
+        ? c.env.DB.prepare(`SELECT e.detail_json, e.at, u.login FROM change_events e LEFT JOIN users u ON u.id = e.actor_id WHERE e.change_id = ? AND e.stage = 'changes_requested' ORDER BY e.at DESC LIMIT 1`).bind(row.id).first<{ detail_json: string | null, at: number, login: string | null }>()
         : Promise.resolve(null),
     ])
     const comment = asked?.detail_json ? (JSON.parse(asked.detail_json) as { comment?: string }).comment : undefined
-    return [row.id, { comments, askedFor: typeof comment === 'string' ? comment.slice(0, 300) : null }] as const
+    return [row.id, { comments, askedFor: typeof comment === 'string' ? comment.slice(0, 300) : null, askedBy: asked?.login ?? null, askedAt: asked?.at ?? null }] as const
   }))
   return c.json({ changes: results.map(row => ({ ...present(c.env, row), ...extra.get(row.id) })) })
 })

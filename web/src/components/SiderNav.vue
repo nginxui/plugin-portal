@@ -28,8 +28,16 @@ const emit = defineEmits<{ navigate: [key: string] }>()
       @click="({ key }) => emit('navigate', String(key))"
     />
     <div class="sider-foot">
-      <a href="https://nginxui.com/guide/plugins.html" target="_blank" rel="noopener">{{ $gettext('Developer docs') }}</a>
-      <a href="https://plugins.nginxui.com" target="_blank" rel="noopener">{{ $gettext('Plugin catalog') }}</a>
+      <a href="https://nginxui.com/guide/plugins.html" target="_blank" rel="noopener" class="foot-link">
+        <span class="i-tabler-book" />
+        <span class="flex-1">{{ $gettext('Developer docs') }}</span>
+        <span class="i-tabler-arrow-up-right foot-out" />
+      </a>
+      <a href="https://plugins.nginxui.com" target="_blank" rel="noopener" class="foot-link">
+        <span class="i-tabler-building-store" />
+        <span class="flex-1">{{ $gettext('Plugin catalog') }}</span>
+        <span class="i-tabler-arrow-up-right foot-out" />
+      </a>
     </div>
   </div>
 </template>
@@ -44,7 +52,9 @@ const emit = defineEmits<{ navigate: [key: string] }>()
 }
 
 .logo {
+  flex: none;
   height: 64px;
+  border-bottom: 1px solid var(--portal-border);
   display: flex;
   align-items: center;
   gap: 10px;
@@ -64,11 +74,39 @@ const emit = defineEmits<{ navigate: [key: string] }>()
 }
 
 .sider-foot {
+  flex: none;
   margin-top: auto;
-  padding: 16px 24px;
+  padding: 8px;
+  border-top: 1px solid var(--portal-border);
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 2px;
   font-size: 13px;
+}
+
+.foot-link {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  padding: 6px 20px;
+  border-radius: 6px;
+  color: inherit;
+  opacity: 0.75;
+  transition: background-color 0.2s, opacity 0.2s;
+}
+
+.foot-link:hover {
+  opacity: 1;
+  background: var(--portal-faint);
+}
+
+.foot-out {
+  font-size: 12px;
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+
+.foot-link:hover .foot-out {
+  opacity: 0.6;
 }
 </style>

@@ -8,13 +8,13 @@ import { approveChange, commentOnChange, getAiReview, getQueue, getReview, makeA
 import { categoryLabel } from '@/lib/categories'
 import { kindLabel } from '@/lib/changeKinds'
 import { checkRunLabel } from '@/lib/checkRuns'
-import gettext, { $gettext } from '@/lib/gettext'
+import gettext, { $gettext, $ngettext } from '@/lib/gettext'
 import { HOST_LOCALES } from '@/lib/hostLocales'
-import { localized, trustLabel } from '@/lib/labels'
+import { joinList, localized, trustLabel } from '@/lib/labels'
 import { localeName } from '@/lib/locales'
 import { permissionText } from '@/lib/market'
 import { previewRows } from '@/lib/preview'
-import { formatDate, fromNow } from '@/lib/time'
+import { formatDate, formatMoment, fromNow } from '@/lib/time'
 import { useCrumbs } from '@/stores/crumbs'
 import { usePaletteStore } from '@/stores/palette'
 import { useReviewStore } from '@/stores/review'
@@ -117,6 +117,38 @@ const extraRows = computed(() => rows.value.filter(row => ['author', 'repository
 // A new primary key ends the certificates the old one issued.
 const keyRotation = computed(() => !!detail.value?.before && rows.value.some(row => row.key === 'author_public_key' && row.changed))
 
+// The diff rows, with the key ids under a new primary key.
+const tableRows = computed(() => rows.value.filter(row => !detail.value?.before || row.changed).flatMap((row) => {
+  const rotation = detail.value?.rotation
+  if (row.key !== 'author_public_key' || !rotation)
+    return [row]
+  return [row, { key: 'key_id', label: $gettext('Key ID'), before: rotation.oldId ? [rotation.oldId] : [], after: rotation.newId ? [rotation.newId] : [], changed: true }]
+}))
+
+const rotationText = computed(() => {
+  const versions = detail.value?.rotation?.versions ?? []
+  return versions.length
+    ? $gettext('These versions stop installing until the author signs them again with a new certificate: %{list}.', { list: joinList(versions.map(v => `v${v}`)) })
+    : $gettext('Versions signed under them stop installing until the author signs them with a certificate of the new key.')
+})
+
+const comma = computed(() => gettext.current.startsWith('zh') ? '，' : ', ')
+
+function roleLabel(item: { author: string | null, role: 'maintainer' | null }): string {
+  if (item.author && item.author === detail.value?.author?.login)
+    return $gettext('Author')
+  return item.role === 'maintainer' ? $gettext('Maintainer') : ''
+}
+
+const historyText = computed(() => {
+  const a = detail.value?.author
+  if (!a || a.changes === 0)
+    return $gettext('None')
+  return a.merged === a.changes
+    ? $ngettext('%{n} in total, all merged', '%{n} in total, all merged', a.changes, { n: String(a.changes) })
+    : $gettext('%{n} in total, %{merged} merged', { n: String(a.changes), merged: String(a.merged) })
+})
+
 // The permissions of the listed release, as users read them.
 const permissions = computed(() => {
   const manifest = detail.value?.listing?.manifest as { permissions?: string[], permission_reasons?: Record<string, string>, network_hosts?: string[] } | null | undefined
@@ -167,6 +199,14 @@ const afterDoc = computed<Doc>(() => {
     ...(e.homepage_url ? { homepage_url: e.homepage_url } : {}),
   }
 })
+// Whether anything on the listing page changes, which the comparison is for.
+const userVisible = computed(() => {
+  const b = beforeDoc.value
+  if (!b)
+    return true
+  const a = afterDoc.value
+  return (['name', 'description', 'homepage_url', 'screenshots'] as const).some(k => JSON.stringify(b[k] ?? null) !== JSON.stringify(a[k] ?? null))
+})
 const compareImages = computed(() => Object.fromEntries((beforeDoc.value?.screenshots ?? []).flatMap(sh => [[sh.path, sh.path], ...(sh.dark_path ? [[sh.dark_path, sh.dark_path]] : [])])))
 
 // Names by language, each approved or kept as listed.
@@ -181,6 +221,7 @@ const nameRows = computed(() => {
   })).sort((a, b) => Number(a.state === 'same') - Number(b.state === 'same'))
 })
 const changedNames = computed(() => nameRows.value.filter(r => r.state !== 'same'))
+const approveLabel = computed(() => changedNames.value.length ? $gettext('Approve the checked names') : $gettext('Approve and merge'))
 const unchecked = ref<string[]>([])
 watch(() => change.value?.id, () => (unchecked.value = []))
 function toggleName(locale: string, on: boolean) {
@@ -391,13 +432,9 @@ onKeyStroke('k', e => !typing(e) && step(-1))
               </ATag>
             </AFlex>
             <div class="text-3 op-65 mt-1">
-              {{ name }} <span class="mono">{{ change.pluginId }}</span>,
-              <template v-if="detail.author">
-                {{ $gettext('submitted by @%{login} %{time}', { login: detail.author.login, time: fromNow(change.createdAt) }) }}
-              </template>
-              <template v-else>
-                {{ $gettext('found in a new release %{time}', { time: fromNow(change.createdAt) }) }}
-              </template>
+              {{ name }} <span class="mono">{{ change.pluginId }}</span>{{ comma }}{{ detail.author
+                ? $gettext('submitted by @%{login} at %{time}', { login: detail.author.login, time: formatMoment(change.createdAt) })
+                : $gettext('found in a new release %{time}', { time: fromNow(change.createdAt) }) }}
             </div>
           </div>
           <AFlex v-if="isOpen" gap="small" wrap>
@@ -410,7 +447,7 @@ onKeyStroke('k', e => !typing(e) && step(-1))
             </AButton>
             <AButton type="primary" @click="approveOpen = true">
               <span class="i-tabler-check" />
-              {{ unchecked.length ? $gettext('Approve the checked names') : $gettext('Approve and merge') }}
+              {{ approveLabel }}
               <kbd class="keycap on-primary">a</kbd>
             </AButton>
           </AFlex>
@@ -465,7 +502,7 @@ onKeyStroke('k', e => !typing(e) && step(-1))
             <AAlert v-if="aiError" type="error" show-icon class="mt-3" :title="aiError" />
           </ACard>
 
-          <ACard>
+          <ACard v-if="userVisible">
             <template #title>
               <span class="i-tabler-eye mr-2 op-65" />{{ $gettext('What users will see') }}
             </template>
@@ -574,7 +611,7 @@ onKeyStroke('k', e => !typing(e) && step(-1))
                   </tr>
                 </thead>
                 <tbody>
-                  <tr v-for="row in rows" :key="row.key">
+                  <tr v-for="row in tableRows" :key="row.key">
                     <td class="field">
                       {{ row.label }}
                     </td>
@@ -592,7 +629,16 @@ onKeyStroke('k', e => !typing(e) && step(-1))
                 </tbody>
               </table>
             </div>
-            <AAlert v-if="keyRotation" type="warning" show-icon class="m-4" :title="$gettext('Once approved, signer certificates issued by the old primary key are no longer accepted.')" :description="$gettext('Versions signed under them stop installing until the author signs them with a certificate of the new key.')" />
+            <AAlert v-if="keyRotation" type="warning" show-icon class="m-4">
+              <template #title>
+                <div class="font-500">
+                  {{ $gettext('Once approved, signer certificates issued by the old primary key are no longer accepted.') }}
+                </div>
+                <div class="text-3">
+                  {{ rotationText }}
+                </div>
+              </template>
+            </AAlert>
           </ACard>
 
           <ACard v-if="permissions.length">
@@ -642,6 +688,15 @@ onKeyStroke('k', e => !typing(e) && step(-1))
                   </div>
                 </div>
               </li>
+              <li v-if="detail.rotation?.seenIn">
+                <span :class="detail.rotation.seenIn.length ? 'i-tabler-circle-check-filled ok' : 'i-tabler-alert-triangle-filled warn'" />
+                <div>
+                  <div>{{ detail.rotation.seenIn.length ? $gettext('The new primary key is already used by %{list}', { list: joinList(detail.rotation.seenIn) }) : $gettext('The new primary key has not appeared in the catalog before') }}</div>
+                  <div v-if="!detail.rotation.seenIn.length" class="text-3 op-65">
+                    {{ $gettext('A primary key used for the first time. Confirm the reason for the rotation with the author.') }}
+                  </div>
+                </div>
+              </li>
               <li v-if="detail.repository">
                 <span class="i-tabler-brand-github op-60" />
                 <a :href="detail.repository" target="_blank" rel="noopener">{{ detail.repository.replace('https://github.com/', '') }}</a>
@@ -661,8 +716,9 @@ onKeyStroke('k', e => !typing(e) && step(-1))
               <div class="bubble">
                 <div class="bubble-head">
                   <span class="font-600">{{ item.author }}</span>
+                  <span v-if="roleLabel(item)" class="text-3 op-65">{{ roleLabel(item) }}</span>
                   <span v-if="reviewState(item.state)" class="op-75">{{ reviewState(item.state) }}</span>
-                  <span class="text-3 op-60">{{ fromNow(item.at) }}</span>
+                  <span class="text-3 op-60">{{ formatMoment(item.at) }}</span>
                 </div>
                 <div v-if="item.body" class="bubble-body">
                   {{ item.body }}
@@ -681,7 +737,7 @@ onKeyStroke('k', e => !typing(e) && step(-1))
         </AFlex>
 
         <AFlex vertical gap="middle" class="col-side">
-          <ACard :title="$gettext('Checks')">
+          <ACard :title="$gettext('Check results')">
             <template #extra>
               <ATag :color="checksPassed ? 'success' : 'error'" class="m-0">
                 {{ checksPassed ? $gettext('All passed') : $gettext('Needs attention') }}
@@ -706,7 +762,7 @@ onKeyStroke('k', e => !typing(e) && step(-1))
 
           <ACard :title="$gettext('Shortcuts')">
             <dl class="shortcuts">
-              <dt>{{ unchecked.length ? $gettext('Approve the checked names') : $gettext('Approve and merge') }}</dt>
+              <dt>{{ approveLabel }}</dt>
               <dd><kbd class="keycap">a</kbd></dd>
               <dt>{{ $gettext('Request changes') }}</dt>
               <dd><kbd class="keycap">r</kbd></dd>
@@ -732,8 +788,16 @@ onKeyStroke('k', e => !typing(e) && step(-1))
               </div>
             </AFlex>
             <dl class="kv small mt-4">
+              <template v-if="detail.author.plugins?.length">
+                <dt>{{ $gettext('Listed plugins') }}</dt>
+                <dd>{{ joinList(detail.author.plugins.map(p => p.name)) }}</dd>
+              </template>
+              <template v-if="detail.author.firstListed">
+                <dt>{{ $gettext('First listed') }}</dt>
+                <dd>{{ formatDate(detail.author.firstListed) }}</dd>
+              </template>
               <dt>{{ $gettext('Earlier changes') }}</dt>
-              <dd>{{ $gettext('%{n} in total, %{merged} merged', { n: String(detail.author.changes), merged: String(detail.author.merged) }) }}</dd>
+              <dd>{{ historyText }}</dd>
               <dt>{{ $gettext('Submitted') }}</dt>
               <dd>{{ formatDate(change.createdAt) }}</dd>
               <template v-if="detail.repositoryCreatedAt">
@@ -932,13 +996,12 @@ a.source:hover {
 }
 
 .diff td.old {
-  background: rgba(255, 77, 79, 0.06);
+  color: #ff4d4f;
   text-decoration: line-through;
-  text-decoration-color: rgba(255, 77, 79, 0.5);
 }
 
 .diff td.new {
-  background: rgba(82, 196, 26, 0.08);
+  color: #52c41a;
 }
 
 .kv {
@@ -991,6 +1054,10 @@ a.source:hover {
 
 .bad {
   color: #ff4d4f;
+}
+
+.warn {
+  color: #faad14;
 }
 
 .comment {

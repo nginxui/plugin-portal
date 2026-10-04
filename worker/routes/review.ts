@@ -9,6 +9,7 @@ import { loadCatalog, repoOf } from '../lib/catalog'
 import { event, getChange } from '../lib/changes'
 import { github, GitHubError } from '../lib/github'
 import { isHostLocale } from '../lib/locales'
+import { keyIdOf } from '../lib/partners'
 import { userToken } from '../lib/session'
 import { headOf } from '../lib/store'
 import { now } from '../lib/time'
@@ -37,6 +38,7 @@ interface Pull {
 
 interface Review {
   user: { login: string } | null
+  author_association?: string
   state: string
   body: string
   submitted_at: string
@@ -44,6 +46,7 @@ interface Review {
 
 interface Comment {
   user: { login: string } | null
+  author_association?: string
   body: string
   created_at: string
 }
@@ -67,6 +70,11 @@ async function currentEntry(env: Env, pluginId: string | null): Promise<unknown 
     return null
   const response = await fetch(`https://raw.githubusercontent.com/${env.CATALOG_REPO}/main/plugins/${pluginId}.json`)
   return response.ok ? response.json() : null
+}
+
+// People with a hand in the catalog repository count as maintainers.
+function roleOf(association: string | undefined): 'maintainer' | null {
+  return association === 'OWNER' || association === 'MEMBER' || association === 'COLLABORATOR' ? 'maintainer' : null
 }
 
 export const review = new Hono<AppEnv>()
@@ -157,7 +165,7 @@ review.get('/:id/ai', async (c) => {
     defaultProvider(c.env),
   ])
   return c.json({
-    enabled: !!provider && !!c.env.AI_KEY,
+    enabled: !!provider,
     review: row && { findings: JSON.parse(row.findings_json), provider: row.provider, model: row.model, createdAt: row.created_at },
   })
 })
@@ -217,7 +225,8 @@ review.get('/:id', async (c) => {
       github<CheckRuns>(`/repos/${repo}/commits/${pull.head.sha}/check-runs?per_page=50`, token).then(r => r.check_runs).catch(() => []),
     ])
   }
-  const listing = change.plugin_id ? (await loadCatalog(c.env)).plugins.find(p => p.id === change.plugin_id) ?? null : null
+  const catalog = await loadCatalog(c.env)
+  const listing = change.plugin_id ? catalog.plugins.find(p => p.id === change.plugin_id) ?? null : null
   const [author, before, history] = await Promise.all([
     c.env.DB.prepare('SELECT login, avatar_url FROM users WHERE id = ?').bind(change.author_id).first<{ login: string, avatar_url: string | null }>(),
     currentEntry(c.env, change.plugin_id),
@@ -231,6 +240,23 @@ review.get('/:id', async (c) => {
   const repoCreatedAt = repoName
     ? await cached(`repo-created:${repoName.toLowerCase()}`, 86400, async () => (await github<{ created_at?: string }>(`/repos/${repoName}`, token).catch(() => null))?.created_at ?? null)
     : null
+  // What the author already has listed, by repository owner.
+  const owned = author
+    ? catalog.plugins.filter(p => repoOf(p.repository_url)?.split('/')[0].toLowerCase() === author.login.toLowerCase())
+    : []
+  const firstListed = owned.flatMap(p => (p.releases ?? []).map(r => r.released_at ?? '')).filter(Boolean).sort()[0] ?? null
+  // A new primary key: its id, the listed versions it stops, and whether the catalog knows it.
+  const entryAfter = change.entry_json ? JSON.parse(change.entry_json) as { author_public_key?: string } : {}
+  const oldKey = (before as { author_public_key?: string } | null)?.author_public_key
+  const newKey = entryAfter.author_public_key
+  const rotation = oldKey && newKey && oldKey !== newKey
+    ? {
+        oldId: keyIdOf(oldKey),
+        newId: keyIdOf(newKey),
+        versions: (listing?.releases ?? []).filter(r => !r.yanked).map(r => r.version),
+        seenIn: catalog.plugins.filter(p => p.id !== change.plugin_id && (p as { author_public_key?: string }).author_public_key === newKey).map(p => p.id),
+      }
+    : null
   const { results: events } = await c.env.DB.prepare(
     `SELECT e.stage, e.detail_json, e.at, u.login AS actor FROM change_events e LEFT JOIN users u ON u.id = e.actor_id
      WHERE e.change_id = ? ORDER BY e.at, e.id`,
@@ -238,7 +264,10 @@ review.get('/:id', async (c) => {
 
   return c.json({
     change: { ...present(c.env, change), risk: risk(change) },
-    author: author ? { login: author.login, avatarUrl: author.avatar_url, changes: history?.total ?? 0, merged: history?.merged ?? 0 } : null,
+    author: author
+      ? { login: author.login, avatarUrl: author.avatar_url, changes: history?.total ?? 0, merged: history?.merged ?? 0, plugins: owned.map(p => ({ id: p.id, name: p.name?.en ?? p.id })), firstListed }
+      : null,
+    rotation,
     claim: payload.eligibility ?? null,
     repository: payload.repository_url ?? null,
     repositoryCreatedAt: repoCreatedAt,
@@ -256,8 +285,8 @@ review.get('/:id', async (c) => {
     },
     checks: checks.map(r => ({ name: r.name, status: r.status, conclusion: r.conclusion, url: r.html_url })),
     conversation: [
-      ...reviews.filter(r => r.body || r.state !== 'COMMENTED').map(r => ({ kind: 'review', state: r.state, author: r.user?.login ?? null, body: r.body, at: r.submitted_at })),
-      ...comments.map(r => ({ kind: 'comment', state: null, author: r.user?.login ?? null, body: r.body, at: r.created_at })),
+      ...reviews.filter(r => r.body || r.state !== 'COMMENTED').map(r => ({ kind: 'review', state: r.state, author: r.user?.login ?? null, role: roleOf(r.author_association), body: r.body, at: r.submitted_at })),
+      ...comments.map(r => ({ kind: 'comment', state: null, author: r.user?.login ?? null, role: roleOf(r.author_association), body: r.body, at: r.created_at })),
     ].sort((a, b) => a.at.localeCompare(b.at)),
     events: events.map(e => ({ stage: e.stage, actor: e.actor, at: e.at, detail: e.detail_json ? JSON.parse(e.detail_json) : null })),
   })
