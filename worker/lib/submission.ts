@@ -3,7 +3,7 @@ import type { Manifest } from './rules'
 import { repoAccess } from './access'
 import { loadCatalog } from './catalog'
 import { github, GitHubError } from './github'
-import { categoriesFromManifest, isSemver, manifestNames, packageAssets, PLUGIN_ID, reservedWord, tagVersion } from './rules'
+import { categoriesFromManifest, isSemver, manifestDescriptions, manifestNames, packageAssets, parseCertificateSignature, parsePublicKey, PLUGIN_ID, reservedWord, tagVersion } from './rules'
 
 export type CheckStatus = 'pass' | 'fail' | 'warn'
 
@@ -19,7 +19,7 @@ export interface Draft {
   repo: string
   id: string
   name: Record<string, string>
-  description: string
+  description: Record<string, string>
   version: string
   tag: string
   prerelease: boolean
@@ -28,6 +28,8 @@ export interface Draft {
   license: string | null
   categories: string[]
   readmeUrl: string
+  // The signer certificate at the release tag, null when there is none.
+  signer: { signingKeyId: string | null, primaryKeyId: string | null, pluginId: string | null } | null
 }
 
 export interface Preview {
@@ -198,6 +200,26 @@ export async function previewSubmission(env: Env, session: Session, token: strin
     ? { key: 'package', status: 'pass', params: { count: String(packages.length) } }
     : { key: 'package', status: 'fail', reason: 'missing', params: { name: `${id}-${version}.tar.gz` } })
 
+  const [certificate, certificateSignature] = await Promise.all([
+    rawFile(full, release.tag_name, 'plugin.signer'),
+    rawFile(full, release.tag_name, 'plugin.signer.minisig'),
+  ])
+  let signer: Draft['signer'] = null
+  if (certificate || certificateSignature) {
+    const signed = certificateSignature ? parseCertificateSignature(certificateSignature) : null
+    signer = {
+      signingKeyId: certificate ? parsePublicKey(certificate)?.id ?? null : null,
+      primaryKeyId: signed?.primaryKeyId ?? null,
+      pluginId: signed?.pluginId ?? null,
+    }
+  }
+  if (!signer?.signingKeyId || !signer.primaryKeyId)
+    checks.push({ key: 'signer', status: 'warn', reason: 'missing', params: { tag: release.tag_name } })
+  else if (id && signer.pluginId !== id)
+    checks.push({ key: 'signer', status: 'fail', reason: 'other_plugin', params: { id: signer.pluginId ?? '' } })
+  else
+    checks.push({ key: 'signer', status: 'pass', params: { key: signer.primaryKeyId } })
+
   const license = repo.license?.spdx_id && repo.license.spdx_id !== 'NOASSERTION' ? repo.license.spdx_id : null
   checks.push(license ? { key: 'license', status: 'pass', params: { license } } : { key: 'license', status: 'warn', reason: 'missing' })
 
@@ -205,7 +227,7 @@ export async function previewSubmission(env: Env, session: Session, token: strin
     repo: full,
     id,
     name: { en: english, ...translated },
-    description: typeof manifest.description === 'string' ? manifest.description : '',
+    description: { ...(typeof manifest.description === 'string' && manifest.description.trim() ? { en: manifest.description.trim() } : {}), ...manifestDescriptions(manifest) },
     version,
     tag: release.tag_name,
     prerelease: release.prerelease,
@@ -214,6 +236,7 @@ export async function previewSubmission(env: Env, session: Session, token: strin
     license,
     categories: categoriesFromManifest(manifest),
     readmeUrl: `${RAW}/${full}/${encodeURIComponent(release.tag_name)}/README.md`,
+    signer,
   }
   return done(draft, claim)
 }

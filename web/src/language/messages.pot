@@ -2,8 +2,196 @@ msgid ""
 msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 
+#: web/src/components/CategoryPicker.vue:28
+#: web/src/views/plugin/PluginOverview.vue:42
+#: web/src/views/SubmitPlugin.vue:216
+#: web/src/views/SubmitPlugin.vue:286
+msgid "Categories"
+msgstr ""
+
+#: web/src/components/CategoryPicker.vue:40
+msgid "Suggested"
+msgstr ""
+
+#: web/src/components/CategoryPicker.vue:45
+msgid "Up to three. Remove one to choose another."
+msgstr ""
+
+#: web/src/components/CategoryPicker.vue:45
+msgid "Up to three. Suggested ones come from the capabilities of the plugin."
+msgstr ""
+
+#: web/src/components/CategoryPicker.vue:47
+msgid "%{n} of %{max} chosen"
+msgstr ""
+
+#: web/src/components/KeyChain.vue:23
+msgid "This is not a minisign public key. Paste the whole content of primary.pub."
+msgstr ""
+
+#: web/src/components/KeyChain.vue:27
+msgid "Key %{id}. The release has no certificate to check it against."
+msgstr ""
+
+#: web/src/components/KeyChain.vue:31
+msgid "Your key"
+msgstr ""
+
+#: web/src/components/KeyChain.vue:38
+msgid "Certificate signer"
+msgstr ""
+
+#: web/src/components/KeyChain.vue:45
+msgid "Signing key"
+msgstr ""
+
+#: web/src/components/KeyChain.vue:49
+msgid "The chain matches"
+msgstr ""
+
+#: web/src/components/KeyChain.vue:52
+msgid "You pasted the signing key. Paste primary.pub instead."
+msgstr ""
+
+#: web/src/components/KeyChain.vue:55
+msgid "This key did not issue the certificate of %{tag}."
+msgstr ""
+
+#: web/src/components/KeyGuide.vue:25
+msgid "Pasted, matches the certificate"
+msgstr ""
+
+#: web/src/components/KeyGuide.vue:26
+msgid "Pasted"
+msgstr ""
+
+#: web/src/components/KeyGuide.vue:27
+msgid "Not pasted yet"
+msgstr ""
+
+#: web/src/components/KeyGuide.vue:28
+msgid "Check the key under the field"
+msgstr ""
+
+#: web/src/components/KeyGuide.vue:35
+msgid "Not in %{tag}"
+msgstr ""
+
+#: web/src/components/KeyGuide.vue:37
+msgid "Issued for another plugin"
+msgstr ""
+
+#: web/src/components/KeyGuide.vue:38
+msgid "Found in %{tag}"
+msgstr ""
+
+#: web/src/components/KeyGuide.vue:54
+msgid "Run once in a terminal with Nginx UI"
+msgstr ""
+
+#: web/src/components/KeyGuide.vue:57
+msgid "Copied"
+msgstr ""
+
+#: web/src/components/KeyGuide.vue:57
+msgid "Copy"
+msgstr ""
+
+#: web/src/components/KeyGuide.vue:66
+msgid "It creates five files. Put each one in its place:"
+msgstr ""
+
+#: web/src/components/KeyGuide.vue:72
+msgid "This page"
+msgstr ""
+
+#: web/src/components/KeyGuide.vue:74
+msgid "The primary public key field"
+msgstr ""
+
+#: web/src/components/KeyGuide.vue:87
+msgid "Plugin repository"
+msgstr ""
+
+#: web/src/components/KeyGuide.vue:89
+msgid "The root and the release environment"
+msgstr ""
+
+#: web/src/components/KeyGuide.vue:105
+msgid "Add it as the secret PLUGIN_SIGNING_KEY of the release environment, then delete the local copy."
+msgstr ""
+
+#: web/src/components/KeyGuide.vue:113
+msgid "Your offline backup"
+msgstr ""
+
+#: web/src/components/KeyGuide.vue:115
+msgid "A password manager or offline storage"
+msgstr ""
+
+#: web/src/components/KeyGuide.vue:122
+msgid "Without it no new certificate can be issued"
+msgstr ""
+
+#: web/src/components/KeyGuide.vue:128
+msgid "Then publish every release with nginxui/plugin-release, which signs the packages when a version tag is pushed."
+msgstr ""
+
+#: web/src/components/KeyGuide.vue:130
+#: web/src/views/SubmitPlugin.vue:174
+msgid "Signing and trust"
+msgstr ""
+
+#: web/src/components/ListingCard.vue:36
+#: web/src/lib/labels.ts:42
+msgid "Community"
+msgstr ""
+
 #: web/src/components/PluginRow.vue:37
 msgid "Manage"
+msgstr ""
+
+#: web/src/components/RepoPicker.vue:27
+msgid "Search repositories"
+msgstr ""
+
+#: web/src/components/RepoPicker.vue:48
+msgid "App installed"
+msgstr ""
+
+#: web/src/components/RepoPicker.vue:48
+#: web/src/lib/labels.ts:14
+msgid "Admin"
+msgstr ""
+
+#: web/src/components/RepoPicker.vue:50
+msgid "Updated %{time}"
+msgstr ""
+
+#: web/src/components/RepoPicker.vue:57
+msgid "No repository matches the search."
+msgstr ""
+
+#: web/src/components/RepoPicker.vue:57
+#: web/src/views/MyPlugins.vue:134
+msgid "No repository is waiting to be submitted."
+msgstr ""
+
+#: web/src/components/RepoPicker.vue:61
+msgid "Another public repository you administer"
+msgstr ""
+
+#: web/src/components/RepoPicker.vue:64
+msgid "owner/repository"
+msgstr ""
+
+#: web/src/components/RepoPicker.vue:66
+msgid "Check"
+msgstr ""
+
+#: web/src/components/RepoPicker.vue:70
+#: web/src/views/MyPlugins.vue:156
+msgid "Install the app on another repository"
 msgstr ""
 
 #: web/src/components/SiderNav.vue:19
@@ -28,7 +216,7 @@ msgstr ""
 
 #: web/src/layouts/PortalLayout.vue:29
 #: web/src/views/MyPlugins.vue:81
-#: web/src/views/SubmitPlugin.vue:88
+#: web/src/views/SubmitPlugin.vue:136
 msgid "Submit a plugin"
 msgstr ""
 
@@ -62,10 +250,66 @@ msgstr ""
 msgid "Account menu"
 msgstr ""
 
+#: web/src/lib/categories.ts:6
+msgid "Certificates"
+msgstr ""
+
+#: web/src/lib/categories.ts:7
+msgid "DNS"
+msgstr ""
+
+#: web/src/lib/categories.ts:8
+msgid "Security"
+msgstr ""
+
+#: web/src/lib/categories.ts:9
+msgid "Traffic"
+msgstr ""
+
+#: web/src/lib/categories.ts:10
+msgid "Monitoring"
+msgstr ""
+
+#: web/src/lib/categories.ts:11
+msgid "Logs"
+msgstr ""
+
+#: web/src/lib/categories.ts:12
+msgid "Analytics"
+msgstr ""
+
+#: web/src/lib/categories.ts:13
+msgid "Notifications"
+msgstr ""
+
+#: web/src/lib/categories.ts:14
+msgid "Backup"
+msgstr ""
+
+#: web/src/lib/categories.ts:15
+msgid "AI"
+msgstr ""
+
+#: web/src/lib/categories.ts:16
+msgid "Templates"
+msgstr ""
+
+#: web/src/lib/categories.ts:17
+msgid "Languages"
+msgstr ""
+
+#: web/src/lib/categories.ts:18
+msgid "Integrations"
+msgstr ""
+
+#: web/src/lib/categories.ts:19
+msgid "Tools"
+msgstr ""
+
 #: web/src/lib/checks.ts:6
 #: web/src/views/plugin/PluginLayout.vue:79
 #: web/src/views/plugin/PluginOverview.vue:34
-#: web/src/views/SubmitPlugin.vue:95
+#: web/src/views/SubmitPlugin.vue:265
 msgid "Repository"
 msgstr ""
 
@@ -82,10 +326,12 @@ msgid "plugin.json"
 msgstr ""
 
 #: web/src/lib/checks.ts:10
+#: web/src/views/SubmitPlugin.vue:269
 msgid "Plugin ID"
 msgstr ""
 
 #: web/src/lib/checks.ts:11
+#: web/src/views/SubmitPlugin.vue:273
 msgid "Name"
 msgstr ""
 
@@ -94,112 +340,124 @@ msgid "Packages"
 msgstr ""
 
 #: web/src/lib/checks.ts:13
-#: web/src/views/SubmitPlugin.vue:140
+#: web/src/views/SubmitPlugin.vue:295
 msgid "License"
 msgstr ""
 
-#: web/src/lib/checks.ts:22
-msgid "%{repo} is a public repository."
+#: web/src/lib/checks.ts:14
+msgid "Signer certificate"
 msgstr ""
 
 #: web/src/lib/checks.ts:23
-msgid "The repository does not exist or is not public."
+msgid "%{repo} is a public repository."
 msgstr ""
 
 #: web/src/lib/checks.ts:24
-msgid "The repository is private. The catalog lists public repositories only."
+msgid "The repository does not exist or is not public."
 msgstr ""
 
 #: web/src/lib/checks.ts:25
-msgid "This repository may not be listed. Contact the maintainers if you think this is a mistake."
+msgid "The repository is private. The catalog lists public repositories only."
 msgstr ""
 
 #: web/src/lib/checks.ts:26
-msgid "The repository is archived."
+msgid "This repository may not be listed. Contact the maintainers if you think this is a mistake."
 msgstr ""
 
 #: web/src/lib/checks.ts:27
-msgid "You installed the Nginx UI Plugin Catalog app on this repository."
+msgid "The repository is archived."
 msgstr ""
 
 #: web/src/lib/checks.ts:28
-msgid "You have admin permission on this repository."
+msgid "You installed the Nginx UI Plugin Catalog app on this repository."
 msgstr ""
 
 #: web/src/lib/checks.ts:29
-msgid "Only an admin of the repository can submit it. Ask an admin to submit it, or to install the Nginx UI Plugin Catalog app."
+msgid "You have admin permission on this repository."
 msgstr ""
 
 #: web/src/lib/checks.ts:30
-msgid "Version %{version}, the newest stable release."
+msgid "Only an admin of the repository can submit it. Ask an admin to submit it, or to install the Nginx UI Plugin Catalog app."
 msgstr ""
 
 #: web/src/lib/checks.ts:31
-msgid "Version %{version} is a prerelease. The listing starts with it until a stable release is published."
+msgid "Version %{version}, the newest stable release."
 msgstr ""
 
 #: web/src/lib/checks.ts:32
-msgid "The repository has no GitHub Release with a version tag such as v1.0.0 yet."
+msgid "Version %{version} is a prerelease. The listing starts with it until a stable release is published."
 msgstr ""
 
 #: web/src/lib/checks.ts:33
-msgid "Read from the release %{tag}."
+msgid "The repository has no GitHub Release with a version tag such as v1.0.0 yet."
 msgstr ""
 
 #: web/src/lib/checks.ts:34
-msgid "There is no plugin.json at the root of the repository at %{tag}."
+msgid "Read from the release %{tag}."
 msgstr ""
 
 #: web/src/lib/checks.ts:35
+msgid "There is no plugin.json at the root of the repository at %{tag}."
+msgstr ""
+
+#: web/src/lib/checks.ts:36
 msgid "plugin.json at %{tag} is not valid JSON."
 msgstr ""
 
-#: web/src/lib/checks.ts:37
+#: web/src/lib/checks.ts:38
 msgid "The plugin ID %{id} does not follow the naming rule, for example io.github.<owner>.<name>."
 msgstr ""
 
-#: web/src/lib/checks.ts:38
+#: web/src/lib/checks.ts:39
 msgid "The com.nginxui namespace is reserved for the plugins of the Nginx UI project."
 msgstr ""
 
-#: web/src/lib/checks.ts:39
+#: web/src/lib/checks.ts:40
 msgid "The plugin ID %{id} names another GitHub owner than %{owner}."
 msgstr ""
 
-#: web/src/lib/checks.ts:40
+#: web/src/lib/checks.ts:41
 msgid "This plugin ID may not be listed. Contact the maintainers if you think this is a mistake."
 msgstr ""
 
-#: web/src/lib/checks.ts:41
+#: web/src/lib/checks.ts:42
 msgid "A plugin with this ID is listed already."
 msgstr ""
 
-#: web/src/lib/checks.ts:42
+#: web/src/lib/checks.ts:43
 msgid "A submission of this plugin is already under review."
 msgstr ""
 
-#: web/src/lib/checks.ts:44
+#: web/src/lib/checks.ts:45
 msgid "plugin.json has no name."
 msgstr ""
 
-#: web/src/lib/checks.ts:45
+#: web/src/lib/checks.ts:46
 msgid "The name holds \"%{word}\", which no name may hold. Only the plugins of the Nginx UI project are official."
 msgstr ""
 
-#: web/src/lib/checks.ts:46
+#: web/src/lib/checks.ts:47
 msgid "%{count} packages in the release."
 msgstr ""
 
-#: web/src/lib/checks.ts:47
+#: web/src/lib/checks.ts:48
 msgid "The release has no package named %{name} or one per platform."
 msgstr ""
 
-#: web/src/lib/checks.ts:49
-msgid "GitHub detects no license in the repository. The listing shows none."
+#: web/src/lib/checks.ts:50
+msgid "Issued by the primary key %{key}."
 msgstr ""
 
-#: web/src/lib/labels.ts:14
-msgid "Admin"
+#: web/src/lib/checks.ts:51
+msgid "There is no plugin.signer at %{tag}. Create the keys as described in the next step and publish a new release."
+msgstr ""
+
+#: web/src/lib/checks.ts:52
+msgid "The certificate was issued for %{id}, not for this plugin."
+msgstr ""
+
+#: web/src/lib/checks.ts:53
+msgid "GitHub detects no license in the repository. The listing shows none."
 msgstr ""
 
 #: web/src/lib/labels.ts:16
@@ -234,10 +492,6 @@ msgstr ""
 msgid "Partner"
 msgstr ""
 
-#: web/src/lib/labels.ts:42
-msgid "Community"
-msgstr ""
-
 #: web/src/lib/labels.ts:51
 msgid "Listed"
 msgstr ""
@@ -257,7 +511,7 @@ msgid "Submitted"
 msgstr ""
 
 #: web/src/views/ChangeView.vue:56
-#: web/src/views/SubmitPlugin.vue:165
+#: web/src/views/SubmitPlugin.vue:153
 msgid "Checks"
 msgstr ""
 
@@ -382,7 +636,7 @@ msgid "All"
 msgstr ""
 
 #: web/src/views/MyPlugins.vue:54
-#: web/src/views/SubmitPlugin.vue:171
+#: web/src/views/SubmitPlugin.vue:156
 msgid "Needs changes"
 msgstr ""
 
@@ -444,10 +698,6 @@ msgstr ""
 msgid "Public repositories you administer or installed the Nginx UI Plugin Catalog app on. With the app installed, new releases reach the catalog within minutes."
 msgstr ""
 
-#: web/src/views/MyPlugins.vue:134
-msgid "No repository is waiting to be submitted."
-msgstr ""
-
 #: web/src/views/MyPlugins.vue:144
 msgid "App installed %{time}"
 msgstr ""
@@ -458,10 +708,6 @@ msgstr ""
 
 #: web/src/views/MyPlugins.vue:152
 msgid "Submit as plugin"
-msgstr ""
-
-#: web/src/views/MyPlugins.vue:156
-msgid "Install the app on another repository"
 msgstr ""
 
 #: web/src/views/NotFound.vue:6
@@ -626,7 +872,7 @@ msgid "Plugin sections"
 msgstr ""
 
 #: web/src/views/plugin/PluginOverview.vue:14
-#: web/src/views/SubmitPlugin.vue:132
+#: web/src/views/SubmitPlugin.vue:281
 msgid "Version"
 msgstr ""
 
@@ -643,18 +889,11 @@ msgid "Release notes"
 msgstr ""
 
 #: web/src/views/plugin/PluginOverview.vue:29
-#: web/src/views/SubmitPlugin.vue:116
 msgid "Listing"
 msgstr ""
 
 #: web/src/views/plugin/PluginOverview.vue:31
-#: web/src/views/SubmitPlugin.vue:129
 msgid "Description"
-msgstr ""
-
-#: web/src/views/plugin/PluginOverview.vue:42
-#: web/src/views/SubmitPlugin.vue:154
-msgid "Categories"
 msgstr ""
 
 #: web/src/views/plugin/PluginOverview.vue:47
@@ -717,70 +956,144 @@ msgstr ""
 msgid "Signing in only confirms your GitHub identity. It grants no write access to your repositories."
 msgstr ""
 
+#: web/src/views/SubmitPlugin.vue:51
+msgid "%{total} checks passed, %{n} with a warning"
+msgstr ""
+
+#: web/src/views/SubmitPlugin.vue:52
+msgid "All %{total} checks passed"
+msgstr ""
+
 #: web/src/views/SubmitPlugin.vue:65
-msgid "The primary public key is not a minisign public key. Paste the content of primary.pub."
+#: web/src/views/SubmitPlugin.vue:149
+msgid "Choose a repository"
+msgstr ""
+
+#: web/src/views/SubmitPlugin.vue:66
+#: web/src/views/SubmitPlugin.vue:183
+msgid "Fill in the details"
 msgstr ""
 
 #: web/src/views/SubmitPlugin.vue:67
+msgid "Check and submit"
+msgstr ""
+
+#: web/src/views/SubmitPlugin.vue:107
+msgid "The primary public key is not a minisign public key. Paste the content of primary.pub."
+msgstr ""
+
+#: web/src/views/SubmitPlugin.vue:112
 msgid "The checks no longer pass. Check the repository again."
 msgstr ""
 
-#: web/src/views/SubmitPlugin.vue:68
+#: web/src/views/SubmitPlugin.vue:113
 msgid "The submission could not be sent. Please try again."
 msgstr ""
 
-#: web/src/views/SubmitPlugin.vue:91
+#: web/src/views/SubmitPlugin.vue:139
 msgid "Once the checks pass, submit the plugin. It is listed after a maintainer approves it."
 msgstr ""
 
-#: web/src/views/SubmitPlugin.vue:100
-msgid "owner/repository"
-msgstr ""
-
-#: web/src/views/SubmitPlugin.vue:105
-msgid "Check"
-msgstr ""
-
-#: web/src/views/SubmitPlugin.vue:109
-msgid "You need admin permission on the repository. The newest release, its plugin.json and its packages are read from GitHub."
-msgstr ""
-
-#: web/src/views/SubmitPlugin.vue:111
+#: web/src/views/SubmitPlugin.vue:151
 msgid "The repository could not be checked. Please try again."
 msgstr ""
 
-#: web/src/views/SubmitPlugin.vue:135
-msgid "Name translations"
+#: web/src/views/SubmitPlugin.vue:164
+msgid "Fix the problems in the repository or a new release, then choose the repository again."
 msgstr ""
 
-#: web/src/views/SubmitPlugin.vue:145
-msgid "Names in every language are reviewed with the submission."
+#: web/src/views/SubmitPlugin.vue:167
+msgid "Before you start"
 msgstr ""
 
-#: web/src/views/SubmitPlugin.vue:149
-msgid "Details"
+#: web/src/views/SubmitPlugin.vue:169
+msgid "The repository is public and you are its admin."
 msgstr ""
 
-#: web/src/views/SubmitPlugin.vue:151
-msgid "Primary public key"
+#: web/src/views/SubmitPlugin.vue:170
+msgid "A GitHub Release with a version tag holds the signed packages of the plugin."
 msgstr ""
 
-#: web/src/views/SubmitPlugin.vue:151
+#: web/src/views/SubmitPlugin.vue:171
+msgid "The primary public key from nginx-ui plugin key init is at hand."
+msgstr ""
+
+#: web/src/views/SubmitPlugin.vue:195
+msgid "Change"
+msgstr ""
+
+#: web/src/views/SubmitPlugin.vue:199
 msgid "The content of primary.pub, created with nginx-ui plugin key init. It verifies the signer certificates of your releases."
 msgstr ""
 
-#: web/src/views/SubmitPlugin.vue:154
-msgid "Up to three. Suggested from the capabilities of the plugin."
+#: web/src/views/SubmitPlugin.vue:201
+#: web/src/views/SubmitPlugin.vue:298
+msgid "Primary public key"
 msgstr ""
 
-#: web/src/views/SubmitPlugin.vue:160
+#: web/src/views/SubmitPlugin.vue:203
+#: web/src/views/SubmitPlugin.vue:234
+msgid "How to create the keys"
+msgstr ""
+
+#: web/src/views/SubmitPlugin.vue:206
+msgid "%{tag} has no signer certificate, so the keys of this plugin have not been created yet."
+msgstr ""
+
+#: web/src/views/SubmitPlugin.vue:209
+msgid "Show the steps"
+msgstr ""
+
+#: web/src/views/SubmitPlugin.vue:223
+#: web/src/views/SubmitPlugin.vue:324
+msgid "Back"
+msgstr ""
+
+#: web/src/views/SubmitPlugin.vue:226
+msgid "Next"
+msgstr ""
+
+#: web/src/views/SubmitPlugin.vue:230
+#: web/src/views/SubmitPlugin.vue:309
+msgid "Catalog preview"
+msgstr ""
+
+#: web/src/views/SubmitPlugin.vue:246
+msgid "The packages, their signatures and the signer certificate are verified again in the catalog repository after you submit."
+msgstr ""
+
+#: web/src/views/SubmitPlugin.vue:249
+msgid "Hide details"
+msgstr ""
+
+#: web/src/views/SubmitPlugin.vue:249
+msgid "Show details"
+msgstr ""
+
+#: web/src/views/SubmitPlugin.vue:258
+msgid "Plugin details"
+msgstr ""
+
+#: web/src/views/SubmitPlugin.vue:261
+msgid "Edit"
+msgstr ""
+
+#: web/src/views/SubmitPlugin.vue:284
+msgid "%{count} packages"
+msgstr ""
+
+#: web/src/views/SubmitPlugin.vue:303
+msgid "Matches the certificate"
+msgstr ""
+
+#: web/src/views/SubmitPlugin.vue:312
+msgid "Names in every language are reviewed with the submission. The description and screenshots come from plugin.json and update with every release."
+msgstr ""
+
+#: web/src/views/SubmitPlugin.vue:320
+msgid "After you submit, a maintainer reviews the plugin. Follow it on the change page, and GitHub notifies you of the review."
+msgstr ""
+
+#: web/src/views/SubmitPlugin.vue:327
 msgid "Submit for review"
-msgstr ""
-
-#: web/src/views/SubmitPlugin.vue:168
-msgid "Passed"
-msgstr ""
-
-#: web/src/views/SubmitPlugin.vue:176
-msgid "After you submit, the packages, their signatures and the signer certificate are verified in the catalog repository."
 msgstr ""

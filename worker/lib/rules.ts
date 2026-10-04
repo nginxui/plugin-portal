@@ -41,6 +41,16 @@ export interface Manifest {
   i18n?: Record<string, { name?: unknown, description?: unknown }>
 }
 
+/** The translated descriptions of a manifest, English left out. */
+export function manifestDescriptions(manifest: Manifest): Record<string, string> {
+  const out: Record<string, string> = {}
+  for (const [locale, text] of Object.entries(manifest.i18n ?? {})) {
+    if (locale !== 'en' && LOCALE.test(locale) && typeof text?.description === 'string' && text.description.trim())
+      out[locale] = text.description.trim()
+  }
+  return out
+}
+
 /** The translated names of a manifest, English left out. */
 export function manifestNames(manifest: Manifest): Record<string, string> {
   const names: Record<string, string> = {}
@@ -85,23 +95,46 @@ export function packageAssets(assets: { name: string }[], id: string, version: s
 }
 
 const PUBLIC_KEY_BYTES = 42
+const SIGNATURE_BYTES = 74
 
-/** The key line and key id of a minisign public key, or null. */
-export function parsePublicKey(text: string): { line: string, id: string } | null {
-  const line = text.split(/\r?\n/).map(l => l.trim()).filter(l => l && !l.startsWith('untrusted comment:')).at(-1) ?? ''
+function keyIdAt(bytes: Uint8Array): string {
+  let id = ''
+  for (let i = 9; i >= 2; i--)
+    id += bytes[i].toString(16).padStart(2, '0')
+  return id.toUpperCase()
+}
+
+function decode(line: string): Uint8Array | null {
   if (!/^[A-Z0-9+/]+={0,2}$/i.test(line))
     return null
-  let bytes: Uint8Array
   try {
-    bytes = Uint8Array.from(atob(line), c => c.charCodeAt(0))
+    return Uint8Array.from(atob(line), c => c.charCodeAt(0))
   }
   catch {
     return null
   }
-  if (bytes.length !== PUBLIC_KEY_BYTES || bytes[0] !== 0x45 || bytes[1] !== 0x64)
+}
+
+/**
+ * What a signer certificate says: the id of the key that signed it (the
+ * primary key) and the plugin id of its trusted comment, from
+ * plugin.signer.minisig. Null when it is not a minisign signature.
+ */
+export function parseCertificateSignature(text: string): { primaryKeyId: string, pluginId: string | null } | null {
+  const lines = text.split(/\r?\n/)
+  const bytes = decode(lines[1]?.trim() ?? '')
+  if (!bytes || bytes.length !== SIGNATURE_BYTES)
     return null
-  let id = ''
-  for (let i = 9; i >= 2; i--)
-    id += bytes[i].toString(16).padStart(2, '0')
-  return { line, id: id.toUpperCase() }
+  const trusted = lines.find(l => l.startsWith('trusted comment: '))?.slice('trusted comment: '.length).trim() ?? ''
+  const pluginId = /^signer:(\S+)/.exec(trusted)?.[1] ?? null
+  return { primaryKeyId: keyIdAt(bytes), pluginId }
+}
+
+/** The key line and key id of a minisign public key, or null. */
+export function parsePublicKey(text: string): { line: string, id: string } | null {
+  const line = text.split(/\r?\n/).map(l => l.trim()).filter(l => l && !l.startsWith('untrusted comment:')).at(-1) ?? ''
+  const bytes = decode(line)
+  if (!bytes || bytes.length !== PUBLIC_KEY_BYTES || bytes[0] !== 0x45 || bytes[1] !== 0x64)
+    return null
+  return { line, id: keyIdAt(bytes) }
 }

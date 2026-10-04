@@ -74,3 +74,10 @@ export async function signIn(options: { push?: boolean } = {}): Promise<string> 
 // A minisign public key: "Ed", the key id 0x0102030405060708 little endian, 32 key bytes.
 const keyBytes = new Uint8Array([0x45, 0x64, 8, 7, 6, 5, 4, 3, 2, 1, ...Array.from({ length: 32 }, (_, i) => i)])
 export const publicKey = `untrusted comment: minisign public key 0102030405060708\n${btoa(String.fromCharCode(...keyBytes))}`
+
+// A minisign signature by the key above over a signer certificate.
+const signatureBytes = new Uint8Array(74)
+signatureBytes.set([0x45, 0x44, 8, 7, 6, 5, 4, 3, 2, 1])
+export function certificateSignature(pluginId: string) {
+  return `untrusted comment: signer certificate\n${btoa(String.fromCharCode(...signatureBytes))}\ntrusted comment: signer:${pluginId}\n${btoa('x'.repeat(64))}\n`
+}
