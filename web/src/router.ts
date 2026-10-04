@@ -46,3 +46,25 @@ router.beforeEach(async (to) => {
   if (to.meta.maintainer && !session.isMaintainer)
     return '/plugins'
 })
+
+// A deploy replaces the page chunks, so a tab opened before it cannot load
+// the next page. Load that page in full instead, once, to pick up the new build.
+const CHUNK_ERROR = /dynamically imported module|Importing a module script failed|Loading chunk/i
+router.onError((error, to) => {
+  if (!CHUNK_ERROR.test(String((error as Error)?.message ?? error)))
+    return
+  try {
+    if (sessionStorage.getItem('portal-chunk-reload') === to.fullPath)
+      return
+    sessionStorage.setItem('portal-chunk-reload', to.fullPath)
+  }
+  catch {}
+  window.location.assign(to.fullPath)
+})
+
+router.afterEach(() => {
+  try {
+    sessionStorage.removeItem('portal-chunk-reload')
+  }
+  catch {}
+})
