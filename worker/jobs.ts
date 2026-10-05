@@ -49,7 +49,7 @@ export async function mail(env: Env): Promise<number> {
       const text = live
         ? `Your change to ${row.plugin_id} is live in the catalog. Nginx UI shows it at its next marketplace refresh.\n\n${url}`
         : `Your change to ${row.plugin_id} waits for you.\n\n${url}`
-      if (await sendMail(env, row.email, subject, text))
+      if ((await sendMail(env, row.email, subject, text)).ok)
         sent++
     }
   }

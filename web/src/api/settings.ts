@@ -8,7 +8,7 @@ export interface Announcement {
 }
 
 export interface PortalSettings {
-  mail: { url: string, from: string, keySet: boolean, active: 'settings' | 'env' | null }
+  mail: MailView
   bot: { login: string, tokenSet: boolean, active: 'settings' | 'env' | null }
   announcements: Announcement[]
 }
@@ -35,7 +35,31 @@ export function deleteAnnouncement(id: number) {
   return api<{ ok: true }>(`/settings/announcements/${id}`, { method: 'DELETE' })
 }
 
-export function saveMail(input: { url: string, from: string, key: string }) {
+export interface MailView {
+  kind: 'http' | 'smtp'
+  url: string
+  from: string
+  keySet: boolean
+  host: string
+  port: number
+  user: string
+  passwordSet: boolean
+  active: 'settings' | 'env' | null
+  activeKind: 'http' | 'smtp' | null
+}
+
+export interface MailInput {
+  kind: 'http' | 'smtp'
+  from: string
+  url: string
+  key: string
+  host: string
+  port: number
+  user: string
+  password: string
+}
+
+export function saveMail(input: MailInput) {
   return api<Omit<PortalSettings, 'announcements'>>('/settings/mail', { method: 'PUT', json: input })
 }
 

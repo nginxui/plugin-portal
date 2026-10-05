@@ -66,7 +66,9 @@ export function auditLines(entry: AuditEntry): string[] {
     case 'settings.announcement_create': return [$gettext('Published the announcement %{title}', { title: String(d.title ?? '') })]
     case 'settings.announcement_update': return [$gettext('Changed the announcement %{title}', { title: String(d.title ?? '') })]
     case 'settings.announcement_delete': return [$gettext('Removed the announcement %{title}', { title: String(d.title ?? '') })]
-    case 'settings.mail': return [d.keyChanged ? $gettext('Set the mail service, sender %{from}, with a new key', { from: String(d.from ?? '') }) : $gettext('Set the mail service, sender %{from}', { from: String(d.from ?? '') })]
+    case 'settings.mail': return d.kind === 'smtp'
+      ? [$gettext('Set the mail service to SMTP through %{host}, sender %{from}', { host: `${String(d.host ?? '')}:${String(d.port ?? '')}`, from: String(d.from ?? '') })]
+      : [d.keyChanged ? $gettext('Set the mail service, sender %{from}, with a new key', { from: String(d.from ?? '') }) : $gettext('Set the mail service, sender %{from}', { from: String(d.from ?? '') })]
     case 'settings.mail_clear': return [$gettext('Removed the mail service settings')]
     case 'settings.bot': return [d.tokenChanged ? $gettext('Set the bot account @%{login} with a new token', { login: String(d.login ?? '') }) : $gettext('Set the bot account @%{login}', { login: String(d.login ?? '') })]
     case 'settings.bot_clear': return [$gettext('Removed the bot account settings')]

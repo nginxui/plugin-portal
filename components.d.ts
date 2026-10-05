@@ -13,6 +13,7 @@ declare module 'vue' {
   export interface GlobalComponents {
     AAlert: typeof import('antdv-next')['Alert']
     AApp: typeof import('antdv-next')['App']
+    AAutoComplete: typeof import('antdv-next')['AutoComplete']
     AAvatar: typeof import('antdv-next')['Avatar']
     ABadge: typeof import('antdv-next')['Badge']
     ABreadcrumb: typeof import('antdv-next')['Breadcrumb']
@@ -71,6 +72,7 @@ declare module 'vue' {
     ListingCard: typeof import('./web/src/components/ListingCard.vue')['default']
     MarketPreview: typeof import('./web/src/components/MarketPreview.vue')['default']
     NotificationBell: typeof import('./web/src/components/NotificationBell.vue')['default']
+    NotificationPrefs: typeof import('./web/src/components/NotificationPrefs.vue')['default']
     PendingChange: typeof import('./web/src/components/PendingChange.vue')['default']
     PluginCard: typeof import('./web/src/components/PluginCard.vue')['default']
     PluginHeader: typeof import('./web/src/components/PluginHeader.vue')['default']

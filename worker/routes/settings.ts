@@ -102,28 +102,68 @@ settings.delete('/settings/announcements/:id', async (c) => {
   return c.json({ ok: true })
 })
 
+// The mail service: an HTTP API or an SMTP server. Saving one kind removes
+// the settings of the other, so no unused secret stays behind. An empty key
+// or password keeps the one saved.
 settings.put('/settings/mail', async (c) => {
   const session = c.get('session')
-  const body = await c.req.json<{ url?: string, from?: string, key?: string }>()
-  const url = String(body.url ?? '').trim()
+  const body = await c.req.json<{ kind?: string, url?: string, from?: string, key?: string, host?: string, port?: number | string, user?: string, password?: string }>()
   const from = String(body.from ?? '').trim()
-  const key = String(body.key ?? '').trim()
-  if (!/^https:\/\/\S+$/.test(url))
-    return c.json({ error: 'url' }, 422)
   // "Name <address>" or a bare address.
   if (!EMAIL.test(/<([^>]+)>\s*$/.exec(from)?.[1] ?? from))
     return c.json({ error: 'from' }, 422)
   const current = await settingsView(c.env)
-  if (!key && !current.mail.keySet)
+
+  if (body.kind === 'smtp') {
+    const host = String(body.host ?? '').trim().toLowerCase()
+    const port = Number(body.port)
+    const user = String(body.user ?? '').trim()
+    const password = String(body.password ?? '')
+    if (!/^[a-z0-9](?:[a-z0-9-]*[a-z0-9])?(?:\.[a-z0-9](?:[a-z0-9-]*[a-z0-9])?)+$/.test(host))
+      return c.json({ error: 'host' }, 422)
+    // Workers cannot reach port 25.
+    if (!Number.isInteger(port) || port < 1 || port > 65535 || port === 25)
+      return c.json({ error: 'port' }, 422)
+    const keepPassword = current.mail.kind === 'smtp' && current.mail.passwordSet && user === current.mail.user
+    if (user && !password && !keepPassword)
+      return c.json({ error: 'password' }, 422)
+    await saveSettings(c.env, session.user.id, {
+      'mail.kind': 'smtp',
+      'mail.from': from,
+      'mail.smtp_host': host,
+      'mail.smtp_port': String(port),
+      'mail.smtp_user': user || null,
+      ...(password ? { 'mail.smtp_password': password } : user ? {} : { 'mail.smtp_password': null }),
+      'mail.url': null,
+      'mail.key': null,
+    }, ['mail.smtp_password'])
+    await audit(c.env.DB, { actorId: session.user.id, action: 'settings.mail', detail: { kind: 'smtp', host, port, user, from, keyChanged: !!password } })
+    return c.json(await settingsView(c.env))
+  }
+
+  const url = String(body.url ?? '').trim()
+  const key = String(body.key ?? '').trim()
+  if (!/^https:\/\/\S+$/.test(url))
+    return c.json({ error: 'url' }, 422)
+  if (!key && !(current.mail.kind === 'http' && current.mail.keySet))
     return c.json({ error: 'key' }, 422)
-  await saveSettings(c.env, session.user.id, { 'mail.url': url, 'mail.from': from, ...(key ? { 'mail.key': key } : {}) }, ['mail.key'])
+  await saveSettings(c.env, session.user.id, {
+    'mail.kind': null,
+    'mail.url': url,
+    'mail.from': from,
+    ...(key ? { 'mail.key': key } : {}),
+    'mail.smtp_host': null,
+    'mail.smtp_port': null,
+    'mail.smtp_user': null,
+    'mail.smtp_password': null,
+  }, ['mail.key'])
   await audit(c.env.DB, { actorId: session.user.id, action: 'settings.mail', detail: { url, from, keyChanged: !!key } })
   return c.json(await settingsView(c.env))
 })
 
 settings.delete('/settings/mail', async (c) => {
   const session = c.get('session')
-  await saveSettings(c.env, session.user.id, { 'mail.url': null, 'mail.from': null, 'mail.key': null })
+  await saveSettings(c.env, session.user.id, { 'mail.kind': null, 'mail.url': null, 'mail.from': null, 'mail.key': null, 'mail.smtp_host': null, 'mail.smtp_port': null, 'mail.smtp_user': null, 'mail.smtp_password': null })
   await audit(c.env.DB, { actorId: session.user.id, action: 'settings.mail_clear' })
   return c.json(await settingsView(c.env))
 })
@@ -132,8 +172,8 @@ settings.post('/settings/mail/test', async (c) => {
   const to = String((await c.req.json<{ to?: string }>()).to ?? '').trim()
   if (!EMAIL.test(to))
     return c.json({ error: 'to' }, 422)
-  const ok = await sendMail(c.env, to, 'Test mail from the Nginx UI developer portal', 'This is a test. Authors who turn on email get progress mail from this sender.')
-  return ok ? c.json({ ok: true }) : c.json({ error: 'send_failed' }, 502)
+  const result = await sendMail(c.env, to, 'Test mail from the Nginx UI developer portal', 'This is a test. Authors who turn on email get progress mail from this sender.')
+  return result.ok ? c.json({ ok: true }) : c.json({ error: 'send_failed', status: result.status ?? null, message: result.message ?? null }, 502)
 })
 
 settings.put('/settings/bot', async (c) => {

@@ -964,6 +964,9 @@ msgstr "修改公告“%{title}”"
 msgid "Removed the announcement %{title}"
 msgstr "删除公告“%{title}”"
 
+msgid "Set the mail service to SMTP through %{host}, sender %{from}"
+msgstr "将邮件服务设为 SMTP（%{host}），发件人 %{from}"
+
 msgid "Set the mail service, sender %{from}, with a new key"
 msgstr "设置邮件服务，发件人 %{from}，更换了密钥"
 
@@ -2202,8 +2205,22 @@ msgstr "请填写发件人邮箱地址，可以带上名称。"
 msgid "Enter the API key of the mail service."
 msgstr "请填写邮件服务的 API 密钥。"
 
+msgid "Enter the host name of the SMTP server."
+msgstr "请输入 SMTP 服务器的主机名。"
+
+msgid "Enter a port of the SMTP server other than 25, usually 465 or 587."
+msgstr "请输入 25 以外的 SMTP 端口，通常为 465 或 587。"
+
+msgid "Enter the password of the SMTP account."
+msgstr "请输入 SMTP 账号的密码。"
+
 msgid "Enter an email address to send the test to."
 msgstr "请填写接收测试邮件的邮箱地址。"
+
+msgid ""
+"The SMTP server did not take the test mail. Check the host, the port, the "
+"account and the sender."
+msgstr "SMTP 服务器未接收测试邮件，请检查服务器、端口、账号和发件人。"
 
 msgid ""
 "The mail service did not accept the test mail. Check the address, the sender"
@@ -2236,6 +2253,9 @@ msgstr "未配置"
 
 msgid "The test mail was sent."
 msgstr "测试邮件已发送。"
+
+msgid "%{text} The mail service answered: %{answer}"
+msgstr "%{text}邮件服务返回：%{answer}"
 
 msgid ""
 "Announcements for authors, and the services the portal sends mail and opens "
@@ -2272,13 +2292,50 @@ msgid "Mail service"
 msgstr "邮件服务"
 
 msgid ""
-"Authors who turn on email get mail about the progress of their changes. The "
-"service takes from, to, subject and text, as Resend and similar services do."
-msgstr ""
-"作者开启邮件通知后，会收到更改进度邮件。邮件服务需接收 from、to、subject、text 四个字段，Resend 等服务可直接使用。"
+"Authors who turn on email get mail about the progress of their changes."
+msgstr "作者开启邮件通知后，会收到更改进度邮件。"
+
+msgid "Send through"
+msgstr "发送方式"
+
+msgid "HTTP API"
+msgstr "HTTP 接口"
 
 msgid "Address"
 msgstr "地址"
+
+msgid ""
+"The API takes from, to, subject and text as JSON with a bearer key, as "
+"Resend and similar services do."
+msgstr "接口以 JSON 接收 from、to、subject、text，并使用 Bearer 密钥认证，Resend 等服务可直接使用。"
+
+msgid "Server"
+msgstr "服务器"
+
+msgid "Port"
+msgstr "端口"
+
+msgid "Port 465 is encrypted with TLS from the start."
+msgstr "465 端口从连接开始即使用 TLS 加密。"
+
+msgid ""
+"The connection is encrypted with STARTTLS before signing in; a server "
+"without it is refused. Port 25 cannot be used."
+msgstr "登录前会通过 STARTTLS 加密连接，不支持的服务器会被拒绝。无法使用 25 端口。"
+
+msgid "Account"
+msgstr "账号"
+
+msgid "Leave empty for a server that takes mail without signing in."
+msgstr "服务器无需登录即可发信时留空。"
+
+msgid "Password"
+msgstr "密码"
+
+msgid ""
+"Kept encrypted and never sent to a browser. Gmail and many company mail "
+"services need an app password."
+msgstr "加密保存，不会发送到浏览器。Gmail 和许多企业邮箱需要使用应用专用密码。"
 
 msgid "Sender"
 msgstr "发件人"
@@ -4473,6 +4530,12 @@ msgstr "名称建议"
 
 msgid "An accepted name still goes to a maintainer before it is listed."
 msgstr "名称建议被采纳后，仍需维护者审核才会显示。"
+
+#~ msgid ""
+#~ "Authors who turn on email get mail about the progress of their changes. The "
+#~ "service takes from, to, subject and text, as Resend and similar services do."
+#~ msgstr ""
+#~ "作者开启邮件通知后，会收到更改进度邮件。邮件服务需接收 from、to、subject、text 四个字段，Resend 等服务可直接使用。"
 
 #~ msgid "Enter a valid email address."
 #~ msgstr "请输入有效的邮箱地址。"
