@@ -30,6 +30,10 @@ export interface Env {
   SMTP_PORT?: string
   SMTP_USER?: string
   SMTP_PASSWORD?: string
+  // Per user bursts on checks, writes and uploads (middleware/limits.ts).
+  LIMIT_CHECK?: RateLimit
+  LIMIT_WRITE?: RateLimit
+  LIMIT_UPLOAD?: RateLimit
 }
 
 export interface SessionUser {

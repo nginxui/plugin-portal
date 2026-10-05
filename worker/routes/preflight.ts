@@ -8,6 +8,7 @@ import { preflightChecks, runtimeDiff, storeDiff } from '../lib/preflight'
 import { docFromManifest, headOf, readStore } from '../lib/store'
 import { repoReleases } from '../lib/submission'
 import { requireSession } from '../middleware/auth'
+import { limit } from '../middleware/limits'
 
 // Preflight for publishers: pick a branch, tag or commit and see what
 // releasing it would change for users (spec 10).
@@ -63,7 +64,7 @@ preflight.get('/plugins/:id/preflight/refs', requireSession, async (c) => {
   })
 })
 
-preflight.get('/plugins/:id/preflight', requireSession, async (c) => {
+preflight.get('/plugins/:id/preflight', requireSession, limit('check'), async (c) => {
   const ctx = await pluginContext(c.env, c.get('session'), c.req.param('id'))
   if (!ctx?.repo)
     return c.json({ error: 'not_found' }, 404)

@@ -8,6 +8,7 @@ import { dispatchApply } from '../lib/deployApp'
 import { userToken } from '../lib/session'
 import { now } from '../lib/time'
 import { requireSession } from '../middleware/auth'
+import { limit } from '../middleware/limits'
 
 // Changes the author of a listed plugin makes alone: yanking and unyanking
 // versions, revoking signers and categories. The portal sends the operations;
@@ -50,7 +51,7 @@ export const selfService = new Hono<AppEnv>()
 
 selfService.use('*', requireSession)
 
-selfService.post('/:id/changes', async (c) => {
+selfService.post('/:id/changes', limit('write'), async (c) => {
   const session = c.get('session')
   const id = c.req.param('id')
   const body = await c.req.json<{ operations?: unknown, reason?: unknown }>()

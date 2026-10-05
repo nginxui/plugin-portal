@@ -1,10 +1,12 @@
 <script setup lang="ts">
 import type { MenuProps } from 'antdv-next'
 import type { Crumb } from '@/stores/crumbs'
-import { breakpointsAntDesign, onKeyStroke, useBreakpoints } from '@vueuse/core'
+import { breakpointsAntDesign, onKeyStroke, useBreakpoints, useEventListener } from '@vueuse/core'
+import { App } from 'antdv-next'
 import { computed, h, ref, watch } from 'vue'
 import { useGettext } from 'vue3-gettext'
 import { useRoute, useRouter } from 'vue-router'
+import { LIMITED_EVENT } from '@/api/client'
 import { $gettext, languages, setLanguage } from '@/lib/gettext'
 import { isDark, toggleTheme } from '@/lib/theme'
 import { useCrumbStore } from '@/stores/crumbs'
@@ -17,6 +19,17 @@ const router = useRouter()
 const session = useSessionStore()
 const gettext = useGettext()
 const isMobile = useBreakpoints(breakpointsAntDesign).smaller('lg')
+const { message } = App.useApp()
+
+// The page shows its own failure; this says why the call was refused.
+useEventListener(window, LIMITED_EVENT, (event: Event) => {
+  message.warning({
+    key: 'limited',
+    content: (event as CustomEvent<string>).detail === 'daily_limit'
+      ? $gettext('You have reached the daily limit for this action. Please try again tomorrow.')
+      : $gettext('Too many requests in a short time. Please wait a minute and try again.'),
+  })
+})
 const drawerOpen = ref(false)
 
 watch(() => route.fullPath, () => {

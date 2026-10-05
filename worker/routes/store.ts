@@ -14,6 +14,7 @@ import { repoFiles, storeJson } from '../lib/storeFiles'
 import { now } from '../lib/time'
 import { zip } from '../lib/zip'
 import { requireSession } from '../middleware/auth'
+import { limit } from '../middleware/limits'
 
 // The store editor: the plugin's store document as it is, the user's draft,
 // and submitting the draft through the store source (spec 7.1, 7.2).
@@ -148,7 +149,7 @@ async function dispatchOrRecord(env: Env, change: string, payload: unknown) {
   }
 }
 
-store.post('/plugins/:id/store/submit', requireSession, async (c) => {
+store.post('/plugins/:id/store/submit', requireSession, limit('write'), async (c) => {
   const session = c.get('session')
   const ctx = await pluginContext(c.env, session, c.req.param('id'))
   if (!ctx)
@@ -314,7 +315,7 @@ store.get('/changes/:id/patch', requireSession, async (c) => {
 // Uploads a screenshot the studio encoded as WebP: cropped to 16:10, or with
 // ?original=1 the whole image, which a crop in the document then frames. A
 // whole image has room for a 16:10 crop at least 640 pixels wide.
-store.post('/media', requireSession, async (c) => {
+store.post('/media', requireSession, limit('upload'), async (c) => {
   const session = c.get('session')
   if (!c.env.MEDIA)
     return c.json({ error: 'uploads_off' }, 503)

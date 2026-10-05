@@ -23,6 +23,13 @@
       "migrations_dir": "migrations"
     }
   ],
+  // Per user bursts (worker/middleware/limits.ts). Namespace ids are unique
+  // within the account; staging uses its own.
+  "ratelimits": [
+    { "name": "LIMIT_CHECK", "namespace_id": "4101", "simple": { "limit": 20, "period": 60 } },
+    { "name": "LIMIT_WRITE", "namespace_id": "4102", "simple": { "limit": 6, "period": 60 } },
+    { "name": "LIMIT_UPLOAD", "namespace_id": "4103", "simple": { "limit": 30, "period": 60 } }
+  ],
   "vars": {
     "PORTAL_ORIGIN": "https://portal.nginxui.com",
     "CATALOG_URL": "https://plugins.nginxui.com",
@@ -47,6 +54,11 @@
       ],
       // Screenshot uploads; no public domain yet, so drafts are served by the portal.
       "r2_buckets": [{ "binding": "MEDIA", "bucket_name": "plugin-media-staging" }],
+      "ratelimits": [
+        { "name": "LIMIT_CHECK", "namespace_id": "4201", "simple": { "limit": 20, "period": 60 } },
+        { "name": "LIMIT_WRITE", "namespace_id": "4202", "simple": { "limit": 6, "period": 60 } },
+        { "name": "LIMIT_UPLOAD", "namespace_id": "4203", "simple": { "limit": 30, "period": 60 } }
+      ],
       "vars": {
         "PORTAL_ORIGIN": "https://portal-staging.nginxui.com",
         "CATALOG_URL": "https://plugins.nginxui.com",
