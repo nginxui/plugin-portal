@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { PreviewDoc } from './MarketPreview.vue'
 import type { CommunityState, Suggestion } from '@/api/community'
-import { computed, ref } from 'vue'
+import { ref } from 'vue'
 import { decide, setCommunity } from '@/api/community'
 import { $gettext } from '@/lib/gettext'
 import { HOST_LOCALES } from '@/lib/hostLocales'
@@ -14,7 +14,6 @@ const emit = defineEmits<{ changed: [] }>()
 
 const busy = ref(false)
 const error = ref('')
-const needsSource = computed(() => props.storeSource === 'release')
 const others = HOST_LOCALES.filter(l => l !== 'en')
 
 async function toggle(enabled: boolean) {
@@ -87,12 +86,9 @@ async function act(accept: { id: number, text?: string }[], decline: { id: numbe
 <template>
   <ACard :title="$gettext('Community translation')">
     <template #extra>
-      <ASwitch :checked="state.enabled" :loading="busy" :disabled="!state.canManage || needsSource" :aria-label="$gettext('Community translation')" @change="(v: boolean) => toggle(v)" />
+      <ASwitch :checked="state.enabled" :loading="busy" :disabled="!state.canManage" :aria-label="$gettext('Community translation')" @change="(v: boolean) => toggle(v)" />
     </template>
-    <ATypographyParagraph v-if="needsSource" type="secondary" class="text-3">
-      {{ $gettext('Community translation needs a store source. Pick one on the store page and submit once.') }}
-    </ATypographyParagraph>
-    <ATypographyParagraph v-else-if="!state.enabled" type="secondary" class="text-3">
+    <ATypographyParagraph v-if="!state.enabled" type="secondary" class="text-3">
       {{ $gettext('When it is on, signed in users can suggest translations of the store texts. You review every suggestion before it goes out.') }}
     </ATypographyParagraph>
     <template v-else>

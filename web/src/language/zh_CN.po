@@ -175,11 +175,6 @@ msgid "Community translation"
 msgstr "社区翻译"
 
 msgid ""
-"Community translation needs a store source. Pick one on the store page and "
-"submit once."
-msgstr "社区翻译需要先设置商店来源。请在商店页面选择来源并提交一次。"
-
-msgid ""
 "When it is on, signed in users can suggest translations of the store texts. "
 "You review every suggestion before it goes out."
 msgstr "开启后，已登录的用户可以为商店资料提交翻译建议。每条建议都需经你审核后才会发布。"
@@ -1158,26 +1153,20 @@ msgstr "已下架"
 msgid "Repository, following the default branch"
 msgstr "仓库，跟踪默认分支"
 
-msgid "Repository, following releases"
-msgstr "仓库，跟随版本发布"
-
 msgid "Hosted by the catalog"
 msgstr "目录托管"
 
-msgid "The manifest of the newest release"
-msgstr "发布清单"
+msgid "Repository, following releases"
+msgstr "仓库，跟随版本发布"
 
 msgid "Repository, default branch"
 msgstr "仓库，默认分支"
 
-msgid "Repository, with releases"
-msgstr "仓库，随版本"
-
 msgid "Catalog hosted"
 msgstr "目录托管"
 
-msgid "Release manifest"
-msgstr "发布清单"
+msgid "Repository, with releases"
+msgstr "仓库，随版本"
 
 msgid "Badges"
 msgstr "徽章"
@@ -3184,13 +3173,13 @@ msgstr "在目录条目中设置"
 msgid "Publishers edit this"
 msgstr "由发布者编辑"
 
+msgid ""
+"plugin.store.json in %{repo} goes live with the next release, so screenshots"
+" of unreleased features stay off the listing. Needs no setting."
+msgstr "%{repo} 中的 plugin.store.json 随下一个版本一同生效，未发布功能的截图不会提前显示。无需设置。"
+
 msgid "plugin.store.json in %{repo}, live minutes after it is merged."
 msgstr "%{repo} 中的 plugin.store.json，合并后几分钟生效"
-
-msgid ""
-"Goes live with the next release, so screenshots of unreleased features stay "
-"off the listing."
-msgstr "随下一个版本一同生效，未发布功能的截图不会提前显示"
 
 msgid ""
 "Kept in the catalog repository and live at its next update. For plugins "
@@ -3275,9 +3264,9 @@ msgid "Current"
 msgstr "当前"
 
 msgid ""
-"The store texts come from the manifest of each release now. Submitting "
-"creates the first store document."
-msgstr "目前商店资料来自每个发布版本的清单。提交后会创建第一份商店文档。"
+"There is no plugin.store.json yet, so the store texts come from plugin.json."
+" Submitting adds the file to the repository."
+msgstr "仓库中还没有 plugin.store.json，商店资料目前取自 plugin.json。提交后会把这个文件加入仓库。"
 
 msgid "Moving the store source is reviewed by a maintainer."
 msgstr "迁移商店来源需经维护者审核。"
@@ -4287,6 +4276,27 @@ msgstr "名称建议"
 
 msgid "An accepted name still goes to a maintainer before it is listed."
 msgstr "名称建议被采纳后，仍需维护者审核才会显示。"
+
+#~ msgid ""
+#~ "Community translation needs a store source. Pick one on the store page and "
+#~ "submit once."
+#~ msgstr "社区翻译需要先设置商店来源。请在商店页面选择来源并提交一次。"
+
+#~ msgid "The manifest of the newest release"
+#~ msgstr "发布清单"
+
+#~ msgid "Release manifest"
+#~ msgstr "发布清单"
+
+#~ msgid ""
+#~ "Goes live with the next release, so screenshots of unreleased features stay "
+#~ "off the listing."
+#~ msgstr "随下一个版本一同生效，未发布功能的截图不会提前显示"
+
+#~ msgid ""
+#~ "The store texts come from the manifest of each release now. Submitting "
+#~ "creates the first store document."
+#~ msgstr "目前商店资料来自每个发布版本的清单。提交后会创建第一份商店文档。"
 
 #~ msgid "Delisting and blocking"
 #~ msgstr "下架与屏蔽"

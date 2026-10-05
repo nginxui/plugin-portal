@@ -57,6 +57,8 @@ export interface StoreState {
   repo: string | null
   ref: string | null
   doc: StoreDoc
+  // Whether the document is a store document, not one made from plugin.json.
+  fromFile: boolean
   readme: string | null
   manifest: Manifest | null
   tag: string | null
@@ -183,17 +185,15 @@ export async function readStore(env: Env, token: string, opts: { id: string, rep
       rawJson<StoreDoc>(env.CATALOG_REPO, 'main', `store/${opts.id}/store.json`),
       raw(env.CATALOG_REPO, 'main', `store/${opts.id}/README.md`),
     ])
-    return { source, repo: env.CATALOG_REPO, ref: 'main', doc: withManifestReasons(doc ?? {}, manifest), readme, manifest, tag: opts.tag }
+    return { source, repo: env.CATALOG_REPO, ref: 'main', doc: withManifestReasons(doc ?? {}, manifest), fromFile: !!doc, readme, manifest, tag: opts.tag }
   }
-  if (source === 'repo-branch' || source === 'repo-release') {
-    const ref = source === 'repo-branch' && opts.repo ? (await headOf(token, opts.repo)).sha : opts.tag
-    const [doc, readme] = opts.repo && ref
-      ? await Promise.all([rawJson<StoreDoc>(opts.repo, ref, 'plugin.store.json'), raw(opts.repo, ref, 'README.md')])
-      : [null, null]
-    return { source, repo: opts.repo, ref, doc: withManifestReasons(doc ?? docFromManifest(manifest), manifest), readme, manifest, tag: opts.tag }
-  }
-  const readme = opts.repo && opts.tag ? await raw(opts.repo, opts.tag, 'README.md') : null
-  return { source, repo: opts.repo, ref: opts.tag, doc: docFromManifest(manifest), readme, manifest, tag: opts.tag }
+  // Without a store field, plugin.store.json travels with the release like
+  // plugin.json; the catalog reads it at the release tag when there is one.
+  const ref = source === 'repo-branch' && opts.repo ? (await headOf(token, opts.repo)).sha : opts.tag
+  const [doc, readme] = opts.repo && ref
+    ? await Promise.all([rawJson<StoreDoc>(opts.repo, ref, 'plugin.store.json'), raw(opts.repo, ref, 'README.md')])
+    : [null, null]
+  return { source, repo: opts.repo, ref, doc: withManifestReasons(doc ?? docFromManifest(manifest), manifest), fromFile: !!doc, readme, manifest, tag: opts.tag }
 }
 
 const SCREENSHOT_ID = /^[a-z0-9][a-z0-9-]{0,31}$/

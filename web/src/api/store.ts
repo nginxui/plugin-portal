@@ -20,6 +20,8 @@ export interface StoreDraft {
 
 export interface StoreState {
   source: StoreSourceKind
+  // Whether plugin.store.json or the catalog document exists yet.
+  fromFile?: boolean
   repo: string | null
   ref: string | null
   tag: string | null
