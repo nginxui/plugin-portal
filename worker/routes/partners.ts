@@ -14,6 +14,7 @@ import { reservedWord } from '../lib/rules'
 import { userToken } from '../lib/session'
 import { now } from '../lib/time'
 import { checkMaintainer, requireSession } from '../middleware/auth'
+import { limit } from '../middleware/limits'
 
 // Organizations, partners and vendors (spec 11.4). A GitHub organization is
 // managed on GitHub; the portal only lists its plugins and takes its partner
@@ -106,7 +107,7 @@ partners.get('/owners/:login', requireSession, async (c) => {
   })
 })
 
-partners.post('/owners/:login/partner-application', requireSession, async (c) => {
+partners.post('/owners/:login/partner-application', requireSession, limit('write'), async (c) => {
   const session = c.get('session')
   const login = c.req.param('login')
   const token = await userToken(c.env, session.id)
@@ -357,7 +358,7 @@ partners.put('/vendors/:id/plugins/:pluginId/commercial', requireSession, async 
 })
 
 // A key rotation or revocation request, decided by a maintainer.
-partners.post('/vendors/:id/key-request', requireSession, async (c) => {
+partners.post('/vendors/:id/key-request', requireSession, limit('write'), async (c) => {
   const session = c.get('session')
   const id = Number(c.req.param('id'))
   const access = await vendorAccess(c.env, session, id)

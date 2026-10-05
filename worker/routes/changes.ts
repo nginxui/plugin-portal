@@ -13,6 +13,7 @@ import { userToken } from '../lib/session'
 import { headOf } from '../lib/store'
 import { now } from '../lib/time'
 import { checkMaintainer, requireSession } from '../middleware/auth'
+import { limit } from '../middleware/limits'
 
 interface PullResponse {
   state: 'open' | 'closed'
@@ -250,7 +251,7 @@ function retryable(change: ChangeRow): boolean {
 
 // Runs apply.yml again for a change whose checks failed, with the newest
 // release of the repository.
-changes.post('/:id/retry', async (c) => {
+changes.post('/:id/retry', limit('write'), async (c) => {
   const session = c.get('session')
   const change = await getChange(c.env, c.req.param('id'))
   if (!change || change.author_id !== session.user.id)

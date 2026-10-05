@@ -8,6 +8,7 @@ import { userToken } from '../lib/session'
 import { knownCategories, previewSubmission } from '../lib/submission'
 import { now } from '../lib/time'
 import { requireSession } from '../middleware/auth'
+import { limit } from '../middleware/limits'
 
 export const submit = new Hono<AppEnv>()
 
@@ -69,14 +70,14 @@ submit.delete('/drafts', async (c) => {
   return c.json({ ok: true })
 })
 
-submit.post('/check', async (c) => {
+submit.post('/check', limit('check'), async (c) => {
   const { repo } = await c.req.json<{ repo?: string }>()
   const session = c.get('session')
   const preview = await previewSubmission(c.env, session, await userToken(c.env, session.id), String(repo ?? '').trim())
   return c.json(preview)
 })
 
-submit.post('/', async (c) => {
+submit.post('/', limit('write'), async (c) => {
   const body = await c.req.json<{ repo?: string, authorPublicKey?: string, categories?: string[] }>()
   const session = c.get('session')
   const token = await userToken(c.env, session.id)

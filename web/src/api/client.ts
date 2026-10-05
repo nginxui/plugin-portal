@@ -5,6 +5,9 @@ export class ApiError extends Error {
   }
 }
 
+// Fired when a per user limit refused a call; the layout says why.
+export const LIMITED_EVENT = 'portal:limited'
+
 // A session that ended sends the user to sign in again, then back to the page.
 let leaving = false
 function signInAgain() {
@@ -30,6 +33,8 @@ export async function api<T>(path: string, init: RequestInit & { json?: unknown 
   const data = await response.json().catch(() => ({}))
   if (response.status === 401 && path !== '/me' && !path.startsWith('/auth/'))
     signInAgain()
+  if (response.status === 429)
+    window.dispatchEvent(new CustomEvent(LIMITED_EVENT, { detail: (data as { error?: string }).error }))
   if (!response.ok)
     throw new ApiError(response.status, (data as { error?: string }).error ?? 'unknown', data as Record<string, unknown>)
   return data as T
