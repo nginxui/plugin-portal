@@ -1,5 +1,6 @@
 export class ApiError extends Error {
-  constructor(readonly status: number, readonly code: string) {
+  // The rest of the error body, for messages that carry details.
+  constructor(readonly status: number, readonly code: string, readonly detail: Record<string, unknown> = {}) {
     super(code)
   }
 }
@@ -30,6 +31,6 @@ export async function api<T>(path: string, init: RequestInit & { json?: unknown 
   if (response.status === 401 && path !== '/me' && !path.startsWith('/auth/'))
     signInAgain()
   if (!response.ok)
-    throw new ApiError(response.status, (data as { error?: string }).error ?? 'unknown')
+    throw new ApiError(response.status, (data as { error?: string }).error ?? 'unknown', data as Record<string, unknown>)
   return data as T
 }

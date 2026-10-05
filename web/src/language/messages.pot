@@ -22,8 +22,8 @@ msgstr ""
 #: web/src/components/CategoryEditModal.vue:50
 #: web/src/components/CommunityCard.vue:178
 #: web/src/views/maintain/AiModels.vue:235
-#: web/src/views/maintain/Settings.vue:282
-#: web/src/views/maintain/Settings.vue:327
+#: web/src/views/maintain/Settings.vue:326
+#: web/src/views/maintain/Settings.vue:371
 #: web/src/views/plugin/PluginTranslations.vue:425
 msgid "Save"
 msgstr ""
@@ -240,7 +240,7 @@ msgstr ""
 #: web/src/layouts/PortalLayout.vue:67
 #: web/src/layouts/PortalLayout.vue:105
 #: web/src/lib/audit.ts:15
-#: web/src/views/maintain/Settings.vue:206
+#: web/src/views/maintain/Settings.vue:226
 msgid "Settings"
 msgstr ""
 
@@ -377,7 +377,7 @@ msgid "All %{n}"
 msgstr ""
 
 #: web/src/components/CommunityCard.vue:106
-#: web/src/views/maintain/Settings.vue:248
+#: web/src/views/maintain/Settings.vue:268
 #: web/src/views/SubmitPlugin.vue:295
 msgid "Edit"
 msgstr ""
@@ -417,10 +417,10 @@ msgstr ""
 #: web/src/components/MarketPreview.vue:434
 #: web/src/views/maintain/AiModels.vue:240
 #: web/src/views/maintain/PartnersAdmin.vue:315
-#: web/src/views/maintain/Settings.vue:250
-#: web/src/views/maintain/Settings.vue:284
-#: web/src/views/maintain/Settings.vue:329
-#: web/src/views/maintain/Settings.vue:340
+#: web/src/views/maintain/Settings.vue:270
+#: web/src/views/maintain/Settings.vue:328
+#: web/src/views/maintain/Settings.vue:373
+#: web/src/views/maintain/Settings.vue:384
 #: web/src/views/owners/VendorPage.vue:341
 #: web/src/views/plugin/PluginScreenshots.vue:352
 #: web/src/views/plugin/PluginScreenshots.vue:417
@@ -891,7 +891,7 @@ msgid "Choose an address"
 msgstr ""
 
 #: web/src/components/NotificationPrefs.vue:90
-#: web/src/views/maintain/Settings.vue:297
+#: web/src/views/maintain/Settings.vue:341
 msgid "Email address"
 msgstr ""
 
@@ -1484,123 +1484,127 @@ msgstr ""
 msgid "Removed the announcement %{title}"
 msgstr ""
 
-#: web/src/lib/audit.ts:69
+#: web/src/lib/audit.ts:70
+msgid "Set the mail service to SMTP through %{host}, sender %{from}"
+msgstr ""
+
+#: web/src/lib/audit.ts:71
 msgid "Set the mail service, sender %{from}, with a new key"
 msgstr ""
 
-#: web/src/lib/audit.ts:69
+#: web/src/lib/audit.ts:71
 msgid "Set the mail service, sender %{from}"
 msgstr ""
 
-#: web/src/lib/audit.ts:70
+#: web/src/lib/audit.ts:72
 msgid "Removed the mail service settings"
 msgstr ""
 
-#: web/src/lib/audit.ts:71
+#: web/src/lib/audit.ts:73
 msgid "Set the bot account @%{login} with a new token"
 msgstr ""
 
-#: web/src/lib/audit.ts:71
+#: web/src/lib/audit.ts:73
 msgid "Set the bot account @%{login}"
 msgstr ""
 
-#: web/src/lib/audit.ts:72
+#: web/src/lib/audit.ts:74
 msgid "Removed the bot account settings"
 msgstr ""
 
-#: web/src/lib/audit.ts:73
+#: web/src/lib/audit.ts:75
 msgid "Read the glossary again, %{n} languages"
 msgstr ""
 
-#: web/src/lib/audit.ts:74
+#: web/src/lib/audit.ts:76
 msgid "Withdrew the change"
 msgstr ""
 
-#: web/src/lib/audit.ts:75
+#: web/src/lib/audit.ts:77
 msgid "Asked to change the trust to %{trust}"
 msgstr ""
 
-#: web/src/lib/audit.ts:76
+#: web/src/lib/audit.ts:78
 msgid "Asked to delist the plugin"
 msgstr ""
 
-#: web/src/lib/audit.ts:77
+#: web/src/lib/audit.ts:79
 msgid "Asked to add it to the block list"
 msgstr ""
 
-#: web/src/lib/audit.ts:78
+#: web/src/lib/audit.ts:80
 msgid "Approved a partner request"
 msgstr ""
 
-#: web/src/lib/audit.ts:79
+#: web/src/lib/audit.ts:81
 msgid "Declined a partner request"
 msgstr ""
 
-#: web/src/lib/audit.ts:80
+#: web/src/lib/audit.ts:82
 msgid "Revoked the partner key"
 msgstr ""
 
-#: web/src/lib/audit.ts:81
+#: web/src/lib/audit.ts:83
 msgid "Created the vendor %{name}"
 msgstr ""
 
-#: web/src/lib/audit.ts:82
+#: web/src/lib/audit.ts:84
 msgid "Applied to become a partner"
 msgstr ""
 
-#: web/src/lib/audit.ts:83
+#: web/src/lib/audit.ts:85
 msgid "Asked for the partner key to be revoked"
 msgstr ""
 
-#: web/src/lib/audit.ts:83
+#: web/src/lib/audit.ts:85
 msgid "Asked for a new partner key"
 msgstr ""
 
-#: web/src/lib/audit.ts:84
+#: web/src/lib/audit.ts:86
 msgid "Added @%{login} as %{role}"
 msgstr ""
 
-#: web/src/lib/audit.ts:85
+#: web/src/lib/audit.ts:87
 msgid "Changed the role of a member to %{role}"
 msgstr ""
 
-#: web/src/lib/audit.ts:86
+#: web/src/lib/audit.ts:88
 msgid "Removed a member"
 msgstr ""
 
-#: web/src/lib/audit.ts:91
+#: web/src/lib/audit.ts:93
 msgid "Yanked %{versions}"
 msgstr ""
 
-#: web/src/lib/audit.ts:93
+#: web/src/lib/audit.ts:95
 msgid "Restored %{versions}"
 msgstr ""
 
-#: web/src/lib/audit.ts:95
+#: web/src/lib/audit.ts:97
 msgid "Revoked signer %{ids}"
 msgstr ""
 
-#: web/src/lib/audit.ts:97
+#: web/src/lib/audit.ts:99
 msgid "Set the categories to %{list}"
 msgstr ""
 
-#: web/src/lib/audit.ts:120
+#: web/src/lib/audit.ts:122
 msgid "Change: %{id}"
 msgstr ""
 
-#: web/src/lib/audit.ts:123
+#: web/src/lib/audit.ts:125
 msgid "Pull request: #%{n}"
 msgstr ""
 
-#: web/src/lib/audit.ts:126
+#: web/src/lib/audit.ts:128
 msgid "Commit: %{sha}"
 msgstr ""
 
-#: web/src/lib/audit.ts:129
+#: web/src/lib/audit.ts:131
 msgid "Workflow run: %{id}"
 msgstr ""
 
-#: web/src/lib/audit.ts:132
+#: web/src/lib/audit.ts:134
 #: web/src/views/ChangeView.vue:383
 #: web/src/views/maintain/AuditLog.vue:260
 #: web/src/views/maintain/PartnersAdmin.vue:204
@@ -1608,17 +1612,17 @@ msgstr ""
 msgid "Reason: %{reason}"
 msgstr ""
 
-#: web/src/lib/audit.ts:138
+#: web/src/lib/audit.ts:140
 msgid "Went live: %{list}"
 msgstr ""
 
-#: web/src/lib/audit.ts:138
+#: web/src/lib/audit.ts:140
 #: web/src/views/maintain/PartnersAdmin.vue:87
 #: web/src/views/owners/OwnerPage.vue:157
 msgid "none"
 msgstr ""
 
-#: web/src/lib/audit.ts:142
+#: web/src/lib/audit.ts:144
 msgid "Name in %{lang}: %{name}"
 msgstr ""
 
@@ -2484,19 +2488,20 @@ msgid "For an OpenAI compatible endpoint, its base URL, for example https://llm.
 msgstr ""
 
 #: web/src/views/maintain/AiModels.vue:217
-#: web/src/views/maintain/Settings.vue:276
+#: web/src/views/maintain/Settings.vue:297
 msgid "API key"
 msgstr ""
 
 #: web/src/views/maintain/AiModels.vue:217
-#: web/src/views/maintain/Settings.vue:276
-#: web/src/views/maintain/Settings.vue:321
+#: web/src/views/maintain/Settings.vue:297
+#: web/src/views/maintain/Settings.vue:365
 msgid "Kept encrypted and never sent to a browser."
 msgstr ""
 
 #: web/src/views/maintain/AiModels.vue:218
-#: web/src/views/maintain/Settings.vue:277
-#: web/src/views/maintain/Settings.vue:322
+#: web/src/views/maintain/Settings.vue:298
+#: web/src/views/maintain/Settings.vue:317
+#: web/src/views/maintain/Settings.vue:366
 msgid "Saved, can only be replaced"
 msgstr ""
 
@@ -2518,12 +2523,12 @@ msgstr ""
 
 #: web/src/views/maintain/AiModels.vue:240
 #: web/src/views/maintain/AiModels.vue:242
-#: web/src/views/maintain/Settings.vue:250
-#: web/src/views/maintain/Settings.vue:252
-#: web/src/views/maintain/Settings.vue:284
-#: web/src/views/maintain/Settings.vue:286
-#: web/src/views/maintain/Settings.vue:329
-#: web/src/views/maintain/Settings.vue:331
+#: web/src/views/maintain/Settings.vue:270
+#: web/src/views/maintain/Settings.vue:272
+#: web/src/views/maintain/Settings.vue:328
+#: web/src/views/maintain/Settings.vue:330
+#: web/src/views/maintain/Settings.vue:373
+#: web/src/views/maintain/Settings.vue:375
 #: web/src/views/owners/VendorPage.vue:341
 msgid "Remove"
 msgstr ""
@@ -3162,194 +3167,258 @@ msgstr ""
 msgid "Once revoked, every version signed with the key stops installing. A revocation needs no review and is committed to the catalog repository at once."
 msgstr ""
 
-#: web/src/views/maintain/Settings.vue:42
+#: web/src/views/maintain/Settings.vue:48
 msgid "Enter a date."
 msgstr ""
 
-#: web/src/views/maintain/Settings.vue:43
+#: web/src/views/maintain/Settings.vue:49
 msgid "Enter an English title of at most 80 characters."
 msgstr ""
 
-#: web/src/views/maintain/Settings.vue:44
+#: web/src/views/maintain/Settings.vue:50
 msgid "Enter an English text of at most 400 characters."
 msgstr ""
 
-#: web/src/views/maintain/Settings.vue:45
+#: web/src/views/maintain/Settings.vue:51
 msgid "Enter the address of the mail service, starting with https://."
 msgstr ""
 
-#: web/src/views/maintain/Settings.vue:46
+#: web/src/views/maintain/Settings.vue:52
 msgid "Enter the sender as an email address, with a name if you like."
 msgstr ""
 
-#: web/src/views/maintain/Settings.vue:47
+#: web/src/views/maintain/Settings.vue:53
 msgid "Enter the API key of the mail service."
 msgstr ""
 
-#: web/src/views/maintain/Settings.vue:48
+#: web/src/views/maintain/Settings.vue:54
+msgid "Enter the host name of the SMTP server."
+msgstr ""
+
+#: web/src/views/maintain/Settings.vue:55
+msgid "Enter a port of the SMTP server other than 25, usually 465 or 587."
+msgstr ""
+
+#: web/src/views/maintain/Settings.vue:56
+msgid "Enter the password of the SMTP account."
+msgstr ""
+
+#: web/src/views/maintain/Settings.vue:57
 msgid "Enter an email address to send the test to."
 msgstr ""
 
-#: web/src/views/maintain/Settings.vue:49
-msgid "The mail service did not accept the test mail. Check the address, the sender and the key."
-msgstr ""
-
-#: web/src/views/maintain/Settings.vue:50
-msgid "Enter the GitHub account of the bot."
-msgstr ""
-
-#: web/src/views/maintain/Settings.vue:51
-msgid "Enter an access token of the bot account."
-msgstr ""
-
-#: web/src/views/maintain/Settings.vue:52
-msgid "The token belongs to another GitHub account."
-msgstr ""
-
-#: web/src/views/maintain/Settings.vue:53
-msgid "GitHub did not accept the token."
-msgstr ""
-
-#: web/src/views/maintain/Settings.vue:54
-msgid "The settings could not be saved. Please try again."
+#: web/src/views/maintain/Settings.vue:59
+msgid "The SMTP server did not take the test mail. Check the host, the port, the account and the sender."
 msgstr ""
 
 #: web/src/views/maintain/Settings.vue:60
-msgid "In use"
+msgid "The mail service did not accept the test mail. Check the address, the sender and the key."
+msgstr ""
+
+#: web/src/views/maintain/Settings.vue:61
+msgid "Enter the GitHub account of the bot."
 msgstr ""
 
 #: web/src/views/maintain/Settings.vue:62
-msgid "From the Worker config"
+msgid "Enter an access token of the bot account."
 msgstr ""
 
 #: web/src/views/maintain/Settings.vue:63
+msgid "The token belongs to another GitHub account."
+msgstr ""
+
+#: web/src/views/maintain/Settings.vue:64
+msgid "GitHub did not accept the token."
+msgstr ""
+
+#: web/src/views/maintain/Settings.vue:65
+msgid "The settings could not be saved. Please try again."
+msgstr ""
+
+#: web/src/views/maintain/Settings.vue:71
+msgid "In use"
+msgstr ""
+
+#: web/src/views/maintain/Settings.vue:73
+msgid "From the Worker config"
+msgstr ""
+
+#: web/src/views/maintain/Settings.vue:74
 msgid "Not set up"
 msgstr ""
 
-#: web/src/views/maintain/Settings.vue:159
+#: web/src/views/maintain/Settings.vue:176
 msgid "The test mail was sent."
 msgstr ""
 
-#: web/src/views/maintain/Settings.vue:209
+#: web/src/views/maintain/Settings.vue:182
+msgid "%{text} The mail service answered: %{answer}"
+msgstr ""
+
+#: web/src/views/maintain/Settings.vue:229
 msgid "Announcements for authors, and the services the portal sends mail and opens pull requests with. Changes are kept in the audit log."
 msgstr ""
 
-#: web/src/views/maintain/Settings.vue:213
+#: web/src/views/maintain/Settings.vue:233
 msgid "The settings could not be loaded."
 msgstr ""
 
-#: web/src/views/maintain/Settings.vue:216
+#: web/src/views/maintain/Settings.vue:236
 #: web/src/views/MyPlugins.vue:181
 msgid "Retry"
 msgstr ""
 
-#: web/src/views/maintain/Settings.vue:222
+#: web/src/views/maintain/Settings.vue:242
 #: web/src/views/MyPlugins.vue:313
 msgid "Announcements"
 msgstr ""
 
-#: web/src/views/maintain/Settings.vue:225
-#: web/src/views/maintain/Settings.vue:340
+#: web/src/views/maintain/Settings.vue:245
+#: web/src/views/maintain/Settings.vue:384
 msgid "New announcement"
 msgstr ""
 
-#: web/src/views/maintain/Settings.vue:229
+#: web/src/views/maintain/Settings.vue:249
 msgid "Shown on My plugins, the newest five first, in the language of the portal or else in English."
 msgstr ""
 
-#: web/src/views/maintain/Settings.vue:231
+#: web/src/views/maintain/Settings.vue:251
 #: web/src/views/MyPlugins.vue:326
 msgid "No announcements."
 msgstr ""
 
-#: web/src/views/maintain/Settings.vue:242
+#: web/src/views/maintain/Settings.vue:262
 msgid ", no Chinese version"
 msgstr ""
 
-#: web/src/views/maintain/Settings.vue:250
+#: web/src/views/maintain/Settings.vue:270
 msgid "Remove this announcement?"
 msgstr ""
 
-#: web/src/views/maintain/Settings.vue:260
+#: web/src/views/maintain/Settings.vue:280
 msgid "Mail service"
 msgstr ""
 
-#: web/src/views/maintain/Settings.vue:267
-msgid "Authors who turn on email get mail about the progress of their changes. The service takes from, to, subject and text, as Resend and similar services do."
+#: web/src/views/maintain/Settings.vue:287
+msgid "Authors who turn on email get mail about the progress of their changes."
 msgstr ""
 
-#: web/src/views/maintain/Settings.vue:270
-msgid "Address"
+#: web/src/views/maintain/Settings.vue:290
+msgid "Send through"
 msgstr ""
 
-#: web/src/views/maintain/Settings.vue:273
-msgid "Sender"
-msgstr ""
-
-#: web/src/views/maintain/Settings.vue:284
-msgid "Remove the mail service settings?"
+#: web/src/views/maintain/Settings.vue:291
+msgid "HTTP API"
 msgstr ""
 
 #: web/src/views/maintain/Settings.vue:294
+msgid "Address"
+msgstr ""
+
+#: web/src/views/maintain/Settings.vue:294
+msgid "The API takes from, to, subject and text as JSON with a bearer key, as Resend and similar services do."
+msgstr ""
+
+#: web/src/views/maintain/Settings.vue:303
+msgid "Server"
+msgstr ""
+
+#: web/src/views/maintain/Settings.vue:306
+msgid "Port"
+msgstr ""
+
+#: web/src/views/maintain/Settings.vue:311
+msgid "Port 465 is encrypted with TLS from the start."
+msgstr ""
+
+#: web/src/views/maintain/Settings.vue:311
+msgid "The connection is encrypted with STARTTLS before signing in; a server without it is refused. Port 25 cannot be used."
+msgstr ""
+
+#: web/src/views/maintain/Settings.vue:313
+msgid "Account"
+msgstr ""
+
+#: web/src/views/maintain/Settings.vue:313
+msgid "Leave empty for a server that takes mail without signing in."
+msgstr ""
+
+#: web/src/views/maintain/Settings.vue:316
+msgid "Password"
+msgstr ""
+
+#: web/src/views/maintain/Settings.vue:316
+msgid "Kept encrypted and never sent to a browser. Gmail and many company mail services need an app password."
+msgstr ""
+
+#: web/src/views/maintain/Settings.vue:320
+msgid "Sender"
+msgstr ""
+
+#: web/src/views/maintain/Settings.vue:328
+msgid "Remove the mail service settings?"
+msgstr ""
+
+#: web/src/views/maintain/Settings.vue:338
 msgid "Send a test mail"
 msgstr ""
 
-#: web/src/views/maintain/Settings.vue:299
+#: web/src/views/maintain/Settings.vue:343
 #: web/src/views/owners/VendorPage.vue:380
 #: web/src/views/review/ReviewChange.vue:849
 #: web/src/views/review/ReviewQueue.vue:464
 msgid "Send"
 msgstr ""
 
-#: web/src/views/maintain/Settings.vue:308
+#: web/src/views/maintain/Settings.vue:352
 msgid "Bot account"
 msgstr ""
 
-#: web/src/views/maintain/Settings.vue:315
+#: web/src/views/maintain/Settings.vue:359
 msgid "When authors send store changes through the bot, it opens a pull request on their repository from a fork of its own, and the author merges it. The token needs the public_repo scope."
 msgstr ""
 
-#: web/src/views/maintain/Settings.vue:318
+#: web/src/views/maintain/Settings.vue:362
 msgid "GitHub account"
 msgstr ""
 
-#: web/src/views/maintain/Settings.vue:321
+#: web/src/views/maintain/Settings.vue:365
 msgid "Access token"
 msgstr ""
 
-#: web/src/views/maintain/Settings.vue:329
+#: web/src/views/maintain/Settings.vue:373
 msgid "Remove the bot account settings?"
 msgstr ""
 
-#: web/src/views/maintain/Settings.vue:340
+#: web/src/views/maintain/Settings.vue:384
 msgid "Edit the announcement"
 msgstr ""
 
-#: web/src/views/maintain/Settings.vue:340
+#: web/src/views/maintain/Settings.vue:384
 msgid "Publish"
 msgstr ""
 
-#: web/src/views/maintain/Settings.vue:342
+#: web/src/views/maintain/Settings.vue:386
 msgid "Date"
 msgstr ""
 
-#: web/src/views/maintain/Settings.vue:345
+#: web/src/views/maintain/Settings.vue:389
 msgid "Title in English"
 msgstr ""
 
-#: web/src/views/maintain/Settings.vue:348
+#: web/src/views/maintain/Settings.vue:392
 msgid "Text in English"
 msgstr ""
 
-#: web/src/views/maintain/Settings.vue:351
+#: web/src/views/maintain/Settings.vue:395
 msgid "Title in Simplified Chinese"
 msgstr ""
 
-#: web/src/views/maintain/Settings.vue:354
+#: web/src/views/maintain/Settings.vue:398
 msgid "Text in Simplified Chinese"
 msgstr ""
 
-#: web/src/views/maintain/Settings.vue:354
+#: web/src/views/maintain/Settings.vue:398
 msgid "Without a Chinese version, the English shows."
 msgstr ""
 

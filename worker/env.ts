@@ -26,6 +26,10 @@ export interface Env {
   EMAIL_API_URL?: string
   EMAIL_API_KEY?: string
   EMAIL_FROM?: string
+  SMTP_HOST?: string
+  SMTP_PORT?: string
+  SMTP_USER?: string
+  SMTP_PASSWORD?: string
 }
 
 export interface SessionUser {

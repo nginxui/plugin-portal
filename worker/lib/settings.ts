@@ -8,11 +8,11 @@ import { now } from './time'
 
 const CONTEXT = 'portal-setting'
 
-export interface MailConfig {
-  url: string
-  key: string
-  from: string
-}
+export type MailConfig
+  = | { kind: 'http', url: string, key: string, from: string }
+    | { kind: 'smtp', host: string, port: number, user: string, password: string, from: string }
+
+const MAIL_KEYS = ['mail.kind', 'mail.url', 'mail.key', 'mail.from', 'mail.smtp_host', 'mail.smtp_port', 'mail.smtp_user', 'mail.smtp_password']
 
 export interface BotConfig {
   login: string
@@ -54,14 +54,24 @@ export async function saveSettings(env: Env, userId: number, entries: Record<str
     await env.DB.batch(statements)
 }
 
-/** The mail API, from the Settings page or else the Worker variables. */
+/** The mail service, from the Settings page or else the Worker variables. */
 export async function mailConfig(env: Env): Promise<(MailConfig & { source: 'settings' | 'env' }) | null> {
-  const v = await values(env, ['mail.url', 'mail.key', 'mail.from'])
-  const key = await unseal(env, v['mail.key'])
-  if (v['mail.url'] && key && v['mail.from'])
-    return { url: v['mail.url'], key, from: v['mail.from'], source: 'settings' }
+  const v = await values(env, MAIL_KEYS)
+  if (v['mail.kind'] === 'smtp') {
+    // A server that takes mail without signing in needs no password.
+    const password = v['mail.smtp_password'] ? await unseal(env, v['mail.smtp_password']) : ''
+    if (v['mail.smtp_host'] && v['mail.from'] && password !== null)
+      return { kind: 'smtp', host: v['mail.smtp_host'], port: Number(v['mail.smtp_port'] ?? 587), user: v['mail.smtp_user'] ?? '', password, from: v['mail.from'], source: 'settings' }
+  }
+  else {
+    const key = await unseal(env, v['mail.key'])
+    if (v['mail.url'] && key && v['mail.from'])
+      return { kind: 'http', url: v['mail.url'], key, from: v['mail.from'], source: 'settings' }
+  }
   if (env.EMAIL_API_URL && env.EMAIL_API_KEY && env.EMAIL_FROM)
-    return { url: env.EMAIL_API_URL, key: env.EMAIL_API_KEY, from: env.EMAIL_FROM, source: 'env' }
+    return { kind: 'http', url: env.EMAIL_API_URL, key: env.EMAIL_API_KEY, from: env.EMAIL_FROM, source: 'env' }
+  if (env.SMTP_HOST && env.EMAIL_FROM)
+    return { kind: 'smtp', host: env.SMTP_HOST, port: Number(env.SMTP_PORT ?? 587), user: env.SMTP_USER ?? '', password: env.SMTP_PASSWORD ?? '', from: env.EMAIL_FROM, source: 'env' }
   return null
 }
 
@@ -78,10 +88,22 @@ export async function botConfig(env: Env): Promise<(BotConfig & { source: 'setti
 
 /** What the Settings page shows: everything but the secrets. */
 export async function settingsView(env: Env) {
-  const v = await values(env, ['mail.url', 'mail.key', 'mail.from', 'bot.login', 'bot.token'])
+  const v = await values(env, [...MAIL_KEYS, 'bot.login', 'bot.token'])
   const [mail, bot] = await Promise.all([mailConfig(env), botConfig(env)])
   return {
-    mail: { url: v['mail.url'] ?? '', from: v['mail.from'] ?? '', keySet: !!v['mail.key'], active: mail?.source ?? null },
+    mail: {
+      kind: v['mail.kind'] === 'smtp' ? 'smtp' as const : 'http' as const,
+      url: v['mail.url'] ?? '',
+      from: v['mail.from'] ?? '',
+      keySet: !!v['mail.key'],
+      host: v['mail.smtp_host'] ?? '',
+      port: Number(v['mail.smtp_port'] ?? 587),
+      user: v['mail.smtp_user'] ?? '',
+      passwordSet: !!v['mail.smtp_password'],
+      active: mail?.source ?? null,
+      // What the mail in use goes through, the Worker variables included.
+      activeKind: mail?.kind ?? null,
+    },
     bot: { login: v['bot.login'] ?? '', tokenSet: !!v['bot.token'], active: bot?.source ?? null },
   }
 }
