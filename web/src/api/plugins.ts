@@ -97,7 +97,7 @@ export interface Insights {
   storeSource: StoreSource
   minHostVersion: string | null
   openIssues: number | null
-  releases: { version: string, publishedAt: string | null, yanked: boolean, prerelease: boolean, listed?: boolean, yankReason?: string | null }[]
+  releases: { version: string, publishedAt: string | null, yanked: boolean, prerelease: boolean, listed?: boolean, listedAt?: number | null, yankReason?: string | null }[]
 }
 
 export interface OwnerSummary {

@@ -26,7 +26,8 @@ export interface Insights {
   storeSource: StoreSource
   minHostVersion: string | null
   openIssues: number | null
-  releases: { version: string, publishedAt: string | null, yanked: boolean, prerelease: boolean, listed: boolean, yankReason: string | null }[]
+  // listedAt: when the catalog first listed the version, if a deploy report saw it happen.
+  releases: { version: string, publishedAt: string | null, yanked: boolean, prerelease: boolean, listed: boolean, listedAt: number | null, yankReason: string | null }[]
 }
 
 interface GitHubRelease {
@@ -63,9 +64,17 @@ export function coverage(plugin: Pick<CatalogPlugin, 'name' | 'description'>) {
 
 const version = (tag: string) => tag.replace(/^v/, '')
 
+/** When the catalog first listed each version, as deploy reports saw it. */
+async function listingTimes(env: Env, pluginId: string): Promise<Map<string, number>> {
+  const { results } = await env.DB.prepare('SELECT version, listed_at FROM release_listings WHERE plugin_id = ? AND listed_at IS NOT NULL')
+    .bind(pluginId)
+    .all<{ version: string, listed_at: number }>()
+  return new Map(results.map(r => [r.version, r.listed_at]))
+}
+
 export async function insightsOf(env: Env, token: string, plugin: CatalogPlugin & { screenshots?: { dark_url?: string }[], readme_url?: string }): Promise<Insights> {
   const repo = repoOf(plugin.repository_url)
-  const [gh, entry, daily] = await Promise.all([
+  const [gh, entry, daily, listedAt] = await Promise.all([
     repo
       ? cached(`gh:${repo.toLowerCase()}`, CACHE_SECONDS, async () => {
           const [releases, info] = await Promise.all([
@@ -86,6 +95,7 @@ export async function insightsOf(env: Env, token: string, plugin: CatalogPlugin 
       : Promise.resolve({ releases: [], openIssues: null }),
     catalogEntry(env, plugin.id),
     dailyDownloads(env, plugin.id),
+    listingTimes(env, plugin.id),
   ])
   const yanked = new Set(plugin.releases?.filter(r => r.yanked).map(r => r.version))
   const listed = new Set(plugin.releases?.map(r => r.version))
@@ -116,6 +126,6 @@ export async function insightsOf(env: Env, token: string, plugin: CatalogPlugin 
     storeSource: storeSourceOf(entry?.store),
     minHostVersion: newest?.min_nginx_ui_version ?? null,
     openIssues: gh.openIssues,
-    releases: gh.releases.slice(0, 5).map(r => ({ version: r.version, publishedAt: r.publishedAt, prerelease: r.prerelease, yanked: yanked.has(r.version), listed: listed.has(r.version), yankReason: reasons.get(r.version)?.slice(0, 120) ?? null })),
+    releases: gh.releases.slice(0, 5).map(r => ({ version: r.version, publishedAt: r.publishedAt, prerelease: r.prerelease, yanked: yanked.has(r.version), listed: listed.has(r.version), listedAt: listedAt.get(r.version) ?? null, yankReason: reasons.get(r.version)?.slice(0, 120) ?? null })),
   }
 }

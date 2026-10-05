@@ -30,6 +30,13 @@ export function waited(value: number | null | undefined): string {
   return dayjs.unix(value).locale(locale()).fromNow(true)
 }
 
+/** The time from one moment to a later one, such as "12 minutes". */
+export function between(from: string | number, to: string | number): string {
+  const start = typeof from === 'number' ? dayjs.unix(from) : dayjs(from)
+  const end = typeof to === 'number' ? dayjs.unix(to) : dayjs(to)
+  return end.locale(locale()).from(start, true)
+}
+
 /** A day without the year, such as "Oct 4". */
 export function formatDay(value: string | number | null | undefined): string {
   if (value === null || value === undefined)
