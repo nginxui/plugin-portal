@@ -1,6 +1,6 @@
 import type { Manifest, StoreDoc } from './store'
 import { parseCertificateSignature, parsePublicKey, reservedWord } from './rules'
-import { docFromManifest } from './store'
+import { docFromManifest, imageChanged } from './store'
 
 // Preflight (spec 10): what a branch, tag or commit would change against the
 // listed release, before it is released. The same comparison orders the
@@ -89,7 +89,7 @@ export function storeDiff(listed: StoreDoc, next: StoreDoc): DiffRow[] {
     const was = before.get(shot.id)
     if (!was)
       rows.push({ sign: 'add', kind: 'screenshot', subject: shot.id, to: shot.caption?.en })
-    else if (was.path !== shot.path || was.dark_path !== shot.dark_path)
+    else if (imageChanged(was, shot))
       rows.push({ sign: 'mod', kind: 'screenshot', subject: shot.id, to: shot.caption?.en })
   }
   for (const id of before.keys()) {

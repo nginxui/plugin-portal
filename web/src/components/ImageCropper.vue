@@ -1,15 +1,20 @@
 <script setup lang="ts">
+import type { Crop } from '@/lib/crop'
 import { computed, onBeforeUnmount, ref, watch } from 'vue'
 import { $gettext } from '@/lib/gettext'
 
-// Crops an image to 16:10 with zoom and drag, and encodes it as WebP at a
-// width the catalog accepts. Nothing is encoded until crop() is called.
-const props = defineProps<{ src: string }>()
+// Frames a 16:10 part of an image with zoom and drag, starting from the crop
+// given. It gives the part as a crop of the whole image, or encodes the part
+// or the whole image as WebP the catalog accepts. Nothing is encoded until
+// crop() or original() is called.
+const props = defineProps<{ src: string, crop?: Crop | null }>()
 const emit = defineEmits<{ adjusted: [adjusted: boolean], failed: [] }>()
 
 const RATIO = 1.6
 const MAX_WIDTH = 1920
 const MIN_WIDTH = 640
+const MAX_SIDE = 3840
+const MAX_BYTES = 2 * 1024 * 1024
 
 const image = ref<HTMLImageElement | null>(null)
 const failed = ref(false)
@@ -18,13 +23,37 @@ const zoom = ref(1)
 const offset = ref({ x: 0, y: 0 })
 const frame = ref<HTMLElement | null>(null)
 
+// The zoom and offset that frame a crop, the whole image without one.
+const start = ref({ zoom: 1, x: 0, y: 0 })
+function frameOf(crop: Crop | null | undefined) {
+  const img = image.value
+  if (!img || !crop)
+    return { zoom: 1, x: 0, y: 0 }
+  const fit = Math.min(img.naturalWidth, img.naturalHeight * RATIO)
+  return {
+    zoom: Math.max(1, fit / (crop.width * img.naturalWidth)),
+    x: (crop.x + crop.width / 2 - 0.5) * img.naturalWidth,
+    y: (crop.y + crop.height / 2 - 0.5) * img.naturalHeight,
+  }
+}
+
+function applyStart() {
+  start.value = frameOf(props.crop)
+  reset()
+}
+
+watch(() => props.crop, applyStart, { deep: true })
+
 watch(() => props.src, (src) => {
   failed.value = false
   zoom.value = 1
   offset.value = { x: 0, y: 0 }
   const img = new Image()
   img.crossOrigin = 'anonymous'
-  img.onload = () => (image.value = img)
+  img.onload = () => {
+    image.value = img
+    applyStart()
+  }
   img.onerror = () => {
     failed.value = true
     emit('failed')
@@ -82,19 +111,67 @@ onBeforeUnmount(onUp)
 
 const tooSmall = computed(() => !!region.value && region.value.width < MIN_WIDTH)
 
-// Whether the crop differs from the whole image, as it was loaded.
+// Whether the frame moved from where it started.
 watch(region, (r) => {
   const img = image.value
   if (!r || !img)
     return
-  const centred = Math.abs(r.left - (img.naturalWidth - r.width) / 2) < 0.5 && Math.abs(r.top - (img.naturalHeight - r.height) / 2) < 0.5
-  emit('adjusted', zoom.value !== 1 || !centred)
+  const s = frameOf(props.crop)
+  const fit = Math.min(img.naturalWidth, img.naturalHeight * RATIO)
+  const from = { width: fit / s.zoom, left: img.naturalWidth / 2 + s.x - fit / s.zoom / 2, top: img.naturalHeight / 2 + s.y - fit / s.zoom / RATIO / 2 }
+  emit('adjusted', Math.abs(r.width - from.width) > 0.5 || Math.abs(r.left - from.left) > 0.5 || Math.abs(r.top - from.top) > 0.5)
 })
 
-/** Back to the whole image. */
+/** Back to where the frame started. */
 function reset() {
-  zoom.value = 1
-  offset.value = { x: 0, y: 0 }
+  zoom.value = start.value.zoom
+  offset.value = { x: start.value.x, y: start.value.y }
+}
+
+/**
+ * The framed part as a crop of the whole image, or null when there is no
+ * need for one: a 16:10 image framed whole.
+ */
+function cropOrNull(): Crop | null {
+  const img = image.value
+  const r = region.value
+  if (!img || !r)
+    return null
+  const whole = Math.abs(img.naturalWidth / img.naturalHeight - RATIO) < 0.01 && r.width >= img.naturalWidth - 1
+  if (whole)
+    return null
+  const round = (n: number) => Math.round(n * 10000) / 10000
+  return { x: round(r.left / img.naturalWidth), y: round(r.top / img.naturalHeight), width: round(r.width / img.naturalWidth), height: round(r.height / img.naturalHeight) }
+}
+
+async function encode(canvas: HTMLCanvasElement): Promise<Blob | null> {
+  for (const quality of [0.9, 0.8, 0.7, 0.6]) {
+    const blob = await new Promise<Blob | null>(resolve => canvas.toBlob(resolve, 'image/webp', quality))
+    if (blob && blob.size <= MAX_BYTES)
+      return blob
+  }
+  return null
+}
+
+/** The whole image as WebP, smaller until it fits 3840 pixels and 2 MB; null when it cannot be read. */
+async function original(): Promise<Blob | null> {
+  const img = image.value
+  if (!img)
+    return null
+  let scale = Math.min(1, MAX_SIDE / img.naturalWidth, MAX_SIDE / img.naturalHeight)
+  for (let tries = 0; tries < 4; tries++) {
+    const canvas = document.createElement('canvas')
+    canvas.width = Math.round(img.naturalWidth * scale)
+    canvas.height = Math.round(img.naturalHeight * scale)
+    const context = canvas.getContext('2d')!
+    context.imageSmoothingQuality = 'high'
+    context.drawImage(img, 0, 0, canvas.width, canvas.height)
+    const blob = await encode(canvas)
+    if (blob)
+      return blob
+    scale *= 0.75
+  }
+  return null
 }
 
 /** The crop as WebP, or null when the image cannot be read. */
@@ -111,15 +188,10 @@ async function crop(): Promise<Blob | null> {
   const context = canvas.getContext('2d')!
   context.imageSmoothingQuality = 'high'
   context.drawImage(img, r.left, r.top, r.width, r.height, 0, 0, width, height)
-  for (const quality of [0.9, 0.8, 0.7, 0.6]) {
-    const blob = await new Promise<Blob | null>(resolve => canvas.toBlob(resolve, 'image/webp', quality))
-    if (blob && blob.size <= 2 * 1024 * 1024)
-      return blob
-  }
-  return null
+  return encode(canvas)
 }
 
-defineExpose({ crop, reset })
+defineExpose({ crop, cropOrNull, original, reset })
 </script>
 
 <template>

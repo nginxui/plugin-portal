@@ -311,7 +311,9 @@ store.get('/changes/:id/patch', requireSession, async (c) => {
   })
 })
 
-// Uploads a screenshot the studio cropped and encoded as WebP.
+// Uploads a screenshot the studio encoded as WebP: cropped to 16:10, or with
+// ?original=1 the whole image, which a crop in the document then frames. A
+// whole image has room for a 16:10 crop at least 640 pixels wide.
 store.post('/media', requireSession, async (c) => {
   const session = c.get('session')
   if (!c.env.MEDIA)
@@ -325,10 +327,10 @@ store.post('/media', requireSession, async (c) => {
   const size = webpSize(bytes)
   if (!size)
     return c.json({ error: 'not_webp' }, 415)
-  if (size.width > MAX_SIDE || size.height > MAX_SIDE || size.width < 640)
+  if (size.width > MAX_SIDE || size.height > MAX_SIDE || Math.min(size.width, size.height * 1.6) < 640)
     return c.json({ error: 'bad_size', ...size }, 422)
   const ratio = size.width / size.height
-  if (Math.abs(ratio - 1.6) > 0.02)
+  if (c.req.query('original') !== '1' && Math.abs(ratio - 1.6) > 0.02)
     return c.json({ error: 'bad_ratio', ...size }, 422)
   const sha = await sha256Hex(bytes)
   if (!await c.env.MEDIA.head(publishedKey(sha))) {

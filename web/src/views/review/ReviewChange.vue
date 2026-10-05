@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { AiReview, ReviewDetail } from '@/api/review'
+import type { Crop } from '@/lib/crop'
 import { onKeyStroke } from '@vueuse/core'
 import { computed, onMounted, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
@@ -185,7 +186,7 @@ const claimText = computed(() => {
 })
 
 // What users see now and after the change.
-interface Doc { name?: Record<string, string>, description?: Record<string, string>, homepage_url?: string, screenshots?: { id: string, path: string, dark_path?: string, caption?: Record<string, string> }[] }
+interface Doc { name?: Record<string, string>, description?: Record<string, string>, homepage_url?: string, screenshots?: { id: string, path: string, crop?: Crop, dark_path?: string, dark_crop?: Crop, caption?: Record<string, string> }[] }
 const compareMode = ref<'side' | 'slider' | 'changes'>('side')
 const compareTheme = ref<'light' | 'dark'>('light')
 const compareLocale = ref('en')
@@ -199,7 +200,7 @@ const beforeDoc = computed<Doc | null>(() => {
     name: b?.name,
     description: b?.description ?? l?.description ?? undefined,
     homepage_url: b?.homepage_url,
-    screenshots: (l?.screenshots ?? []).map((sh, i) => ({ id: `s${i + 1}`, path: sh.url, ...(sh.dark_url ? { dark_path: sh.dark_url } : {}), ...(sh.caption ? { caption: sh.caption } : {}) })),
+    screenshots: (l?.screenshots ?? []).map((sh, i) => ({ id: `s${i + 1}`, path: sh.url, ...(sh.crop ? { crop: sh.crop } : {}), ...(sh.dark_url ? { dark_path: sh.dark_url } : {}), ...(sh.dark_crop ? { dark_crop: sh.dark_crop } : {}), ...(sh.caption ? { caption: sh.caption } : {}) })),
   }
 })
 const afterDoc = computed<Doc>(() => {

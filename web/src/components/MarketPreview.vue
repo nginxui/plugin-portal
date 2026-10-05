@@ -1,6 +1,8 @@
 <script setup lang="ts">
+import type { Crop } from '@/lib/crop'
 import type { Localized } from '@/lib/market'
 import { computed, nextTick, ref, useTemplateRef } from 'vue'
+import { cropOf, croppedStyles } from '@/lib/crop'
 import { $gettext } from '@/lib/gettext'
 import { RTL_LOCALES } from '@/lib/hostLocales'
 import { capabilityText, categoryText, installLabel, label, permissionText, renderMarkdown, resolve, trustText } from '@/lib/market'
@@ -12,7 +14,7 @@ export interface PreviewDoc {
   name?: Localized
   description?: Localized
   homepage_url?: string
-  screenshots?: { id: string, path: string, dark_path?: string, caption?: Localized }[]
+  screenshots?: { id: string, path: string, crop?: Crop, dark_path?: string, dark_crop?: Crop, caption?: Localized }[]
   // Translations of the permission notes, keyed by permission.
   permission_reasons?: Record<string, Localized>
 }
@@ -95,11 +97,22 @@ const name = computed(() => resolve(props.doc.name, props.locale))
 const description = computed(() => resolve(props.doc.description, props.locale))
 const L = (key: string, value?: string) => label(props.locale, key, value)
 
-const shots = computed(() => (props.doc.screenshots ?? []).map(shot => ({
-  ...shot,
-  url: (props.theme === 'dark' && shot.dark_path ? props.images[shot.dark_path] : null) ?? props.images[shot.path] ?? null,
-  caption: resolve(shot.caption, props.locale),
-})))
+// Screenshots open a larger preview when clicked.
+const SHOT = {
+  root: { display: 'block', width: '100%' },
+  image: { display: 'block', width: '100%', aspectRatio: '16 / 10', objectFit: 'cover', borderRadius: '8px', border: '1px solid var(--p-border)', background: 'var(--p-fill)' },
+} as const
+
+// The image for the theme, framed by its crop; opening it shows it whole.
+const shots = computed(() => (props.doc.screenshots ?? []).map((shot) => {
+  const darkUrl = props.theme === 'dark' && shot.dark_path ? props.images[shot.dark_path] : null
+  return {
+    ...shot,
+    url: darkUrl ?? props.images[shot.path] ?? null,
+    styles: croppedStyles(cropOf(shot, !!darkUrl), SHOT),
+    caption: resolve(shot.caption, props.locale),
+  }
+}))
 
 const permissions = computed(() => (props.manifest?.permissions ?? []).map((p) => {
   const reasons = props.manifest?.i18n?.[props.locale]?.permission_reasons ?? props.manifest?.permission_reasons ?? {}
@@ -212,12 +225,6 @@ function editableClass(key: string, missing = false) {
     hl: !!props.highlight[key],
   }
 }
-
-// Screenshots open a larger preview when clicked.
-const SHOT = {
-  root: { display: 'block', width: '100%' },
-  image: { display: 'block', width: '100%', aspectRatio: '16 / 10', objectFit: 'cover', borderRadius: '8px', border: '1px solid var(--p-border)', background: 'var(--p-fill)' },
-} as const
 </script>
 
 <template>
@@ -352,7 +359,7 @@ const SHOT = {
         <AImagePreviewGroup>
           <div class="strip">
             <figure v-for="shot in shots" :key="shot.id" class="shot" :class="{ hl: highlight[`shot:${shot.id}`] }" :data-hl="highlight[`shot:${shot.id}`]">
-              <AImage v-if="shot.url" :src="shot.url" :alt="shot.caption.text" loading="lazy" referrerpolicy="no-referrer" :styles="SHOT" />
+              <AImage v-if="shot.url" :src="shot.url" :alt="shot.caption.text" loading="lazy" referrerpolicy="no-referrer" :styles="shot.styles" />
               <div v-else class="shot-missing">
                 {{ shot.path }}
               </div>
