@@ -351,6 +351,7 @@ onMounted(async () => {
             <MarketPreview
               v-else
               :doc="{ name: draft.name, description: draft.description }"
+              :plugin-id="draft.id"
               :locale="gettext.current"
               :version="draft.version"
               :author="draft.repo.split('/')[0]"

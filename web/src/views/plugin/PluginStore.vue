@@ -316,6 +316,7 @@ const name = computed(() => localized(doc.value.name) || localized(plugin.value.
           <MarketPreview
             ref="preview"
             :doc="doc"
+            :plugin-id="plugin.id"
             :locale="locale"
             :theme="theme"
             :device="device"

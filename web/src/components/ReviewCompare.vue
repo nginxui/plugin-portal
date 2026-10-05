@@ -11,6 +11,7 @@ import { joinList, joinSentences } from '@/lib/labels'
 const props = defineProps<{
   before: PreviewDoc | null
   after: PreviewDoc
+  pluginId?: string | null
   manifest: PreviewManifest | null
   version: string | null
   author: string | null
@@ -98,6 +99,7 @@ const highlight = computed<Record<string, string>>(() => {
 })
 
 const common = computed(() => ({
+  pluginId: props.pluginId ?? null,
   manifest: props.manifest,
   version: props.version,
   author: props.author,

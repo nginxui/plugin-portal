@@ -1,14 +1,18 @@
 <script setup lang="ts">
+import type { MarketEntry } from '@nginxui/plugin-market-ui'
 import type { Crop } from '@/lib/crop'
 import type { Localized } from '@/lib/market'
+import { bundledText, MarketDetail, provideMarketText } from '@nginxui/plugin-market-ui'
+import { theme as antTheme } from 'antdv-next'
 import { computed, nextTick, ref, useTemplateRef } from 'vue'
-import { cropOf, croppedStyles } from '@/lib/crop'
 import { $gettext } from '@/lib/gettext'
 import { RTL_LOCALES } from '@/lib/hostLocales'
-import { capabilityText, categoryText, installLabel, label, permissionText, renderMarkdown, resolve, trustText } from '@/lib/market'
+import { installLabel, renderMarkdown, resolve } from '@/lib/market'
 
 // The marketplace detail of a plugin as Nginx UI shows it, in any language,
-// theme and width, with the store texts editable in place.
+// theme and width, with the store texts editable in place. The detail is
+// the one Nginx UI draws, from the package both share; this adds the title
+// of its drawer and the editors.
 
 export interface PreviewDoc {
   name?: Localized
@@ -31,6 +35,7 @@ export interface PreviewManifest {
 
 const props = withDefaults(defineProps<{
   doc: PreviewDoc
+  pluginId?: string | null
   locale: string
   theme?: 'light' | 'dark'
   device?: 'desktop' | 'phone'
@@ -59,6 +64,7 @@ const props = withDefaults(defineProps<{
   // Parts to mark as changed, by key ("name", "shot:<id>") with a label.
   highlight?: Record<string, string>
 }>(), {
+  pluginId: null,
   theme: 'light',
   device: 'desktop',
   images: () => ({}),
@@ -95,39 +101,45 @@ const LIMITS: Record<string, number> = { name: 64, description: 1000, homepage_u
 const rtl = computed(() => RTL_LOCALES.includes(props.locale))
 const name = computed(() => resolve(props.doc.name, props.locale))
 const description = computed(() => resolve(props.doc.description, props.locale))
-const L = (key: string, value?: string) => label(props.locale, key, value)
 
-// Screenshots open a larger preview when clicked.
-const SHOT = {
-  root: { display: 'block', width: '100%' },
-  image: { display: 'block', width: '100%', aspectRatio: '16 / 10', objectFit: 'cover', borderRadius: '8px', border: '1px solid var(--p-border)', background: 'var(--p-fill)' },
-} as const
+// The wording of Nginx UI in the preview language, its theme apart from the portal's.
+const text = computed(() => bundledText(props.locale))
+provideMarketText((msgid, params) => text.value(msgid, params))
+const themeConfig = computed(() => ({ algorithm: props.theme === 'dark' ? antTheme.darkAlgorithm : antTheme.defaultAlgorithm }))
 
-// The image for the theme, framed by its crop; opening it shows it whole.
-const shots = computed(() => (props.doc.screenshots ?? []).map((shot) => {
-  const darkUrl = props.theme === 'dark' && shot.dark_path ? props.images[shot.dark_path] : null
-  return {
-    ...shot,
-    url: darkUrl ?? props.images[shot.path] ?? null,
-    styles: croppedStyles(cropOf(shot, !!darkUrl), SHOT),
-    caption: resolve(shot.caption, props.locale),
+// The store document as the catalog lists it.
+const entry = computed<MarketEntry>(() => ({
+  id: props.pluginId ?? '',
+  name: props.doc.name,
+  description: props.doc.description,
+  author: props.author ?? undefined,
+  homepage_url: props.doc.homepage_url,
+  repository_url: props.repository ?? undefined,
+  icon_url: props.iconUrl ?? undefined,
+  trust: props.trust ?? undefined,
+  categories: props.categories,
+  capabilities: props.manifest?.capabilities,
+  permission_reasons: props.doc.permission_reasons,
+  screenshots: (props.doc.screenshots ?? []).map(shot => ({
+    id: shot.id,
+    url: props.images[shot.path] ?? '',
+    dark_url: shot.dark_path ? props.images[shot.dark_path] ?? undefined : undefined,
+    caption: shot.caption,
+    crop: shot.crop,
+    dark_crop: shot.dark_crop,
+  })),
+  installable_release: props.manifest ? { version: props.version ?? props.manifest.version ?? '', manifest: props.manifest } : undefined,
+}))
+
+// Changed parts, by the parts of the detail.
+const marks = computed(() => {
+  const out: Record<string, string> = {}
+  for (const [key, label] of Object.entries(props.highlight)) {
+    if (key === 'homepage_url')
+      out.links = label
+    else if (key !== 'name')
+      out[key] = label
   }
-}))
-
-const permissions = computed(() => (props.manifest?.permissions ?? []).map((p) => {
-  const reasons = props.manifest?.i18n?.[props.locale]?.permission_reasons ?? props.manifest?.permission_reasons ?? {}
-  return { id: p, ...permissionText(props.locale, p), reason: props.doc.permission_reasons?.[p]?.[props.locale] || reasons[p] || props.manifest?.permission_reasons?.[p] || '' }
-}))
-
-const facts = computed(() => {
-  const out: { key: string, label: string, value: string }[] = []
-  const version = props.version ?? props.manifest?.version
-  if (version)
-    out.push({ key: 'version', label: L('version'), value: version })
-  if (props.manifest?.min_nginx_ui_version)
-    out.push({ key: 'requires', label: L('requiresLabel'), value: L('minVersion', props.manifest.min_nginx_ui_version) })
-  if (props.author)
-    out.push({ key: 'author', label: L('author'), value: props.author })
   return out
 })
 
@@ -233,220 +245,177 @@ function editableClass(key: string, missing = false) {
       <span class="dots" aria-hidden="true"><i /><i /><i /></span>
       <span>{{ $gettext('Nginx UI marketplace, as users see it') }}</span>
     </div>
-    <div class="body" :dir="rtl ? 'rtl' : 'ltr'" :lang="locale.replace('_', '-')">
-      <div class="head">
-        <PluginIcon :src="iconUrl" :name="resolve(doc.name, locale).text || '?'" :size="48" />
-        <div class="min-w-0 flex-1">
-          <div class="pill-row">
-            <span v-if="trust" class="pill" :class="trust === 'official' ? 'is-accent' : ''">{{ trustText(locale, trust) }}</span>
-            <span v-for="cap in manifest?.capabilities ?? []" :key="cap" class="pill is-accent">{{ capabilityText(locale, cap) }}</span>
-          </div>
+    <AConfigProvider :theme="themeConfig">
+      <AFlex vertical class="drawer" :dir="rtl ? 'rtl' : 'ltr'" :lang="locale.replace('_', '-')">
+        <div class="drawer-head">
           <div :class="editableClass('name', name.fallback)" :data-hl="highlight.name" class="name-row" role="button" :tabindex="editable ? 0 : -1" @click="edit('name')" @keydown.enter="edit('name')">
             <h2 class="name">
-              {{ name.text }}
+              {{ name.text || pluginId }}
             </h2>
             <span v-if="editable && !locked.name" class="review-pill"><span class="i-tabler-shield-check" />{{ $gettext('Changes need review') }}</span>
           </div>
-          <div v-if="author" class="by">
-            {{ L('by', author) }}
-          </div>
+          <button type="button" class="install" disabled>
+            {{ installLabel(locale) }}
+          </button>
         </div>
-        <button type="button" class="install" disabled>
-          {{ installLabel(locale) }}
-        </button>
-      </div>
 
-      <div v-if="isEditing('name')" class="editor" :class="{ pop: editing!.source }" @keydown="onKey">
-        <div v-if="progress && editing!.source" class="progress">
-          {{ progress }}
-        </div>
-        <div v-if="editing!.source" class="source">
-          <span>English</span>{{ editing!.source }}
-        </div>
-        <input ref="field" v-model="editing!.value" class="input" :maxlength="limitOf('name')" :aria-label="$gettext('Name')">
-        <div class="editor-foot">
-          <span class="count">{{ editing!.value.length }} / {{ limitOf('name') }}</span>
-          <span v-if="editing!.drafted" class="ai-tag">{{ $gettext('AI draft') }}</span>
-          <span class="flex-1" />
-          <button v-if="draft && editing!.source" type="button" class="btn" :disabled="drafting" @click="aiDraft">
-            <span class="i-tabler-sparkles" />{{ $gettext('AI draft') }}
-          </button>
-          <button type="button" class="btn" @click="editing = null">
-            {{ $gettext('Cancel') }}
-          </button>
-          <button type="button" class="btn primary" @click="done(!!editing!.source)">
-            {{ editing!.source ? $gettext('Save and go to the next') : $gettext('Done') }}
-          </button>
-        </div>
-      </div>
-
-      <p v-if="!isEditing('description') || editing!.source" :class="editableClass('description', description.fallback)" :data-hl="highlight.description" class="description" role="button" :tabindex="editable ? 0 : -1" @click="edit('description')" @keydown.enter="edit('description')">
-        {{ description.text || (editable ? $gettext('Add a description') : '') }}
-      </p>
-      <div v-if="isEditing('description')" class="editor" :class="{ pop: editing!.source }" @keydown="onKey">
-        <div v-if="progress && editing!.source" class="progress">
-          {{ progress }}
-        </div>
-        <div v-if="editing!.source" class="source">
-          <span>English</span>{{ editing!.source }}
-        </div>
-        <textarea ref="field" v-model="editing!.value" class="input" rows="4" :maxlength="limitOf('description')" :aria-label="$gettext('Description')" />
-        <div class="editor-foot">
-          <span class="count">{{ editing!.value.length }} / {{ limitOf('description') }}</span>
-          <span v-if="editing!.drafted" class="ai-tag">{{ $gettext('AI draft') }}</span>
-          <span class="flex-1" />
-          <button v-if="draft && editing!.source" type="button" class="btn" :disabled="drafting" @click="aiDraft">
-            <span class="i-tabler-sparkles" />{{ $gettext('AI draft') }}
-          </button>
-          <button type="button" class="btn" @click="editing = null">
-            {{ $gettext('Cancel') }}
-          </button>
-          <button type="button" class="btn primary" @click="done(!!editing!.source)">
-            {{ editing!.source ? $gettext('Save and go to the next') : $gettext('Done') }}
-          </button>
-        </div>
-      </div>
-
-      <div v-if="facts.length" class="facts">
-        <div v-for="fact in facts" :key="fact.key" class="fact">
-          <span class="fact-label">{{ fact.label }}</span>
-          <span class="fact-value">{{ fact.value }}</span>
-        </div>
-      </div>
-
-      <dl class="list">
-        <div v-if="categories.length" class="row">
-          <dt>{{ L('categories') }}</dt>
-          <dd class="pill-row" :class="{ editable: canPickCategories }" :role="canPickCategories ? 'button' : undefined" :tabindex="canPickCategories ? 0 : -1" @click="canPickCategories && emit('categories')" @keydown.enter="canPickCategories && emit('categories')">
-            <span v-for="item in categories" :key="item" class="pill">{{ categoryText(locale, item) }}</span>
-          </dd>
-        </div>
-        <div v-if="doc.homepage_url || editable" class="row">
-          <dt>{{ L('homepage') }}</dt>
-          <dd>
-            <span v-if="!isEditing('homepage_url')" :class="editableClass('homepage_url')" :data-hl="highlight.homepage_url" class="link" role="button" :tabindex="editable ? 0 : -1" @click="edit('homepage_url')" @keydown.enter="edit('homepage_url')">
-              {{ doc.homepage_url || (editable ? $gettext('Add a homepage') : '') }}
-            </span>
-            <div v-else class="editor" @keydown="onKey">
-              <input ref="field" v-model="editing!.value" class="input" placeholder="https://" :aria-label="$gettext('Homepage')">
-              <div class="editor-foot">
-                <span class="flex-1" />
-                <button type="button" class="btn" @click="editing = null">
-                  {{ $gettext('Cancel') }}
-                </button>
-                <button type="button" class="btn primary" @click="done()">
-                  {{ $gettext('Done') }}
-                </button>
-              </div>
+        <div class="drawer-body">
+          <div v-if="isEditing('name')" class="editor name-editor" :class="{ pop: editing!.source }" @keydown="onKey">
+            <div v-if="progress && editing!.source" class="progress">
+              {{ progress }}
             </div>
-          </dd>
-        </div>
-        <div v-if="repository" class="row">
-          <dt>{{ L('repository') }}</dt>
-          <dd class="link">
-            {{ repository.replace('https://', '') }}
-          </dd>
-        </div>
-      </dl>
+            <div v-if="editing!.source" class="source">
+              <span>English</span>{{ editing!.source }}
+            </div>
+            <input ref="field" v-model="editing!.value" class="input" :maxlength="limitOf('name')" :aria-label="$gettext('Name')">
+            <div class="editor-foot">
+              <span class="count">{{ editing!.value.length }} / {{ limitOf('name') }}</span>
+              <span v-if="editing!.drafted" class="ai-tag">{{ $gettext('AI draft') }}</span>
+              <span class="flex-1" />
+              <button v-if="draft && editing!.source" type="button" class="btn" :disabled="drafting" @click="aiDraft">
+                <span class="i-tabler-sparkles" />{{ $gettext('AI draft') }}
+              </button>
+              <button type="button" class="btn" @click="editing = null">
+                {{ $gettext('Cancel') }}
+              </button>
+              <button type="button" class="btn primary" @click="done(!!editing!.source)">
+                {{ editing!.source ? $gettext('Save and go to the next') : $gettext('Done') }}
+              </button>
+            </div>
+          </div>
 
-      <section v-if="shots.length || editable" class="section">
-        <div class="section-head">
-          <h4>{{ L('screenshots') }}</h4>
-          <button v-if="editable && !locked.screenshots" type="button" class="edit-pill" @click="emit('studio')">
-            <span class="i-tabler-photo-edit" />{{ $gettext('Edit in the screenshot studio') }}
-          </button>
-        </div>
-        <AImagePreviewGroup>
-          <div class="strip">
-            <figure v-for="shot in shots" :key="shot.id" class="shot" :class="{ hl: highlight[`shot:${shot.id}`] }" :data-hl="highlight[`shot:${shot.id}`]">
-              <AImage v-if="shot.url" :src="shot.url" :alt="shot.caption.text" loading="lazy" referrerpolicy="no-referrer" :styles="shot.styles" />
-              <div v-else class="shot-missing">
-                {{ shot.path }}
+          <MarketDetail :entry="entry" :locale="locale" :dark="theme === 'dark'" :readme-html="readmeHtml" :marks="marks">
+            <template #description>
+              <p v-if="!isEditing('description') || editing!.source" :class="editableClass('description', description.fallback)" class="pmu-description" role="button" :tabindex="editable ? 0 : -1" @click="edit('description')" @keydown.enter="edit('description')">
+                {{ description.text || (editable ? $gettext('Add a description') : text('No description provided.')) }}
+              </p>
+              <div v-if="isEditing('description')" class="editor" :class="{ pop: editing!.source }" @keydown="onKey">
+                <div v-if="progress && editing!.source" class="progress">
+                  {{ progress }}
+                </div>
+                <div v-if="editing!.source" class="source">
+                  <span>English</span>{{ editing!.source }}
+                </div>
+                <textarea ref="field" v-model="editing!.value" class="input" rows="4" :maxlength="limitOf('description')" :aria-label="$gettext('Description')" />
+                <div class="editor-foot">
+                  <span class="count">{{ editing!.value.length }} / {{ limitOf('description') }}</span>
+                  <span v-if="editing!.drafted" class="ai-tag">{{ $gettext('AI draft') }}</span>
+                  <span class="flex-1" />
+                  <button v-if="draft && editing!.source" type="button" class="btn" :disabled="drafting" @click="aiDraft">
+                    <span class="i-tabler-sparkles" />{{ $gettext('AI draft') }}
+                  </button>
+                  <button type="button" class="btn" @click="editing = null">
+                    {{ $gettext('Cancel') }}
+                  </button>
+                  <button type="button" class="btn primary" @click="done(!!editing!.source)">
+                    {{ editing!.source ? $gettext('Save and go to the next') : $gettext('Done') }}
+                  </button>
+                </div>
               </div>
-              <figcaption :class="editableClass(`caption:${shot.id}`, shot.caption.fallback)" role="button" :tabindex="editable ? 0 : -1" @click="edit(`caption:${shot.id}`)" @keydown.enter="edit(`caption:${shot.id}`)">
-                {{ shot.caption.text || (editable ? $gettext('Add a caption') : '') }}
+            </template>
+
+            <template v-if="canPickCategories" #categories="{ labels }">
+              <span class="pmu-pill-row editable" role="button" tabindex="0" @click="emit('categories')" @keydown.enter="emit('categories')">
+                <span v-for="item in labels" :key="item" class="pmu-pill">{{ item }}</span>
+                <span v-if="!labels.length" class="pmu-pill">{{ $gettext('Pick categories') }}</span>
+              </span>
+            </template>
+
+            <template v-if="editable" #links="{ links }">
+              <span v-if="!isEditing('homepage_url')" class="pmu-pill-row">
+                <span :class="editableClass('homepage_url')" class="pmu-pill is-link" role="button" tabindex="0" @click="edit('homepage_url')" @keydown.enter="edit('homepage_url')">
+                  <span class="i-tabler-world" />{{ doc.homepage_url ? text('Homepage') : $gettext('Add a homepage') }}
+                </span>
+                <span v-for="link in links.filter(l => l.key !== 'homepage')" :key="link.key" class="pmu-pill is-link">
+                  <span class="i-tabler-link" />{{ link.label }}
+                </span>
+              </span>
+              <div v-else class="editor" @keydown="onKey">
+                <input ref="field" v-model="editing!.value" class="input" placeholder="https://" :aria-label="$gettext('Homepage')">
+                <div class="editor-foot">
+                  <span class="flex-1" />
+                  <button type="button" class="btn" @click="editing = null">
+                    {{ $gettext('Cancel') }}
+                  </button>
+                  <button type="button" class="btn primary" @click="done()">
+                    {{ $gettext('Done') }}
+                  </button>
+                </div>
+              </div>
+            </template>
+
+            <template v-if="editable" #screenshots-action>
+              <button v-if="!locked.screenshots" type="button" class="edit-pill" @click="emit('studio')">
+                <span class="i-tabler-photo-edit" />{{ $gettext('Edit in the screenshot studio') }}
+              </button>
+            </template>
+
+            <template #missing="{ index }">
+              {{ doc.screenshots?.[index]?.path }}
+            </template>
+
+            <template #caption="{ index, caption }">
+              <figcaption v-if="caption || editable" :class="editableClass(`caption:${doc.screenshots?.[index]?.id}`, !!doc.screenshots?.[index] && resolve(doc.screenshots[index].caption, locale).fallback)" class="pmu-caption" role="button" :tabindex="editable ? 0 : -1" @click="edit(`caption:${doc.screenshots?.[index]?.id}`)" @keydown.enter="edit(`caption:${doc.screenshots?.[index]?.id}`)">
+                {{ caption || $gettext('Add a caption') }}
               </figcaption>
-            </figure>
-          </div>
-        </AImagePreviewGroup>
-        <div v-if="editing?.key.startsWith('caption:')" class="editor" :class="{ pop: editing.source }" @keydown="onKey">
-          <div v-if="progress && editing.source" class="progress">
-            {{ progress }}
-          </div>
-          <div v-if="editing.source" class="source">
-            <span>English</span>{{ editing.source }}
-          </div>
-          <input ref="field" v-model="editing.value" class="input" :maxlength="limitOf('caption')" :aria-label="$gettext('Caption')">
-          <div class="editor-foot">
-            <span class="count">{{ editing.value.length }} / {{ limitOf('caption') }}</span>
-            <span v-if="editing.drafted" class="ai-tag">{{ $gettext('AI draft') }}</span>
-            <span class="flex-1" />
-            <button v-if="draft && editing.source" type="button" class="btn" :disabled="drafting" @click="aiDraft">
-              <span class="i-tabler-sparkles" />{{ $gettext('AI draft') }}
-            </button>
-            <button type="button" class="btn" @click="editing = null">
-              {{ $gettext('Cancel') }}
-            </button>
-            <button type="button" class="btn primary" @click="done(!!editing.source)">
-              {{ editing.source ? $gettext('Save and go to the next') : $gettext('Done') }}
-            </button>
-          </div>
-        </div>
-      </section>
+            </template>
 
-      <section class="section">
-        <div class="section-head">
-          <h4>{{ L('permissions') }}</h4>
-          <span v-if="permissions.length" class="count-pill">{{ permissions.length }}</span>
-        </div>
-        <ul v-if="permissions.length" class="permissions">
-          <li v-for="p in permissions" :key="p.id">
-            <span class="perm-tag">{{ p.label }}</span>
-            <div>
-              <div class="perm-desc">
-                {{ p.description }}
+            <template #screenshots-after>
+              <div v-if="editing?.key.startsWith('caption:')" class="editor" :class="{ pop: editing.source }" @keydown="onKey">
+                <div v-if="progress && editing.source" class="progress">
+                  {{ progress }}
+                </div>
+                <div v-if="editing.source" class="source">
+                  <span>English</span>{{ editing.source }}
+                </div>
+                <input ref="field" v-model="editing.value" class="input" :maxlength="limitOf('caption')" :aria-label="$gettext('Caption')">
+                <div class="editor-foot">
+                  <span class="count">{{ editing.value.length }} / {{ limitOf('caption') }}</span>
+                  <span v-if="editing.drafted" class="ai-tag">{{ $gettext('AI draft') }}</span>
+                  <span class="flex-1" />
+                  <button v-if="draft && editing.source" type="button" class="btn" :disabled="drafting" @click="aiDraft">
+                    <span class="i-tabler-sparkles" />{{ $gettext('AI draft') }}
+                  </button>
+                  <button type="button" class="btn" @click="editing = null">
+                    {{ $gettext('Cancel') }}
+                  </button>
+                  <button type="button" class="btn primary" @click="done(!!editing.source)">
+                    {{ editing.source ? $gettext('Save and go to the next') : $gettext('Done') }}
+                  </button>
+                </div>
               </div>
-              <div v-if="p.id === 'network'" class="perm-reason">
-                {{ manifest?.network_hosts?.length ? `${L('onlyHosts')}: ${manifest.network_hosts.join(', ')}` : L('noHosts') }}
-              </div>
-              <div v-if="p.reason" class="perm-reason">
-                <span>{{ L('authorNote') }}</span> {{ p.reason }}
-              </div>
-            </div>
-          </li>
-        </ul>
-        <p v-else class="muted">
-          {{ L('noPermissions') }}
-        </p>
-      </section>
+            </template>
 
-      <section v-if="readme || readmeEditable" class="section">
-        <div class="section-head">
-          <h4>README</h4>
-          <span v-if="readmeNote" class="muted small">{{ readmeNote }}</span>
+            <template v-if="readmeNote" #readme-action>
+              <span class="muted small">{{ readmeNote }}</span>
+            </template>
+
+            <template v-if="readmeEditable" #readme>
+              <div v-if="!isEditing('readme')" :class="editableClass('readme')" class="readme" role="button" tabindex="0" @click="edit('readme')" @keydown.enter="edit('readme')">
+                <!-- eslint-disable-next-line vue/no-v-html -->
+                <div v-if="readmeHtml" class="pmu-readme" v-html="readmeHtml" />
+                <p v-else class="muted">
+                  {{ $gettext('Add a README') }}
+                </p>
+              </div>
+              <div v-else class="editor" @keydown="onKey">
+                <textarea ref="field" v-model="editing!.value" class="input mono" rows="14" :aria-label="$gettext('README')" />
+                <div class="editor-foot">
+                  <span class="count">Markdown</span>
+                  <span class="flex-1" />
+                  <button type="button" class="btn" @click="editing = null">
+                    {{ $gettext('Cancel') }}
+                  </button>
+                  <button type="button" class="btn primary" @click="done()">
+                    {{ $gettext('Done') }}
+                  </button>
+                </div>
+              </div>
+            </template>
+          </MarketDetail>
         </div>
-        <div v-if="!isEditing('readme')" :class="editableClass('readme')" class="readme" role="button" :tabindex="readmeEditable ? 0 : -1" @click="edit('readme')" @keydown.enter="edit('readme')">
-          <!-- eslint-disable-next-line vue/no-v-html -->
-          <div v-if="readmeHtml" v-html="readmeHtml" />
-          <p v-else class="muted">
-            {{ $gettext('Add a README') }}
-          </p>
-        </div>
-        <div v-else class="editor" @keydown="onKey">
-          <textarea ref="field" v-model="editing!.value" class="input mono" rows="14" :aria-label="$gettext('README')" />
-          <div class="editor-foot">
-            <span class="count">Markdown</span>
-            <span class="flex-1" />
-            <button type="button" class="btn" @click="editing = null">
-              {{ $gettext('Cancel') }}
-            </button>
-            <button type="button" class="btn primary" @click="done()">
-              {{ $gettext('Done') }}
-            </button>
-          </div>
-        </div>
-      </section>
-    </div>
+      </AFlex>
+    </AConfigProvider>
   </div>
 </template>
 
@@ -480,6 +449,22 @@ function editableClass(key: string, missing = false) {
   --p-warn: #e8b339;
 }
 
+/* Inside the drawer the tokens of its own theme take over. */
+.drawer {
+  --p-bg: var(--ant-color-bg-elevated);
+  --p-text: var(--ant-color-text);
+  --p-muted: var(--ant-color-text-secondary);
+  --p-fill: var(--ant-color-fill-quaternary);
+  --p-fill-strong: var(--ant-color-fill-tertiary);
+  --p-border: var(--ant-color-border-secondary);
+  --p-accent: var(--ant-color-primary);
+  --p-accent-bg: var(--ant-color-primary-bg);
+  --p-warn: var(--ant-color-warning);
+  background: var(--p-bg);
+  color: var(--p-text);
+  font-size: 14px;
+}
+
 .chrome {
   display: flex;
   align-items: center;
@@ -503,62 +488,48 @@ function editableClass(key: string, missing = false) {
   background: var(--p-fill-strong);
 }
 
-.body {
+/* The title row of the drawer Nginx UI opens. */
+.drawer-head {
   display: flex;
-  flex-direction: column;
-  gap: 22px;
-  padding: 24px;
-  font-size: 14px;
+  align-items: center;
+  gap: 12px;
+  padding: 16px 24px;
+  border-bottom: 1px solid var(--ant-color-split);
 }
 
-.phone .body {
+.drawer-body {
+  position: relative;
+  padding: 24px;
+}
+
+.phone .drawer {
   max-width: 390px;
   margin: 0 auto;
-  padding: 18px 16px;
   border-inline: 1px dashed var(--p-border);
 }
 
-.head {
-  display: flex;
-  align-items: flex-start;
-  gap: 14px;
+.phone .drawer-head {
+  padding: 14px 16px;
 }
 
-.pill-row {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
-  margin: 0 0 8px;
-}
-
-.pill {
-  display: inline-flex;
-  align-items: center;
-  padding: 2px 10px;
-  font-size: 12px;
-  line-height: 20px;
-  color: var(--p-muted);
-  background: var(--p-fill-strong);
-  border-radius: 999px;
-}
-
-.pill.is-accent {
-  color: var(--p-accent);
-  background: var(--p-accent-bg);
+.phone .drawer-body {
+  padding: 18px 16px;
 }
 
 .name-row {
   display: inline-flex;
+  flex: 1;
+  min-width: 0;
   align-items: center;
   gap: 8px;
   flex-wrap: wrap;
-  max-width: 100%;
 }
 
 .name {
   margin: 0;
-  font-size: 20px;
+  font-size: 16px;
   font-weight: 600;
+  line-height: 1.5;
   overflow-wrap: anywhere;
 }
 
@@ -574,12 +545,6 @@ function editableClass(key: string, missing = false) {
   background: var(--p-accent-bg);
 }
 
-.by {
-  margin-top: 2px;
-  font-size: 12px;
-  color: var(--p-muted);
-}
-
 .install {
   flex: none;
   padding: 4px 15px;
@@ -591,92 +556,8 @@ function editableClass(key: string, missing = false) {
   font: inherit;
 }
 
-.description {
-  margin: 0;
-  line-height: 1.7;
-  color: var(--p-muted);
-  white-space: pre-line;
-}
-
-.facts {
-  display: grid;
-  gap: 10px;
-  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
-}
-
-.fact {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-  padding: 12px 14px;
-  background: var(--p-fill);
-  border-radius: 12px;
-  min-width: 0;
-}
-
-.fact-label {
-  font-size: 12px;
-  color: var(--p-muted);
-}
-
-.fact-value {
-  font-weight: 600;
-  overflow-wrap: anywhere;
-}
-
-.list {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  margin: 0;
-}
-
-.row {
-  display: grid;
-  grid-template-columns: 96px minmax(0, 1fr);
-  gap: 12px;
-  align-items: baseline;
-}
-
-.row dt {
-  font-size: 12px;
-  color: var(--p-muted);
-}
-
-.row dd {
-  margin: 0;
-}
-
-.link {
-  color: var(--p-accent);
-  overflow-wrap: anywhere;
-}
-
-.section {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-
-.section-head {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.section-head h4 {
-  margin: 0;
-  font-size: 14px;
-  font-weight: 600;
-}
-
-.count-pill {
-  padding: 0 7px;
-  font-size: 12px;
-  line-height: 18px;
-  border-radius: 999px;
-  background: var(--p-fill-strong);
-  color: var(--p-muted);
+.name-editor {
+  margin-bottom: 16px;
 }
 
 .edit-pill {
@@ -693,90 +574,6 @@ function editableClass(key: string, missing = false) {
   cursor: pointer;
 }
 
-.strip {
-  display: flex;
-  gap: 12px;
-  overflow-x: auto;
-  padding-bottom: 4px;
-}
-
-.shot {
-  flex: none;
-  width: 240px;
-  margin: 0;
-}
-
-.phone .shot {
-  width: 200px;
-}
-
-.shot-missing {
-  display: block;
-  width: 100%;
-  aspect-ratio: 16 / 10;
-  object-fit: cover;
-  border-radius: 8px;
-  border: 1px solid var(--p-border);
-  background: var(--p-fill);
-}
-
-.shot-missing {
-  display: grid;
-  place-items: center;
-  padding: 8px;
-  font-size: 11px;
-  color: var(--p-muted);
-  overflow-wrap: anywhere;
-}
-
-.shot figcaption {
-  margin-top: 6px;
-  font-size: 12px;
-  color: var(--p-muted);
-}
-
-.permissions {
-  margin: 0;
-  padding: 0;
-  list-style: none;
-}
-
-.permissions li {
-  display: grid;
-  grid-template-columns: max-content minmax(0, 1fr);
-  column-gap: 8px;
-  align-items: baseline;
-  padding: 6px 0;
-}
-
-.permissions li + li {
-  border-top: 1px solid var(--p-border);
-}
-
-.perm-tag {
-  padding: 0 7px;
-  font-size: 12px;
-  line-height: 20px;
-  border-radius: 4px;
-  color: var(--p-warn);
-  border: 1px solid currentcolor;
-}
-
-.perm-desc {
-  color: var(--p-muted);
-}
-
-.perm-reason {
-  margin-top: 6px;
-  padding-inline-start: 10px;
-  border-inline-start: 2px solid var(--p-border);
-  font-size: 13px;
-}
-
-.perm-reason span {
-  color: var(--p-muted);
-}
-
 .readme {
   padding: 12px 14px;
   border: 1px solid var(--p-border);
@@ -784,18 +581,6 @@ function editableClass(key: string, missing = false) {
   overflow-wrap: anywhere;
   max-height: 420px;
   overflow: auto;
-}
-
-.readme :deep(img) {
-  max-width: 100%;
-}
-
-.readme :deep(h1) {
-  font-size: 18px;
-}
-
-.readme :deep(h2) {
-  font-size: 16px;
 }
 
 .muted {
@@ -843,17 +628,6 @@ function editableClass(key: string, missing = false) {
   margin-top: 8px;
   border-color: var(--p-border);
   box-shadow: 0 6px 16px rgba(0, 0, 0, 0.12), 0 3px 6px -4px rgba(0, 0, 0, 0.12);
-}
-
-.body,
-.section {
-  position: relative;
-}
-
-/* The caption editor opens below the captions of the strip. */
-.section > .editor.pop {
-  top: calc(100% - 8px);
-  inset-inline-start: 0;
 }
 
 .hl {

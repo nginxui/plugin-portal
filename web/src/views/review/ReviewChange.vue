@@ -534,6 +534,7 @@ onKeyStroke('k', e => !typing(e) && step(-1))
               v-model:mode="compareMode"
               :before="beforeDoc"
               :after="afterDoc"
+              :plugin-id="detail.change.pluginId"
               :manifest="detail.listing?.manifest ?? null"
               :version="detail.listing?.version ?? null"
               :author="(entry?.author as string | undefined) ?? null"
