@@ -12,7 +12,7 @@ import gettext, { $gettext } from '@/lib/gettext'
 import { joinList, localized } from '@/lib/labels'
 import { localeName } from '@/lib/locales'
 import { loadDrafts } from '@/lib/submitDrafts'
-import { formatDay, formatTime, fromNow, waited } from '@/lib/time'
+import { between, formatDay, formatTime, fromNow, waited } from '@/lib/time'
 import { useMoreRepos } from '@/lib/useMoreRepos'
 
 const plugins = ref<PluginSummary[]>([])
@@ -286,6 +286,9 @@ const activity = computed(() => plugins.value
                   </template>
                   <template v-else-if="release.listed === false">
                     {{ $gettext('Released %{time}, not listed yet', { time: fromNow(release.publishedAt) }) }}
+                  </template>
+                  <template v-else-if="release.listedAt && release.publishedAt">
+                    {{ $gettext('Released %{time}, listed after %{delay}', { time: fromNow(release.publishedAt), delay: between(release.publishedAt, release.listedAt) }) }}
                   </template>
                   <template v-else>
                     {{ $gettext('Released %{time}, listed in the catalog', { time: fromNow(release.publishedAt) }) }}

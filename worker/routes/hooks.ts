@@ -104,6 +104,8 @@ interface DeployReport {
   commit?: string
   entries?: Record<string, unknown>
   listed?: string[]
+  // Release times of the listed versions, by plugin and version.
+  versions?: Record<string, Record<string, string | null>>
   pending?: PendingNames[]
 }
 
@@ -118,6 +120,40 @@ function canonical(value: unknown): string {
 
 const PLUGIN_ID = /^[a-z0-9]+(?:\.[a-z0-9-]+)+$/
 const LOCALE = /^[a-z]{2,3}(?:_[A-Z][A-Za-z]{1,3})?$/
+
+// A version the report shows for the first time was listed by this deploy,
+// unless it was released long before, which only a first report or a gap in
+// the reports explains.
+const LISTING_WINDOW = 7 * 86400
+
+// Rows per insert: three bound values each, under the limit of 100 per query.
+const LISTING_ROWS = 30
+
+// New versions only, as a few multi row inserts, so a deploy stays far below
+// the queries a Worker may run however many versions the catalog lists.
+async function listings(env: Env, versions: DeployReport['versions'], t: number): Promise<D1PreparedStatement[]> {
+  if (!versions || typeof versions !== 'object')
+    return []
+  const { results } = await env.DB.prepare('SELECT plugin_id, version FROM release_listings').all<{ plugin_id: string, version: string }>()
+  const known = new Set(results.map(r => `${r.plugin_id}@${r.version}`))
+  const rows: [string, string, number | null][] = []
+  for (const [id, releases] of Object.entries(versions)) {
+    if (!PLUGIN_ID.test(id) || !releases || typeof releases !== 'object')
+      continue
+    for (const [version, releasedAt] of Object.entries(releases).slice(0, 200)) {
+      if (version.length > 64 || known.has(`${id}@${version}`))
+        continue
+      const released = typeof releasedAt === 'string' ? Date.parse(releasedAt) / 1000 : Number.NaN
+      rows.push([id, version, Number.isFinite(released) && t - released < LISTING_WINDOW ? t : null])
+    }
+  }
+  const out: D1PreparedStatement[] = []
+  for (let i = 0; i < rows.length; i += LISTING_ROWS) {
+    const chunk = rows.slice(i, i + LISTING_ROWS)
+    out.push(env.DB.prepare(`INSERT OR IGNORE INTO release_listings (plugin_id, version, listed_at) VALUES ${chunk.map(() => '(?, ?, ?)').join(', ')}`).bind(...chunk.flat()))
+  }
+  return out
+}
 
 /** The names a release brought, cleaned, or null when none is usable. */
 function cleanNames(value: unknown): Record<string, string> | null {
@@ -222,6 +258,7 @@ hooks.post('/deploy', async (c) => {
       event(c.env, change.id, 'live', null, { commit }),
     )
   }
+  statements.push(...await listings(c.env, report.versions, t))
   if (statements.length)
     await c.env.DB.batch(statements)
   const names = await proposeNames(c.env, Array.isArray(report.pending) ? report.pending : [])

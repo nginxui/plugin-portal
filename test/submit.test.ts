@@ -261,6 +261,33 @@ describe('apply report', () => {
     expect(await env.DB.prepare('SELECT state FROM changes WHERE id = ?').bind(change).first()).toEqual({ state: 'merged' })
   })
 
+  it('records when a deploy first lists a version, with no time for old releases', async () => {
+    await withJwks(await signedIn())
+    const id = 'io.github.octo-author.geoip'
+    const send = async (versions: Record<string, string | null>) => call('/api/hooks/deploy', { method: 'POST', headers: { Authorization: `Bearer ${await oidc(deployClaims())}` }, body: JSON.stringify({ commit: 'abc', entries: {}, listed: [id], versions: { [id]: versions } }) })
+    const hourAgo = new Date(Date.now() - 3600_000).toISOString()
+    await send({ '1.1.0': hourAgo, '1.0.0': '2025-01-01T00:00:00Z', '0.9.0': null })
+    const rows = async () => (await env.DB.prepare('SELECT version, listed_at FROM release_listings ORDER BY version').all<{ version: string, listed_at: number | null }>()).results
+    const first = await rows()
+    expect(first.map(r => [r.version, r.listed_at === null])).toEqual([['0.9.0', true], ['1.0.0', true], ['1.1.0', false]])
+    // A later report keeps the first time.
+    const listedAt = first[2].listed_at
+    await send({ '1.1.0': hourAgo })
+    expect((await rows())[2].listed_at).toBe(listedAt)
+  })
+
+  it('records the versions of a large catalog in a few queries', async () => {
+    await withJwks(await signedIn())
+    const recent = new Date(Date.now() - 3600_000).toISOString()
+    const versions = Object.fromEntries(Array.from({ length: 60 }, (_, p) => [`io.github.octo.p${p}`, Object.fromEntries(Array.from({ length: 30 }, (_, v) => [`1.0.${v}`, recent]))]))
+    const send = async () => call('/api/hooks/deploy', { method: 'POST', headers: { Authorization: `Bearer ${await oidc(deployClaims())}` }, body: JSON.stringify({ commit: 'abc', entries: {}, listed: [], versions }) })
+    expect((await send()).status).toBe(200)
+    expect(await env.DB.prepare('SELECT count(*) AS n FROM release_listings WHERE listed_at IS NOT NULL').first()).toEqual({ n: 1800 })
+    // A second report finds every version known and writes nothing.
+    expect((await send()).status).toBe(200)
+    expect(await env.DB.prepare('SELECT count(*) AS n FROM release_listings').first()).toEqual({ n: 1800 })
+  })
+
   it('turns names waiting for review into one reviewed change per plugin', async () => {
     await withJwks(await signedIn())
     const id = 'io.github.octo-author.geoip'

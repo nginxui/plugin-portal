@@ -131,8 +131,8 @@ msgid "%{n} plugins, their actions in the audit log"
 msgstr ""
 
 #: web/src/components/CommandPalette.vue:125
-#: web/src/layouts/PortalLayout.vue:57
-#: web/src/layouts/PortalLayout.vue:101
+#: web/src/layouts/PortalLayout.vue:70
+#: web/src/layouts/PortalLayout.vue:114
 #: web/src/views/ChangeView.vue:147
 #: web/src/views/MyPlugins.vue:164
 #: web/src/views/plugin/PluginLayout.vue:25
@@ -144,8 +144,8 @@ msgid "Plugins you manage"
 msgstr ""
 
 #: web/src/components/CommandPalette.vue:126
-#: web/src/layouts/PortalLayout.vue:58
-#: web/src/layouts/PortalLayout.vue:102
+#: web/src/layouts/PortalLayout.vue:71
+#: web/src/layouts/PortalLayout.vue:115
 #: web/src/views/MyPlugins.vue:173
 #: web/src/views/SubmitPlugin.vue:170
 msgid "Submit a plugin"
@@ -156,8 +156,8 @@ msgid "List a new plugin in the catalog"
 msgstr ""
 
 #: web/src/components/CommandPalette.vue:127
-#: web/src/layouts/PortalLayout.vue:59
-#: web/src/layouts/PortalLayout.vue:103
+#: web/src/layouts/PortalLayout.vue:72
+#: web/src/layouts/PortalLayout.vue:116
 #: web/src/views/translate/TranslatePage.vue:150
 msgid "Contribute translations"
 msgstr ""
@@ -167,8 +167,8 @@ msgid "Suggest translations for other plugins"
 msgstr ""
 
 #: web/src/components/CommandPalette.vue:128
-#: web/src/layouts/PortalLayout.vue:60
-#: web/src/layouts/PortalLayout.vue:104
+#: web/src/layouts/PortalLayout.vue:73
+#: web/src/layouts/PortalLayout.vue:117
 #: web/src/views/owners/OwnerList.vue:34
 #: web/src/views/owners/OwnerPage.vue:43
 #: web/src/views/owners/VendorPage.vue:23
@@ -180,8 +180,8 @@ msgid "Owners of your plugins"
 msgstr ""
 
 #: web/src/components/CommandPalette.vue:132
-#: web/src/layouts/PortalLayout.vue:67
-#: web/src/layouts/PortalLayout.vue:105
+#: web/src/layouts/PortalLayout.vue:80
+#: web/src/layouts/PortalLayout.vue:118
 #: web/src/views/review/ReviewChange.vue:58
 #: web/src/views/review/ReviewQueue.vue:294
 msgid "Review queue"
@@ -192,8 +192,8 @@ msgid "Changes waiting for a review"
 msgstr ""
 
 #: web/src/components/CommandPalette.vue:133
-#: web/src/layouts/PortalLayout.vue:68
-#: web/src/layouts/PortalLayout.vue:106
+#: web/src/layouts/PortalLayout.vue:81
+#: web/src/layouts/PortalLayout.vue:119
 #: web/src/views/maintain/AllPlugins.vue:142
 msgid "All plugins"
 msgstr ""
@@ -203,8 +203,8 @@ msgid "Trust, delisting and the block list"
 msgstr ""
 
 #: web/src/components/CommandPalette.vue:134
-#: web/src/layouts/PortalLayout.vue:69
-#: web/src/layouts/PortalLayout.vue:107
+#: web/src/layouts/PortalLayout.vue:82
+#: web/src/layouts/PortalLayout.vue:120
 #: web/src/views/maintain/PartnersAdmin.vue:143
 msgid "Partner management"
 msgstr ""
@@ -214,8 +214,8 @@ msgid "Partner requests, keys and vendors"
 msgstr ""
 
 #: web/src/components/CommandPalette.vue:135
-#: web/src/layouts/PortalLayout.vue:70
-#: web/src/layouts/PortalLayout.vue:108
+#: web/src/layouts/PortalLayout.vue:83
+#: web/src/layouts/PortalLayout.vue:121
 #: web/src/views/maintain/AuditLog.vue:184
 #: web/src/views/review/ReviewQueue.vue:429
 msgid "Audit log"
@@ -226,8 +226,8 @@ msgid "Every action in the developer portal"
 msgstr ""
 
 #: web/src/components/CommandPalette.vue:136
-#: web/src/layouts/PortalLayout.vue:71
-#: web/src/layouts/PortalLayout.vue:109
+#: web/src/layouts/PortalLayout.vue:84
+#: web/src/layouts/PortalLayout.vue:122
 #: web/src/views/maintain/AiModels.vue:144
 msgid "AI models"
 msgstr ""
@@ -237,8 +237,8 @@ msgid "Models for translation drafts"
 msgstr ""
 
 #: web/src/components/CommandPalette.vue:137
-#: web/src/layouts/PortalLayout.vue:72
-#: web/src/layouts/PortalLayout.vue:110
+#: web/src/layouts/PortalLayout.vue:85
+#: web/src/layouts/PortalLayout.vue:123
 #: web/src/lib/audit.ts:15
 #: web/src/views/maintain/Settings.vue:226
 msgid "Settings"
@@ -422,8 +422,8 @@ msgstr ""
 #: web/src/views/maintain/Settings.vue:373
 #: web/src/views/maintain/Settings.vue:384
 #: web/src/views/owners/VendorPage.vue:341
-#: web/src/views/plugin/PluginScreenshots.vue:398
-#: web/src/views/plugin/PluginScreenshots.vue:471
+#: web/src/views/plugin/PluginScreenshots.vue:405
+#: web/src/views/plugin/PluginScreenshots.vue:478
 msgid "Cancel"
 msgstr ""
 
@@ -678,7 +678,7 @@ msgstr ""
 #: web/src/components/MarketPreview.vue:299
 #: web/src/components/MarketPreview.vue:382
 #: web/src/components/MarketPreview.vue:385
-#: web/src/views/plugin/PluginScreenshots.vue:457
+#: web/src/views/plugin/PluginScreenshots.vue:464
 #: web/src/views/plugin/PluginTranslations.vue:327
 #: web/src/views/plugin/PluginTranslations.vue:366
 #: web/src/views/plugin/PluginTranslations.vue:403
@@ -725,7 +725,7 @@ msgid "Add a caption"
 msgstr ""
 
 #: web/src/components/MarketPreview.vue:379
-#: web/src/views/plugin/PluginScreenshots.vue:445
+#: web/src/views/plugin/PluginScreenshots.vue:452
 msgid "Caption"
 msgstr ""
 
@@ -1014,7 +1014,7 @@ msgstr ""
 #: web/src/components/PluginCard.vue:124
 #: web/src/components/PluginCard.vue:190
 #: web/src/lib/pluginSections.ts:15
-#: web/src/views/plugin/PluginScreenshots.vue:303
+#: web/src/views/plugin/PluginScreenshots.vue:310
 msgid "Screenshots"
 msgstr ""
 
@@ -1093,7 +1093,7 @@ msgstr ""
 #: web/src/components/PluginCard.vue:218
 #: web/src/components/PluginCard.vue:244
 #: web/src/lib/pluginSections.ts:14
-#: web/src/views/plugin/PluginScreenshots.vue:379
+#: web/src/views/plugin/PluginScreenshots.vue:386
 #: web/src/views/plugin/PluginTranslations.vue:395
 msgid "Store details"
 msgstr ""
@@ -1204,7 +1204,7 @@ msgid "Install the app on another repository"
 msgstr ""
 
 #: web/src/components/ReviewCompare.vue:45
-#: web/src/views/plugin/PluginScreenshots.vue:323
+#: web/src/views/plugin/PluginScreenshots.vue:330
 msgid "Screenshot %{n}"
 msgstr ""
 
@@ -1232,7 +1232,7 @@ msgstr ""
 
 #: web/src/components/ReviewCompare.vue:93
 #: web/src/views/plugin/PluginPreflight.vue:92
-#: web/src/views/plugin/PluginScreenshots.vue:385
+#: web/src/views/plugin/PluginScreenshots.vue:392
 msgid "New screenshot"
 msgstr ""
 
@@ -1320,45 +1320,53 @@ msgstr ""
 msgid "Discard"
 msgstr ""
 
-#: web/src/layouts/PortalLayout.vue:65
-#: web/src/layouts/PortalLayout.vue:99
+#: web/src/layouts/PortalLayout.vue:29
+msgid "You have reached the daily limit for this action. Please try again tomorrow."
+msgstr ""
+
+#: web/src/layouts/PortalLayout.vue:30
+msgid "Too many requests in a short time. Please wait a minute and try again."
+msgstr ""
+
+#: web/src/layouts/PortalLayout.vue:78
+#: web/src/layouts/PortalLayout.vue:112
 msgid "Maintenance"
 msgstr ""
 
-#: web/src/layouts/PortalLayout.vue:136
+#: web/src/layouts/PortalLayout.vue:149
 msgid "GitHub profile"
 msgstr ""
 
-#: web/src/layouts/PortalLayout.vue:140
+#: web/src/layouts/PortalLayout.vue:153
 msgid "Light mode"
 msgstr ""
 
-#: web/src/layouts/PortalLayout.vue:140
+#: web/src/layouts/PortalLayout.vue:153
 msgid "Dark mode"
 msgstr ""
 
-#: web/src/layouts/PortalLayout.vue:145
+#: web/src/layouts/PortalLayout.vue:158
 msgid "Sign out"
 msgstr ""
 
-#: web/src/layouts/PortalLayout.vue:179
+#: web/src/layouts/PortalLayout.vue:192
 msgid "Open menu"
 msgstr ""
 
-#: web/src/layouts/PortalLayout.vue:186
+#: web/src/layouts/PortalLayout.vue:199
 msgid "Search and commands"
 msgstr ""
 
-#: web/src/layouts/PortalLayout.vue:192
+#: web/src/layouts/PortalLayout.vue:205
 #: web/src/views/review/ReviewChange.vue:557
 msgid "Language"
 msgstr ""
 
-#: web/src/layouts/PortalLayout.vue:197
+#: web/src/layouts/PortalLayout.vue:210
 msgid "Toggle dark mode"
 msgstr ""
 
-#: web/src/layouts/PortalLayout.vue:201
+#: web/src/layouts/PortalLayout.vue:214
 msgid "Account menu"
 msgstr ""
 
@@ -2048,7 +2056,7 @@ msgstr ""
 msgid "Image of screenshot %{n}"
 msgstr ""
 
-#: web/src/lib/time.ts:55
+#: web/src/lib/time.ts:62
 msgid "Today %{time}"
 msgstr ""
 
@@ -3269,7 +3277,7 @@ msgid "Retry"
 msgstr ""
 
 #: web/src/views/maintain/Settings.vue:242
-#: web/src/views/MyPlugins.vue:313
+#: web/src/views/MyPlugins.vue:316
 msgid "Announcements"
 msgstr ""
 
@@ -3283,7 +3291,7 @@ msgid "Shown on My plugins, the newest five first, in the language of the portal
 msgstr ""
 
 #: web/src/views/maintain/Settings.vue:251
-#: web/src/views/MyPlugins.vue:326
+#: web/src/views/MyPlugins.vue:329
 msgid "No announcements."
 msgstr ""
 
@@ -3570,38 +3578,42 @@ msgid "Released %{time}, not listed yet"
 msgstr ""
 
 #: web/src/views/MyPlugins.vue:291
+msgid "Released %{time}, listed after %{delay}"
+msgstr ""
+
+#: web/src/views/MyPlugins.vue:294
 msgid "Released %{time}, listed in the catalog"
 msgstr ""
 
-#: web/src/views/MyPlugins.vue:298
+#: web/src/views/MyPlugins.vue:301
 msgid "No releases yet."
 msgstr ""
 
-#: web/src/views/MyPlugins.vue:301
+#: web/src/views/MyPlugins.vue:304
 msgid "Repository activity"
 msgstr ""
 
-#: web/src/views/MyPlugins.vue:308
+#: web/src/views/MyPlugins.vue:311
 msgid "%{n} open issues"
 msgstr ""
 
-#: web/src/views/MyPlugins.vue:309
+#: web/src/views/MyPlugins.vue:312
 msgid "No open issues"
 msgstr ""
 
-#: web/src/views/MyPlugins.vue:329
+#: web/src/views/MyPlugins.vue:332
 msgid "Getting started"
 msgstr ""
 
-#: web/src/views/MyPlugins.vue:331
+#: web/src/views/MyPlugins.vue:334
 msgid "Plugin development guide"
 msgstr ""
 
-#: web/src/views/MyPlugins.vue:332
+#: web/src/views/MyPlugins.vue:335
 msgid "Create the primary key and signer certificates"
 msgstr ""
 
-#: web/src/views/MyPlugins.vue:333
+#: web/src/views/MyPlugins.vue:336
 msgid "Package and sign with the release action"
 msgstr ""
 
@@ -4150,14 +4162,14 @@ msgid "Preview"
 msgstr ""
 
 #: web/src/views/plugin/PluginBadges.vue:114
-#: web/src/views/plugin/PluginScreenshots.vue:408
+#: web/src/views/plugin/PluginScreenshots.vue:415
 #: web/src/views/plugin/PluginStore.vue:294
 #: web/src/views/review/ReviewChange.vue:529
 msgid "Light"
 msgstr ""
 
 #: web/src/views/plugin/PluginBadges.vue:114
-#: web/src/views/plugin/PluginScreenshots.vue:408
+#: web/src/views/plugin/PluginScreenshots.vue:415
 #: web/src/views/plugin/PluginStore.vue:294
 #: web/src/views/review/ReviewChange.vue:529
 msgid "Dark"
@@ -4577,170 +4589,170 @@ msgstr ""
 msgid "The AI draft could not be made. Please try again later."
 msgstr ""
 
-#: web/src/views/plugin/PluginScreenshots.vue:296
+#: web/src/views/plugin/PluginScreenshots.vue:303
 #: web/src/views/plugin/PluginStore.vue:275
 #: web/src/views/plugin/PluginTranslations.vue:250
 msgid "The store texts could not be loaded."
 msgstr ""
 
-#: web/src/views/plugin/PluginScreenshots.vue:299
+#: web/src/views/plugin/PluginScreenshots.vue:306
 msgid "Screenshot uploads are not open yet. You can reorder the screenshots and edit their captions."
 msgstr ""
 
-#: web/src/views/plugin/PluginScreenshots.vue:300
+#: web/src/views/plugin/PluginScreenshots.vue:307
 msgid "The catalog entry sets the screenshots of this plugin, so they cannot be changed here."
 msgstr ""
 
-#: web/src/views/plugin/PluginScreenshots.vue:306
+#: web/src/views/plugin/PluginScreenshots.vue:313
 msgid "16:10, light and dark in pairs"
 msgstr ""
 
-#: web/src/views/plugin/PluginScreenshots.vue:309
+#: web/src/views/plugin/PluginScreenshots.vue:316
 msgid "Add a screenshot"
 msgstr ""
 
-#: web/src/views/plugin/PluginScreenshots.vue:336
+#: web/src/views/plugin/PluginScreenshots.vue:343
 #: web/src/views/review/ReviewChange.vue:575
 msgid "Changed"
 msgstr ""
 
-#: web/src/views/plugin/PluginScreenshots.vue:339
+#: web/src/views/plugin/PluginScreenshots.vue:346
 #: web/src/views/translate/TranslatePage.vue:214
 msgid "Complete"
 msgstr ""
 
-#: web/src/views/plugin/PluginScreenshots.vue:339
+#: web/src/views/plugin/PluginScreenshots.vue:346
 msgid "No dark version"
 msgstr ""
 
-#: web/src/views/plugin/PluginScreenshots.vue:347
-#: web/src/views/plugin/PluginScreenshots.vue:414
+#: web/src/views/plugin/PluginScreenshots.vue:354
+#: web/src/views/plugin/PluginScreenshots.vue:421
 msgid "No dark screenshot"
 msgstr ""
 
-#: web/src/views/plugin/PluginScreenshots.vue:348
-#: web/src/views/plugin/PluginScreenshots.vue:415
+#: web/src/views/plugin/PluginScreenshots.vue:355
+#: web/src/views/plugin/PluginScreenshots.vue:422
 msgid "Click to upload"
 msgstr ""
 
-#: web/src/views/plugin/PluginScreenshots.vue:353
+#: web/src/views/plugin/PluginScreenshots.vue:360
 msgid "No caption"
 msgstr ""
 
-#: web/src/views/plugin/PluginScreenshots.vue:370
+#: web/src/views/plugin/PluginScreenshots.vue:377
 msgid "Drop a PNG, JPEG or WebP image here"
 msgstr ""
 
-#: web/src/views/plugin/PluginScreenshots.vue:372
+#: web/src/views/plugin/PluginScreenshots.vue:379
 msgid "Kept whole and converted to WebP, up to 2 MB; lists show the 16:10 part you choose"
 msgstr ""
 
-#: web/src/views/plugin/PluginScreenshots.vue:372
+#: web/src/views/plugin/PluginScreenshots.vue:379
 msgid "Cropped to 16:10 and converted to WebP, up to 2 MB"
 msgstr ""
 
-#: web/src/views/plugin/PluginScreenshots.vue:375
+#: web/src/views/plugin/PluginScreenshots.vue:382
 msgid "No screenshots yet."
 msgstr ""
 
-#: web/src/views/plugin/PluginScreenshots.vue:377
+#: web/src/views/plugin/PluginScreenshots.vue:384
 #: web/src/views/plugin/PluginStore.vue:417
 #: web/src/views/plugin/PluginTranslations.vue:393
 msgid "Saving the draft"
 msgstr ""
 
-#: web/src/views/plugin/PluginScreenshots.vue:377
+#: web/src/views/plugin/PluginScreenshots.vue:384
 #: web/src/views/plugin/PluginTranslations.vue:393
 msgid "Draft saved %{time}. Submit it from the store page."
 msgstr ""
 
-#: web/src/views/plugin/PluginScreenshots.vue:385
+#: web/src/views/plugin/PluginScreenshots.vue:392
 msgid "Dark version"
 msgstr ""
 
-#: web/src/views/plugin/PluginScreenshots.vue:385
+#: web/src/views/plugin/PluginScreenshots.vue:392
 msgid "Light version"
 msgstr ""
 
-#: web/src/views/plugin/PluginScreenshots.vue:389
-#: web/src/views/plugin/PluginScreenshots.vue:436
+#: web/src/views/plugin/PluginScreenshots.vue:396
+#: web/src/views/plugin/PluginScreenshots.vue:443
 msgid "Keep the whole image, record only the part shown"
 msgstr ""
 
-#: web/src/views/plugin/PluginScreenshots.vue:392
-#: web/src/views/plugin/PluginScreenshots.vue:439
+#: web/src/views/plugin/PluginScreenshots.vue:399
+#: web/src/views/plugin/PluginScreenshots.vue:446
 msgid "Lists show the framed part; opening the screenshot shows the whole image."
 msgstr ""
 
-#: web/src/views/plugin/PluginScreenshots.vue:392
-#: web/src/views/plugin/PluginScreenshots.vue:439
+#: web/src/views/plugin/PluginScreenshots.vue:399
+#: web/src/views/plugin/PluginScreenshots.vue:446
 msgid "The framed part becomes the image; the rest is not kept."
 msgstr ""
 
-#: web/src/views/plugin/PluginScreenshots.vue:401
+#: web/src/views/plugin/PluginScreenshots.vue:408
 msgid "Add the screenshot"
 msgstr ""
 
-#: web/src/views/plugin/PluginScreenshots.vue:401
-#: web/src/views/plugin/PluginScreenshots.vue:421
+#: web/src/views/plugin/PluginScreenshots.vue:408
+#: web/src/views/plugin/PluginScreenshots.vue:428
 msgid "Use this crop"
 msgstr ""
 
-#: web/src/views/plugin/PluginScreenshots.vue:414
+#: web/src/views/plugin/PluginScreenshots.vue:421
 msgid "The image is missing"
 msgstr ""
 
-#: web/src/views/plugin/PluginScreenshots.vue:421
+#: web/src/views/plugin/PluginScreenshots.vue:428
 msgid "Show this part"
 msgstr ""
 
-#: web/src/views/plugin/PluginScreenshots.vue:424
+#: web/src/views/plugin/PluginScreenshots.vue:431
 msgid "Undo the crop"
 msgstr ""
 
-#: web/src/views/plugin/PluginScreenshots.vue:428
+#: web/src/views/plugin/PluginScreenshots.vue:435
 msgid "Upload the dark version"
 msgstr ""
 
-#: web/src/views/plugin/PluginScreenshots.vue:428
+#: web/src/views/plugin/PluginScreenshots.vue:435
 msgid "Replace the image"
 msgstr ""
 
-#: web/src/views/plugin/PluginScreenshots.vue:431
+#: web/src/views/plugin/PluginScreenshots.vue:438
 msgid "Remove the dark version"
 msgstr ""
 
-#: web/src/views/plugin/PluginScreenshots.vue:457
+#: web/src/views/plugin/PluginScreenshots.vue:464
 #: web/src/views/plugin/PluginTranslations.vue:106
 msgid "Waiting for confirmation"
 msgstr ""
 
-#: web/src/views/plugin/PluginScreenshots.vue:461
+#: web/src/views/plugin/PluginScreenshots.vue:468
 msgid "Show filled languages only"
 msgstr ""
 
-#: web/src/views/plugin/PluginScreenshots.vue:461
+#: web/src/views/plugin/PluginScreenshots.vue:468
 msgid "The other languages, %{n} of %{total} filled"
 msgstr ""
 
-#: web/src/views/plugin/PluginScreenshots.vue:466
+#: web/src/views/plugin/PluginScreenshots.vue:473
 #: web/src/views/plugin/PluginTranslations.vue:259
 msgid "Drafting %{done} of %{total}"
 msgstr ""
 
-#: web/src/views/plugin/PluginScreenshots.vue:466
+#: web/src/views/plugin/PluginScreenshots.vue:473
 msgid "AI draft the caption in the %{n} missing languages"
 msgstr ""
 
-#: web/src/views/plugin/PluginScreenshots.vue:471
+#: web/src/views/plugin/PluginScreenshots.vue:478
 msgid "Delete this screenshot and its captions?"
 msgstr ""
 
-#: web/src/views/plugin/PluginScreenshots.vue:471
+#: web/src/views/plugin/PluginScreenshots.vue:478
 msgid "Delete"
 msgstr ""
 
-#: web/src/views/plugin/PluginScreenshots.vue:473
+#: web/src/views/plugin/PluginScreenshots.vue:480
 msgid "Delete this screenshot"
 msgstr ""
 
