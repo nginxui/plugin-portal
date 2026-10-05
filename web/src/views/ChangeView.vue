@@ -3,7 +3,6 @@ import type { Change, ChangeEvent } from '@/api/changes'
 import { computed, h, onBeforeUnmount, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { getChange, retryChange, withdrawChange } from '@/api/changes'
-import { getPrefs, savePrefs } from '@/api/notifications'
 import { categoryLabel } from '@/lib/categories'
 import { changePath, kindLabel } from '@/lib/changeKinds'
 import { useFailure } from '@/lib/feedback'
@@ -299,22 +298,6 @@ async function withdraw() {
   }
 }
 
-// Notification preferences.
-const prefs = ref<{ inApp: boolean, emailOnAction: boolean, emailOnLive: boolean, email: string | null, mail: boolean } | null>(null)
-getPrefs().then(p => (prefs.value = p)).catch(() => {})
-async function setPref(key: 'inApp' | 'emailOnAction' | 'emailOnLive', value: boolean) {
-  if (!prefs.value)
-    return
-  prefs.value = { ...prefs.value, [key]: value }
-  await savePrefs(prefs.value).catch(() => failure())
-}
-async function setEmail(value: string) {
-  if (!prefs.value)
-    return
-  prefs.value = { ...prefs.value, email: value || null }
-  await savePrefs(prefs.value).catch(() => failure())
-}
-
 // A small track of another change.
 function miniTrack(c: Change) {
   const order = ['submitted', 'checks', 'review', 'merged', 'live']
@@ -523,23 +506,8 @@ async function retry() {
               </div>
             </RouterLink>
           </ACard>
-          <ACard v-if="prefs" :title="$gettext('Notifications')">
-            <AFlex vertical gap="12" class="text-3">
-              <AFlex justify="space-between" align="center" gap="small">
-                <span>{{ $gettext('Tell me in the portal when a change moves') }}</span>
-                <ASwitch :checked="prefs.inApp" size="small" @change="(v: boolean) => setPref('inApp', v)" />
-              </AFlex>
-              <AFlex justify="space-between" align="center" gap="small">
-                <span>{{ $gettext('Email me when I need to act') }}</span>
-                <ASwitch :checked="prefs.emailOnAction" size="small" :disabled="!prefs.mail" @change="(v: boolean) => setPref('emailOnAction', v)" />
-              </AFlex>
-              <AFlex justify="space-between" align="center" gap="small">
-                <span>{{ $gettext('Email me when a listing goes live') }}</span>
-                <ASwitch :checked="prefs.emailOnLive" size="small" :disabled="!prefs.mail" @change="(v: boolean) => setPref('emailOnLive', v)" />
-              </AFlex>
-              <AInput v-if="prefs.mail && (prefs.emailOnAction || prefs.emailOnLive)" :value="prefs.email ?? ''" size="small" :placeholder="$gettext('Email address')" @change="(e: Event) => setEmail((e.target as HTMLInputElement).value)" />
-              <span v-if="!prefs.mail" class="op-65">{{ $gettext('Email is not available yet.') }}</span>
-            </AFlex>
+          <ACard :title="$gettext('Notifications')">
+            <NotificationPrefs />
           </ACard>
           <ACard>
             <div class="font-600 text-3">

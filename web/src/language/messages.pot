@@ -15,7 +15,7 @@ msgstr ""
 
 #: web/src/components/CategoryEditModal.vue:50
 #: web/src/lib/changeKinds.ts:18
-#: web/src/views/ChangeView.vue:203
+#: web/src/views/ChangeView.vue:202
 msgid "Change categories"
 msgstr ""
 
@@ -121,29 +121,29 @@ msgstr ""
 msgid "%{state}, waiting %{time}"
 msgstr ""
 
-#: web/src/components/CommandPalette.vue:99
-#: web/src/components/CommandPalette.vue:105
+#: web/src/components/CommandPalette.vue:100
+#: web/src/components/CommandPalette.vue:106
 msgid "%{id}, %{state}"
 msgstr ""
 
-#: web/src/components/CommandPalette.vue:117
+#: web/src/components/CommandPalette.vue:118
 msgid "%{n} plugins, their actions in the audit log"
 msgstr ""
 
-#: web/src/components/CommandPalette.vue:124
+#: web/src/components/CommandPalette.vue:125
 #: web/src/layouts/PortalLayout.vue:52
 #: web/src/layouts/PortalLayout.vue:96
-#: web/src/views/ChangeView.vue:148
+#: web/src/views/ChangeView.vue:147
 #: web/src/views/MyPlugins.vue:164
 #: web/src/views/plugin/PluginLayout.vue:25
 msgid "My plugins"
 msgstr ""
 
-#: web/src/components/CommandPalette.vue:124
+#: web/src/components/CommandPalette.vue:125
 msgid "Plugins you manage"
 msgstr ""
 
-#: web/src/components/CommandPalette.vue:125
+#: web/src/components/CommandPalette.vue:126
 #: web/src/layouts/PortalLayout.vue:53
 #: web/src/layouts/PortalLayout.vue:97
 #: web/src/views/MyPlugins.vue:173
@@ -151,22 +151,22 @@ msgstr ""
 msgid "Submit a plugin"
 msgstr ""
 
-#: web/src/components/CommandPalette.vue:125
+#: web/src/components/CommandPalette.vue:126
 msgid "List a new plugin in the catalog"
 msgstr ""
 
-#: web/src/components/CommandPalette.vue:126
+#: web/src/components/CommandPalette.vue:127
 #: web/src/layouts/PortalLayout.vue:54
 #: web/src/layouts/PortalLayout.vue:98
 #: web/src/views/translate/TranslatePage.vue:150
 msgid "Contribute translations"
 msgstr ""
 
-#: web/src/components/CommandPalette.vue:126
+#: web/src/components/CommandPalette.vue:127
 msgid "Suggest translations for other plugins"
 msgstr ""
 
-#: web/src/components/CommandPalette.vue:127
+#: web/src/components/CommandPalette.vue:128
 #: web/src/layouts/PortalLayout.vue:55
 #: web/src/layouts/PortalLayout.vue:99
 #: web/src/views/owners/OwnerList.vue:34
@@ -175,11 +175,11 @@ msgstr ""
 msgid "Organizations"
 msgstr ""
 
-#: web/src/components/CommandPalette.vue:127
+#: web/src/components/CommandPalette.vue:128
 msgid "Owners of your plugins"
 msgstr ""
 
-#: web/src/components/CommandPalette.vue:131
+#: web/src/components/CommandPalette.vue:132
 #: web/src/layouts/PortalLayout.vue:62
 #: web/src/layouts/PortalLayout.vue:100
 #: web/src/views/review/ReviewChange.vue:57
@@ -187,33 +187,33 @@ msgstr ""
 msgid "Review queue"
 msgstr ""
 
-#: web/src/components/CommandPalette.vue:131
+#: web/src/components/CommandPalette.vue:132
 msgid "Changes waiting for a review"
 msgstr ""
 
-#: web/src/components/CommandPalette.vue:132
+#: web/src/components/CommandPalette.vue:133
 #: web/src/layouts/PortalLayout.vue:63
 #: web/src/layouts/PortalLayout.vue:101
 #: web/src/views/maintain/AllPlugins.vue:142
 msgid "All plugins"
 msgstr ""
 
-#: web/src/components/CommandPalette.vue:132
+#: web/src/components/CommandPalette.vue:133
 msgid "Trust, delisting and the block list"
 msgstr ""
 
-#: web/src/components/CommandPalette.vue:133
+#: web/src/components/CommandPalette.vue:134
 #: web/src/layouts/PortalLayout.vue:64
 #: web/src/layouts/PortalLayout.vue:102
 #: web/src/views/maintain/PartnersAdmin.vue:143
 msgid "Partner management"
 msgstr ""
 
-#: web/src/components/CommandPalette.vue:133
+#: web/src/components/CommandPalette.vue:134
 msgid "Partner requests, keys and vendors"
 msgstr ""
 
-#: web/src/components/CommandPalette.vue:134
+#: web/src/components/CommandPalette.vue:135
 #: web/src/layouts/PortalLayout.vue:65
 #: web/src/layouts/PortalLayout.vue:103
 #: web/src/views/maintain/AuditLog.vue:184
@@ -221,22 +221,22 @@ msgstr ""
 msgid "Audit log"
 msgstr ""
 
-#: web/src/components/CommandPalette.vue:134
+#: web/src/components/CommandPalette.vue:135
 msgid "Every action in the developer portal"
 msgstr ""
 
-#: web/src/components/CommandPalette.vue:135
+#: web/src/components/CommandPalette.vue:136
 #: web/src/layouts/PortalLayout.vue:66
 #: web/src/layouts/PortalLayout.vue:104
 #: web/src/views/maintain/AiModels.vue:144
 msgid "AI models"
 msgstr ""
 
-#: web/src/components/CommandPalette.vue:135
+#: web/src/components/CommandPalette.vue:136
 msgid "Models for translation drafts"
 msgstr ""
 
-#: web/src/components/CommandPalette.vue:136
+#: web/src/components/CommandPalette.vue:137
 #: web/src/layouts/PortalLayout.vue:67
 #: web/src/layouts/PortalLayout.vue:105
 #: web/src/lib/audit.ts:15
@@ -244,61 +244,61 @@ msgstr ""
 msgid "Settings"
 msgstr ""
 
-#: web/src/components/CommandPalette.vue:136
+#: web/src/components/CommandPalette.vue:137
 msgid "Announcements, mail service and bot account"
 msgstr ""
 
-#: web/src/components/CommandPalette.vue:162
+#: web/src/components/CommandPalette.vue:163
 msgid "Search the audit log for “%{q}”"
 msgstr ""
 
-#: web/src/components/CommandPalette.vue:163
+#: web/src/components/CommandPalette.vue:164
 msgid "Reviews, self service changes and catalog updates"
 msgstr ""
 
-#: web/src/components/CommandPalette.vue:171
+#: web/src/components/CommandPalette.vue:172
 msgid "Add a plugin to the block list"
 msgstr ""
 
-#: web/src/components/CommandPalette.vue:172
+#: web/src/components/CommandPalette.vue:173
 msgid "A reason is required"
 msgstr ""
 
-#: web/src/components/CommandPalette.vue:240
+#: web/src/components/CommandPalette.vue:241
 #: web/src/views/review/ReviewChange.vue:789
 #: web/src/views/review/ReviewQueue.vue:421
 msgid "Command palette"
 msgstr ""
 
-#: web/src/components/CommandPalette.vue:255
+#: web/src/components/CommandPalette.vue:256
 msgid "Search reviews, plugins, authors and actions"
 msgstr ""
 
-#: web/src/components/CommandPalette.vue:255
+#: web/src/components/CommandPalette.vue:256
 msgid "Search plugins and actions"
 msgstr ""
 
-#: web/src/components/CommandPalette.vue:256
+#: web/src/components/CommandPalette.vue:257
 #: web/src/views/maintain/AllPlugins.vue:184
 #: web/src/views/review/ReviewQueue.vue:311
 #: web/src/views/review/ReviewQueue.vue:420
 msgid "Search"
 msgstr ""
 
-#: web/src/components/CommandPalette.vue:289
+#: web/src/components/CommandPalette.vue:290
 msgid "↵ Open"
 msgstr ""
 
-#: web/src/components/CommandPalette.vue:293
+#: web/src/components/CommandPalette.vue:294
 msgid "Nothing matches “%{q}”."
 msgstr ""
 
-#: web/src/components/CommandPalette.vue:297
+#: web/src/components/CommandPalette.vue:298
 #: web/src/views/review/ReviewQueue.vue:415
 msgid "Select"
 msgstr ""
 
-#: web/src/components/CommandPalette.vue:298
+#: web/src/components/CommandPalette.vue:299
 #: web/src/views/owners/OwnerList.vue:58
 #: web/src/views/owners/OwnerList.vue:74
 #: web/src/views/owners/OwnerPage.vue:161
@@ -307,7 +307,7 @@ msgstr ""
 msgid "Open"
 msgstr ""
 
-#: web/src/components/CommandPalette.vue:299
+#: web/src/components/CommandPalette.vue:300
 msgid "Open in a new tab"
 msgstr ""
 
@@ -738,56 +738,193 @@ msgstr ""
 msgid "README"
 msgstr ""
 
-#: web/src/components/NotificationBell.vue:38
-msgid "The catalog"
+#: web/src/components/NotificationBell.vue:54
+#: web/src/views/ChangeView.vue:128
+#: web/src/views/ChangeView.vue:309
+msgid "Waiting for you"
 msgstr ""
 
-#: web/src/components/NotificationBell.vue:40
-msgid "The checks passed and the pull request is open"
+#: web/src/components/NotificationBell.vue:55
+msgid "Other progress"
 msgstr ""
 
-#: web/src/components/NotificationBell.vue:41
+#: web/src/components/NotificationBell.vue:55
+msgid "Recent progress"
+msgstr ""
+
+#: web/src/components/NotificationBell.vue:107
+msgid "Pull request #%{n} is open, ready for you to merge"
+msgstr ""
+
+#: web/src/components/NotificationBell.vue:107
+msgid "The files are ready for you to commit"
+msgstr ""
+
+#: web/src/components/NotificationBell.vue:108
+msgid "The checks passed, waiting for a maintainer"
+msgstr ""
+
+#: web/src/components/NotificationBell.vue:110
 #: web/src/lib/audit.ts:38
 msgid "The checks found problems"
 msgstr ""
 
-#: web/src/components/NotificationBell.vue:42
+#: web/src/components/NotificationBell.vue:110
+#: web/src/lib/audit.ts:41
+msgid "The checks could not finish"
+msgstr ""
+
+#: web/src/components/NotificationBell.vue:111
 msgid "%{who} asked for changes"
 msgstr ""
 
-#: web/src/components/NotificationBell.vue:43
-msgid "%{who} merged it"
+#: web/src/components/NotificationBell.vue:111
+#: web/src/views/ChangeView.vue:274
+msgid "A maintainer asked for changes"
 msgstr ""
 
-#: web/src/components/NotificationBell.vue:43
+#: web/src/components/NotificationBell.vue:114
+#: web/src/views/ChangeView.vue:108
+#: web/src/views/ChangeView.vue:272
+msgid "Committed to the catalog"
+msgstr ""
+
+#: web/src/components/NotificationBell.vue:115
+msgid "%{who} approved and merged it"
+msgstr ""
+
+#: web/src/components/NotificationBell.vue:115
 msgid "It was merged"
 msgstr ""
 
-#: web/src/components/NotificationBell.vue:44
+#: web/src/components/NotificationBell.vue:116
 msgid "It is live in the catalog"
 msgstr ""
 
-#: web/src/components/NotificationBell.vue:45
+#: web/src/components/NotificationBell.vue:117
 msgid "%{who} rejected it"
 msgstr ""
 
-#: web/src/components/NotificationBell.vue:46
-msgid "It has waited for you for a while"
+#: web/src/components/NotificationBell.vue:117
+msgid "The pull request was closed"
 msgstr ""
 
-#: web/src/components/NotificationBell.vue:47
+#: web/src/components/NotificationBell.vue:118
+msgid "Still waiting for you"
+msgstr ""
+
+#: web/src/components/NotificationBell.vue:119
 msgid "It was withdrawn"
 msgstr ""
 
-#: web/src/components/NotificationBell.vue:60
-#: web/src/components/NotificationBell.vue:68
+#: web/src/components/NotificationBell.vue:120
+msgid "More translations were added to the pull request"
+msgstr ""
+
+#: web/src/components/NotificationBell.vue:151
+#: web/src/components/NotificationBell.vue:161
 #: web/src/lib/categories.ts:13
-#: web/src/views/ChangeView.vue:526
+#: web/src/views/ChangeView.vue:509
 msgid "Notifications"
 msgstr ""
 
-#: web/src/components/NotificationBell.vue:79
-msgid "Nothing new."
+#: web/src/components/NotificationBell.vue:162
+#: web/src/components/NotificationBell.vue:170
+#: web/src/components/NotificationBell.vue:182
+msgid "Notification settings"
+msgstr ""
+
+#: web/src/components/NotificationBell.vue:167
+msgid "Back to the notifications"
+msgstr ""
+
+#: web/src/components/NotificationBell.vue:180
+msgid "Notifications in the Developer Center are turned off."
+msgstr ""
+
+#: web/src/components/NotificationBell.vue:188
+msgid "No notifications yet."
+msgstr ""
+
+#: web/src/components/NotificationBell.vue:190
+msgid "Progress of your submissions and changes shows here."
+msgstr ""
+
+#: web/src/components/NotificationBell.vue:200
+msgid "Clear the list"
+msgstr ""
+
+#: web/src/components/NotificationBell.vue:215
+msgid "Unread"
+msgstr ""
+
+#: web/src/components/NotificationPrefs.vue:33
+msgid "Choose an address verified on your GitHub account."
+msgstr ""
+
+#: web/src/components/NotificationPrefs.vue:56
+msgid "%{email} (primary)"
+msgstr ""
+
+#: web/src/components/NotificationPrefs.vue:65
+msgid "In the Developer Center"
+msgstr ""
+
+#: web/src/components/NotificationPrefs.vue:68
+msgid "Tell me in the portal when a change moves"
+msgstr ""
+
+#: web/src/components/NotificationPrefs.vue:72
+msgid "By email"
+msgstr ""
+
+#: web/src/components/NotificationPrefs.vue:75
+msgid "Email me when I need to act"
+msgstr ""
+
+#: web/src/components/NotificationPrefs.vue:79
+msgid "Email me when a listing goes live"
+msgstr ""
+
+#: web/src/components/NotificationPrefs.vue:89
+msgid "Choose an address"
+msgstr ""
+
+#: web/src/components/NotificationPrefs.vue:90
+#: web/src/views/maintain/Settings.vue:297
+msgid "Email address"
+msgstr ""
+
+#: web/src/components/NotificationPrefs.vue:94
+msgid "Choose an address to get the mail."
+msgstr ""
+
+#: web/src/components/NotificationPrefs.vue:95
+msgid "Only addresses verified on your GitHub account can be chosen."
+msgstr ""
+
+#: web/src/components/NotificationPrefs.vue:98
+msgid "Your GitHub account has no verified address that receives mail. Add one on GitHub, then open this again."
+msgstr ""
+
+#: web/src/components/NotificationPrefs.vue:99
+msgid "Email settings on GitHub"
+msgstr ""
+
+#: web/src/components/NotificationPrefs.vue:102
+msgid "To send mail, the Developer Center needs to read the verified addresses of your GitHub account."
+msgstr ""
+
+#: web/src/components/NotificationPrefs.vue:103
+msgid "Sign in again to allow it"
+msgstr ""
+
+#: web/src/components/NotificationPrefs.vue:106
+msgid "Email is not available yet."
+msgstr ""
+
+#: web/src/components/NotificationPrefs.vue:108
+msgid "The notification settings could not be loaded."
 msgstr ""
 
 #: web/src/components/PendingChange.vue:12
@@ -807,9 +944,9 @@ msgid "In review"
 msgstr ""
 
 #: web/src/components/PluginCard.vue:31
-#: web/src/views/ChangeView.vue:107
+#: web/src/views/ChangeView.vue:106
+#: web/src/views/ChangeView.vue:108
 #: web/src/views/ChangeView.vue:109
-#: web/src/views/ChangeView.vue:110
 #: web/src/views/plugin/PluginStore.vue:496
 msgid "Submit"
 msgstr ""
@@ -819,7 +956,7 @@ msgid "Checks passed"
 msgstr ""
 
 #: web/src/components/PluginCard.vue:33
-#: web/src/views/ChangeView.vue:110
+#: web/src/views/ChangeView.vue:109
 msgid "Maintainer review"
 msgstr ""
 
@@ -856,7 +993,7 @@ msgid "%{n} comments"
 msgstr ""
 
 #: web/src/components/PluginCard.vue:119
-#: web/src/views/ChangeView.vue:236
+#: web/src/views/ChangeView.vue:235
 msgid "The checks found problems. Fix them in a new release, then run the checks again."
 msgstr ""
 
@@ -1135,12 +1272,12 @@ msgstr ""
 msgid "Developer Center"
 msgstr ""
 
-#: web/src/components/SiderNav.vue:34
+#: web/src/components/SiderNav.vue:35
 #: web/src/views/SignIn.vue:81
 msgid "Developer docs"
 msgstr ""
 
-#: web/src/components/SiderNav.vue:39
+#: web/src/components/SiderNav.vue:40
 #: web/src/views/SignIn.vue:82
 msgid "Plugin catalog"
 msgstr ""
@@ -1269,10 +1406,6 @@ msgstr ""
 
 #: web/src/lib/audit.ts:40
 msgid "The change is not supported yet"
-msgstr ""
-
-#: web/src/lib/audit.ts:41
-msgid "The checks could not finish"
 msgstr ""
 
 #: web/src/lib/audit.ts:50
@@ -1468,7 +1601,7 @@ msgid "Workflow run: %{id}"
 msgstr ""
 
 #: web/src/lib/audit.ts:132
-#: web/src/views/ChangeView.vue:400
+#: web/src/views/ChangeView.vue:383
 #: web/src/views/maintain/AuditLog.vue:260
 #: web/src/views/maintain/PartnersAdmin.vue:204
 #: web/src/views/translate/TranslatePage.vue:301
@@ -1560,17 +1693,17 @@ msgid "Delisting"
 msgstr ""
 
 #: web/src/lib/changeKinds.ts:15
-#: web/src/views/ChangeView.vue:197
+#: web/src/views/ChangeView.vue:196
 msgid "Yank a version"
 msgstr ""
 
 #: web/src/lib/changeKinds.ts:16
-#: web/src/views/ChangeView.vue:199
+#: web/src/views/ChangeView.vue:198
 msgid "Restore a version"
 msgstr ""
 
 #: web/src/lib/changeKinds.ts:17
-#: web/src/views/ChangeView.vue:201
+#: web/src/views/ChangeView.vue:200
 msgid "Revoke a signer"
 msgstr ""
 
@@ -1915,290 +2048,276 @@ msgstr ""
 msgid "Today %{time}"
 msgstr ""
 
-#: web/src/views/ChangeView.vue:107
+#: web/src/views/ChangeView.vue:106
 msgid "Automatic checks"
 msgstr ""
 
-#: web/src/views/ChangeView.vue:107
+#: web/src/views/ChangeView.vue:106
 msgid "Merge the pull request"
 msgstr ""
 
-#: web/src/views/ChangeView.vue:107
+#: web/src/views/ChangeView.vue:106
 msgid "Catalog updated"
 msgstr ""
 
-#: web/src/views/ChangeView.vue:107
+#: web/src/views/ChangeView.vue:106
 msgid "Visible to users"
 msgstr ""
 
+#: web/src/views/ChangeView.vue:108
 #: web/src/views/ChangeView.vue:109
-#: web/src/views/ChangeView.vue:110
 #: web/src/views/plugin/PluginPreflight.vue:271
 #: web/src/views/review/ReviewQueue.vue:346
 #: web/src/views/SubmitPlugin.vue:187
 msgid "Checks"
 msgstr ""
 
+#: web/src/views/ChangeView.vue:108
 #: web/src/views/ChangeView.vue:109
-#: web/src/views/ChangeView.vue:273
-msgid "Committed to the catalog"
-msgstr ""
-
-#: web/src/views/ChangeView.vue:109
-#: web/src/views/ChangeView.vue:110
-#: web/src/views/ChangeView.vue:279
+#: web/src/views/ChangeView.vue:278
 msgid "Live in the catalog"
 msgstr ""
 
-#: web/src/views/ChangeView.vue:110
+#: web/src/views/ChangeView.vue:109
 #: web/src/views/review/ReviewChange.vue:67
 #: web/src/views/review/ReviewQueue.vue:119
 msgid "Merged"
 msgstr ""
 
-#: web/src/views/ChangeView.vue:127
+#: web/src/views/ChangeView.vue:126
 msgid "Waited %{time}"
 msgstr ""
 
-#: web/src/views/ChangeView.vue:129
-#: web/src/views/ChangeView.vue:326
-msgid "Waiting for you"
-msgstr ""
-
-#: web/src/views/ChangeView.vue:132
+#: web/src/views/ChangeView.vue:131
 msgid "Passed"
 msgstr ""
 
-#: web/src/views/ChangeView.vue:136
+#: web/src/views/ChangeView.vue:135
 msgid "Within minutes of the merge"
 msgstr ""
 
-#: web/src/views/ChangeView.vue:138
+#: web/src/views/ChangeView.vue:137
 msgid "Once Nginx UI refreshes its marketplace"
 msgstr ""
 
-#: web/src/views/ChangeView.vue:150
+#: web/src/views/ChangeView.vue:149
 msgid "Change #%{n}"
 msgstr ""
 
-#: web/src/views/ChangeView.vue:150
+#: web/src/views/ChangeView.vue:149
 msgid "Change progress"
 msgstr ""
 
-#: web/src/views/ChangeView.vue:159
+#: web/src/views/ChangeView.vue:158
 msgid "Stopped"
 msgstr ""
 
-#: web/src/views/ChangeView.vue:161
-#: web/src/views/ChangeView.vue:163
+#: web/src/views/ChangeView.vue:160
+#: web/src/views/ChangeView.vue:162
 msgid "Waiting for name review"
 msgstr ""
 
-#: web/src/views/ChangeView.vue:161
+#: web/src/views/ChangeView.vue:160
 msgid "Live"
 msgstr ""
 
-#: web/src/views/ChangeView.vue:163
-#: web/src/views/ChangeView.vue:330
+#: web/src/views/ChangeView.vue:162
+#: web/src/views/ChangeView.vue:313
 msgid "Takes effect at the next catalog update"
 msgstr ""
 
-#: web/src/views/ChangeView.vue:164
+#: web/src/views/ChangeView.vue:163
 msgid "Waiting for the merge"
 msgstr ""
 
-#: web/src/views/ChangeView.vue:172
+#: web/src/views/ChangeView.vue:171
 msgid "%{kind}, %{n} items"
 msgstr ""
 
-#: web/src/views/ChangeView.vue:176
+#: web/src/views/ChangeView.vue:175
 msgid "Submitted by @%{login} %{time}"
 msgstr ""
 
-#: web/src/views/ChangeView.vue:205
+#: web/src/views/ChangeView.vue:204
 msgid "Names from a new release"
 msgstr ""
 
-#: web/src/views/ChangeView.vue:223
+#: web/src/views/ChangeView.vue:222
 msgid "The change is live in the catalog."
 msgstr ""
 
-#: web/src/views/ChangeView.vue:225
+#: web/src/views/ChangeView.vue:224
 msgid "The plugin is listed in the catalog."
 msgstr ""
 
-#: web/src/views/ChangeView.vue:227
+#: web/src/views/ChangeView.vue:226
 msgid "The pull request was closed without merging."
 msgstr ""
 
-#: web/src/views/ChangeView.vue:229
+#: web/src/views/ChangeView.vue:228
 msgid "This change was withdrawn and goes no further."
 msgstr ""
 
-#: web/src/views/ChangeView.vue:232
+#: web/src/views/ChangeView.vue:231
 msgid "@%{login} asked for changes. Make them, then run the checks again."
 msgstr ""
 
-#: web/src/views/ChangeView.vue:233
+#: web/src/views/ChangeView.vue:232
 msgid "A maintainer asked for changes. Make them, then run the checks again."
 msgstr ""
 
-#: web/src/views/ChangeView.vue:238
-#: web/src/views/ChangeView.vue:341
+#: web/src/views/ChangeView.vue:237
+#: web/src/views/ChangeView.vue:324
 msgid "The checks could not be started. Please try again later."
 msgstr ""
 
-#: web/src/views/ChangeView.vue:240
+#: web/src/views/ChangeView.vue:239
 msgid "The checks could not finish. A maintainer will look into it."
 msgstr ""
 
-#: web/src/views/ChangeView.vue:242
+#: web/src/views/ChangeView.vue:241
 msgid "The packages, signatures and listing are being checked. This takes a few minutes."
 msgstr ""
 
-#: web/src/views/ChangeView.vue:244
+#: web/src/views/ChangeView.vue:243
 msgid "Waiting for a maintainer to review the submission."
 msgstr ""
 
-#: web/src/views/ChangeView.vue:246
+#: web/src/views/ChangeView.vue:245
 msgid "The change is in the catalog sources and takes effect at its next update, usually within minutes."
 msgstr ""
 
-#: web/src/views/ChangeView.vue:248
+#: web/src/views/ChangeView.vue:247
 msgid "Approved. The plugin appears in the catalog after the next deploy, usually within minutes."
 msgstr ""
 
-#: web/src/views/ChangeView.vue:264
+#: web/src/views/ChangeView.vue:263
 msgid "Checks started again"
 msgstr ""
 
-#: web/src/views/ChangeView.vue:265
+#: web/src/views/ChangeView.vue:264
 msgid "Submitted %{n} changes"
 msgstr ""
 
-#: web/src/views/ChangeView.vue:265
+#: web/src/views/ChangeView.vue:264
 #: web/src/views/review/ReviewChange.vue:817
 msgid "Submitted"
 msgstr ""
 
-#: web/src/views/ChangeView.vue:268
+#: web/src/views/ChangeView.vue:267
 msgid "The checks could not be started"
 msgstr ""
 
-#: web/src/views/ChangeView.vue:269
+#: web/src/views/ChangeView.vue:268
 msgid "Checks found problems"
 msgstr ""
 
-#: web/src/views/ChangeView.vue:269
+#: web/src/views/ChangeView.vue:268
 msgid "Checks could not finish"
 msgstr ""
 
-#: web/src/views/ChangeView.vue:271
+#: web/src/views/ChangeView.vue:270
 msgid "Pull request #%{n} opened on %{repo}"
 msgstr ""
 
-#: web/src/views/ChangeView.vue:272
+#: web/src/views/ChangeView.vue:271
 msgid "Checks passed, pull request #%{n} opened"
 msgstr ""
 
-#: web/src/views/ChangeView.vue:273
+#: web/src/views/ChangeView.vue:272
 msgid "Merged by a maintainer"
 msgstr ""
 
-#: web/src/views/ChangeView.vue:274
+#: web/src/views/ChangeView.vue:273
 msgid "Rejected by a maintainer"
 msgstr ""
 
-#: web/src/views/ChangeView.vue:274
+#: web/src/views/ChangeView.vue:273
 msgid "Pull request closed"
 msgstr ""
 
 #: web/src/views/ChangeView.vue:275
-msgid "A maintainer asked for changes"
-msgstr ""
-
-#: web/src/views/ChangeView.vue:276
 msgid "Waited %{h} hours for you, a reminder was sent"
 msgstr ""
 
-#: web/src/views/ChangeView.vue:277
+#: web/src/views/ChangeView.vue:276
 #: web/src/views/review/ReviewChange.vue:71
 #: web/src/views/review/ReviewQueue.vue:118
 msgid "Withdrawn"
 msgstr ""
 
-#: web/src/views/ChangeView.vue:278
+#: web/src/views/ChangeView.vue:277
 msgid "More translations added to the pull request"
 msgstr ""
 
-#: web/src/views/ChangeView.vue:279
+#: web/src/views/ChangeView.vue:278
 msgid "Listed in the catalog"
 msgstr ""
 
-#: web/src/views/ChangeView.vue:295
+#: web/src/views/ChangeView.vue:294
 msgid "The change could not be withdrawn. Please try again."
 msgstr ""
 
-#: web/src/views/ChangeView.vue:328
+#: web/src/views/ChangeView.vue:311
 msgid "Waiting for a maintainer"
 msgstr ""
 
-#: web/src/views/ChangeView.vue:331
+#: web/src/views/ChangeView.vue:314
 msgid "Being checked"
 msgstr ""
 
-#: web/src/views/ChangeView.vue:351
+#: web/src/views/ChangeView.vue:334
 #: web/src/views/review/ReviewChange.vue:433
 msgid "Change not found"
 msgstr ""
 
-#: web/src/views/ChangeView.vue:361
+#: web/src/views/ChangeView.vue:344
 msgid "Submitted %{time}"
 msgstr ""
 
-#: web/src/views/ChangeView.vue:376
+#: web/src/views/ChangeView.vue:359
 msgid "Waiting for you to merge pull request #%{n} on GitHub"
 msgstr ""
 
-#: web/src/views/ChangeView.vue:376
+#: web/src/views/ChangeView.vue:359
 msgid "Waiting for you to commit the files to %{repo}"
 msgstr ""
 
-#: web/src/views/ChangeView.vue:379
+#: web/src/views/ChangeView.vue:362
 msgid "The pull request is on %{repo}. Once it is merged, the change shows in the catalog within minutes."
 msgstr ""
 
-#: web/src/views/ChangeView.vue:379
+#: web/src/views/ChangeView.vue:362
 msgid "Unpack the patch at the root of the repository and commit it to the default branch. The portal notices the commit by itself."
 msgstr ""
 
-#: web/src/views/ChangeView.vue:384
-#: web/src/views/ChangeView.vue:554
+#: web/src/views/ChangeView.vue:367
+#: web/src/views/ChangeView.vue:522
 msgid "Withdraw the change"
 msgstr ""
 
-#: web/src/views/ChangeView.vue:387
+#: web/src/views/ChangeView.vue:370
 msgid "Merge on GitHub"
 msgstr ""
 
-#: web/src/views/ChangeView.vue:390
+#: web/src/views/ChangeView.vue:373
 msgid "Download the patch"
 msgstr ""
 
-#: web/src/views/ChangeView.vue:414
+#: web/src/views/ChangeView.vue:397
 msgid "Run the checks again"
 msgstr ""
 
-#: web/src/views/ChangeView.vue:417
-#: web/src/views/ChangeView.vue:554
+#: web/src/views/ChangeView.vue:400
+#: web/src/views/ChangeView.vue:522
 msgid "Withdraw"
 msgstr ""
 
-#: web/src/views/ChangeView.vue:423
+#: web/src/views/ChangeView.vue:406
 msgid "What was asked"
 msgstr ""
 
-#: web/src/views/ChangeView.vue:437
+#: web/src/views/ChangeView.vue:420
 #: web/src/views/maintain/AllPlugins.vue:336
 #: web/src/views/maintain/PartnersAdmin.vue:345
 #: web/src/views/owners/VendorPage.vue:385
@@ -2206,96 +2325,75 @@ msgstr ""
 msgid "Reason"
 msgstr ""
 
-#: web/src/views/ChangeView.vue:444
+#: web/src/views/ChangeView.vue:427
 msgid "Each item"
 msgstr ""
 
-#: web/src/views/ChangeView.vue:449
+#: web/src/views/ChangeView.vue:432
 msgid "Item"
 msgstr ""
 
-#: web/src/views/ChangeView.vue:450
+#: web/src/views/ChangeView.vue:433
 msgid "Needs review"
 msgstr ""
 
-#: web/src/views/ChangeView.vue:451
+#: web/src/views/ChangeView.vue:434
 msgid "Current state"
 msgstr ""
 
-#: web/src/views/ChangeView.vue:462
+#: web/src/views/ChangeView.vue:445
 msgid "Name review after the merge"
 msgstr ""
 
-#: web/src/views/ChangeView.vue:464
+#: web/src/views/ChangeView.vue:447
 msgid "No review"
 msgstr ""
 
-#: web/src/views/ChangeView.vue:474
+#: web/src/views/ChangeView.vue:457
 msgid "History"
 msgstr ""
 
-#: web/src/views/ChangeView.vue:490
+#: web/src/views/ChangeView.vue:473
 msgid "Links"
 msgstr ""
 
-#: web/src/views/ChangeView.vue:493
+#: web/src/views/ChangeView.vue:476
 msgid "Pull request #%{n}"
 msgstr ""
 
-#: web/src/views/ChangeView.vue:497
+#: web/src/views/ChangeView.vue:480
 msgid "Commit in the catalog"
 msgstr ""
 
-#: web/src/views/ChangeView.vue:501
+#: web/src/views/ChangeView.vue:484
 msgid "Log of the checks"
 msgstr ""
 
-#: web/src/views/ChangeView.vue:505
+#: web/src/views/ChangeView.vue:488
 msgid "Manage the plugin"
 msgstr ""
 
-#: web/src/views/ChangeView.vue:509
+#: web/src/views/ChangeView.vue:492
 msgid "The review is public on GitHub. You are mentioned in the pull request, so GitHub notifies you of comments."
 msgstr ""
 
-#: web/src/views/ChangeView.vue:512
+#: web/src/views/ChangeView.vue:495
 msgid "Your other changes in progress"
 msgstr ""
 
-#: web/src/views/ChangeView.vue:529
-msgid "Tell me in the portal when a change moves"
-msgstr ""
-
-#: web/src/views/ChangeView.vue:533
-msgid "Email me when I need to act"
-msgstr ""
-
-#: web/src/views/ChangeView.vue:537
-msgid "Email me when a listing goes live"
-msgstr ""
-
-#: web/src/views/ChangeView.vue:540
-#: web/src/views/maintain/Settings.vue:297
-msgid "Email address"
-msgstr ""
-
-#: web/src/views/ChangeView.vue:541
-msgid "Email is not available yet."
-msgstr ""
-
-#: web/src/views/ChangeView.vue:546
+#: web/src/views/ChangeView.vue:514
 msgid "Every plugin page shows the progress at the top"
 msgstr ""
 
-#: web/src/views/ChangeView.vue:549
+#: web/src/views/ChangeView.vue:517
 msgid "A change in progress shows as one line at the top of its plugin page. Click it to open this page."
 msgstr ""
 
-#: web/src/views/ChangeView.vue:555
+#: web/src/views/ChangeView.vue:523
 msgid "Pull request #%{n} is closed and the change stops here. You can submit again at any time."
 msgstr ""
 
-#: web/src/views/ChangeView.vue:555
+#: web/src/views/ChangeView.vue:523
 msgid "The change stops here. You can submit again at any time."
 msgstr ""
 

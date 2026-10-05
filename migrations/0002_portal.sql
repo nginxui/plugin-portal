@@ -13,6 +13,9 @@ CREATE UNIQUE INDEX changes_number ON changes (number);
 -- When a user last read their notifications.
 ALTER TABLE notify_prefs ADD COLUMN read_at INTEGER;
 
+-- When a user last cleared their notification list.
+ALTER TABLE notify_prefs ADD COLUMN cleared_at INTEGER;
+
 -- Partner applications and key requests, decided by maintainers. An approved
 -- one becomes a pull request on partners/<name>.json in the catalog.
 CREATE TABLE partner_requests (
