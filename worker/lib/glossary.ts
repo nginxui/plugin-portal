@@ -3,49 +3,28 @@ import { cached, store } from './cache'
 import { HOST_LOCALES } from './locales'
 
 // Terms as Nginx UI translates them, read from its gettext catalogs, so an AI
-// draft of a plugin's texts uses the host's words (spec 9).
+// draft of a plugin's texts uses the words of Nginx UI (spec 9).
 
 const BASE = 'https://raw.githubusercontent.com/0xJacky/nginx-ui/dev/app/src/language'
 
-export const TERMS = [
-  'Site',
-  'Sites',
-  'Stream',
-  'Upstream',
-  'Certificate',
-  'Certificates',
-  'Access Log',
-  'Error Log',
-  'Configuration',
-  'Config',
-  'Node',
-  'Nodes',
-  'Backup',
-  'Notification',
-  'Notifications',
-  'Plugin',
-  'Plugins',
-  'Marketplace',
-  'Template',
-  'Templates',
-  'Reload',
-  'Restart',
-  'Dashboard',
-  'Settings',
-  'Domain',
-  'DNS Credential',
-  'Environment',
-  'Terminal',
-  'Upgrade',
-  'Install',
-  'Enable',
-  'Disable',
-  'Log',
-  'Logs',
-  'Analytics',
-  'Blocklist',
-  'Monitoring',
-]
+// Interface labels such as "Access Log" or "DNS Credential": up to three
+// capitalized words, with no punctuation and no status words, so messages
+// like "Install successfully" stay out.
+const LABEL = /^[A-Z][A-Za-z0-9]*(?: (?:[A-Z][A-Za-z0-9]*|[A-Z0-9]{2,}|of|and|for|to)){0,2}$/
+const STATUS = /\b(?:Success|Successfully|Successful|Failed|Fail|Not|Invalid|Missing|Required)\b/
+
+export function isTerm(msgid: string, msgstr: string): boolean {
+  return LABEL.test(msgid) && !STATUS.test(msgid) && msgstr.trim() !== '' && msgstr !== msgid
+}
+
+/** The terms a text uses, longest first, so "Access Log" wins over "Log". */
+export function termsIn(terms: Record<string, string>, text: string, limit = 40): [string, string][] {
+  const escape = (t: string) => t.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+  return Object.entries(terms)
+    .filter(([en]) => new RegExp(`\\b${escape(en)}(?:s|es)?\\b`, 'i').test(text))
+    .sort((a, b) => b[0].length - a[0].length)
+    .slice(0, limit)
+}
 
 /** msgid to msgstr of a .po file, single line and wrapped entries alike. */
 export function parsePo(text: string): Record<string, string> {
@@ -85,10 +64,10 @@ async function fetchTerms(locale: string): Promise<Record<string, string>> {
   if (!response.ok)
     return {}
   const catalog = parsePo(await response.text())
-  return Object.fromEntries(TERMS.filter(t => catalog[t]).map(t => [t, catalog[t]]))
+  return Object.fromEntries(Object.entries(catalog).filter(([id, str]) => isTerm(id, str)))
 }
 
-/** The terms in one language, English to the host's translation. */
+/** The terms in one language, English to the translation of Nginx UI. */
 export async function glossary(locale: string): Promise<Record<string, string>> {
   if (locale === 'en' || !(HOST_LOCALES as readonly string[]).includes(locale))
     return {}
