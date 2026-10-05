@@ -39,6 +39,9 @@ const steps = computed(() => {
 })
 
 const downloads = computed(() => props.insights?.downloads.map(d => d.count) ?? [])
+// Downloads per day once the daily snapshots cover two days, else per version.
+const daily = computed(() => props.insights?.daily?.map(d => d.count) ?? [])
+const dailyTotal = computed(() => daily.value.reduce((sum, n) => sum + n, 0))
 const latestDownloads = computed(() => props.insights?.downloads.at(-1)?.count ?? 0)
 const translated = computed(() => props.insights?.translated.length ?? 0)
 const shots = computed(() => props.insights?.screenshots)
@@ -165,12 +168,20 @@ const notes = computed(() => [
           <span class="i-tabler-clock" />
           {{ reviewing.waitingOn === 'author' ? $gettext('%{kind} in review, waiting for you', { kind: kindLabel(reviewing.kind) }) : $gettext('%{kind} in review, waiting for a maintainer', { kind: kindLabel(reviewing.kind) }) }}
         </RouterLink>
-        <div v-if="downloads.length > 1">
+        <div v-if="daily.length >= 2">
           <AFlex justify="space-between" class="text-3">
-            <span class="op-65">{{ $gettext('Downloads GitHub counts, last %{n} versions', { n: String(downloads.length) }) }}</span>
+            <span class="op-65">{{ $gettext('Downloads per day, last %{n} days', { n: String(daily.length) }) }}</span>
+            <span class="font-500">{{ $gettext('%{n} downloads in all', { n: String(dailyTotal) }) }}</span>
+          </AFlex>
+          <SparkLine :values="daily" />
+        </div>
+        <div v-else-if="downloads.length">
+          <AFlex justify="space-between" class="text-3">
+            <span class="op-65">{{ downloads.length > 1 ? $gettext('Downloads GitHub counts, last %{n} versions', { n: String(downloads.length) }) : $gettext('Downloads GitHub counts') }}</span>
             <span class="font-500">{{ $gettext('%{n} for this version', { n: String(latestDownloads) }) }}</span>
           </AFlex>
-          <SparkLine :values="downloads" />
+          <!-- One version has no trend to draw. -->
+          <SparkLine v-if="downloads.length > 1" :values="downloads" />
         </div>
         <template v-if="insights">
           <CoverageMeter :label="$gettext('Translations')" :percent="translated / HOST_LOCALES.length * 100" :text="`${translated} / ${HOST_LOCALES.length}`" />

@@ -684,7 +684,7 @@ msgid "Add a README"
 msgstr ""
 
 #: web/src/components/MarketPreview.vue:425
-#: web/src/components/PluginCard.vue:183
+#: web/src/components/PluginCard.vue:193
 msgid "README"
 msgstr ""
 
@@ -777,88 +777,88 @@ msgstr ""
 msgid "Go live"
 msgstr ""
 
-#: web/src/components/PluginCard.vue:52
+#: web/src/components/PluginCard.vue:55
 msgid "Owner %{owner}, your role: %{role}."
 msgstr ""
 
-#: web/src/components/PluginCard.vue:53
+#: web/src/components/PluginCard.vue:56
 msgid "Store texts: %{source}."
 msgstr ""
 
-#: web/src/components/PluginCard.vue:54
+#: web/src/components/PluginCard.vue:57
 msgid "Needs Nginx UI %{version} or later."
 msgstr ""
 
-#: web/src/components/PluginCard.vue:93
+#: web/src/components/PluginCard.vue:96
 msgid "Submitted version"
 msgstr ""
 
-#: web/src/components/PluginCard.vue:101
+#: web/src/components/PluginCard.vue:104
 msgid "Waited"
 msgstr ""
 
-#: web/src/components/PluginCard.vue:109
+#: web/src/components/PluginCard.vue:112
 msgid "Comments"
 msgstr ""
 
-#: web/src/components/PluginCard.vue:112
+#: web/src/components/PluginCard.vue:115
 msgid "%{n} comments"
 msgstr ""
 
-#: web/src/components/PluginCard.vue:116
+#: web/src/components/PluginCard.vue:119
 #: web/src/views/ChangeView.vue:215
 msgid "The checks found problems. Fix them in a new release, then run the checks again."
 msgstr ""
 
-#: web/src/components/PluginCard.vue:116
+#: web/src/components/PluginCard.vue:119
 msgid "%{text} Once it is fixed the checks run again, there is no need to submit again."
 msgstr ""
 
-#: web/src/components/PluginCard.vue:116
+#: web/src/components/PluginCard.vue:119
 msgid "A maintainer asked for changes. See the review on the change page."
 msgstr ""
 
-#: web/src/components/PluginCard.vue:118
-#: web/src/components/PluginCard.vue:176
+#: web/src/components/PluginCard.vue:121
+#: web/src/components/PluginCard.vue:186
 #: web/src/lib/pluginSections.ts:16
 msgid "Translations"
 msgstr ""
 
-#: web/src/components/PluginCard.vue:121
-#: web/src/components/PluginCard.vue:179
+#: web/src/components/PluginCard.vue:124
+#: web/src/components/PluginCard.vue:189
 #: web/src/lib/pluginSections.ts:15
 #: web/src/views/plugin/PluginScreenshots.vue:260
 msgid "Screenshots"
 msgstr ""
 
-#: web/src/components/PluginCard.vue:123
-#: web/src/components/PluginCard.vue:181
+#: web/src/components/PluginCard.vue:126
+#: web/src/components/PluginCard.vue:191
 msgid "%{dark} of %{total} with dark"
 msgstr ""
 
-#: web/src/components/PluginCard.vue:136
+#: web/src/components/PluginCard.vue:139
 msgid "GitHub organization, your role: %{role}"
 msgstr ""
 
-#: web/src/components/PluginCard.vue:141
+#: web/src/components/PluginCard.vue:144
 #: web/src/views/plugin/PluginBadges.vue:36
 msgid "Newest version"
 msgstr ""
 
-#: web/src/components/PluginCard.vue:149
+#: web/src/components/PluginCard.vue:152
 msgid "Released on"
 msgstr ""
 
-#: web/src/components/PluginCard.vue:157
+#: web/src/components/PluginCard.vue:160
 #: web/src/views/review/ReviewChange.vue:103
 msgid "Platforms"
 msgstr ""
 
-#: web/src/components/PluginCard.vue:160
+#: web/src/components/PluginCard.vue:163
 msgid "%{n} platforms"
 msgstr ""
 
-#: web/src/components/PluginCard.vue:160
+#: web/src/components/PluginCard.vue:163
 #: web/src/views/maintain/AllPlugins.vue:178
 #: web/src/views/maintain/AuditLog.vue:92
 #: web/src/views/MyPlugins.vue:73
@@ -866,59 +866,71 @@ msgstr ""
 msgid "All"
 msgstr ""
 
-#: web/src/components/PluginCard.vue:166
+#: web/src/components/PluginCard.vue:169
 msgid "%{kind} in review, waiting for you"
 msgstr ""
 
-#: web/src/components/PluginCard.vue:166
+#: web/src/components/PluginCard.vue:169
 msgid "%{kind} in review, waiting for a maintainer"
 msgstr ""
 
-#: web/src/components/PluginCard.vue:170
+#: web/src/components/PluginCard.vue:173
+msgid "Downloads per day, last %{n} days"
+msgstr ""
+
+#: web/src/components/PluginCard.vue:174
+msgid "%{n} downloads in all"
+msgstr ""
+
+#: web/src/components/PluginCard.vue:180
 msgid "Downloads GitHub counts, last %{n} versions"
 msgstr ""
 
-#: web/src/components/PluginCard.vue:171
+#: web/src/components/PluginCard.vue:180
+msgid "Downloads GitHub counts"
+msgstr ""
+
+#: web/src/components/PluginCard.vue:181
 msgid "%{n} for this version"
 msgstr ""
 
-#: web/src/components/PluginCard.vue:183
+#: web/src/components/PluginCard.vue:193
 msgid "Provided"
 msgstr ""
 
-#: web/src/components/PluginCard.vue:183
+#: web/src/components/PluginCard.vue:193
 msgid "Not provided"
 msgstr ""
 
-#: web/src/components/PluginCard.vue:195
-#: web/src/components/PluginCard.vue:207
-#: web/src/components/PluginCard.vue:233
+#: web/src/components/PluginCard.vue:205
+#: web/src/components/PluginCard.vue:217
+#: web/src/components/PluginCard.vue:243
 #: web/src/lib/pluginSections.ts:14
 #: web/src/views/plugin/PluginScreenshots.vue:336
 #: web/src/views/plugin/PluginTranslations.vue:388
 msgid "Store details"
 msgstr ""
 
-#: web/src/components/PluginCard.vue:200
+#: web/src/components/PluginCard.vue:210
 msgid "Organization page"
 msgstr ""
 
-#: web/src/components/PluginCard.vue:212
+#: web/src/components/PluginCard.vue:222
 #: web/src/lib/pluginSections.ts:17
 msgid "Release preflight"
 msgstr ""
 
-#: web/src/components/PluginCard.vue:217
+#: web/src/components/PluginCard.vue:227
 #: web/src/lib/pluginSections.ts:18
 #: web/src/views/plugin/PluginVersions.vue:130
 msgid "Versions"
 msgstr ""
 
-#: web/src/components/PluginCard.vue:221
+#: web/src/components/PluginCard.vue:231
 msgid "Catalog page"
 msgstr ""
 
-#: web/src/components/PluginCard.vue:228
+#: web/src/components/PluginCard.vue:238
 msgid "View the review"
 msgstr ""
 

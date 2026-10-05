@@ -86,6 +86,7 @@ export type StoreSource = 'release' | 'repo-branch' | 'repo-release' | 'catalog'
 
 export interface Insights {
   id: string
+  daily?: { day: string, count: number }[]
   downloads: { version: string, count: number }[]
   platforms: number | null
   translated: string[]

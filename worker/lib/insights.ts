@@ -2,6 +2,7 @@ import type { Env } from '../env'
 import type { CatalogPlugin } from './catalog'
 import { cached } from './cache'
 import { catalogEntry, repoOf } from './catalog'
+import { dailyDownloads } from './downloads'
 import { github } from './github'
 import { HOST_LOCALES } from './locales'
 
@@ -13,6 +14,8 @@ import { HOST_LOCALES } from './locales'
 export type StoreSource = 'release' | 'repo-branch' | 'repo-release' | 'catalog'
 
 export interface Insights {
+  // Downloads per day over the last 30 days, once the daily snapshots allow.
+  daily: { day: string, count: number }[]
   id: string
   downloads: { version: string, count: number }[]
   platforms: number | null
@@ -62,7 +65,7 @@ const version = (tag: string) => tag.replace(/^v/, '')
 
 export async function insightsOf(env: Env, token: string, plugin: CatalogPlugin & { screenshots?: { dark_url?: string }[], readme_url?: string }): Promise<Insights> {
   const repo = repoOf(plugin.repository_url)
-  const [gh, entry] = await Promise.all([
+  const [gh, entry, daily] = await Promise.all([
     repo
       ? cached(`gh:${repo.toLowerCase()}`, CACHE_SECONDS, async () => {
           const [releases, info] = await Promise.all([
@@ -82,6 +85,7 @@ export async function insightsOf(env: Env, token: string, plugin: CatalogPlugin 
         })
       : Promise.resolve({ releases: [], openIssues: null }),
     catalogEntry(env, plugin.id),
+    dailyDownloads(env, plugin.id),
   ])
   const yanked = new Set(plugin.releases?.filter(r => r.yanked).map(r => r.version))
   const listed = new Set(plugin.releases?.map(r => r.version))
@@ -103,6 +107,7 @@ export async function insightsOf(env: Env, token: string, plugin: CatalogPlugin 
   const shots = plugin.screenshots ?? []
   return {
     id: plugin.id,
+    daily,
     downloads: gh.releases.slice(0, 6).reverse().map(r => ({ version: r.version, count: r.count })),
     platforms: (newest as { platforms?: string[] } | undefined)?.platforms?.length ?? null,
     ...coverage(plugin),

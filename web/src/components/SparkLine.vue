@@ -3,10 +3,14 @@ import { computed } from 'vue'
 
 const props = defineProps<{ values: number[] }>()
 
+const max = computed(() => Math.max(...props.values, 1))
+const y = (v: number) => (28 - v * 26 / max.value).toFixed(1)
+// One value has no trend; it shows as a level line.
 const points = computed(() => {
-  const max = Math.max(...props.values, 1)
-  const step = props.values.length > 1 ? 100 / (props.values.length - 1) : 0
-  return props.values.map((v, i) => `${(i * step).toFixed(1)},${(28 - v * 26 / max).toFixed(1)}`).join(' ')
+  if (props.values.length === 1)
+    return '0,16 100,16'
+  const step = 100 / (props.values.length - 1)
+  return props.values.map((v, i) => `${(i * step).toFixed(1)},${y(v)}`).join(' ')
 })
 </script>
 
