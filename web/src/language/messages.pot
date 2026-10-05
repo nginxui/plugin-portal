@@ -22,8 +22,8 @@ msgstr ""
 #: web/src/components/CategoryEditModal.vue:50
 #: web/src/components/CommunityCard.vue:175
 #: web/src/views/maintain/AiModels.vue:219
-#: web/src/views/maintain/Settings.vue:254
-#: web/src/views/maintain/Settings.vue:299
+#: web/src/views/maintain/Settings.vue:252
+#: web/src/views/maintain/Settings.vue:297
 #: web/src/views/plugin/PluginTranslations.vue:418
 msgid "Save"
 msgstr ""
@@ -333,7 +333,7 @@ msgid "All %{n}"
 msgstr ""
 
 #: web/src/components/CommunityCard.vue:103
-#: web/src/views/maintain/Settings.vue:219
+#: web/src/views/maintain/Settings.vue:218
 #: web/src/views/SubmitPlugin.vue:295
 msgid "Edit"
 msgstr ""
@@ -372,10 +372,10 @@ msgstr ""
 #: web/src/components/MarketPreview.vue:377
 #: web/src/components/MarketPreview.vue:430
 #: web/src/views/maintain/PartnersAdmin.vue:299
-#: web/src/views/maintain/Settings.vue:221
-#: web/src/views/maintain/Settings.vue:256
-#: web/src/views/maintain/Settings.vue:301
-#: web/src/views/maintain/Settings.vue:312
+#: web/src/views/maintain/Settings.vue:220
+#: web/src/views/maintain/Settings.vue:254
+#: web/src/views/maintain/Settings.vue:299
+#: web/src/views/maintain/Settings.vue:310
 #: web/src/views/plugin/PluginScreenshots.vue:347
 msgid "Cancel"
 msgstr ""
@@ -887,10 +887,7 @@ msgid "Provided"
 msgstr ""
 
 #: web/src/components/PluginCard.vue:183
-#: web/src/views/plugin/PluginTranslations.vue:105
-#: web/src/views/plugin/PluginTranslations.vue:363
-#: web/src/views/translate/TranslatePage.vue:234
-msgid "Missing"
+msgid "Not provided"
 msgstr ""
 
 #: web/src/components/PluginCard.vue:195
@@ -2164,7 +2161,7 @@ msgid "Email me when a listing goes live"
 msgstr ""
 
 #: web/src/views/ChangeView.vue:512
-#: web/src/views/maintain/Settings.vue:269
+#: web/src/views/maintain/Settings.vue:267
 msgid "Email address"
 msgstr ""
 
@@ -2270,19 +2267,19 @@ msgid "For an OpenAI compatible endpoint, its base URL, for example https://llm.
 msgstr ""
 
 #: web/src/views/maintain/AiModels.vue:201
-#: web/src/views/maintain/Settings.vue:248
+#: web/src/views/maintain/Settings.vue:246
 msgid "API key"
 msgstr ""
 
 #: web/src/views/maintain/AiModels.vue:201
-#: web/src/views/maintain/Settings.vue:248
-#: web/src/views/maintain/Settings.vue:293
+#: web/src/views/maintain/Settings.vue:246
+#: web/src/views/maintain/Settings.vue:291
 msgid "Kept encrypted and never sent to a browser."
 msgstr ""
 
 #: web/src/views/maintain/AiModels.vue:202
-#: web/src/views/maintain/Settings.vue:249
-#: web/src/views/maintain/Settings.vue:294
+#: web/src/views/maintain/Settings.vue:247
+#: web/src/views/maintain/Settings.vue:292
 msgid "Saved, can only be replaced"
 msgstr ""
 
@@ -2299,12 +2296,12 @@ msgid "Test the connection"
 msgstr ""
 
 #: web/src/views/maintain/AiModels.vue:225
-#: web/src/views/maintain/Settings.vue:221
-#: web/src/views/maintain/Settings.vue:223
+#: web/src/views/maintain/Settings.vue:220
+#: web/src/views/maintain/Settings.vue:222
+#: web/src/views/maintain/Settings.vue:254
 #: web/src/views/maintain/Settings.vue:256
-#: web/src/views/maintain/Settings.vue:258
+#: web/src/views/maintain/Settings.vue:299
 #: web/src/views/maintain/Settings.vue:301
-#: web/src/views/maintain/Settings.vue:303
 msgid "Remove"
 msgstr ""
 
@@ -3005,113 +3002,113 @@ msgstr ""
 msgid "Announcements for authors, and the services the portal sends mail and opens pull requests with. Changes are kept in the audit log."
 msgstr ""
 
-#: web/src/views/maintain/Settings.vue:193
+#: web/src/views/maintain/Settings.vue:192
 #: web/src/views/MyPlugins.vue:310
 msgid "Announcements"
 msgstr ""
 
-#: web/src/views/maintain/Settings.vue:196
-#: web/src/views/maintain/Settings.vue:312
+#: web/src/views/maintain/Settings.vue:195
+#: web/src/views/maintain/Settings.vue:310
 msgid "New announcement"
 msgstr ""
 
-#: web/src/views/maintain/Settings.vue:200
+#: web/src/views/maintain/Settings.vue:199
 msgid "Shown on My plugins, the newest five first, in the language of the portal or else in English."
 msgstr ""
 
-#: web/src/views/maintain/Settings.vue:202
+#: web/src/views/maintain/Settings.vue:201
 #: web/src/views/MyPlugins.vue:320
 msgid "No announcements."
 msgstr ""
 
-#: web/src/views/maintain/Settings.vue:213
+#: web/src/views/maintain/Settings.vue:212
 msgid ", no Chinese version"
 msgstr ""
 
-#: web/src/views/maintain/Settings.vue:221
+#: web/src/views/maintain/Settings.vue:220
 msgid "Remove this announcement?"
 msgstr ""
 
-#: web/src/views/maintain/Settings.vue:232
+#: web/src/views/maintain/Settings.vue:230
 msgid "Mail service"
 msgstr ""
 
-#: web/src/views/maintain/Settings.vue:239
+#: web/src/views/maintain/Settings.vue:237
 msgid "Authors who turn on email get mail about the progress of their changes. The service takes from, to, subject and text, as Resend and similar services do."
 msgstr ""
 
-#: web/src/views/maintain/Settings.vue:242
+#: web/src/views/maintain/Settings.vue:240
 msgid "Address"
 msgstr ""
 
-#: web/src/views/maintain/Settings.vue:245
+#: web/src/views/maintain/Settings.vue:243
 msgid "Sender"
 msgstr ""
 
-#: web/src/views/maintain/Settings.vue:256
+#: web/src/views/maintain/Settings.vue:254
 msgid "Remove the mail service settings?"
 msgstr ""
 
-#: web/src/views/maintain/Settings.vue:266
+#: web/src/views/maintain/Settings.vue:264
 msgid "Send a test mail"
 msgstr ""
 
-#: web/src/views/maintain/Settings.vue:271
+#: web/src/views/maintain/Settings.vue:269
 #: web/src/views/owners/VendorPage.vue:378
 #: web/src/views/review/ReviewChange.vue:838
 #: web/src/views/review/ReviewQueue.vue:455
 msgid "Send"
 msgstr ""
 
-#: web/src/views/maintain/Settings.vue:280
+#: web/src/views/maintain/Settings.vue:278
 msgid "Bot account"
 msgstr ""
 
-#: web/src/views/maintain/Settings.vue:287
+#: web/src/views/maintain/Settings.vue:285
 msgid "When authors send store changes through the bot, it opens a pull request on their repository from a fork of its own, and the author merges it. The token needs the public_repo scope."
 msgstr ""
 
-#: web/src/views/maintain/Settings.vue:290
+#: web/src/views/maintain/Settings.vue:288
 msgid "GitHub account"
 msgstr ""
 
-#: web/src/views/maintain/Settings.vue:293
+#: web/src/views/maintain/Settings.vue:291
 msgid "Access token"
 msgstr ""
 
-#: web/src/views/maintain/Settings.vue:301
+#: web/src/views/maintain/Settings.vue:299
 msgid "Remove the bot account settings?"
 msgstr ""
 
-#: web/src/views/maintain/Settings.vue:312
+#: web/src/views/maintain/Settings.vue:310
 msgid "Edit the announcement"
 msgstr ""
 
-#: web/src/views/maintain/Settings.vue:312
+#: web/src/views/maintain/Settings.vue:310
 msgid "Publish"
 msgstr ""
 
-#: web/src/views/maintain/Settings.vue:314
+#: web/src/views/maintain/Settings.vue:312
 msgid "Date"
 msgstr ""
 
-#: web/src/views/maintain/Settings.vue:317
+#: web/src/views/maintain/Settings.vue:315
 msgid "Title in English"
 msgstr ""
 
-#: web/src/views/maintain/Settings.vue:320
+#: web/src/views/maintain/Settings.vue:318
 msgid "Text in English"
 msgstr ""
 
-#: web/src/views/maintain/Settings.vue:323
+#: web/src/views/maintain/Settings.vue:321
 msgid "Title in Simplified Chinese"
 msgstr ""
 
-#: web/src/views/maintain/Settings.vue:326
+#: web/src/views/maintain/Settings.vue:324
 msgid "Text in Simplified Chinese"
 msgstr ""
 
-#: web/src/views/maintain/Settings.vue:326
+#: web/src/views/maintain/Settings.vue:324
 msgid "Without a Chinese version, the English shows."
 msgstr ""
 
@@ -4650,6 +4647,12 @@ msgstr ""
 
 #: web/src/views/plugin/PluginStore.vue:495
 msgid "Store source: %{source}"
+msgstr ""
+
+#: web/src/views/plugin/PluginTranslations.vue:105
+#: web/src/views/plugin/PluginTranslations.vue:363
+#: web/src/views/translate/TranslatePage.vue:234
+msgid "Missing"
 msgstr ""
 
 #: web/src/views/plugin/PluginTranslations.vue:156

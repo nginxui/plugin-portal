@@ -1,11 +1,13 @@
 <script setup lang="ts">
-defineProps<{ label: string, percent: number, text: string }>()
+// Without a percent the row is a plain fact, such as whether a README exists.
+defineProps<{ label: string, percent?: number, text: string }>()
 </script>
 
 <template>
   <div class="meter">
     <span class="label">{{ label }}</span>
-    <span class="bar"><span :style="{ width: `${Math.min(100, Math.max(0, percent))}%` }" /></span>
+    <span v-if="percent !== undefined" class="bar"><span :style="{ width: `${Math.min(100, Math.max(0, percent))}%` }" /></span>
+    <span v-else class="flex-1" />
     <span class="text">{{ text }}</span>
   </div>
 </template>

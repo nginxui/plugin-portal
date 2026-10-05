@@ -180,7 +180,7 @@ const notes = computed(() => [
             :percent="shots.dark / shots.total * 100"
             :text="$gettext('%{dark} of %{total} with dark', { dark: String(shots.dark), total: String(shots.total) })"
           />
-          <CoverageMeter :label="$gettext('README')" :percent="insights.readme ? 100 : 0" :text="insights.readme ? $gettext('Provided') : $gettext('Missing')" />
+          <CoverageMeter :label="$gettext('README')" :text="insights.readme ? $gettext('Provided') : $gettext('Not provided')" />
         </template>
         <div class="text-3 op-65">
           {{ notes }}

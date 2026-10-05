@@ -188,47 +188,45 @@ async function removeBot() {
       </ATypographyText>
     </div>
 
-    <div class="cols">
-      <AFlex vertical gap="middle" class="col-main">
-        <ACard :title="$gettext('Announcements')" :loading="loading">
-          <template #extra>
-            <AButton type="primary" size="small" @click="startCreate">
-              <span class="i-tabler-plus" />{{ $gettext('New announcement') }}
-            </AButton>
-          </template>
-          <ATypographyParagraph type="secondary" class="text-3">
-            {{ $gettext('Shown on My plugins, the newest five first, in the language of the portal or else in English.') }}
-          </ATypographyParagraph>
-          <AEmpty v-if="!data?.announcements.length" :description="$gettext('No announcements.')" />
-          <div v-for="item in data?.announcements ?? []" :key="item.id" class="row">
-            <div class="min-w-0 flex-1">
-              <div class="font-500">
-                {{ inPortalLanguage(item.title) }}
-              </div>
-              <div class="text-3 op-65">
-                {{ inPortalLanguage(item.text) }}
-              </div>
-              <div class="text-3 op-50 mt-1">
-                {{ formatDay(item.date) }}<template v-if="!item.title.zh_CN || !item.text.zh_CN">
-                  {{ $gettext(', no Chinese version') }}
-                </template>
-              </div>
+    <AFlex vertical gap="middle">
+      <ACard :title="$gettext('Announcements')" :loading="loading">
+        <template #extra>
+          <AButton type="primary" size="small" @click="startCreate">
+            <span class="i-tabler-plus" />{{ $gettext('New announcement') }}
+          </AButton>
+        </template>
+        <ATypographyParagraph type="secondary" class="text-3">
+          {{ $gettext('Shown on My plugins, the newest five first, in the language of the portal or else in English.') }}
+        </ATypographyParagraph>
+        <AEmpty v-if="!data?.announcements.length" :description="$gettext('No announcements.')" />
+        <div v-for="item in data?.announcements ?? []" :key="item.id" class="row">
+          <div class="min-w-0 flex-1">
+            <div class="font-500">
+              {{ inPortalLanguage(item.title) }}
             </div>
-            <AFlex gap="small">
-              <AButton size="small" @click="startEdit(item)">
-                {{ $gettext('Edit') }}
-              </AButton>
-              <APopconfirm :title="$gettext('Remove this announcement?')" :ok-text="$gettext('Remove')" :cancel-text="$gettext('Cancel')" @confirm="removeAnnouncement(item)">
-                <AButton size="small" danger>
-                  {{ $gettext('Remove') }}
-                </AButton>
-              </APopconfirm>
-            </AFlex>
+            <div class="text-3 op-65">
+              {{ inPortalLanguage(item.text) }}
+            </div>
+            <div class="text-3 op-50 mt-1">
+              {{ formatDay(item.date) }}<template v-if="!item.title.zh_CN || !item.text.zh_CN">
+                {{ $gettext(', no Chinese version') }}
+              </template>
+            </div>
           </div>
-        </ACard>
-      </AFlex>
+          <AFlex gap="small">
+            <AButton size="small" @click="startEdit(item)">
+              {{ $gettext('Edit') }}
+            </AButton>
+            <APopconfirm :title="$gettext('Remove this announcement?')" :ok-text="$gettext('Remove')" :cancel-text="$gettext('Cancel')" @confirm="removeAnnouncement(item)">
+              <AButton size="small" danger>
+                {{ $gettext('Remove') }}
+              </AButton>
+            </APopconfirm>
+          </AFlex>
+        </div>
+      </ACard>
 
-      <AFlex vertical gap="middle" class="col-side">
+      <div class="below-row">
         <ACard :title="$gettext('Mail service')" :loading="loading">
           <template v-if="data" #extra>
             <ATag :color="status(data.mail.active).color" class="m-0">
@@ -306,8 +304,8 @@ async function removeBot() {
             </AFlex>
           </AForm>
         </ACard>
-      </AFlex>
-    </div>
+      </div>
+    </AFlex>
 
     <AModal :open="!!editing" :title="editing?.id ? $gettext('Edit the announcement') : $gettext('New announcement')" :confirm-loading="announcementSaving" :ok-text="$gettext('Publish')" :cancel-text="$gettext('Cancel')" @ok="saveAnnouncement" @cancel="editing = null">
       <AForm v-if="editing" layout="vertical">
