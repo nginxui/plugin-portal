@@ -1,5 +1,6 @@
 import type { StoreItem } from '@/api/store'
 import type { PreviewDoc } from '@/components/MarketPreview.vue'
+import { imageChanged } from './crop'
 import gettext, { $gettext } from './gettext'
 import { HOST_LOCALES } from './hostLocales'
 import { localeName } from './locales'
@@ -27,7 +28,7 @@ export function diffDoc(before: PreviewDoc, after: PreviewDoc): StoreItem[] {
       items.push({ field: 'screenshots', label: `screenshots.${shot.id}.added`, review: false })
       continue
     }
-    if (was.path !== shot.path || (was.dark_path ?? '') !== (shot.dark_path ?? ''))
+    if (imageChanged(was, shot))
       items.push({ field: 'screenshots', label: `screenshots.${shot.id}.image`, review: false })
     for (const locale of new Set([...Object.keys(was.caption ?? {}), ...Object.keys(shot.caption ?? {})])) {
       if ((was.caption?.[locale] ?? '') !== (shot.caption?.[locale] ?? ''))

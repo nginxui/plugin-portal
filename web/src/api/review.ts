@@ -1,4 +1,5 @@
 import type { Change, ChangeEvent } from './changes'
+import type { Crop } from '@/lib/crop'
 import { api } from './client'
 
 export interface QueueItem extends Change {
@@ -15,7 +16,7 @@ export interface ReviewDetail {
   repository: string | null
   repositoryCreatedAt?: string | null
   before: Record<string, unknown> | null
-  listing: { description: Record<string, string> | null, screenshots: { url: string, dark_url?: string, caption?: Record<string, string> }[], iconUrl: string | null, capabilities: string[], manifest: Record<string, any> | null, version: string | null } | null
+  listing: { description: Record<string, string> | null, screenshots: { url: string, dark_url?: string, caption?: Record<string, string>, crop?: Crop, dark_crop?: Crop }[], iconUrl: string | null, capabilities: string[], manifest: Record<string, any> | null, version: string | null } | null
   pull: { number: number, state: string, merged: boolean, mergeable: boolean | null, mergeableState: string, url: string, title: string } | null
   checks: { name: string, status: string, conclusion: string | null, url: string }[]
   conversation: { kind: 'review' | 'comment', state: string | null, author: string | null, role: 'maintainer' | null, body: string, at: string }[]

@@ -12,11 +12,40 @@ import { reservedWord } from './rules'
 // A plugin without a document shows what the plugin.json of its listed
 // release gives, which the editor turns into a first document.
 
+/** A region of an image as shares of its width and height, from its top left corner. */
+export interface Crop {
+  x: number
+  y: number
+  width: number
+  height: number
+}
+
 export interface StoreScreenshot {
   id: string
   path: string
+  // The part of the image lists show; opening the screenshot shows it whole.
+  crop?: Crop
   dark_path?: string
+  dark_crop?: Crop
   caption?: Localized
+}
+
+/** A crop kept to four places, or null when it is no region inside its image. */
+export function cleanCrop(value: unknown): Crop | null {
+  if (!value || typeof value !== 'object')
+    return null
+  const v = value as Record<string, unknown>
+  const [x, y, width, height] = [v.x, v.y, v.width, v.height].map(n => typeof n === 'number' && Number.isFinite(n) ? Math.round(n * 10000) / 10000 : Number.NaN)
+  if (![x, y, width, height].every(n => n >= 0 && n <= 1) || width <= 0 || height <= 0 || x + width > 1.0001 || y + height > 1.0001)
+    return null
+  return { x, y, width, height }
+}
+
+const sameCrop = (a?: Crop, b?: Crop) => JSON.stringify(a ?? null) === JSON.stringify(b ?? null)
+
+/** Whether the image a screenshot shows differs: its file or the part of it shown. */
+export function imageChanged(a: StoreScreenshot, b: StoreScreenshot): boolean {
+  return a.path !== b.path || (a.dark_path ?? '') !== (b.dark_path ?? '') || !sameCrop(a.crop, b.crop) || !sameCrop(a.dark_crop, b.dark_crop)
 }
 
 export interface StoreDoc {
@@ -267,11 +296,25 @@ export function cleanDoc(input: unknown): { doc: StoreDoc, problems: string[] } 
       }
       seen.add(id)
       const out: StoreScreenshot = { id, path }
+      if (shot.crop !== undefined) {
+        const crop = cleanCrop(shot.crop)
+        if (crop)
+          out.crop = crop
+        else
+          problems.push(`screenshots.${id}: the crop is not a region inside the image`)
+      }
       if (typeof shot.dark_path === 'string' && shot.dark_path) {
         if (pathOk(shot.dark_path))
           out.dark_path = shot.dark_path
         else
           problems.push(`screenshots.${id}: the dark image path is not valid`)
+      }
+      if (out.dark_path && shot.dark_crop !== undefined) {
+        const crop = cleanCrop(shot.dark_crop)
+        if (crop)
+          out.dark_crop = crop
+        else
+          problems.push(`screenshots.${id}: the dark crop is not a region inside the image`)
       }
       const caption = cleanLocalized(shot.caption, LIMITS.caption, `screenshots.${id}.caption`, problems)
       if (caption)
@@ -330,7 +373,7 @@ export function diffDoc(before: StoreDoc, after: StoreDoc): StoreItem[] {
       items.push({ field: 'screenshots', label: `screenshots.${shot.id}.added`, review: false })
       continue
     }
-    if (old.path !== shot.path || (old.dark_path ?? '') !== (shot.dark_path ?? ''))
+    if (imageChanged(old, shot))
       items.push({ field: 'screenshots', label: `screenshots.${shot.id}.image`, review: false })
     const locales = new Set([...Object.keys(old.caption ?? {}), ...Object.keys(shot.caption ?? {})])
     for (const locale of locales) {
@@ -359,5 +402,5 @@ export function textsOnly(before: StoreDoc, after: StoreDoc): boolean {
     return false
   const a = before.screenshots ?? []
   const b = after.screenshots ?? []
-  return a.length === b.length && a.every((s, i) => s.id === b[i].id && s.path === b[i].path && (s.dark_path ?? '') === (b[i].dark_path ?? ''))
+  return a.length === b.length && a.every((s, i) => s.id === b[i].id && !imageChanged(s, b[i]))
 }

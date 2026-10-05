@@ -55,8 +55,9 @@ export function submitStore(id: string, delivery: 'bot' | 'patch') {
   return api<{ change: string, moveChange: string | null, delivery: string, prUrl: string | null }>(`/plugins/${encodeURIComponent(id)}/store/submit`, { method: 'POST', json: { delivery } })
 }
 
-export async function uploadImage(blob: Blob) {
-  const response = await fetch('/api/media', { method: 'POST', body: blob, headers: { 'Content-Type': 'image/webp', 'X-Portal-Request': '1' }, credentials: 'same-origin' })
+/** Uploads a screenshot: cropped to 16:10, or the whole image a crop in the document frames. */
+export async function uploadImage(blob: Blob, original = false) {
+  const response = await fetch(original ? '/api/media?original=1' : '/api/media', { method: 'POST', body: blob, headers: { 'Content-Type': 'image/webp', 'X-Portal-Request': '1' }, credentials: 'same-origin' })
   const data = await response.json().catch(() => ({})) as { path?: string, url?: string, error?: string, width?: number, height?: number }
   if (!response.ok)
     throw new Error(data.error ?? 'upload_failed')

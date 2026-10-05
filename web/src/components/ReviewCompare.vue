@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import type { PreviewDoc, PreviewManifest } from './MarketPreview.vue'
 import { computed, ref } from 'vue'
+import { imageChanged } from '@/lib/crop'
 import { $gettext, $ngettext } from '@/lib/gettext'
 import { joinList, joinSentences } from '@/lib/labels'
 
@@ -40,7 +41,7 @@ const changes = computed(() => {
   const old = new Map((b.screenshots ?? []).map(s => [s.id, s]))
   ;(a.screenshots ?? []).forEach((shot, i) => {
     const was = old.get(shot.id)
-    if (!was || was.path !== shot.path || (was.dark_path ?? '') !== (shot.dark_path ?? ''))
+    if (!was || imageChanged(was, shot))
       out.push($gettext('Screenshot %{n}', { n: String(i + 1) }))
   })
   const kept = new Set((a.screenshots ?? []).map(s => s.id))
@@ -90,7 +91,7 @@ const highlight = computed<Record<string, string>>(() => {
     const was = old.get(shot.id)
     if (!was)
       out[`shot:${shot.id}`] = $gettext('New screenshot')
-    else if (was.path !== shot.path || (was.dark_path ?? '') !== (shot.dark_path ?? ''))
+    else if (imageChanged(was, shot))
       out[`shot:${shot.id}`] = $gettext('Screenshot image changed')
   }
   return out

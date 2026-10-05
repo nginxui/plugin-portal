@@ -1,9 +1,12 @@
 <script setup lang="ts">
 import type { StoreState } from '@/api/store'
 import type { PreviewDoc } from '@/components/MarketPreview.vue'
+import type { Crop } from '@/lib/crop'
+import { useLocalStorage } from '@vueuse/core'
 import { computed, onBeforeUnmount, ref, useTemplateRef, watch } from 'vue'
 import { aiDraft, aiStatus } from '@/api/community'
 import { uploadImage } from '@/api/store'
+import { croppedStyles } from '@/lib/crop'
 import gettext, { $gettext } from '@/lib/gettext'
 import { HOST_LOCALES, RTL_LOCALES } from '@/lib/hostLocales'
 import { localeName } from '@/lib/locales'
@@ -61,10 +64,19 @@ function move(id: string, step: number) {
   setShots(list)
 }
 
-// Cropping a picked file, or the current image again.
+// Framing a picked file, or the current image again. By default the whole
+// image is kept and the document records the part lists show; opening the
+// screenshot shows it whole. Otherwise the part becomes an image of its own.
+const keepOriginal = useLocalStorage('portal-screenshot-keep-original', true)
+interface Framer {
+  crop: () => Promise<Blob | null>
+  cropOrNull: () => Crop | null
+  original: () => Promise<Blob | null>
+  reset: () => void
+}
 const side = ref<'light' | 'dark'>('light')
 const pending = ref<{ url: string, target: 'new' | 'light' | 'dark', name: string } | null>(null)
-const cropper = useTemplateRef<{ crop: () => Promise<Blob | null> }>('cropper')
+const cropper = useTemplateRef<Framer>('cropper')
 const uploading = ref(false)
 const uploadError = ref('')
 const fileInput = useTemplateRef<HTMLInputElement>('fileInput')
@@ -119,7 +131,9 @@ function onDropFile(e: DragEvent) {
 // The image of the selected screenshot sits in a crop box all the time; a
 // crop is encoded and uploaded only when it is confirmed.
 const liveUrl = computed(() => imageOf(side.value === 'dark' ? selected.value?.dark_path : selected.value?.path))
-const live = useTemplateRef<{ crop: () => Promise<Blob | null>, reset: () => void }>('live')
+const live = useTemplateRef<Framer>('live')
+// The crop the live frame starts from: the dark image's, else the light one's.
+const liveCrop = computed(() => side.value === 'dark' ? selected.value?.dark_crop ?? selected.value?.crop ?? null : selected.value?.crop ?? null)
 const adjusted = ref(false)
 const liveFailed = ref(false)
 watch(liveUrl, () => {
@@ -131,48 +145,72 @@ async function applyCrop() {
   const p = pending.value
   if (!p)
     return
-  if (await upload(() => cropper.value?.crop() ?? Promise.resolve(null), p.target, p.name)) {
+  if (await upload(cropper.value, p.target, p.name)) {
     URL.revokeObjectURL(p.url)
     pending.value = null
   }
 }
 
+// A shot with the image of one side and its crop, none to show it whole.
+function withImage(shot: Shot, target: 'light' | 'dark', path: string | null, crop: Crop | null): Shot {
+  const [pathKey, cropKey] = target === 'dark' ? ['dark_path', 'dark_crop'] as const : ['path', 'crop'] as const
+  const next: Shot = { ...shot, ...(path ? { [pathKey]: path } : {}) }
+  if (crop)
+    next[cropKey] = crop
+  else
+    delete next[cropKey]
+  return next
+}
+
+// Keeping the whole image, a new frame is only a new crop; otherwise the
+// framed part is encoded and uploaded as the image.
 async function applyLive() {
-  if (selected.value && await upload(() => live.value?.crop() ?? Promise.resolve(null), side.value, selected.value.id))
+  const shot = selected.value
+  if (!shot)
+    return
+  if (keepOriginal.value) {
+    setShots(shots.value.map(s => s.id === shot.id ? withImage(s, side.value, null, live.value?.cropOrNull() ?? null) : s))
+    adjusted.value = false
+    return
+  }
+  if (await upload(live.value, side.value, shot.id))
     adjusted.value = false
 }
 
-async function upload(make: () => Promise<Blob | null>, target: 'new' | 'light' | 'dark', name: string): Promise<boolean> {
+async function upload(framer: Framer | null, target: 'new' | 'light' | 'dark', name: string): Promise<boolean> {
   uploading.value = true
   uploadError.value = ''
   try {
-    const blob = await make()
+    const original = keepOriginal.value
+    const blob = framer ? await (original ? framer.original() : framer.crop()) : null
     if (!blob) {
       uploadError.value = $gettext('The image could not be encoded under 2 MB.')
       return false
     }
-    const { path, url } = await uploadImage(blob)
+    const crop = original ? framer?.cropOrNull() ?? null : null
+    const { path, url } = await uploadImage(blob, original)
     if (state.value)
       state.value.images[path] = url
     if (target === 'new') {
       const id = slug(name)
-      setShots([...shots.value, { id, path }])
+      setShots([...shots.value, withImage({ id, path }, 'light', path, crop)])
       selectedId.value = id
       side.value = 'light'
     }
     else if (selected.value) {
-      const key = target === 'dark' ? 'dark_path' : 'path'
-      setShots(shots.value.map(s => s.id === selected.value!.id ? { ...s, [key]: path } : s))
+      setShots(shots.value.map(s => s.id === selected.value!.id ? withImage(s, target, path, crop) : s))
     }
     return true
   }
   catch (e) {
     const code = (e as Error).message
-    uploadError.value = code === 'bad_ratio' || code === 'bad_size'
-      ? $gettext('The image was refused: it must be 16:10 and between 640 and 3840 pixels wide.')
-      : code === 'uploads_off'
-        ? $gettext('Screenshot uploads are not open yet.')
-        : $gettext('The image could not be uploaded. Please try again.')
+    uploadError.value = code === 'bad_size' && keepOriginal.value
+      ? $gettext('The image is too small: it needs room for a 16:10 part at least 640 pixels wide.')
+      : code === 'bad_ratio' || code === 'bad_size'
+        ? $gettext('The image was refused: it must be 16:10 and between 640 and 3840 pixels wide.')
+        : code === 'uploads_off'
+          ? $gettext('Screenshot uploads are not open yet.')
+          : $gettext('The image could not be uploaded. Please try again.')
     return false
   }
   finally {
@@ -190,7 +228,7 @@ onBeforeUnmount(cancelCrop)
 
 function removeDark() {
   if (selected.value)
-    setShots(shots.value.map(s => s.id === selected.value!.id ? { id: s.id, path: s.path, ...(s.caption ? { caption: s.caption } : {}) } : s))
+    setShots(shots.value.map(s => s.id === selected.value!.id ? (({ dark_path: _path, dark_crop: _crop, ...rest }) => rest)(s) : s))
 }
 
 function remove() {
@@ -251,6 +289,13 @@ const THUMB = {
   root: { display: 'block', width: '100%' },
   image: { display: 'block', width: '100%', aspectRatio: '16 / 10', objectFit: 'cover', borderRadius: '4px', border: '1px solid var(--portal-border)', background: 'var(--portal-faint)' },
 } as const
+
+// Each thumbnail framed by its crop. Made once per change of the screenshots,
+// since a new styles object on every render makes the preview group loop.
+const thumbStyles = computed(() => Object.fromEntries(shots.value.map(shot => [shot.id, {
+  light: croppedStyles(shot.crop, THUMB),
+  dark: croppedStyles(shot.dark_crop ?? shot.crop, THUMB),
+}])))
 </script>
 
 <template>
@@ -303,8 +348,8 @@ const THUMB = {
               </AFlex>
               <AImagePreviewGroup>
                 <div class="pair">
-                  <AImage v-if="imageOf(shot.path)" :src="imageOf(shot.path)!" alt="" referrerpolicy="no-referrer" :styles="THUMB" />
-                  <AImage v-if="imageOf(shot.dark_path)" :src="imageOf(shot.dark_path)!" alt="" referrerpolicy="no-referrer" :styles="THUMB" />
+                  <AImage v-if="imageOf(shot.path)" :src="imageOf(shot.path)!" alt="" referrerpolicy="no-referrer" :styles="thumbStyles[shot.id]?.light" />
+                  <AImage v-if="imageOf(shot.dark_path)" :src="imageOf(shot.dark_path)!" alt="" referrerpolicy="no-referrer" :styles="thumbStyles[shot.id]?.dark" />
                   <div v-else class="missing" :class="{ clickable: canEdit && S.uploads }" @click.stop="canEdit && S.uploads && (selectedId = shot.id, side = 'dark', pick('dark'))">
                     {{ $gettext('No dark screenshot') }}
                     <span v-if="canEdit && S.uploads" class="block text-3">{{ $gettext('Click to upload') }}</span>
@@ -331,7 +376,7 @@ const THUMB = {
             <span class="i-tabler-upload text-6 op-50" />
             <div>{{ $gettext('Drop a PNG, JPEG or WebP image here') }}</div>
             <div class="text-3 op-65">
-              {{ $gettext('Cropped to 16:10 and converted to WebP, up to 2 MB') }}
+              {{ keepOriginal ? $gettext('Kept whole and converted to WebP, up to 2 MB; lists show the 16:10 part you choose') : $gettext('Cropped to 16:10 and converted to WebP, up to 2 MB') }}
             </div>
           </div>
           <AEmpty v-if="!shots.length && !(canEdit && S.uploads)" :description="$gettext('No screenshots yet.')" />
@@ -346,6 +391,14 @@ const THUMB = {
         <AFlex vertical gap="middle" class="col-side">
           <ACard v-if="pending" :title="pending.target === 'new' ? $gettext('New screenshot') : pending.target === 'dark' ? $gettext('Dark version') : $gettext('Light version')">
             <ImageCropper ref="cropper" :src="pending.url" />
+            <div class="keep">
+              <ACheckbox v-model:checked="keepOriginal">
+                {{ $gettext('Keep the whole image, record only the part shown') }}
+              </ACheckbox>
+              <div class="text-3 op-65">
+                {{ keepOriginal ? $gettext('Lists show the framed part; opening the screenshot shows the whole image.') : $gettext('The framed part becomes the image; the rest is not kept.') }}
+              </div>
+            </div>
             <AAlert v-if="uploadError" type="error" show-icon class="mt-3" :title="uploadError" />
             <AFlex justify="flex-end" gap="small" class="mt-4">
               <AButton @click="cancelCrop">
@@ -362,7 +415,7 @@ const THUMB = {
               <ASegmented v-model:value="side" size="small" :options="[{ value: 'light', label: $gettext('Light') }, { value: 'dark', label: $gettext('Dark') }]" />
             </template>
             <div class="preview">
-              <ImageCropper v-if="liveUrl && canEdit && S.uploads && !liveFailed" ref="live" :key="liveUrl" :src="liveUrl" @adjusted="adjusted = $event" @failed="liveFailed = true" />
+              <ImageCropper v-if="liveUrl && canEdit && (S.uploads || keepOriginal) && !liveFailed" ref="live" :key="liveUrl" :src="liveUrl" :crop="liveCrop" @adjusted="adjusted = $event" @failed="liveFailed = true" />
               <img v-else-if="liveUrl" :src="liveUrl" alt="" referrerpolicy="no-referrer">
               <div v-else class="missing big" :class="{ clickable: canEdit && S.uploads }" @click="canEdit && S.uploads && pick(side)">
                 {{ side === 'dark' ? $gettext('No dark screenshot') : $gettext('The image is missing') }}
@@ -372,7 +425,7 @@ const THUMB = {
             <AFlex gap="small" wrap class="mt-3">
               <template v-if="adjusted">
                 <AButton size="small" type="primary" :loading="uploading" @click="applyLive">
-                  {{ $gettext('Use this crop') }}
+                  {{ keepOriginal ? $gettext('Show this part') : $gettext('Use this crop') }}
                 </AButton>
                 <AButton size="small" :disabled="uploading" @click="live?.reset()">
                   {{ $gettext('Undo the crop') }}
@@ -385,6 +438,14 @@ const THUMB = {
                 {{ $gettext('Remove the dark version') }}
               </AButton>
             </AFlex>
+            <div v-if="liveUrl && canEdit" class="keep">
+              <ACheckbox v-model:checked="keepOriginal">
+                {{ $gettext('Keep the whole image, record only the part shown') }}
+              </ACheckbox>
+              <div class="text-3 op-65">
+                {{ keepOriginal ? $gettext('Lists show the framed part; opening the screenshot shows the whole image.') : $gettext('The framed part becomes the image; the rest is not kept.') }}
+              </div>
+            </div>
 
             <div class="captions">
               <div class="font-500 mb-2">
@@ -550,6 +611,13 @@ const THUMB = {
 
 .captions {
   margin-top: 20px;
+}
+
+.keep {
+  margin-top: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
 }
 
 .caption {

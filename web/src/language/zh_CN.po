@@ -3265,6 +3265,11 @@ msgid "The image could not be encoded under 2 MB."
 msgstr "无法将图片压缩到 2 MB 以内。"
 
 msgid ""
+"The image is too small: it needs room for a 16:10 part at least 640 pixels "
+"wide."
+msgstr "图片太小：需要能容纳宽度至少 640 像素的 16:10 区域。"
+
+msgid ""
 "The image was refused: it must be 16:10 and between 640 and 3840 pixels "
 "wide."
 msgstr "图片不符合要求：必须为 16:10，宽度在 640 到 3840 像素之间。"
@@ -3321,6 +3326,11 @@ msgstr "没有说明"
 msgid "Drop a PNG, JPEG or WebP image here"
 msgstr "将 PNG、JPEG 或 WebP 拖放到这里"
 
+msgid ""
+"Kept whole and converted to WebP, up to 2 MB; lists show the 16:10 part you "
+"choose"
+msgstr "保留完整图片并转为 WebP，最大 2 MB；列表中显示你选择的 16:10 区域"
+
 msgid "Cropped to 16:10 and converted to WebP, up to 2 MB"
 msgstr "单张不超过 2 MB，将裁剪为 16:10 并转换为 WebP"
 
@@ -3339,6 +3349,16 @@ msgstr "深色版本"
 msgid "Light version"
 msgstr "浅色版本"
 
+msgid "Keep the whole image, record only the part shown"
+msgstr "保留原图，只记录显示区域"
+
+msgid ""
+"Lists show the framed part; opening the screenshot shows the whole image."
+msgstr "列表中显示框选的区域，点开截图时显示完整原图。"
+
+msgid "The framed part becomes the image; the rest is not kept."
+msgstr "框选的区域会生成新图片，其余部分不保留。"
+
 msgid "Add the screenshot"
 msgstr "添加截图"
 
@@ -3347,6 +3367,9 @@ msgstr "使用此裁剪"
 
 msgid "The image is missing"
 msgstr "缺少图片"
+
+msgid "Show this part"
+msgstr "显示此区域"
 
 msgid "Undo the crop"
 msgstr "还原裁剪"

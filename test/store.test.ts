@@ -156,4 +156,26 @@ describe('store editor', () => {
     const served = await call(url)
     expect(served.headers.get('Cache-Control')).toContain('immutable')
   })
+
+  it('takes a whole image of any shape that has room for a 16:10 part', async () => {
+    const cookie = await signedIn()
+    const upload = (bytes: Uint8Array) => call('/api/media?original=1', { method: 'POST', mutate: true, cookie, body: bytes, headers: { 'Content-Type': 'image/webp' } })
+    expect((await upload(webp(2400, 1000))).status).toBe(201)
+    expect((await upload(webp(1280, 1280))).status).toBe(201)
+    // A 16:10 part of this one would be under 640 pixels wide.
+    expect((await upload(webp(1600, 380))).status).toBe(422)
+  })
+
+  it('keeps the crop of a screenshot and counts a new crop as a new image', async () => {
+    const cookie = await signedIn()
+    const { doc } = await (await call(`/api/plugins/${ID}/store`, { cookie })).json() as { doc: { screenshots?: { id: string, path: string }[] } }
+    const shots = [
+      { id: 'wide', path: 'docs/wide.png', crop: { x: 0.123456, y: 0, width: 0.75, height: 1 } },
+      { id: 'bad', path: 'docs/bad.png', crop: { x: 0.5, y: 0, width: 0.6, height: 1 } },
+    ]
+    const saved = await (await call(`/api/plugins/${ID}/store/draft`, { method: 'PUT', mutate: true, cookie, json: { doc: { ...doc, screenshots: shots }, source: 'repo-branch' } })).json() as { problems: string[] }
+    expect(saved.problems).toEqual(['screenshots.bad: the crop is not a region inside the image'])
+    const state = await (await call(`/api/plugins/${ID}/store`, { cookie })).json() as { draft: { doc: { screenshots: { id: string, crop?: unknown }[] } } }
+    expect(state.draft.doc.screenshots.find(s => s.id === 'wide')?.crop).toEqual({ x: 0.1235, y: 0, width: 0.75, height: 1 })
+  })
 })
