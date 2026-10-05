@@ -6,14 +6,12 @@ import { addBlock, delist, getAllPlugins, setTrust } from '@/api/maintain'
 import { $gettext } from '@/lib/gettext'
 import { joinClauses, localized, storeSourceShort, trustLabel } from '@/lib/labels'
 import { fromNow } from '@/lib/time'
-import { usePaletteStore } from '@/stores/palette'
 
 // Every plugin of the catalog and what a maintainer may do to it (spec
 // 11.5). Changing trust, delisting and blocking each open a pull request.
 
 const router = useRouter()
 const route = useRoute()
-const palette = usePaletteStore()
 const data = ref<AdminPlugins | null>(null)
 const failed = ref(false)
 async function load() {
@@ -24,6 +22,7 @@ async function load() {
     failed.value = true
   }
 }
+const blockOpen = ref(false)
 const lastBlocked = computed(() => (data.value?.blocked ?? []).map(b => b.added_at ?? '').filter(Boolean).sort().at(-1) ?? null)
 
 const state = ref<'all' | 'listed' | 'review' | 'delisted'>('all')
@@ -144,9 +143,6 @@ const title = computed(() => {
           {{ $gettext('Every plugin of the catalog and what maintainers may do to it. Delisting and blocking are written to the catalog repository as pull requests.') }}
         </ATypographyText>
       </div>
-      <AButton @click="palette.show()">
-        <span class="i-tabler-search" />{{ $gettext('Search and commands') }}
-      </AButton>
     </AFlex>
 
     <AAlert v-if="failed" type="error" show-icon :title="$gettext('The plugins could not be loaded.')" />
@@ -169,15 +165,15 @@ const title = computed(() => {
           <span class="num">{{ data.counts.yanked }}</span>
           <span class="text-3 op-65">{{ $gettext('Users stay on the version before') }}</span>
         </div>
-        <div class="stat">
-          <span class="text-3 op-65">{{ $gettext('Block list') }}</span>
+        <button type="button" class="stat clickable" @click="blockOpen = true">
+          <span class="text-3 op-65">{{ $gettext('Block list') }} <span class="i-tabler-chevron-right" /></span>
           <span class="num">{{ data.counts.blocked }}</span>
           <span class="text-3 op-65">{{ lastBlocked ? $gettext('Last added %{date}', { date: fromNow(lastBlocked) }) : $gettext('Plugin ids and repositories') }}</span>
-        </div>
+        </button>
       </div>
 
-      <div class="cols">
-        <ACard class="col-main" :styles="{ body: { padding: 0 } }">
+      <AFlex vertical gap="middle">
+        <ACard :styles="{ body: { padding: 0 } }">
           <div class="toolbar">
             <ASegmented v-model:value="state" :options="[{ value: 'all', label: $gettext('All') }, { value: 'listed', label: $gettext('Listed') }, { value: 'review', label: $gettext('In review') }, { value: 'delisted', label: $gettext('Delisted') }]" @change="page = 1" />
             <AFlex gap="small" wrap>
@@ -279,44 +275,38 @@ const title = computed(() => {
             </AFlex>
           </AFlex>
         </ACard>
-
-        <AFlex vertical gap="middle" class="col-side">
-          <ACard>
-            <template #title>
-              <span class="i-tabler-ban mr-2 op-65" />{{ $gettext('Block list') }}
-            </template>
-            <template #extra>
-              <a :href="data.blockedUrl" target="_blank" rel="noopener" class="text-3">{{ $gettext('View on GitHub') }}</a>
-            </template>
-            <div v-for="b in data.blocked" :key="b.value" class="blocked">
-              <span class="i-tabler-ban c-err" />
-              <div class="min-w-0">
-                <div class="mono text-3 break-all">
-                  {{ b.value }}
-                </div>
-                <div class="text-3 op-65">
-                  {{ joinClauses([b.kind === 'plugin' ? $gettext('Plugin') : $gettext('Repository'), b.reason ?? '', b.added_by ? $gettext('%{time} added by @%{login}', { time: b.added_at ? fromNow(b.added_at) : '', login: b.added_by }) : ''].filter(Boolean)) }}
-                </div>
-              </div>
-            </div>
-            <ATypographyText v-if="!data.blocked.length" type="secondary" class="text-3">
-              {{ $gettext('Nothing is blocked.') }}
-            </ATypographyText>
-            <AButton size="small" class="mt-3" @click="start({ kind: 'block-new' })">
-              <span class="i-tabler-plus" />{{ $gettext('Add an entry') }}
-            </AButton>
-          </ACard>
-          <ACard :title="$gettext('Delisting and blocking')">
-            <ATypographyParagraph class="text-3">
-              {{ $gettext('Delisting removes a plugin from the catalog and leaves installed copies alone. Blocking also keeps the same plugin id or repository from being listed again.') }}
-            </ATypographyParagraph>
-            <ATypographyParagraph type="secondary" class="text-3 mb-0">
-              {{ $gettext('Both need a reason, which goes to the audit log and to the admins of the plugin.') }}
-            </ATypographyParagraph>
-          </ACard>
-        </AFlex>
-      </div>
+      </AFlex>
     </template>
+
+    <ADrawer v-if="data" v-model:open="blockOpen" :size="420" :styles="{ wrapper: { top: '64px' } }">
+      <template #title>
+        <span class="i-tabler-ban mr-2 op-65" />{{ $gettext('Block list') }}
+      </template>
+      <template #extra>
+        <a :href="data.blockedUrl" target="_blank" rel="noopener" class="text-3">{{ $gettext('View on GitHub') }}</a>
+      </template>
+      <div v-for="b in data.blocked" :key="b.value" class="blocked">
+        <span class="i-tabler-ban c-err" />
+        <div class="min-w-0">
+          <div class="mono text-3 break-all">
+            {{ b.value }}
+          </div>
+          <div class="text-3 op-65">
+            {{ joinClauses([b.kind === 'plugin' ? $gettext('Plugin') : $gettext('Repository'), b.reason ?? '', b.added_by ? $gettext('%{time} added by @%{login}', { time: b.added_at ? fromNow(b.added_at) : '', login: b.added_by }) : ''].filter(Boolean)) }}
+          </div>
+        </div>
+      </div>
+      <ATypographyText v-if="!data.blocked.length" type="secondary" class="text-3">
+        {{ $gettext('Nothing is blocked.') }}
+      </ATypographyText>
+      <AButton size="small" class="mt-3" @click="start({ kind: 'block-new' })">
+        <span class="i-tabler-plus" />{{ $gettext('Add an entry') }}
+      </AButton>
+      <ATypographyParagraph type="secondary" class="text-3 mt-4 mb-0">
+        {{ $gettext('Delisting removes a plugin from the catalog and leaves installed copies alone. Blocking also keeps the same plugin id or repository from being listed again.') }}
+        {{ $gettext('Both need a reason, which goes to the audit log and to the admins of the plugin.') }}
+      </ATypographyParagraph>
+    </ADrawer>
 
     <AModal :open="!!action" :title="title" :confirm-loading="sending" :ok-text="action?.kind === 'trust' ? $gettext('Open the pull request') : $gettext('Open the pull request')" :ok-button-props="{ danger: action?.kind !== 'trust' }" @ok="confirm" @cancel="action = null">
       <AForm v-if="action" layout="vertical">
@@ -355,6 +345,19 @@ const title = computed(() => {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
   gap: 16px;
+}
+
+.stat.clickable {
+  font: inherit;
+  color: inherit;
+  text-align: start;
+  cursor: pointer;
+  transition: border-color 0.2s;
+}
+
+.stat.clickable:hover,
+.stat.clickable:focus-visible {
+  border-color: var(--portal-primary);
 }
 
 .stat {

@@ -62,7 +62,7 @@ msgid "Reviews"
 msgstr ""
 
 #: web/src/components/CommandPalette.vue:63
-#: web/src/views/maintain/PartnersAdmin.vue:203
+#: web/src/views/maintain/PartnersAdmin.vue:237
 #: web/src/views/owners/OwnerPage.vue:132
 #: web/src/views/owners/VendorPage.vue:188
 msgid "Plugins"
@@ -183,7 +183,7 @@ msgstr ""
 #: web/src/components/CommandPalette.vue:130
 #: web/src/layouts/PortalLayout.vue:65
 #: web/src/layouts/PortalLayout.vue:103
-#: web/src/views/maintain/AuditLog.vue:127
+#: web/src/views/maintain/AuditLog.vue:135
 #: web/src/views/review/ReviewQueue.vue:425
 msgid "Audit log"
 msgstr ""
@@ -275,8 +275,8 @@ msgstr ""
 #: web/src/lib/checks.ts:11
 #: web/src/views/maintain/AiModels.vue:146
 #: web/src/views/maintain/AiModels.vue:188
-#: web/src/views/maintain/PartnersAdmin.vue:201
-#: web/src/views/maintain/PartnersAdmin.vue:243
+#: web/src/views/maintain/PartnersAdmin.vue:235
+#: web/src/views/maintain/PartnersAdmin.vue:301
 #: web/src/views/owners/VendorPage.vue:362
 #: web/src/views/plugin/PluginStore.vue:82
 #: web/src/views/plugin/PluginTranslations.vue:52
@@ -360,8 +360,8 @@ msgstr ""
 
 #: web/src/components/CommunityCard.vue:131
 #: web/src/components/CommunityCard.vue:145
-#: web/src/views/maintain/PartnersAdmin.vue:181
-#: web/src/views/maintain/PartnersAdmin.vue:282
+#: web/src/views/maintain/PartnersAdmin.vue:215
+#: web/src/views/maintain/PartnersAdmin.vue:317
 msgid "Decline"
 msgstr ""
 
@@ -371,6 +371,7 @@ msgstr ""
 #: web/src/components/MarketPreview.vue:324
 #: web/src/components/MarketPreview.vue:377
 #: web/src/components/MarketPreview.vue:430
+#: web/src/views/maintain/PartnersAdmin.vue:299
 #: web/src/views/maintain/Settings.vue:221
 #: web/src/views/maintain/Settings.vue:256
 #: web/src/views/maintain/Settings.vue:301
@@ -609,7 +610,7 @@ msgstr ""
 #: web/src/components/ListingCard.vue:36
 #: web/src/lib/labels.ts:42
 #: web/src/views/maintain/AllPlugins.vue:184
-#: web/src/views/maintain/AllPlugins.vue:324
+#: web/src/views/maintain/AllPlugins.vue:320
 msgid "Community"
 msgstr ""
 
@@ -859,7 +860,7 @@ msgstr ""
 
 #: web/src/components/PluginCard.vue:160
 #: web/src/views/maintain/AllPlugins.vue:182
-#: web/src/views/maintain/AuditLog.vue:84
+#: web/src/views/maintain/AuditLog.vue:92
 #: web/src/views/MyPlugins.vue:73
 #: web/src/views/plugin/PluginTranslations.vue:104
 msgid "All"
@@ -933,7 +934,7 @@ msgstr ""
 #: web/src/components/PluginHeader.vue:50
 #: web/src/lib/checks.ts:6
 #: web/src/views/maintain/AllPlugins.vue:298
-#: web/src/views/maintain/AllPlugins.vue:330
+#: web/src/views/maintain/AllPlugins.vue:326
 #: web/src/views/review/ReviewChange.vue:73
 #: web/src/views/SubmitPlugin.vue:299
 msgid "Repository"
@@ -1143,7 +1144,7 @@ msgstr ""
 
 #: web/src/layouts/PortalLayout.vue:64
 #: web/src/layouts/PortalLayout.vue:102
-#: web/src/views/maintain/PartnersAdmin.vue:114
+#: web/src/views/maintain/PartnersAdmin.vue:127
 msgid "Partner management"
 msgstr ""
 
@@ -1372,8 +1373,8 @@ msgstr ""
 
 #: web/src/lib/audit.ts:117
 #: web/src/views/ChangeView.vue:360
-#: web/src/views/maintain/AuditLog.vue:202
-#: web/src/views/maintain/PartnersAdmin.vue:154
+#: web/src/views/maintain/AuditLog.vue:210
+#: web/src/views/maintain/PartnersAdmin.vue:188
 #: web/src/views/translate/TranslatePage.vue:289
 msgid "Reason: %{reason}"
 msgstr ""
@@ -1383,7 +1384,7 @@ msgid "Went live: %{list}"
 msgstr ""
 
 #: web/src/lib/audit.ts:123
-#: web/src/views/maintain/PartnersAdmin.vue:68
+#: web/src/views/maintain/PartnersAdmin.vue:76
 #: web/src/views/owners/OwnerPage.vue:157
 msgid "none"
 msgstr ""
@@ -1539,9 +1540,9 @@ msgid "plugin.json"
 msgstr ""
 
 #: web/src/lib/checks.ts:10
-#: web/src/views/maintain/AllPlugins.vue:327
-#: web/src/views/maintain/AuditLog.vue:151
-#: web/src/views/maintain/AuditLog.vue:151
+#: web/src/views/maintain/AllPlugins.vue:323
+#: web/src/views/maintain/AuditLog.vue:158
+#: web/src/views/maintain/AuditLog.vue:158
 #: web/src/views/owners/VendorPage.vue:359
 #: web/src/views/SubmitPlugin.vue:303
 msgid "Plugin ID"
@@ -1702,14 +1703,14 @@ msgstr ""
 
 #: web/src/lib/labels.ts:38
 #: web/src/views/maintain/AllPlugins.vue:184
-#: web/src/views/maintain/AllPlugins.vue:324
+#: web/src/views/maintain/AllPlugins.vue:320
 msgid "Official"
 msgstr ""
 
 #: web/src/lib/labels.ts:40
 #: web/src/views/maintain/AllPlugins.vue:184
-#: web/src/views/maintain/AllPlugins.vue:324
-#: web/src/views/maintain/PartnersAdmin.vue:288
+#: web/src/views/maintain/AllPlugins.vue:320
+#: web/src/views/maintain/PartnersAdmin.vue:326
 #: web/src/views/owners/OwnerPage.vue:116
 #: web/src/views/owners/OwnerPage.vue:170
 #: web/src/views/owners/VendorPage.vue:169
@@ -2081,8 +2082,8 @@ msgid "What was asked"
 msgstr ""
 
 #: web/src/views/ChangeView.vue:397
-#: web/src/views/maintain/AllPlugins.vue:344
-#: web/src/views/maintain/PartnersAdmin.vue:291
+#: web/src/views/maintain/AllPlugins.vue:340
+#: web/src/views/maintain/PartnersAdmin.vue:329
 #: web/src/views/owners/VendorPage.vue:383
 #: web/src/views/plugin/PluginVersions.vue:259
 msgid "Reason"
@@ -2211,8 +2212,8 @@ msgstr ""
 
 #: web/src/views/maintain/AiModels.vue:147
 #: web/src/views/maintain/AiModels.vue:183
-#: web/src/views/maintain/AuditLog.vue:162
-#: web/src/views/maintain/PartnersAdmin.vue:202
+#: web/src/views/maintain/AuditLog.vue:169
+#: web/src/views/maintain/PartnersAdmin.vue:236
 msgid "Kind"
 msgstr ""
 
@@ -2228,7 +2229,7 @@ msgstr ""
 
 #: web/src/views/maintain/AiModels.vue:150
 #: web/src/views/maintain/AllPlugins.vue:198
-#: web/src/views/maintain/PartnersAdmin.vue:206
+#: web/src/views/maintain/PartnersAdmin.vue:240
 msgid "State"
 msgstr ""
 
@@ -2462,7 +2463,7 @@ msgid "Owner"
 msgstr ""
 
 #: web/src/views/maintain/AllPlugins.vue:195
-#: web/src/views/maintain/AllPlugins.vue:323
+#: web/src/views/maintain/AllPlugins.vue:319
 #: web/src/views/review/ReviewChange.vue:77
 msgid "Trust"
 msgstr ""
@@ -2484,13 +2485,13 @@ msgid "Pending review"
 msgstr ""
 
 #: web/src/views/maintain/AllPlugins.vue:221
-#: web/src/views/maintain/PartnersAdmin.vue:144
+#: web/src/views/maintain/PartnersAdmin.vue:178
 msgid "Vendor"
 msgstr ""
 
 #: web/src/views/maintain/AllPlugins.vue:221
-#: web/src/views/maintain/PartnersAdmin.vue:144
-#: web/src/views/maintain/PartnersAdmin.vue:219
+#: web/src/views/maintain/PartnersAdmin.vue:178
+#: web/src/views/maintain/PartnersAdmin.vue:254
 #: web/src/views/owners/OwnerList.vue:52
 #: web/src/views/owners/OwnerPage.vue:113
 #: web/src/views/owners/OwnerPage.vue:234
@@ -2536,6 +2537,7 @@ msgid "%{n} in all, showing %{a} to %{b}"
 msgstr ""
 
 #: web/src/views/maintain/AllPlugins.vue:271
+#: web/src/views/maintain/PartnersAdmin.vue:290
 msgid "%{n} plugins"
 msgstr ""
 
@@ -2560,161 +2562,149 @@ msgid "Add an entry"
 msgstr ""
 
 #: web/src/views/maintain/AllPlugins.vue:309
-msgid "Delisting and blocking"
-msgstr ""
-
-#: web/src/views/maintain/AllPlugins.vue:311
 msgid "Delisting removes a plugin from the catalog and leaves installed copies alone. Blocking also keeps the same plugin id or repository from being listed again."
 msgstr ""
 
-#: web/src/views/maintain/AllPlugins.vue:314
+#: web/src/views/maintain/AllPlugins.vue:310
 msgid "Both need a reason, which goes to the audit log and to the admins of the plugin."
 msgstr ""
 
-#: web/src/views/maintain/AllPlugins.vue:321
-#: web/src/views/maintain/AllPlugins.vue:321
+#: web/src/views/maintain/AllPlugins.vue:317
+#: web/src/views/maintain/AllPlugins.vue:317
 msgid "Open the pull request"
 msgstr ""
 
-#: web/src/views/maintain/AllPlugins.vue:330
+#: web/src/views/maintain/AllPlugins.vue:326
 msgid "owner/repo"
 msgstr ""
 
-#: web/src/views/maintain/AllPlugins.vue:337
+#: web/src/views/maintain/AllPlugins.vue:333
 msgid "Also block it from being listed again"
 msgstr ""
 
-#: web/src/views/maintain/AllPlugins.vue:340
+#: web/src/views/maintain/AllPlugins.vue:336
 msgid "Also block the repository"
 msgstr ""
 
-#: web/src/views/maintain/AllPlugins.vue:340
+#: web/src/views/maintain/AllPlugins.vue:336
 msgid "Leave empty to block the plugin id only."
 msgstr ""
 
-#: web/src/views/maintain/AuditLog.vue:89
+#: web/src/views/maintain/AuditLog.vue:97
 msgid "Last 7 days"
 msgstr ""
 
-#: web/src/views/maintain/AuditLog.vue:90
+#: web/src/views/maintain/AuditLog.vue:98
 msgid "Last 30 days"
 msgstr ""
 
-#: web/src/views/maintain/AuditLog.vue:91
+#: web/src/views/maintain/AuditLog.vue:99
 msgid "All time"
 msgstr ""
 
-#: web/src/views/maintain/AuditLog.vue:97
+#: web/src/views/maintain/AuditLog.vue:105
 msgid "%{n} records in the last 7 days"
 msgstr ""
 
-#: web/src/views/maintain/AuditLog.vue:99
+#: web/src/views/maintain/AuditLog.vue:107
 msgid "%{n} records in the last 30 days"
 msgstr ""
 
-#: web/src/views/maintain/AuditLog.vue:100
+#: web/src/views/maintain/AuditLog.vue:108
 msgid "%{n} records"
 msgstr ""
 
-#: web/src/views/maintain/AuditLog.vue:104
+#: web/src/views/maintain/AuditLog.vue:112
 msgid "Developer portal"
 msgstr ""
 
-#: web/src/views/maintain/AuditLog.vue:113
+#: web/src/views/maintain/AuditLog.vue:121
 msgid "%{repo} commit %{sha}"
 msgstr ""
 
-#: web/src/views/maintain/AuditLog.vue:116
+#: web/src/views/maintain/AuditLog.vue:124
 msgid "%{repo} pull request #%{n}"
 msgstr ""
 
-#: web/src/views/maintain/AuditLog.vue:130
+#: web/src/views/maintain/AuditLog.vue:138
 msgid "Every action in the developer portal. Actions that change the catalog link to a commit or pull request that can be checked on GitHub."
 msgstr ""
 
-#: web/src/views/maintain/AuditLog.vue:135
+#: web/src/views/maintain/AuditLog.vue:143
 msgid "Export CSV"
 msgstr ""
 
-#: web/src/views/maintain/AuditLog.vue:138
+#: web/src/views/maintain/AuditLog.vue:146
 msgid "Export JSON"
 msgstr ""
 
-#: web/src/views/maintain/AuditLog.vue:143
+#: web/src/views/maintain/AuditLog.vue:151
 msgid "The audit log could not be loaded."
 msgstr ""
 
-#: web/src/views/maintain/AuditLog.vue:150
-#: web/src/views/maintain/AuditLog.vue:150
-#: web/src/views/maintain/AuditLog.vue:161
-#: web/src/views/maintain/AuditLog.vue:239
+#: web/src/views/maintain/AuditLog.vue:157
+#: web/src/views/maintain/AuditLog.vue:157
+#: web/src/views/maintain/AuditLog.vue:168
+#: web/src/views/maintain/AuditLog.vue:251
 msgid "Actor"
 msgstr ""
 
-#: web/src/views/maintain/AuditLog.vue:152
+#: web/src/views/maintain/AuditLog.vue:159
 msgid "Time range"
 msgstr ""
 
-#: web/src/views/maintain/AuditLog.vue:160
-#: web/src/views/maintain/AuditLog.vue:237
+#: web/src/views/maintain/AuditLog.vue:167
+#: web/src/views/maintain/AuditLog.vue:249
 msgid "Time"
 msgstr ""
 
-#: web/src/views/maintain/AuditLog.vue:163
+#: web/src/views/maintain/AuditLog.vue:170
 msgid "Action"
 msgstr ""
 
-#: web/src/views/maintain/AuditLog.vue:164
-#: web/src/views/maintain/AuditLog.vue:248
+#: web/src/views/maintain/AuditLog.vue:171
+#: web/src/views/maintain/AuditLog.vue:260
 msgid "Record"
 msgstr ""
 
-#: web/src/views/maintain/AuditLog.vue:196
+#: web/src/views/maintain/AuditLog.vue:204
 msgid "deploy run #%{run}"
 msgstr ""
 
-#: web/src/views/maintain/AuditLog.vue:212
+#: web/src/views/maintain/AuditLog.vue:220
 msgid "Portal"
 msgstr ""
 
-#: web/src/views/maintain/AuditLog.vue:217
+#: web/src/views/maintain/AuditLog.vue:225
 msgid "No records match these filters."
 msgstr ""
 
-#: web/src/views/maintain/AuditLog.vue:224
+#: web/src/views/maintain/AuditLog.vue:232
 msgid "Newer"
 msgstr ""
 
-#: web/src/views/maintain/AuditLog.vue:227
+#: web/src/views/maintain/AuditLog.vue:235
 msgid "Older"
 msgstr ""
 
-#: web/src/views/maintain/AuditLog.vue:234
-msgid "Record details"
-msgstr ""
-
 #: web/src/views/maintain/AuditLog.vue:242
-msgid "Subject"
-msgstr ""
-
-#: web/src/views/maintain/AuditLog.vue:252
-msgid "Change %{id}"
-msgstr ""
-
-#: web/src/views/maintain/AuditLog.vue:260
-msgid "Select a record to see its details."
-msgstr ""
-
-#: web/src/views/maintain/AuditLog.vue:263
-msgid "Retention"
-msgstr ""
-
-#: web/src/views/maintain/AuditLog.vue:265
 msgid "The catalog follows its git history. Should this log be lost, every catalog change can still be traced from its commits and pull requests."
 msgstr ""
 
-#: web/src/views/maintain/AuditLog.vue:268
+#: web/src/views/maintain/AuditLog.vue:243
 msgid "Sign ins, settings and AI use are recorded only here and kept for one year."
+msgstr ""
+
+#: web/src/views/maintain/AuditLog.vue:246
+msgid "Record details"
+msgstr ""
+
+#: web/src/views/maintain/AuditLog.vue:254
+msgid "Subject"
+msgstr ""
+
+#: web/src/views/maintain/AuditLog.vue:264
+msgid "Change %{id}"
 msgstr ""
 
 #: web/src/views/maintain/PartnersAdmin.vue:28
@@ -2733,192 +2723,212 @@ msgstr ""
 msgid "Profile change"
 msgstr ""
 
-#: web/src/views/maintain/PartnersAdmin.vue:68
+#: web/src/views/maintain/PartnersAdmin.vue:76
 msgid "Created with the admins %{list}."
 msgstr ""
 
-#: web/src/views/maintain/PartnersAdmin.vue:73
+#: web/src/views/maintain/PartnersAdmin.vue:82
 msgid "Give a name. The admins are GitHub usernames."
 msgstr ""
 
-#: web/src/views/maintain/PartnersAdmin.vue:98
+#: web/src/views/maintain/PartnersAdmin.vue:111
 #: web/src/views/owners/VendorPage.vue:294
 #: web/src/views/plugin/PluginVersions.vue:220
 msgid "Revoked"
 msgstr ""
 
-#: web/src/views/maintain/PartnersAdmin.vue:99
+#: web/src/views/maintain/PartnersAdmin.vue:112
 msgid "Expired"
 msgstr ""
 
-#: web/src/views/maintain/PartnersAdmin.vue:102
+#: web/src/views/maintain/PartnersAdmin.vue:115
 msgid "Expires %{date}"
 msgstr ""
 
-#: web/src/views/maintain/PartnersAdmin.vue:102
+#: web/src/views/maintain/PartnersAdmin.vue:115
 msgid "Key expires in %{n} days"
 msgstr ""
 
-#: web/src/views/maintain/PartnersAdmin.vue:104
+#: web/src/views/maintain/PartnersAdmin.vue:117
 #: web/src/views/owners/VendorPage.vue:294
 msgid "Valid"
 msgstr ""
 
-#: web/src/views/maintain/PartnersAdmin.vue:117
+#: web/src/views/maintain/PartnersAdmin.vue:130
 msgid "Partners sign with a partner key and may list commercial plugins. Their profiles and keys live in the partners folder of the catalog repository."
 msgstr ""
 
-#: web/src/views/maintain/PartnersAdmin.vue:121
-#: web/src/views/maintain/PartnersAdmin.vue:241
+#: web/src/views/maintain/PartnersAdmin.vue:134
+#: web/src/views/maintain/PartnersAdmin.vue:299
 msgid "New vendor"
 msgstr ""
 
-#: web/src/views/maintain/PartnersAdmin.vue:124
+#: web/src/views/maintain/PartnersAdmin.vue:137
 msgid "The partners could not be loaded."
 msgstr ""
 
-#: web/src/views/maintain/PartnersAdmin.vue:129
+#: web/src/views/maintain/PartnersAdmin.vue:143
+#: web/src/views/maintain/PartnersAdmin.vue:227
+msgid "Partners"
+msgstr ""
+
+#: web/src/views/maintain/PartnersAdmin.vue:145
+msgid "With a valid or expiring key"
+msgstr ""
+
+#: web/src/views/maintain/PartnersAdmin.vue:148
+#: web/src/views/maintain/PartnersAdmin.vue:164
 msgid "Pending requests"
 msgstr ""
 
-#: web/src/views/maintain/PartnersAdmin.vue:132
+#: web/src/views/maintain/PartnersAdmin.vue:150
+msgid "Applications and key rotations"
+msgstr ""
+
+#: web/src/views/maintain/PartnersAdmin.vue:153
+msgid "Keys expiring soon"
+msgstr ""
+
+#: web/src/views/maintain/PartnersAdmin.vue:155
+msgid "Within 30 days"
+msgstr ""
+
+#: web/src/views/maintain/PartnersAdmin.vue:158
+#: web/src/views/maintain/PartnersAdmin.vue:279
+msgid "Vendors without a repository"
+msgstr ""
+
+#: web/src/views/maintain/PartnersAdmin.vue:160
+msgid "Members managed here"
+msgstr ""
+
+#: web/src/views/maintain/PartnersAdmin.vue:167
 #: web/src/views/MyPlugins.vue:193
 #: web/src/views/plugin/PluginStore.vue:373
 msgid "%{n} items"
 msgstr ""
 
-#: web/src/views/maintain/PartnersAdmin.vue:135
-msgid "Nothing is waiting."
-msgstr ""
-
-#: web/src/views/maintain/PartnersAdmin.vue:151
+#: web/src/views/maintain/PartnersAdmin.vue:185
 msgid "Sent by @%{login} %{time}"
 msgstr ""
 
-#: web/src/views/maintain/PartnersAdmin.vue:151
+#: web/src/views/maintain/PartnersAdmin.vue:185
 msgid ", key ID %{id}"
 msgstr ""
 
-#: web/src/views/maintain/PartnersAdmin.vue:162
+#: web/src/views/maintain/PartnersAdmin.vue:196
 msgid "%{n} plugins listed"
 msgstr ""
 
-#: web/src/views/maintain/PartnersAdmin.vue:166
+#: web/src/views/maintain/PartnersAdmin.vue:200
 msgid "Organization created in %{year}"
 msgstr ""
 
-#: web/src/views/maintain/PartnersAdmin.vue:170
+#: web/src/views/maintain/PartnersAdmin.vue:204
 msgid "Partner key given"
 msgstr ""
 
-#: web/src/views/maintain/PartnersAdmin.vue:170
+#: web/src/views/maintain/PartnersAdmin.vue:204
 msgid "No partner key yet"
 msgstr ""
 
-#: web/src/views/maintain/PartnersAdmin.vue:177
+#: web/src/views/maintain/PartnersAdmin.vue:211
 msgid "Contact the applicant"
 msgstr ""
 
-#: web/src/views/maintain/PartnersAdmin.vue:184
+#: web/src/views/maintain/PartnersAdmin.vue:218
 msgid "Approve the request"
 msgstr ""
 
-#: web/src/views/maintain/PartnersAdmin.vue:189
+#: web/src/views/maintain/PartnersAdmin.vue:223
 msgid "Approving opens a pull request in the catalog repository that writes the partner profile and key; it takes effect once merged."
 msgstr ""
 
-#: web/src/views/maintain/PartnersAdmin.vue:193
-msgid "Partners"
-msgstr ""
-
-#: web/src/views/maintain/PartnersAdmin.vue:195
+#: web/src/views/maintain/PartnersAdmin.vue:229
 msgid "%{n} in all"
 msgstr ""
 
-#: web/src/views/maintain/PartnersAdmin.vue:204
+#: web/src/views/maintain/PartnersAdmin.vue:238
 #: web/src/views/owners/OwnerPage.vue:180
 #: web/src/views/owners/VendorPage.vue:299
 #: web/src/views/review/ReviewChange.vue:125
 msgid "Key ID"
 msgstr ""
 
-#: web/src/views/maintain/PartnersAdmin.vue:205
+#: web/src/views/maintain/PartnersAdmin.vue:239
 #: web/src/views/owners/OwnerPage.vue:184
 #: web/src/views/owners/VendorPage.vue:303
 msgid "Valid until"
 msgstr ""
 
-#: web/src/views/maintain/PartnersAdmin.vue:219
+#: web/src/views/maintain/PartnersAdmin.vue:254
 #: web/src/views/owners/OwnerList.vue:70
 #: web/src/views/owners/OwnerPage.vue:247
 msgid "Vendor without a public repository"
 msgstr ""
 
-#: web/src/views/maintain/PartnersAdmin.vue:235
+#: web/src/views/maintain/PartnersAdmin.vue:269
+msgid "Revoke the key"
+msgstr ""
+
+#: web/src/views/maintain/PartnersAdmin.vue:275
 msgid "No partner yet."
 msgstr ""
 
-#: web/src/views/maintain/PartnersAdmin.vue:244
+#: web/src/views/maintain/PartnersAdmin.vue:281
+#: web/src/views/maintain/PartnersAdmin.vue:312
+msgid "Only for vendors without a public repository. A partner with a GitHub organization applies from its organization page, and GitHub decides its members."
+msgstr ""
+
+#: web/src/views/maintain/PartnersAdmin.vue:294
+msgid "No vendors yet."
+msgstr ""
+
+#: web/src/views/maintain/PartnersAdmin.vue:299
+msgid "Create"
+msgstr ""
+
+#: web/src/views/maintain/PartnersAdmin.vue:302
 msgid "For example Orbit Labs"
 msgstr ""
 
-#: web/src/views/maintain/PartnersAdmin.vue:246
+#: web/src/views/maintain/PartnersAdmin.vue:304
 #: web/src/views/owners/OwnerPage.vue:176
 #: web/src/views/owners/OwnerPage.vue:262
 msgid "Partner name"
 msgstr ""
 
-#: web/src/views/maintain/PartnersAdmin.vue:246
+#: web/src/views/maintain/PartnersAdmin.vue:304
 msgid "The name in partners/, once its key is added."
 msgstr ""
 
-#: web/src/views/maintain/PartnersAdmin.vue:249
+#: web/src/views/maintain/PartnersAdmin.vue:307
 msgid "First admins"
 msgstr ""
 
-#: web/src/views/maintain/PartnersAdmin.vue:250
+#: web/src/views/maintain/PartnersAdmin.vue:308
 msgid "GitHub usernames, separated by spaces"
 msgstr ""
 
-#: web/src/views/maintain/PartnersAdmin.vue:254
-msgid "Only for vendors without a public repository. A partner with a GitHub organization applies from its organization page, and GitHub decides its members."
-msgstr ""
-
-#: web/src/views/maintain/PartnersAdmin.vue:257
-msgid "Create"
-msgstr ""
-
-#: web/src/views/maintain/PartnersAdmin.vue:265
-msgid ", %{n} plugins"
-msgstr ""
-
-#: web/src/views/maintain/PartnersAdmin.vue:270
-msgid "Revoke a key"
-msgstr ""
-
-#: web/src/views/maintain/PartnersAdmin.vue:273
-msgid "Once revoked, every version signed with the key stops installing. A revocation needs no review and is committed to the catalog repository at once."
-msgstr ""
-
-#: web/src/views/maintain/PartnersAdmin.vue:276
-msgid "Choose the key to revoke"
-msgstr ""
-
-#: web/src/views/maintain/PartnersAdmin.vue:282
+#: web/src/views/maintain/PartnersAdmin.vue:317
 msgid "Decline the request"
 msgstr ""
 
-#: web/src/views/maintain/PartnersAdmin.vue:283
+#: web/src/views/maintain/PartnersAdmin.vue:318
 msgid "Why, shown to the applicant"
 msgstr ""
 
-#: web/src/views/maintain/PartnersAdmin.vue:286
+#: web/src/views/maintain/PartnersAdmin.vue:321
 msgid "Revoke a partner key"
 msgstr ""
 
-#: web/src/views/maintain/PartnersAdmin.vue:286
+#: web/src/views/maintain/PartnersAdmin.vue:321
 #: web/src/views/plugin/PluginVersions.vue:223
 msgid "Revoke"
+msgstr ""
+
+#: web/src/views/maintain/PartnersAdmin.vue:323
+msgid "Once revoked, every version signed with the key stops installing. A revocation needs no review and is committed to the catalog repository at once."
 msgstr ""
 
 #: web/src/views/maintain/Settings.vue:35

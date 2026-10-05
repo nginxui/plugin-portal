@@ -10,6 +10,7 @@ import { github } from '../lib/github'
 import { storeSourceOf } from '../lib/insights'
 import { keyIdOf, loadPartners } from '../lib/partners'
 import { userToken } from '../lib/session'
+import { repoReleases } from '../lib/submission'
 import { now } from '../lib/time'
 import { requireMaintainer, requireSession } from '../middleware/auth'
 
@@ -81,6 +82,31 @@ maintain.get('/plugins', async (c) => {
     }
   })
   const known = new Set(listed.map(p => p.id))
+  // Listed plugins the published index has not caught up with: their entry on
+  // main and their releases, as the catalog reads them at the next update.
+  const token = await userToken(c.env, c.get('session').id)
+  const lagging = await mapLimit(drafts.results.filter(d => !known.has(d.plugin_id) && d.state === 'listed'), 4, async (d) => {
+    const [entry, releases] = await Promise.all([catalogEntry(c.env, d.plugin_id), d.repo_full_name ? repoReleases(token, d.repo_full_name) : Promise.resolve([])])
+    const newest = releases.find(r => !r.version.includes('-')) ?? releases[0]
+    const owner = d.repo_full_name?.split('/')[0] ?? null
+    return {
+      id: d.plugin_id,
+      name: (entry?.name as Record<string, string> | undefined) ?? { en: d.plugin_id },
+      iconUrl: (entry?.icon_url as string | undefined) ?? null,
+      owner,
+      ownerKind: (entry?.distribution as { type?: string } | undefined)?.type === 'vendor' ? 'vendor' : 'github',
+      ownerType: kinds.get((owner ?? '').toLowerCase()) ?? null,
+      repo: d.repo_full_name,
+      trust: (entry?.trust as string | undefined) ?? 'community',
+      version: newest?.version ?? null,
+      source: storeSourceOf(entry?.store),
+      state: newest && entry?.yanked?.includes(newest.version) ? 'yanked' : openBy.get(d.plugin_id) ? 'review' : 'listed',
+      openChanges: openBy.get(d.plugin_id) ?? 0,
+    }
+  })
+  for (const p of lagging)
+    known.add(p.id)
+  listed.push(...lagging)
   const pending = drafts.results.filter(d => !known.has(d.plugin_id)).map(d => ({
     id: d.plugin_id,
     name: { en: d.plugin_id },

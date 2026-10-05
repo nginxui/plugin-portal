@@ -1740,9 +1740,6 @@ msgstr "屏蔽列表为空。"
 msgid "Add an entry"
 msgstr "添加条目"
 
-msgid "Delisting and blocking"
-msgstr "下架与屏蔽"
-
 msgid ""
 "Delisting removes a plugin from the catalog and leaves installed copies "
 "alone. Blocking also keeps the same plugin id or repository from being "
@@ -1840,21 +1837,6 @@ msgstr "上一页"
 msgid "Older"
 msgstr "下一页"
 
-msgid "Record details"
-msgstr "记录详情"
-
-msgid "Subject"
-msgstr "对象"
-
-msgid "Change %{id}"
-msgstr "变更 %{id}"
-
-msgid "Select a record to see its details."
-msgstr "选择一条记录以查看详情。"
-
-msgid "Retention"
-msgstr "保存"
-
 msgid ""
 "The catalog follows its git history. Should this log be lost, every catalog "
 "change can still be traced from its commits and pull requests."
@@ -1863,6 +1845,15 @@ msgstr "插件目录的变更以 git 历史为准，日志丢失也可以从提�
 msgid ""
 "Sign ins, settings and AI use are recorded only here and kept for one year."
 msgstr "开发者中心内的设置与 AI 用量只记录在日志中，保留 1 年。"
+
+msgid "Record details"
+msgstr "记录详情"
+
+msgid "Subject"
+msgstr "对象"
+
+msgid "Change %{id}"
+msgstr "变更 %{id}"
 
 msgid "Partner application"
 msgstr "合作伙伴申请"
@@ -1908,14 +1899,32 @@ msgstr "新建厂商"
 msgid "The partners could not be loaded."
 msgstr "无法加载合作伙伴列表。"
 
+msgid "Partners"
+msgstr "合作伙伴"
+
+msgid "With a valid or expiring key"
+msgstr "密钥有效或即将过期"
+
 msgid "Pending requests"
 msgstr "待处理的申请"
 
+msgid "Applications and key rotations"
+msgstr "合作申请与密钥轮换"
+
+msgid "Keys expiring soon"
+msgstr "即将过期的密钥"
+
+msgid "Within 30 days"
+msgstr "30 天内"
+
+msgid "Vendors without a repository"
+msgstr "没有公开仓库的厂商"
+
+msgid "Members managed here"
+msgstr "成员在开发者中心管理"
+
 msgid "%{n} items"
 msgstr "%{n} 项"
-
-msgid "Nothing is waiting."
-msgstr "暂无待处理事项。"
 
 msgid "Sent by @%{login} %{time}"
 msgstr "@%{login} 提交，%{time}"
@@ -1946,9 +1955,6 @@ msgid ""
 "partner profile and key; it takes effect once merged."
 msgstr "批准后会在插件目录仓库中创建拉取请求，写入合作伙伴资料与公钥，由维护者合并后生效。"
 
-msgid "Partners"
-msgstr "合作伙伴"
-
 msgid "%{n} in all"
 msgstr "共 %{n} 个"
 
@@ -1961,8 +1967,23 @@ msgstr "有效期至"
 msgid "Vendor without a public repository"
 msgstr "厂商，无公开仓库"
 
+msgid "Revoke the key"
+msgstr "吊销密钥"
+
 msgid "No partner yet."
 msgstr "尚无合作伙伴。"
+
+msgid ""
+"Only for vendors without a public repository. A partner with a GitHub "
+"organization applies from its organization page, and GitHub decides its "
+"members."
+msgstr "只用于没有公开仓库的厂商。有 GitHub 组织的合作伙伴由组织自行申请，成员与权限以 GitHub 为准。"
+
+msgid "No vendors yet."
+msgstr "暂无厂商。"
+
+msgid "Create"
+msgstr "创建"
 
 msgid "For example Orbit Labs"
 msgstr "例如 Orbit Labs"
@@ -1979,30 +2000,6 @@ msgstr "初始管理员"
 msgid "GitHub usernames, separated by spaces"
 msgstr "GitHub 用户名，以空格分隔"
 
-msgid ""
-"Only for vendors without a public repository. A partner with a GitHub "
-"organization applies from its organization page, and GitHub decides its "
-"members."
-msgstr "只用于没有公开仓库的厂商。有 GitHub 组织的合作伙伴由组织自行申请，成员与权限以 GitHub 为准。"
-
-msgid "Create"
-msgstr "创建"
-
-msgid ", %{n} plugins"
-msgstr "，%{n} 个插件"
-
-msgid "Revoke a key"
-msgstr "吊销密钥"
-
-msgid ""
-"Once revoked, every version signed with the key stops installing. A "
-"revocation needs no review and is committed to the catalog repository at "
-"once."
-msgstr "吊销后，由该密钥签名的全部版本立即无法安装。吊销不需要审核，会直接提交到插件目录仓库。"
-
-msgid "Choose the key to revoke"
-msgstr "选择要吊销的密钥"
-
 msgid "Decline the request"
 msgstr "拒绝请求"
 
@@ -2014,6 +2011,12 @@ msgstr "吊销合作伙伴密钥"
 
 msgid "Revoke"
 msgstr "撤销"
+
+msgid ""
+"Once revoked, every version signed with the key stops installing. A "
+"revocation needs no review and is committed to the catalog repository at "
+"once."
+msgstr "吊销后，由该密钥签名的全部版本立即无法安装。吊销不需要审核，会直接提交到插件目录仓库。"
 
 msgid "Enter a date."
 msgstr "请填写日期。"
@@ -4269,6 +4272,27 @@ msgstr "名称建议"
 
 msgid "An accepted name still goes to a maintainer before it is listed."
 msgstr "名称建议被采纳后，仍需维护者审核才会显示。"
+
+#~ msgid "Delisting and blocking"
+#~ msgstr "下架与屏蔽"
+
+#~ msgid "Nothing is waiting."
+#~ msgstr "暂无待处理事项。"
+
+#~ msgid ", %{n} plugins"
+#~ msgstr "，%{n} 个插件"
+
+#~ msgid "Revoke a key"
+#~ msgstr "吊销密钥"
+
+#~ msgid "Choose the key to revoke"
+#~ msgstr "选择要吊销的密钥"
+
+#~ msgid "Select a record to see its details."
+#~ msgstr "选择一条记录以查看详情。"
+
+#~ msgid "Retention"
+#~ msgstr "保存"
 
 #~ msgid "On"
 #~ msgstr "开启"

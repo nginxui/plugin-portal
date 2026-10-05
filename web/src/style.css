@@ -86,3 +86,18 @@ html.dark body {
   flex: 1 1 320px;
   min-width: 0;
 }
+
+/* Room for a side drawer on wide screens, so nothing hides under it. */
+@media (min-width: 1200px) {
+  .beside-drawer {
+    margin-inline-end: 420px;
+  }
+}
+
+/* Secondary cards under a full width table, side by side when they fit. */
+.below-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 16px;
+  align-items: start;
+}
