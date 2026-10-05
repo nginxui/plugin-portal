@@ -45,6 +45,8 @@
           "migrations_dir": "migrations"
         }
       ],
+      // Screenshot uploads; no public domain yet, so drafts are served by the portal.
+      "r2_buckets": [{ "binding": "MEDIA", "bucket_name": "plugin-media-staging" }],
       "vars": {
         "PORTAL_ORIGIN": "https://portal-staging.nginxui.com",
         "CATALOG_URL": "https://plugins.nginxui.com",

@@ -2875,8 +2875,8 @@ msgid ""
 "wide."
 msgstr "图片不符合要求：必须为 16:10，宽度在 640 到 3840 像素之间。"
 
-msgid "Uploads are not available yet."
-msgstr "暂不支持上传。"
+msgid "Screenshot uploads are not open yet."
+msgstr "截图上传暂未开放。"
 
 msgid "The image could not be uploaded. Please try again."
 msgstr "无法上传图片，请重试。"
@@ -2891,9 +2891,9 @@ msgid "The store texts could not be loaded."
 msgstr "无法加载商店资料。"
 
 msgid ""
-"Uploads are not available yet. You can reorder the screenshots and edit "
-"their captions."
-msgstr "暂不支持上传。你可以调整截图顺序并编辑说明。"
+"Screenshot uploads are not open yet. You can reorder the screenshots and "
+"edit their captions."
+msgstr "截图上传暂未开放，你可以调整截图顺序并编辑说明。"
 
 msgid ""
 "The catalog entry sets the screenshots of this plugin, so they cannot be "
@@ -4115,6 +4115,14 @@ msgstr "名称建议"
 
 msgid "An accepted name still goes to a maintainer before it is listed."
 msgstr "名称建议被采纳后，仍需维护者审核才会显示。"
+
+#~ msgid "Uploads are not available yet."
+#~ msgstr "暂不支持上传。"
+
+#~ msgid ""
+#~ "Uploads are not available yet. You can reorder the screenshots and edit "
+#~ "their captions."
+#~ msgstr "暂不支持上传。你可以调整截图顺序并编辑说明。"
 
 #~ msgid ""
 #~ "Each text shows in the language with its longest translation. Check that "
