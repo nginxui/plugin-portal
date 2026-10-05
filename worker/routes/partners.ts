@@ -5,7 +5,7 @@ import { mapLimit, repoAccess } from '../lib/access'
 import { audit } from '../lib/audit'
 import { cached } from '../lib/cache'
 import { catalogEntry, loadCatalog, repoOf } from '../lib/catalog'
-import { event, newChangeId } from '../lib/changes'
+import { event, newChangeId, NEXT_NUMBER } from '../lib/changes'
 import { randomToken } from '../lib/crypto'
 import { dispatchApply } from '../lib/deployApp'
 import { github, GitHubError } from '../lib/github'
@@ -290,8 +290,8 @@ async function dispatchChange(env: Env, session: Session, opts: { pluginId: stri
   const t = now()
   await env.DB.batch([
     env.DB.prepare(
-      `INSERT INTO changes (id, plugin_id, author_id, kind, class, state, stage, waiting_on, payload_json, dispatched_at, created_at, updated_at)
-       VALUES (?, ?, ?, ?, 'reviewed', 'open', 'checks', 'system', ?, ?, ?, ?)`,
+      `INSERT INTO changes (number, id, plugin_id, author_id, kind, class, state, stage, waiting_on, payload_json, dispatched_at, created_at, updated_at)
+       VALUES (${NEXT_NUMBER}, ?, ?, ?, ?, 'reviewed', 'open', 'checks', 'system', ?, ?, ?, ?)`,
     ).bind(change, opts.pluginId, session.user.id, opts.kind, JSON.stringify(opts.payload), t, t, t),
     event(env, change, 'submitted', session.user.id),
   ])

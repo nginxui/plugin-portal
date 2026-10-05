@@ -297,9 +297,13 @@ describe('apply report', () => {
       url => url.pathname === `/repos/${env.CATALOG_REPO}/pulls/12` ? json({ state: 'closed', merged: true, merge_commit_sha: 'abc123' }) : undefined,
       url => url.href === `${env.CATALOG_URL}/v1/index.json` ? json({ plugins: listed ? [{ id: 'io.github.octo-author.geoip', name: { en: 'GeoIP Access' } }] : [] }) : undefined,
     )
-    let body = await (await call(`/api/changes/${change}`, { cookie })).json() as { change: { stage: string, prUrl: string } }
+    let body = await (await call(`/api/changes/${change}`, { cookie })).json() as { change: { id: string, number: number, stage: string, prUrl: string } }
     expect(body.change.stage).toBe('merged')
     expect(body.change.prUrl).toBe(`https://github.com/${env.CATALOG_REPO}/pull/12`)
+    // The short number opens the same change.
+    expect(body.change.number).toBe(1)
+    const byNumber = await (await call('/api/changes/1', { cookie })).json() as { change: { id: string } }
+    expect(byNumber.change.id).toBe(body.change.id)
 
     listed = true
     await caches.default.delete(`${env.CATALOG_URL}/v1/index.json`)

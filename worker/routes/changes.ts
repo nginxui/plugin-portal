@@ -165,6 +165,7 @@ function storeRequest(env: Env, change: ChangeRow) {
 export function present(env: Env, change: ChangeRow) {
   return {
     id: change.id,
+    number: change.number,
     pluginId: change.plugin_id,
     kind: change.kind,
     class: change.class,

@@ -5,6 +5,11 @@ ALTER TABLE changes ADD COLUMN payload_json TEXT;
 ALTER TABLE changes ADD COLUMN dispatched_at INTEGER;
 ALTER TABLE changes ADD COLUMN outcome_json TEXT;
 
+-- A short number for each change, shown as "Change #12" and used in its
+-- address. The random id stays the key the catalog workflows know.
+ALTER TABLE changes ADD COLUMN number INTEGER;
+CREATE UNIQUE INDEX changes_number ON changes (number);
+
 -- When a user last read their notifications.
 ALTER TABLE notify_prefs ADD COLUMN read_at INTEGER;
 

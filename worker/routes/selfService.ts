@@ -3,7 +3,7 @@ import { Hono } from 'hono'
 import { atLeast, repoAccess } from '../lib/access'
 import { audit } from '../lib/audit'
 import { loadCatalog, repoOf } from '../lib/catalog'
-import { event, newChangeId } from '../lib/changes'
+import { event, newChangeId, NEXT_NUMBER } from '../lib/changes'
 import { dispatchApply } from '../lib/deployApp'
 import { userToken } from '../lib/session'
 import { now } from '../lib/time'
@@ -92,8 +92,8 @@ selfService.post('/:id/changes', async (c) => {
   }
   await c.env.DB.batch([
     c.env.DB.prepare(
-      `INSERT INTO changes (id, plugin_id, author_id, kind, class, state, stage, waiting_on, payload_json, dispatched_at, created_at, updated_at)
-       VALUES (?, ?, ?, ?, 'self_service', 'open', 'checks', 'system', ?, ?, ?, ?)`,
+      `INSERT INTO changes (number, id, plugin_id, author_id, kind, class, state, stage, waiting_on, payload_json, dispatched_at, created_at, updated_at)
+       VALUES (${NEXT_NUMBER}, ?, ?, ?, ?, 'self_service', 'open', 'checks', 'system', ?, ?, ?, ?)`,
     ).bind(change, id, session.user.id, kind, JSON.stringify(payload), t, t, t),
     event(c.env, change, 'submitted', session.user.id, { operations, reason: reason || undefined }),
   ])

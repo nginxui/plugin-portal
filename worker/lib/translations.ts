@@ -2,7 +2,7 @@ import type { Env } from '../env'
 import type { PluginContext } from './pluginContext'
 import type { StoreDoc } from './store'
 import { botEnabled, openBotPullRequest } from './bot'
-import { event, newChangeId } from './changes'
+import { event, newChangeId, NEXT_NUMBER } from './changes'
 import { dispatchApply } from './deployApp'
 import { readStore } from './store'
 import { repoFiles, storeJson } from './storeFiles'
@@ -122,8 +122,8 @@ export async function flushAccepted(env: Env, ctx: PluginContext, actor: Transla
     open
       ? env.DB.prepare(`UPDATE changes SET payload_json = ?, pr_number = ?, updated_at = ? WHERE id = ?`).bind(JSON.stringify(payload), prNumber, t, change)
       : env.DB.prepare(
-          `INSERT INTO changes (id, plugin_id, author_id, kind, class, state, stage, waiting_on, pr_number, payload_json, dispatched_at, created_at, updated_at)
-           VALUES (?, ?, ?, 'translations', 'self_service', 'open', ?, ?, ?, ?, ?, ?, ?)`,
+          `INSERT INTO changes (number, id, plugin_id, author_id, kind, class, state, stage, waiting_on, pr_number, payload_json, dispatched_at, created_at, updated_at)
+           VALUES (${NEXT_NUMBER}, ?, ?, ?, 'translations', 'self_service', 'open', ?, ?, ?, ?, ?, ?, ?)`,
         ).bind(change, ctx.id, actor.id, state.source === 'catalog' ? 'checks' : 'review', state.source === 'catalog' ? 'system' : 'author', prNumber, JSON.stringify(payload), t, t, t),
     event(env, change, open ? 'batch' : 'submitted', actor.id, { suggestions: results.length, translators: [...translators.keys()] }),
     env.DB.prepare(`UPDATE suggestions SET change_id = ? WHERE id IN (${results.map(() => '?').join(',')})`).bind(change, ...results.map(s => s.id)),

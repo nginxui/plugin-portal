@@ -1,7 +1,7 @@
 import type { AppEnv } from '../env'
 import { Hono } from 'hono'
 import { audit } from '../lib/audit'
-import { event, newChangeId } from '../lib/changes'
+import { event, newChangeId, NEXT_NUMBER } from '../lib/changes'
 import { dispatchApply } from '../lib/deployApp'
 import { parsePublicKey } from '../lib/rules'
 import { userToken } from '../lib/session'
@@ -108,8 +108,8 @@ submit.post('/', async (c) => {
        ON CONFLICT (plugin_id) DO UPDATE SET repo_full_name = ?2, updated_at = ?4 WHERE state = 'draft'`,
     ).bind(draft.id, draft.repo, session.user.id, t),
     c.env.DB.prepare(
-      `INSERT INTO changes (id, plugin_id, author_id, kind, class, entry_json, state, stage, waiting_on, payload_json, dispatched_at, created_at, updated_at)
-       VALUES (?, ?, ?, 'new_listing', 'reviewed', ?, 'open', 'checks', 'system', ?, ?, ?, ?)`,
+      `INSERT INTO changes (number, id, plugin_id, author_id, kind, class, entry_json, state, stage, waiting_on, payload_json, dispatched_at, created_at, updated_at)
+       VALUES (${NEXT_NUMBER}, ?, ?, ?, 'new_listing', 'reviewed', ?, 'open', 'checks', 'system', ?, ?, ?, ?)`,
     ).bind(id, draft.id, session.user.id, JSON.stringify(draft), JSON.stringify(payload), t, t, t),
     event(c.env, id, 'submitted', session.user.id, { repo: draft.repo, version: draft.version }),
     c.env.DB.prepare('DELETE FROM submit_drafts WHERE user_id = ? AND repo_full_name = ?').bind(session.user.id, draft.repo),

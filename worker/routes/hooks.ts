@@ -1,7 +1,7 @@
 import type { AppEnv, Env } from '../env'
 import { Hono } from 'hono'
 import { audit } from '../lib/audit'
-import { event, getChange, newChangeId } from '../lib/changes'
+import { event, getChange, newChangeId, NEXT_NUMBER } from '../lib/changes'
 import { dispatchApply } from '../lib/deployApp'
 import { OidcError, verifyActionsToken } from '../lib/oidc'
 import { now } from '../lib/time'
@@ -156,8 +156,8 @@ async function proposeNames(env: Env, pending: PendingNames[]): Promise<string[]
     const payload = { kind: 'entry_update', system: true, plugin_id: p.id, version: p.version, operations: { names: p.names } }
     await env.DB.batch([
       env.DB.prepare(
-        `INSERT INTO changes (id, plugin_id, author_id, kind, class, state, stage, waiting_on, payload_json, dispatched_at, created_at, updated_at)
-         VALUES (?, ?, 0, 'names', 'reviewed', 'open', 'checks', 'system', ?, ?, ?, ?)`,
+        `INSERT INTO changes (number, id, plugin_id, author_id, kind, class, state, stage, waiting_on, payload_json, dispatched_at, created_at, updated_at)
+         VALUES (${NEXT_NUMBER}, ?, ?, 0, 'names', 'reviewed', 'open', 'checks', 'system', ?, ?, ?, ?)`,
       ).bind(change, p.id, JSON.stringify(payload), t, t, t),
       event(env, change, 'submitted', null, { names: p.names, version: p.version }),
     ])

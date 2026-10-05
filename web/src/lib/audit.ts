@@ -102,7 +102,8 @@ export function auditDetailLines(entry: AuditEntry): string[] {
       continue
     switch (key) {
       case 'change':
-        lines.push($gettext('Change: %{id}', { id: String(value) }))
+        // Shown by its number when the change is known.
+        lines.push($gettext('Change: %{id}', { id: entry.record?.url.startsWith('/changes/') ? entry.record.label : String(value) }))
         break
       case 'pr':
         lines.push($gettext('Pull request: #%{n}', { n: String(value) }))
