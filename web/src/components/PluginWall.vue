@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { useElementSize } from '@vueuse/core'
+import { computed, useTemplateRef } from 'vue'
 import logo from '@/assets/logo.svg'
 
 // A wall of plugin tiles drifting past, columns in turns up and down, with
@@ -6,8 +8,11 @@ import logo from '@/assets/logo.svg'
 
 // Enough columns and rows to cover the area even while a column moves:
 // each copy of a column must be taller than the tilted area.
-// quiet: how far around the logo the tiles fade, in logo sizes.
-const props = withDefaults(defineProps<{ columns?: number, rows?: number, mark?: number, quiet?: number }>(), { columns: 5, rows: 7, mark: 132, quiet: 3 })
+// quiet: how far around the logo the tiles fade, in logo sizes; fade: the
+// bottom edge melts into the background, for a sheet that rises over it;
+// covered: how much of the bottom that sheet hides, so the logo centers in
+// what stays visible.
+const props = withDefaults(defineProps<{ columns?: number, rows?: number, mark?: number, quiet?: number, fade?: boolean, covered?: number }>(), { columns: 5, rows: 7, mark: 132, quiet: 3, fade: false, covered: 0 })
 
 // What plugins add to Nginx UI, each in a tone of its own.
 const TILES = [
@@ -28,6 +33,11 @@ const TILES = [
   { icon: 'i-tabler-plug', tone: 'magenta' },
 ]
 
+// The logo takes its size, or less on a short wall, so it always fits.
+const root = useTemplateRef<HTMLElement>('root')
+const { height } = useElementSize(root)
+const markSize = computed(() => Math.round(Math.min(props.mark, ((height.value || props.mark * 2) - props.covered) * 0.56)))
+
 // Each column starts elsewhere in the list and moves at its own pace; the
 // tiles repeat once so the loop has no seam.
 const wall = Array.from({ length: props.columns }, (_, column) => {
@@ -37,7 +47,7 @@ const wall = Array.from({ length: props.columns }, (_, column) => {
 </script>
 
 <template>
-  <div class="wall" aria-hidden="true" :style="{ '--mark': `${props.mark}px`, '--quiet': props.quiet }">
+  <div ref="root" class="wall" aria-hidden="true" :style="{ '--mark': `${markSize}px`, '--quiet': props.quiet, '--covered': `${props.covered}px` }">
     <div class="field">
       <div class="tilt">
         <div v-for="(column, index) in wall" :key="index" class="column">
@@ -49,6 +59,8 @@ const wall = Array.from({ length: props.columns }, (_, column) => {
         </div>
       </div>
     </div>
+    <div class="veil" />
+    <div v-if="props.fade" class="fade" />
     <div class="center">
       <span class="glow" />
       <span class="mark"><img :src="logo" alt=""></span>
@@ -61,14 +73,29 @@ const wall = Array.from({ length: props.columns }, (_, column) => {
   position: relative;
   overflow: hidden;
   isolation: isolate;
+  background: var(--portal-wall-bg);
 }
 
-/* The tiles stay quiet: faint, and gone around the logo so it leads. */
+/* Only the tracks move; everything above them is painted once, so a frame
+   only shifts layers. Masks or filters over the tracks would redraw them. */
 .field {
   position: absolute;
   inset: 0;
-  opacity: 0.85;
-  mask-image: radial-gradient(circle at 50% 50%, transparent calc(var(--mark) * 0.7), rgba(0, 0, 0, 0.4) calc(var(--mark) * var(--quiet) * 0.5), #000 calc(var(--mark) * var(--quiet)));
+}
+
+/* The tiles stay quiet: gone around the logo so it leads. */
+.veil {
+  position: absolute;
+  inset: 0 0 var(--covered);
+  pointer-events: none;
+  background: radial-gradient(circle at 50% 50%, var(--portal-wall-bg) calc(var(--mark) * 0.7), color-mix(in srgb, var(--portal-wall-bg) 60%, transparent) calc(var(--mark) * var(--quiet) * 0.5), transparent calc(var(--mark) * var(--quiet)));
+}
+
+.fade {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(to bottom, transparent 60%, var(--portal-wall-bg) calc(100% - var(--covered)));
 }
 
 .tilt {
@@ -90,6 +117,7 @@ const wall = Array.from({ length: props.columns }, (_, column) => {
   gap: 18px;
   animation-timing-function: linear;
   animation-iteration-count: infinite;
+  will-change: transform;
 }
 
 .track.up {
@@ -128,45 +156,44 @@ const wall = Array.from({ length: props.columns }, (_, column) => {
   height: 72px;
   font-size: 30px;
   border-radius: 20px;
-  background: color-mix(in srgb, currentColor 9%, var(--portal-card));
-  filter: var(--portal-wall-filter);
+  background: color-mix(in srgb, currentColor 8%, var(--portal-wall-bg));
 }
 
 .tile > span {
-  opacity: 0.55;
+  opacity: 0.5;
 }
 
 .tile.blue {
-  color: #1677ff;
+  color: var(--portal-wall-blue);
 }
 
 .tile.cyan {
-  color: #13a8a8;
+  color: var(--portal-wall-cyan);
 }
 
 .tile.green {
-  color: #389e0d;
+  color: var(--portal-wall-green);
 }
 
 .tile.purple {
-  color: #722ed1;
+  color: var(--portal-wall-purple);
 }
 
 .tile.orange {
-  color: #d46b08;
+  color: var(--portal-wall-orange);
 }
 
 .tile.magenta {
-  color: #c41d7f;
+  color: var(--portal-wall-magenta);
 }
 
 .tile.red {
-  color: #cf1322;
+  color: var(--portal-wall-red);
 }
 
 .center {
   position: absolute;
-  inset: 0;
+  inset: 0 0 var(--covered);
   display: grid;
   place-items: center;
   pointer-events: none;
@@ -191,26 +218,25 @@ const wall = Array.from({ length: props.columns }, (_, column) => {
 }
 
 .glow {
-  width: var(--mark);
-  height: var(--mark);
-  border-radius: calc(var(--mark) * 0.3);
-  background: #1677ff;
-  opacity: 0.35;
-  filter: blur(calc(var(--mark) * 0.2));
+  width: calc(var(--mark) * 2);
+  height: calc(var(--mark) * 2);
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(22, 119, 255, 0.55) 0, rgba(22, 119, 255, 0.18) 38%, transparent 68%);
   grid-area: 1 / 1;
+  will-change: transform, opacity;
   animation: glow 3.6s ease-in-out infinite;
 }
 
 @keyframes glow {
   0%,
   100% {
-    transform: scale(1);
-    opacity: 0.25;
+    transform: scale(0.8);
+    opacity: 0.55;
   }
 
   50% {
-    transform: scale(1.6);
-    opacity: 0.45;
+    transform: scale(1.1);
+    opacity: 1;
   }
 }
 

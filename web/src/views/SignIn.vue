@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { breakpointsAntDesign, useBreakpoints, useIntervalFn, usePreferredReducedMotion } from '@vueuse/core'
+import { breakpointsAntDesign, useBreakpoints, useIntervalFn, usePreferredReducedMotion, useWindowSize } from '@vueuse/core'
 import { computed, ref } from 'vue'
 import { useGettext } from 'vue3-gettext'
 import { useRoute } from 'vue-router'
@@ -51,7 +51,9 @@ const features = computed(() => [
 // The sheet shows one feature at a time, in turns; with reduced motion, or
 // room enough, all of them stand still.
 const reducedMotion = usePreferredReducedMotion()
-const listFeatures = computed(() => isWide.value || reducedMotion.value === 'reduce')
+// A short window turns the list into the rotation too, so the page fits without scrolling.
+const { height } = useWindowSize()
+const listFeatures = computed(() => (isWide.value && height.value >= 820) || reducedMotion.value === 'reduce')
 const active = ref(0)
 useIntervalFn(() => {
   if (!listFeatures.value)
@@ -71,7 +73,7 @@ const languageItems = computed(() => Object.entries(languages).map(([key, label]
 
 <template>
   <main class="signin" :class="isWide ? 'wide' : 'narrow'">
-    <PluginWall class="wall" :columns="isWide ? 10 : isTablet ? 9 : 6" :rows="isWide ? 16 : 9" :mark="isWide ? 168 : 132" :quiet="isWide ? 3 : 1.8" />
+    <PluginWall class="wall" :columns="isWide ? 10 : isTablet ? 9 : 6" :rows="isWide ? 16 : 9" :mark="isWide ? 168 : 132" :quiet="isWide ? 3 : 1.8" :fade="!isWide" :covered="isWide ? 0 : 32" />
 
     <div class="controls">
       <ADropdown :menu="{ items: languageItems, selectable: true, selectedKeys: [gettext.current], onClick: ({ key }) => setLanguage(String(key)) }">
@@ -177,7 +179,7 @@ const languageItems = computed(() => Object.entries(languages).map(([key, label]
   position: relative;
   min-height: 100vh;
   min-height: 100svh;
-  background: var(--portal-faint);
+  background: var(--portal-wall-bg);
 }
 
 .controls {
@@ -189,8 +191,7 @@ const languageItems = computed(() => Object.entries(languages).map(([key, label]
   gap: 4px;
   padding: 2px;
   border-radius: 10px;
-  background: color-mix(in srgb, var(--portal-card) 70%, transparent);
-  backdrop-filter: blur(8px);
+  background: color-mix(in srgb, var(--portal-card) 85%, transparent);
 }
 
 /* Narrow screens: the wall above, the sign in as a sheet that rises from the bottom. */
@@ -201,8 +202,7 @@ const languageItems = computed(() => Object.entries(languages).map(([key, label]
 
 .narrow .wall {
   flex: 1 1 auto;
-  min-height: 34svh;
-  mask-image: linear-gradient(to bottom, #000 70%, transparent);
+  min-height: 120px;
 }
 
 .narrow .sheet {
@@ -247,7 +247,7 @@ const languageItems = computed(() => Object.entries(languages).map(([key, label]
   justify-self: center;
   width: 100%;
   max-width: 440px;
-  padding: 64px 32px;
+  padding: clamp(24px, 7vh, 64px) 32px;
   box-sizing: border-box;
 }
 
@@ -312,6 +312,7 @@ const languageItems = computed(() => Object.entries(languages).map(([key, label]
 
 .features li {
   display: flex;
+  align-items: center;
   gap: 14px;
 }
 
@@ -321,6 +322,7 @@ const languageItems = computed(() => Object.entries(languages).map(([key, label]
 
 .rotator-item {
   display: flex;
+  align-items: center;
   gap: 14px;
   min-height: 72px;
 }
@@ -451,6 +453,87 @@ const languageItems = computed(() => Object.entries(languages).map(([key, label]
 
 .wide .links {
   margin-top: 32px;
+}
+
+/* Short screens keep the whole sheet in view, the wall gives way first. */
+@media (max-height: 720px) {
+  .narrow .sheet {
+    padding-top: 22px;
+  }
+
+  .narrow .headline {
+    margin-top: 10px;
+    font-size: 21px;
+  }
+
+  .rotator {
+    margin-top: 14px;
+  }
+
+  .rotator-item {
+    min-height: 64px;
+  }
+
+  .narrow .github {
+    margin-top: 18px;
+  }
+
+  .links {
+    margin-top: 14px;
+  }
+}
+
+/* Wide but short windows tighten the sign in so it fits the screen. */
+@media (max-height: 820px) {
+  .wide .headline {
+    margin-top: 20px;
+    font-size: 30px;
+  }
+
+  .wide .features {
+    gap: 14px;
+    margin-top: 24px;
+  }
+
+  .wide .github {
+    margin-top: 28px;
+  }
+
+  .wide .links {
+    margin-top: 24px;
+  }
+}
+
+@media (max-height: 699px) {
+  .wide .headline {
+    margin-top: 16px;
+    font-size: 26px;
+  }
+
+  .wide .rotator {
+    margin-top: 18px;
+  }
+
+  .wide .github {
+    margin-top: 20px;
+  }
+
+  .wide .alert {
+    margin-top: 14px;
+  }
+
+  .wide .alert + .github {
+    margin-top: 14px;
+  }
+
+  .wide .links {
+    margin-top: 16px;
+  }
+
+  /* Only with reduced motion is the list shown this short; titles carry it. */
+  .wide .features .feature-text {
+    display: none;
+  }
 }
 
 /* Each part of the sign in fades in shortly after the one before it. */
