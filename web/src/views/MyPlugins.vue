@@ -1,13 +1,14 @@
 <script setup lang="ts">
 import type { Change } from '@/api/changes'
 import type { Insights, Installable, PluginSummary } from '@/api/plugins'
+import type { Announcement } from '@/api/settings'
 import type { SubmitDraft } from '@/lib/submitDrafts'
 import { computed, onMounted, ref } from 'vue'
 import { getChanges } from '@/api/changes'
 import { getInsights, getMyPlugins } from '@/api/plugins'
-import { announcements } from '@/lib/announcements'
+import { getAnnouncements } from '@/api/settings'
 import { kindLabel } from '@/lib/changeKinds'
-import { $gettext } from '@/lib/gettext'
+import gettext, { $gettext } from '@/lib/gettext'
 import { joinList, localized } from '@/lib/labels'
 import { localeName } from '@/lib/locales'
 import { loadDrafts } from '@/lib/submitDrafts'
@@ -19,6 +20,11 @@ const changes = ref<Change[]>([])
 const insights = ref<Record<string, Insights>>({})
 const installable = ref<Installable[]>([])
 const more = useMoreRepos()
+
+// News from maintainers, in the language of the portal or else English.
+const announcements = ref<Announcement[]>([])
+getAnnouncements().then(r => (announcements.value = r.announcements)).catch(() => {})
+const inPortalLanguage = (value: Record<string, string>) => value[gettext.current] ?? value.en ?? ''
 const installUrl = ref('')
 const loading = ref(true)
 const failed = ref(false)
@@ -303,14 +309,15 @@ const activity = computed(() => plugins.value
         </ACard>
         <ACard :title="$gettext('Announcements')">
           <AFlex vertical gap="12">
-            <div v-for="item in announcements()" :key="item.title">
+            <div v-for="item in announcements" :key="item.id">
               <div class="font-500 text-3">
-                {{ item.title }}
+                {{ inPortalLanguage(item.title) }}
               </div>
               <div class="text-3 op-65">
-                {{ item.text }} {{ formatDay(item.date) }}
+                {{ inPortalLanguage(item.text) }} {{ formatDay(item.date) }}
               </div>
             </div>
+            <span v-if="!announcements.length" class="text-3 op-65">{{ $gettext('No announcements.') }}</span>
           </AFlex>
         </ACard>
         <ACard :title="$gettext('Getting started')">

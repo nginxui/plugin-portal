@@ -94,7 +94,7 @@ store.get('/plugins/:id/store', requireSession, async (c) => {
     items: draft ? diffDoc(base, draft.doc) : [],
     pending: open?.id ?? null,
     canEdit: canEdit(ctx),
-    delivery: { bot: botEnabled(c.env), patch: true },
+    delivery: { bot: await botEnabled(c.env), patch: true },
     uploads: mediaEnabled(c.env),
   })
 })
@@ -222,7 +222,7 @@ store.post('/plugins/:id/store/submit', requireSession, async (c) => {
       return c.json({ error: 'missing_media' }, 409)
     const prFiles = [{ path: 'plugin.store.json', content: storeJson(doc) }, ...bytes.map(f => ({ path: f.path, content: f.content! }))]
     payload.repo_doc = doc
-    if (body.delivery !== 'patch' && botEnabled(c.env)) {
+    if (body.delivery !== 'patch' && await botEnabled(c.env)) {
       const changeUrl = `${c.env.PORTAL_ORIGIN}/changes/${change}`
       const pr = await openBotPullRequest(c.env, {
         repo: ctx.repo!,

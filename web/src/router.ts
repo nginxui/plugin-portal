@@ -43,6 +43,7 @@ export const router = createRouter({
         { path: 'vendors/:id', name: 'vendor', component: () => import('@/views/owners/VendorPage.vue') },
         { path: 'maintain/plugins', name: 'all-plugins', component: () => import('@/views/maintain/AllPlugins.vue'), meta: { maintainer: true } },
         { path: 'maintain/partners', name: 'partners-admin', component: () => import('@/views/maintain/PartnersAdmin.vue'), meta: { maintainer: true } },
+        { path: 'maintain/settings', name: 'settings', component: () => import('@/views/maintain/Settings.vue'), meta: { maintainer: true } },
         { path: 'owners/:login', name: 'owner', component: () => import('@/views/owners/OwnerPage.vue') },
       ],
     },

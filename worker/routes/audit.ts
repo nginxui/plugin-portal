@@ -12,7 +12,7 @@ const KINDS = {
   submission: `a.action = 'change.submit'`,
   maintainer: `a.action LIKE 'maintain.%'`,
   ai: `a.action = 'ai.draft'`,
-  settings: `(a.action LIKE 'ai.provider_%' OR a.action LIKE 'community.enable' OR a.action LIKE 'community.disable')`,
+  settings: `(a.action LIKE 'ai.provider_%' OR a.action LIKE 'settings.%' OR a.action LIKE 'community.enable' OR a.action LIKE 'community.disable')`,
   system: `a.actor_id IS NULL`,
   account: `a.action LIKE 'auth.%'`,
 } as const
@@ -47,7 +47,7 @@ export function kindOf(action: string, actorId: number | null): Kind {
     return 'maintainer'
   if (action === 'ai.draft')
     return 'ai'
-  if (action.startsWith('ai.provider_') || action === 'community.enable' || action === 'community.disable')
+  if (action.startsWith('ai.provider_') || action.startsWith('settings.') || action === 'community.enable' || action === 'community.disable')
     return 'settings'
   return 'account'
 }

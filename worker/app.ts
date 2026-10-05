@@ -18,6 +18,7 @@ import { plugins } from './routes/plugins'
 import { preflight } from './routes/preflight'
 import { review } from './routes/review'
 import { selfService } from './routes/selfService'
+import { settings } from './routes/settings'
 import { media, store } from './routes/store'
 import { submit } from './routes/submit'
 
@@ -42,6 +43,7 @@ app.route('/review', review)
 app.route('/audit', audit)
 app.route('/ai/admin', aiAdmin)
 app.route('/maintain', maintain)
+app.route('/', settings)
 
 app.notFound(c => c.json({ error: 'not_found' }, 404))
 

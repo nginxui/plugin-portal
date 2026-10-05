@@ -93,7 +93,7 @@ export async function flushAccepted(env: Env, ctx: PluginContext, actor: Transla
   if (state.source !== 'catalog') {
     const { doc: repoDoc } = repoFiles(doc)
     payload.repo_doc = repoDoc
-    if (botEnabled(env)) {
+    if (await botEnabled(env)) {
       const changeUrl = `${env.PORTAL_ORIGIN}/changes/${change}`
       const pr = await openBotPullRequest(env, {
         repo: ctx.repo!,
