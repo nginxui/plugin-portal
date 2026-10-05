@@ -166,7 +166,7 @@ async function upload(make: () => Promise<Blob | null>, target: 'new' | 'light' 
     uploadError.value = code === 'bad_ratio' || code === 'bad_size'
       ? $gettext('The image was refused: it must be 16:10 and between 640 and 3840 pixels wide.')
       : code === 'uploads_off'
-        ? $gettext('Uploads are not available yet.')
+        ? $gettext('Screenshot uploads are not open yet.')
         : $gettext('The image could not be uploaded. Please try again.')
     return false
   }
@@ -240,6 +240,12 @@ const titleOf = (shot: Shot) => shot.caption?.[gettext.current] || shot.caption?
 
 const complete = (shot: Shot) => !!shot.dark_path
 const changedIds = computed(() => new Set(items.value.filter(i => i.field === 'screenshots' || i.field === 'caption').map(i => i.label.split('.')[1])))
+
+// Thumbnails open a larger preview when clicked.
+const THUMB = {
+  root: { display: 'block', width: '100%' },
+  image: { display: 'block', width: '100%', aspectRatio: '16 / 10', objectFit: 'cover', borderRadius: '4px', border: '1px solid var(--portal-border)', background: 'var(--portal-faint)' },
+} as const
 </script>
 
 <template>
@@ -247,7 +253,7 @@ const changedIds = computed(() => new Set(items.value.filter(i => i.field === 's
     <AAlert v-if="failed" type="error" show-icon :title="$gettext('The store texts could not be loaded.')" />
     <ASkeleton v-else-if="!state" active />
     <template v-else>
-      <AAlert v-if="!S.uploads" type="info" show-icon :title="$gettext('Uploads are not available yet. You can reorder the screenshots and edit their captions.')" />
+      <AAlert v-if="!S.uploads" type="info" show-icon :title="$gettext('Screenshot uploads are not open yet. You can reorder the screenshots and edit their captions.')" />
       <AAlert v-if="'screenshots' in S.overrides" type="warning" show-icon :title="$gettext('The catalog entry sets the screenshots of this plugin, so they cannot be changed here.')" />
 
       <div class="cols">
@@ -290,14 +296,16 @@ const changedIds = computed(() => new Set(items.value.filter(i => i.field === 's
                   {{ complete(shot) ? $gettext('Complete') : $gettext('No dark version') }}
                 </ATag>
               </AFlex>
-              <div class="pair">
-                <img v-if="imageOf(shot.path)" :src="imageOf(shot.path)!" alt="" referrerpolicy="no-referrer">
-                <img v-if="imageOf(shot.dark_path)" :src="imageOf(shot.dark_path)!" alt="" referrerpolicy="no-referrer">
-                <div v-else class="missing" :class="{ clickable: canEdit && S.uploads }" @click.stop="canEdit && S.uploads && (selectedId = shot.id, side = 'dark', pick('dark'))">
-                  {{ $gettext('No dark screenshot') }}
-                  <span v-if="canEdit && S.uploads" class="block text-3">{{ $gettext('Click to upload') }}</span>
+              <AImagePreviewGroup>
+                <div class="pair">
+                  <AImage v-if="imageOf(shot.path)" :src="imageOf(shot.path)!" alt="" referrerpolicy="no-referrer" :styles="THUMB" />
+                  <AImage v-if="imageOf(shot.dark_path)" :src="imageOf(shot.dark_path)!" alt="" referrerpolicy="no-referrer" :styles="THUMB" />
+                  <div v-else class="missing" :class="{ clickable: canEdit && S.uploads }" @click.stop="canEdit && S.uploads && (selectedId = shot.id, side = 'dark', pick('dark'))">
+                    {{ $gettext('No dark screenshot') }}
+                    <span v-if="canEdit && S.uploads" class="block text-3">{{ $gettext('Click to upload') }}</span>
+                  </div>
                 </div>
-              </div>
+              </AImagePreviewGroup>
               <div class="text-3 truncate">
                 {{ shot.caption?.en || $gettext('No caption') }}
               </div>
@@ -460,7 +468,6 @@ const changedIds = computed(() => new Set(items.value.filter(i => i.field === 's
   gap: 6px;
 }
 
-.pair img,
 .missing {
   width: 100%;
   aspect-ratio: 16 / 10;

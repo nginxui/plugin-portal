@@ -208,6 +208,12 @@ function editableClass(key: string, missing = false) {
     hl: !!props.highlight[key],
   }
 }
+
+// Screenshots open a larger preview when clicked.
+const SHOT = {
+  root: { display: 'block', width: '100%' },
+  image: { display: 'block', width: '100%', aspectRatio: '16 / 10', objectFit: 'cover', borderRadius: '8px', border: '1px solid var(--p-border)', background: 'var(--p-fill)' },
+} as const
 </script>
 
 <template>
@@ -339,17 +345,19 @@ function editableClass(key: string, missing = false) {
             <span class="i-tabler-photo-edit" />{{ $gettext('Edit in the screenshot studio') }}
           </button>
         </div>
-        <div class="strip">
-          <figure v-for="shot in shots" :key="shot.id" class="shot" :class="{ hl: highlight[`shot:${shot.id}`] }" :data-hl="highlight[`shot:${shot.id}`]">
-            <img v-if="shot.url" :src="shot.url" :alt="shot.caption.text" loading="lazy" referrerpolicy="no-referrer">
-            <div v-else class="shot-missing">
-              {{ shot.path }}
-            </div>
-            <figcaption :class="editableClass(`caption:${shot.id}`, shot.caption.fallback)" role="button" :tabindex="editable ? 0 : -1" @click="edit(`caption:${shot.id}`)" @keydown.enter="edit(`caption:${shot.id}`)">
-              {{ shot.caption.text || (editable ? $gettext('Add a caption') : '') }}
-            </figcaption>
-          </figure>
-        </div>
+        <AImagePreviewGroup>
+          <div class="strip">
+            <figure v-for="shot in shots" :key="shot.id" class="shot" :class="{ hl: highlight[`shot:${shot.id}`] }" :data-hl="highlight[`shot:${shot.id}`]">
+              <AImage v-if="shot.url" :src="shot.url" :alt="shot.caption.text" loading="lazy" referrerpolicy="no-referrer" :styles="SHOT" />
+              <div v-else class="shot-missing">
+                {{ shot.path }}
+              </div>
+              <figcaption :class="editableClass(`caption:${shot.id}`, shot.caption.fallback)" role="button" :tabindex="editable ? 0 : -1" @click="edit(`caption:${shot.id}`)" @keydown.enter="edit(`caption:${shot.id}`)">
+                {{ shot.caption.text || (editable ? $gettext('Add a caption') : '') }}
+              </figcaption>
+            </figure>
+          </div>
+        </AImagePreviewGroup>
         <div v-if="editing?.key.startsWith('caption:')" class="editor" :class="{ pop: editing.source }" @keydown="onKey">
           <div v-if="progress && editing.source" class="progress">
             {{ progress }}
@@ -691,7 +699,6 @@ function editableClass(key: string, missing = false) {
   width: 200px;
 }
 
-.shot img,
 .shot-missing {
   display: block;
   width: 100%;

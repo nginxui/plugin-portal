@@ -28,6 +28,8 @@ declare module 'vue' {
     AFlex: typeof import('antdv-next')['Flex']
     AForm: typeof import('antdv-next')['Form']
     AFormItem: typeof import('antdv-next')['FormItem']
+    AImage: typeof import('antdv-next')['Image']
+    AImagePreviewGroup: typeof import('antdv-next')['ImagePreviewGroup']
     AInput: typeof import('antdv-next')['Input']
     AInputNumber: typeof import('antdv-next')['InputNumber']
     AInputPassword: typeof import('antdv-next')['InputPassword']

@@ -255,7 +255,7 @@ msgid "Open in a new tab"
 msgstr ""
 
 #: web/src/components/CommunityCard.vue:51
-#: web/src/components/MarketPreview.vue:249
+#: web/src/components/MarketPreview.vue:255
 #: web/src/components/ReviewCompare.vue:35
 #: web/src/components/ReviewCompare.vue:83
 #: web/src/lib/checks.ts:11
@@ -274,7 +274,7 @@ msgid "Name"
 msgstr ""
 
 #: web/src/components/CommunityCard.vue:53
-#: web/src/components/MarketPreview.vue:276
+#: web/src/components/MarketPreview.vue:282
 #: web/src/components/ReviewCompare.vue:37
 #: web/src/components/ReviewCompare.vue:85
 #: web/src/views/plugin/PluginStore.vue:84
@@ -351,12 +351,12 @@ msgid "Decline"
 msgstr ""
 
 #: web/src/components/CommunityCard.vue:134
-#: web/src/components/MarketPreview.vue:258
-#: web/src/components/MarketPreview.vue:285
-#: web/src/components/MarketPreview.vue:318
-#: web/src/components/MarketPreview.vue:369
-#: web/src/components/MarketPreview.vue:422
-#: web/src/views/plugin/PluginScreenshots.vue:339
+#: web/src/components/MarketPreview.vue:264
+#: web/src/components/MarketPreview.vue:291
+#: web/src/components/MarketPreview.vue:324
+#: web/src/components/MarketPreview.vue:377
+#: web/src/components/MarketPreview.vue:430
+#: web/src/views/plugin/PluginScreenshots.vue:347
 msgid "Cancel"
 msgstr ""
 
@@ -594,21 +594,21 @@ msgstr ""
 msgid "Community"
 msgstr ""
 
-#: web/src/components/MarketPreview.vue:217
+#: web/src/components/MarketPreview.vue:223
 msgid "Nginx UI marketplace, as users see it"
 msgstr ""
 
-#: web/src/components/MarketPreview.vue:231
+#: web/src/components/MarketPreview.vue:237
 msgid "Changes need review"
 msgstr ""
 
-#: web/src/components/MarketPreview.vue:252
-#: web/src/components/MarketPreview.vue:255
-#: web/src/components/MarketPreview.vue:279
-#: web/src/components/MarketPreview.vue:282
-#: web/src/components/MarketPreview.vue:363
-#: web/src/components/MarketPreview.vue:366
-#: web/src/views/plugin/PluginScreenshots.vue:390
+#: web/src/components/MarketPreview.vue:258
+#: web/src/components/MarketPreview.vue:261
+#: web/src/components/MarketPreview.vue:285
+#: web/src/components/MarketPreview.vue:288
+#: web/src/components/MarketPreview.vue:371
+#: web/src/components/MarketPreview.vue:374
+#: web/src/views/plugin/PluginScreenshots.vue:398
 #: web/src/views/plugin/PluginTranslations.vue:325
 #: web/src/views/plugin/PluginTranslations.vue:359
 #: web/src/views/plugin/PluginTranslations.vue:396
@@ -616,29 +616,29 @@ msgstr ""
 msgid "AI draft"
 msgstr ""
 
-#: web/src/components/MarketPreview.vue:261
-#: web/src/components/MarketPreview.vue:288
-#: web/src/components/MarketPreview.vue:372
+#: web/src/components/MarketPreview.vue:267
+#: web/src/components/MarketPreview.vue:294
+#: web/src/components/MarketPreview.vue:380
 msgid "Save and go to the next"
 msgstr ""
 
-#: web/src/components/MarketPreview.vue:261
-#: web/src/components/MarketPreview.vue:288
-#: web/src/components/MarketPreview.vue:321
-#: web/src/components/MarketPreview.vue:372
-#: web/src/components/MarketPreview.vue:425
+#: web/src/components/MarketPreview.vue:267
+#: web/src/components/MarketPreview.vue:294
+#: web/src/components/MarketPreview.vue:327
+#: web/src/components/MarketPreview.vue:380
+#: web/src/components/MarketPreview.vue:433
 msgid "Done"
 msgstr ""
 
-#: web/src/components/MarketPreview.vue:267
+#: web/src/components/MarketPreview.vue:273
 msgid "Add a description"
 msgstr ""
 
-#: web/src/components/MarketPreview.vue:311
+#: web/src/components/MarketPreview.vue:317
 msgid "Add a homepage"
 msgstr ""
 
-#: web/src/components/MarketPreview.vue:314
+#: web/src/components/MarketPreview.vue:320
 #: web/src/components/ReviewCompare.vue:39
 #: web/src/components/ReviewCompare.vue:87
 #: web/src/lib/storeDiff.ts:60
@@ -646,24 +646,24 @@ msgstr ""
 msgid "Homepage"
 msgstr ""
 
-#: web/src/components/MarketPreview.vue:339
+#: web/src/components/MarketPreview.vue:345
 msgid "Edit in the screenshot studio"
 msgstr ""
 
-#: web/src/components/MarketPreview.vue:349
+#: web/src/components/MarketPreview.vue:356
 msgid "Add a caption"
 msgstr ""
 
-#: web/src/components/MarketPreview.vue:360
-#: web/src/views/plugin/PluginScreenshots.vue:378
+#: web/src/components/MarketPreview.vue:368
+#: web/src/views/plugin/PluginScreenshots.vue:386
 msgid "Caption"
 msgstr ""
 
-#: web/src/components/MarketPreview.vue:413
+#: web/src/components/MarketPreview.vue:421
 msgid "Add a README"
 msgstr ""
 
-#: web/src/components/MarketPreview.vue:417
+#: web/src/components/MarketPreview.vue:425
 #: web/src/components/PluginCard.vue:183
 msgid "README"
 msgstr ""
@@ -807,7 +807,7 @@ msgstr ""
 #: web/src/components/PluginCard.vue:121
 #: web/src/components/PluginCard.vue:179
 #: web/src/lib/pluginSections.ts:15
-#: web/src/views/plugin/PluginScreenshots.vue:254
+#: web/src/views/plugin/PluginScreenshots.vue:260
 msgid "Screenshots"
 msgstr ""
 
@@ -877,7 +877,7 @@ msgstr ""
 #: web/src/components/PluginCard.vue:207
 #: web/src/components/PluginCard.vue:233
 #: web/src/lib/pluginSections.ts:14
-#: web/src/views/plugin/PluginScreenshots.vue:328
+#: web/src/views/plugin/PluginScreenshots.vue:336
 #: web/src/views/plugin/PluginTranslations.vue:388
 msgid "Store details"
 msgstr ""
@@ -988,7 +988,7 @@ msgid "Install the app on another repository"
 msgstr ""
 
 #: web/src/components/ReviewCompare.vue:44
-#: web/src/views/plugin/PluginScreenshots.vue:274
+#: web/src/views/plugin/PluginScreenshots.vue:280
 msgid "Screenshot %{n}"
 msgstr ""
 
@@ -1016,7 +1016,7 @@ msgstr ""
 
 #: web/src/components/ReviewCompare.vue:92
 #: web/src/views/plugin/PluginPreflight.vue:89
-#: web/src/views/plugin/PluginScreenshots.vue:334
+#: web/src/views/plugin/PluginScreenshots.vue:342
 msgid "New screenshot"
 msgstr ""
 
@@ -3611,14 +3611,14 @@ msgid "Preview"
 msgstr ""
 
 #: web/src/views/plugin/PluginBadges.vue:114
-#: web/src/views/plugin/PluginScreenshots.vue:349
+#: web/src/views/plugin/PluginScreenshots.vue:357
 #: web/src/views/plugin/PluginStore.vue:288
 #: web/src/views/review/ReviewChange.vue:512
 msgid "Light"
 msgstr ""
 
 #: web/src/views/plugin/PluginBadges.vue:114
-#: web/src/views/plugin/PluginScreenshots.vue:349
+#: web/src/views/plugin/PluginScreenshots.vue:357
 #: web/src/views/plugin/PluginStore.vue:288
 #: web/src/views/review/ReviewChange.vue:512
 msgid "Dark"
@@ -4007,7 +4007,7 @@ msgid "The image was refused: it must be 16:10 and between 640 and 3840 pixels w
 msgstr ""
 
 #: web/src/views/plugin/PluginScreenshots.vue:169
-msgid "Uploads are not available yet."
+msgid "Screenshot uploads are not open yet."
 msgstr ""
 
 #: web/src/views/plugin/PluginScreenshots.vue:170
@@ -4026,135 +4026,135 @@ msgstr ""
 msgid "The AI draft could not be made. Please try again later."
 msgstr ""
 
-#: web/src/views/plugin/PluginScreenshots.vue:247
+#: web/src/views/plugin/PluginScreenshots.vue:253
 #: web/src/views/plugin/PluginStore.vue:259
 #: web/src/views/plugin/PluginTranslations.vue:248
 msgid "The store texts could not be loaded."
 msgstr ""
 
-#: web/src/views/plugin/PluginScreenshots.vue:250
-msgid "Uploads are not available yet. You can reorder the screenshots and edit their captions."
-msgstr ""
-
-#: web/src/views/plugin/PluginScreenshots.vue:251
-msgid "The catalog entry sets the screenshots of this plugin, so they cannot be changed here."
+#: web/src/views/plugin/PluginScreenshots.vue:256
+msgid "Screenshot uploads are not open yet. You can reorder the screenshots and edit their captions."
 msgstr ""
 
 #: web/src/views/plugin/PluginScreenshots.vue:257
+msgid "The catalog entry sets the screenshots of this plugin, so they cannot be changed here."
+msgstr ""
+
+#: web/src/views/plugin/PluginScreenshots.vue:263
 msgid "16:10, light and dark in pairs"
 msgstr ""
 
-#: web/src/views/plugin/PluginScreenshots.vue:260
+#: web/src/views/plugin/PluginScreenshots.vue:266
 msgid "Add a screenshot"
 msgstr ""
 
-#: web/src/views/plugin/PluginScreenshots.vue:287
+#: web/src/views/plugin/PluginScreenshots.vue:293
 #: web/src/views/review/ReviewChange.vue:558
 msgid "Changed"
 msgstr ""
 
-#: web/src/views/plugin/PluginScreenshots.vue:290
+#: web/src/views/plugin/PluginScreenshots.vue:296
 #: web/src/views/translate/TranslatePage.vue:202
 msgid "Complete"
 msgstr ""
 
-#: web/src/views/plugin/PluginScreenshots.vue:290
+#: web/src/views/plugin/PluginScreenshots.vue:296
 msgid "No dark version"
 msgstr ""
 
-#: web/src/views/plugin/PluginScreenshots.vue:297
-#: web/src/views/plugin/PluginScreenshots.vue:355
+#: web/src/views/plugin/PluginScreenshots.vue:304
+#: web/src/views/plugin/PluginScreenshots.vue:363
 msgid "No dark screenshot"
 msgstr ""
 
-#: web/src/views/plugin/PluginScreenshots.vue:298
-#: web/src/views/plugin/PluginScreenshots.vue:356
+#: web/src/views/plugin/PluginScreenshots.vue:305
+#: web/src/views/plugin/PluginScreenshots.vue:364
 msgid "Click to upload"
 msgstr ""
 
-#: web/src/views/plugin/PluginScreenshots.vue:302
+#: web/src/views/plugin/PluginScreenshots.vue:310
 msgid "No caption"
 msgstr ""
 
-#: web/src/views/plugin/PluginScreenshots.vue:319
+#: web/src/views/plugin/PluginScreenshots.vue:327
 msgid "Drop a PNG, JPEG or WebP image here"
 msgstr ""
 
-#: web/src/views/plugin/PluginScreenshots.vue:321
+#: web/src/views/plugin/PluginScreenshots.vue:329
 msgid "Cropped to 16:10 and converted to WebP, up to 2 MB"
 msgstr ""
 
-#: web/src/views/plugin/PluginScreenshots.vue:324
+#: web/src/views/plugin/PluginScreenshots.vue:332
 msgid "No screenshots yet."
 msgstr ""
 
-#: web/src/views/plugin/PluginScreenshots.vue:326
+#: web/src/views/plugin/PluginScreenshots.vue:334
 #: web/src/views/plugin/PluginStore.vue:402
 #: web/src/views/plugin/PluginTranslations.vue:386
 msgid "Saving the draft"
 msgstr ""
 
-#: web/src/views/plugin/PluginScreenshots.vue:326
+#: web/src/views/plugin/PluginScreenshots.vue:334
 #: web/src/views/plugin/PluginTranslations.vue:386
 msgid "Draft saved %{time}. Submit it from the store page."
 msgstr ""
 
-#: web/src/views/plugin/PluginScreenshots.vue:334
+#: web/src/views/plugin/PluginScreenshots.vue:342
 msgid "Dark version"
 msgstr ""
 
-#: web/src/views/plugin/PluginScreenshots.vue:334
+#: web/src/views/plugin/PluginScreenshots.vue:342
 msgid "Light version"
 msgstr ""
 
-#: web/src/views/plugin/PluginScreenshots.vue:342
+#: web/src/views/plugin/PluginScreenshots.vue:350
 msgid "Add the screenshot"
 msgstr ""
 
-#: web/src/views/plugin/PluginScreenshots.vue:342
-#: web/src/views/plugin/PluginScreenshots.vue:362
+#: web/src/views/plugin/PluginScreenshots.vue:350
+#: web/src/views/plugin/PluginScreenshots.vue:370
 msgid "Use this crop"
 msgstr ""
 
-#: web/src/views/plugin/PluginScreenshots.vue:365
+#: web/src/views/plugin/PluginScreenshots.vue:373
 msgid "Undo the crop"
 msgstr ""
 
-#: web/src/views/plugin/PluginScreenshots.vue:369
+#: web/src/views/plugin/PluginScreenshots.vue:377
 msgid "Upload the dark version"
 msgstr ""
 
-#: web/src/views/plugin/PluginScreenshots.vue:369
+#: web/src/views/plugin/PluginScreenshots.vue:377
 msgid "Replace the image"
 msgstr ""
 
-#: web/src/views/plugin/PluginScreenshots.vue:372
+#: web/src/views/plugin/PluginScreenshots.vue:380
 msgid "Remove the dark version"
 msgstr ""
 
-#: web/src/views/plugin/PluginScreenshots.vue:390
+#: web/src/views/plugin/PluginScreenshots.vue:398
 #: web/src/views/plugin/PluginTranslations.vue:106
 msgid "Waiting for confirmation"
 msgstr ""
 
-#: web/src/views/plugin/PluginScreenshots.vue:394
+#: web/src/views/plugin/PluginScreenshots.vue:402
 msgid "Show filled languages only"
 msgstr ""
 
-#: web/src/views/plugin/PluginScreenshots.vue:394
+#: web/src/views/plugin/PluginScreenshots.vue:402
 msgid "The other languages, %{n} of %{total} filled"
 msgstr ""
 
-#: web/src/views/plugin/PluginScreenshots.vue:399
+#: web/src/views/plugin/PluginScreenshots.vue:407
 #: web/src/views/plugin/PluginTranslations.vue:257
 msgid "Drafting %{done} of %{total}"
 msgstr ""
 
-#: web/src/views/plugin/PluginScreenshots.vue:399
+#: web/src/views/plugin/PluginScreenshots.vue:407
 msgid "AI draft the caption in the %{n} missing languages"
 msgstr ""
 
-#: web/src/views/plugin/PluginScreenshots.vue:405
+#: web/src/views/plugin/PluginScreenshots.vue:413
 msgid "Delete this screenshot"
 msgstr ""
 
