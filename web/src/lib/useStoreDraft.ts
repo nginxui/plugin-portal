@@ -28,7 +28,7 @@ export function useStoreDraft(pluginId: () => string) {
       doc.value = structuredClone(s.draft?.doc ?? s.doc)
       readme.value = s.draft?.readme ?? s.readme
       readmeChanged.value = s.draft?.readme !== undefined && s.draft?.readme !== null
-      source.value = s.draft?.source ?? (s.source === 'release' ? 'repo-branch' : s.source)
+      source.value = s.draft?.source ?? (s.source === 'release' ? 'repo-release' : s.source)
       savedAt.value = s.draft?.updatedAt ?? null
       ai.value = s.draft?.ai ?? []
       failed.value = false
@@ -38,7 +38,8 @@ export function useStoreDraft(pluginId: () => string) {
     }
   }
 
-  const sourceChanged = computed(() => !!state.value && source.value !== state.value.source)
+  // Without a store field the document already follows the release.
+  const sourceChanged = computed(() => !!state.value && source.value !== (state.value.source === 'release' ? 'repo-release' : state.value.source))
   const items = computed(() => state.value ? diffDoc(state.value.doc, doc.value) : [])
   const dirty = computed(() => items.value.length > 0 || readmeChanged.value || sourceChanged.value)
 

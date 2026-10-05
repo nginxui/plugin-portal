@@ -2,6 +2,7 @@ import type { Route } from './helpers'
 import { env } from 'cloudflare:workers'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { isTerm, parsePo, termsIn } from '../worker/lib/glossary'
+import { touchedFields } from '../worker/lib/translations'
 import { call, githubOAuth, json, mockFetch, signIn } from './helpers'
 
 const RAW = 'https://raw.githubusercontent.com'
@@ -68,6 +69,14 @@ async function maintainer() {
 async function addProvider(cookie: string, quota = 50) {
   return call('/api/ai/admin/providers', { method: 'POST', mutate: true, cookie, json: { kind: 'anthropic', name: 'Claude', model: 'claude-sonnet-5-5', key: 'sk-ant-test', daily_quota: quota } })
 }
+
+describe('a first plugin.store.json', () => {
+  it('holds only the fields the translations touch', () => {
+    const doc = { name: { en: 'Geo' }, description: { en: 'Blocks.', de_DE: 'Sperrt.' }, homepage_url: 'https://x.example', screenshots: [{ id: 'a', path: 'a.png', caption: { en: 'A' } }] }
+    expect(touchedFields(doc, [{ field: 'description' }])).toEqual({ description: { en: 'Blocks.', de_DE: 'Sperrt.' } })
+    expect(Object.keys(touchedFields(doc, [{ field: 'caption:a' }, { field: 'name' }])).sort()).toEqual(['name', 'screenshots'])
+  })
+})
 
 describe('glossary', () => {
   it('reads wrapped and single line entries', () => {

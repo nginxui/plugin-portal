@@ -112,13 +112,15 @@ describe('store editor', () => {
     expect(await env.DB.prepare('SELECT count(*) AS n FROM store_drafts').first()).toEqual({ n: 0 })
   })
 
-  it('gives a patch for the repository and moves the source in a reviewed change', async () => {
+  it('gives a patch for the repository and moves the source in a self service change', async () => {
     const cookie = await signedIn()
     await call(`/api/plugins/${ID}/store/draft`, { method: 'PUT', mutate: true, cookie, json: { doc: { description: { en: 'Better.' } }, source: 'repo-branch' } })
     const result = await (await call(`/api/plugins/${ID}/store/submit`, { method: 'POST', mutate: true, cookie, json: {} })).json() as { change: string, moveChange: string, delivery: string }
     expect(result.delivery).toBe('patch')
     expect(JSON.parse(dispatched[0].payload)).toMatchObject({ kind: 'entry_update', operations: { store: { source: 'repo', follow: 'branch' } } })
     expect(dispatched[0].change).toBe(result.moveChange)
+    const move = await env.DB.prepare('SELECT class FROM changes WHERE id = ?').bind(result.moveChange).first<{ class: string }>()
+    expect(move?.class).toBe('self_service')
     const zip = await call(`/api/changes/${result.change}/patch`, { cookie })
     expect(zip.headers.get('Content-Type')).toBe('application/zip')
     const text = new TextDecoder().decode(await zip.arrayBuffer())

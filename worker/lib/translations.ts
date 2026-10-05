@@ -56,6 +56,13 @@ export function applySuggestions(doc: StoreDoc, suggestions: Pick<SuggestionRow,
   return out
 }
 
+const FIELD_OF = (field: string): keyof StoreDoc => field.startsWith('caption:') ? 'screenshots' : field as keyof StoreDoc
+
+export function touchedFields(doc: StoreDoc, suggestions: Pick<SuggestionRow, 'field'>[]): StoreDoc {
+  const keys = new Set(suggestions.map(s => FIELD_OF(s.field)))
+  return Object.fromEntries(Object.entries(doc).filter(([key]) => keys.has(key as keyof StoreDoc))) as StoreDoc
+}
+
 interface Translator {
   login: string
   id: number
@@ -74,9 +81,13 @@ export async function flushAccepted(env: Env, ctx: PluginContext, actor: Transla
   if (!results.length)
     return null
   const state = await readStore(env, ctx.token, { id: ctx.id, repo: ctx.repo, tag: ctx.tag, entry: ctx.entry })
-  if (state.source === 'release')
+  if (state.source !== 'catalog' && !ctx.repo)
     return null
-  const doc = applySuggestions(state.doc, results)
+  let doc = applySuggestions(state.doc, results)
+  // A first plugin.store.json holds only the fields the translations touch,
+  // so the others keep following plugin.json.
+  if (!state.fromFile)
+    doc = touchedFields(doc, results)
   const translators = new Map<string, Translator>()
   for (const s of results) {
     if (s.login)

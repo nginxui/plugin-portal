@@ -80,6 +80,7 @@ store.get('/plugins/:id/store', requireSession, async (c) => {
     .first<{ id: string }>()
   return c.json({
     source: state.source,
+    fromFile: state.fromFile,
     repo: state.repo,
     ref: state.ref,
     tag: ctx.tag,
@@ -164,8 +165,11 @@ store.post('/plugins/:id/store/submit', requireSession, async (c) => {
   const draft = JSON.parse(row.doc_json) as Draft
   const state = await readStore(c.env, ctx.token, { id: ctx.id, repo: ctx.repo, tag: ctx.tag, entry: ctx.entry })
   const base = baseline(state, ctx)
-  const target: Source = draft.source ?? (state.source === 'release' ? 'repo-branch' : state.source)
-  const moving = target !== state.source
+  // Without a store field the document already follows the release, so
+  // writing plugin.store.json there is no move.
+  const current: Source = state.source === 'release' ? 'repo-release' : state.source
+  const target: Source = draft.source ?? current
+  const moving = target !== current
   const items = diffDoc(base, draft.doc)
   if (!items.length && !moving)
     return c.json({ error: 'no_change' }, 409)
@@ -266,17 +270,18 @@ store.post('/plugins/:id/store/submit', requireSession, async (c) => {
   await c.env.DB.batch(statements)
 
   // The catalog source goes through apply.yml. Moving a repository source
-  // is a change of the entry of its own, reviewed by a maintainer, since it
-  // changes where the listing reads from.
+  // is a change of the entry of its own: between releases and the default
+  // branch it is the author's call, away from the catalog a maintainer's.
   let moveChange: string | null = null
   if (moving && target !== 'catalog') {
     moveChange = newChangeId()
+    const moveClass = current === 'catalog' ? 'reviewed' : 'self_service'
     const movePayload = { kind: 'entry_update', plugin_id: ctx.id, operations: { store: payload.set_source }, reason: '', submitter, eligibility }
     await c.env.DB.batch([
       c.env.DB.prepare(
         `INSERT INTO changes (number, id, plugin_id, author_id, kind, class, state, stage, waiting_on, payload_json, dispatched_at, created_at, updated_at)
-         VALUES (${NEXT_NUMBER}, ?, ?, ?, 'store_source', 'reviewed', 'open', 'checks', 'system', ?, ?, ?, ?)`,
-      ).bind(moveChange, ctx.id, session.user.id, JSON.stringify(movePayload), t, t, t),
+         VALUES (${NEXT_NUMBER}, ?, ?, ?, 'store_source', ?, 'open', 'checks', 'system', ?, ?, ?, ?)`,
+      ).bind(moveChange, ctx.id, session.user.id, moveClass, JSON.stringify(movePayload), t, t, t),
       event(c.env, moveChange, 'submitted', session.user.id, { store: payload.set_source }),
     ])
     await dispatchOrRecord(c.env, moveChange, movePayload)

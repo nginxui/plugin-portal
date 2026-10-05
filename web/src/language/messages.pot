@@ -20,7 +20,7 @@ msgid "Change categories"
 msgstr ""
 
 #: web/src/components/CategoryEditModal.vue:50
-#: web/src/components/CommunityCard.vue:175
+#: web/src/components/CommunityCard.vue:171
 #: web/src/views/maintain/AiModels.vue:219
 #: web/src/views/maintain/Settings.vue:252
 #: web/src/views/maintain/Settings.vue:297
@@ -268,7 +268,7 @@ msgstr ""
 msgid "Open in a new tab"
 msgstr ""
 
-#: web/src/components/CommunityCard.vue:51
+#: web/src/components/CommunityCard.vue:50
 #: web/src/components/MarketPreview.vue:255
 #: web/src/components/ReviewCompare.vue:35
 #: web/src/components/ReviewCompare.vue:83
@@ -287,7 +287,7 @@ msgstr ""
 msgid "Name"
 msgstr ""
 
-#: web/src/components/CommunityCard.vue:53
+#: web/src/components/CommunityCard.vue:52
 #: web/src/components/MarketPreview.vue:282
 #: web/src/components/ReviewCompare.vue:37
 #: web/src/components/ReviewCompare.vue:85
@@ -298,74 +298,70 @@ msgstr ""
 msgid "Description"
 msgstr ""
 
-#: web/src/components/CommunityCard.vue:55
+#: web/src/components/CommunityCard.vue:54
 #: web/src/views/plugin/PluginStore.vue:86
 #: web/src/views/plugin/PluginTranslations.vue:54
 #: web/src/views/translate/TranslatePage.vue:85
 msgid "Caption of screenshot %{n}"
 msgstr ""
 
-#: web/src/components/CommunityCard.vue:79
+#: web/src/components/CommunityCard.vue:78
 msgid "The decision could not be saved. Please try again."
 msgstr ""
 
-#: web/src/components/CommunityCard.vue:88
-#: web/src/components/CommunityCard.vue:90
+#: web/src/components/CommunityCard.vue:87
+#: web/src/components/CommunityCard.vue:89
 #: web/src/views/plugin/PluginAccess.vue:128
 msgid "Community translation"
 msgstr ""
 
-#: web/src/components/CommunityCard.vue:93
-msgid "Community translation needs a store source. Pick one on the store page and submit once."
-msgstr ""
-
-#: web/src/components/CommunityCard.vue:96
+#: web/src/components/CommunityCard.vue:92
 msgid "When it is on, signed in users can suggest translations of the store texts. You review every suggestion before it goes out."
 msgstr ""
 
-#: web/src/components/CommunityCard.vue:100
-#: web/src/components/CommunityCard.vue:175
+#: web/src/components/CommunityCard.vue:96
+#: web/src/components/CommunityCard.vue:171
 msgid "Open languages"
 msgstr ""
 
-#: web/src/components/CommunityCard.vue:102
+#: web/src/components/CommunityCard.vue:98
 msgid "All %{n}"
 msgstr ""
 
-#: web/src/components/CommunityCard.vue:103
+#: web/src/components/CommunityCard.vue:99
 #: web/src/views/maintain/Settings.vue:218
 #: web/src/views/SubmitPlugin.vue:295
 msgid "Edit"
 msgstr ""
 
-#: web/src/components/CommunityCard.vue:108
+#: web/src/components/CommunityCard.vue:104
 msgid "Waiting for review, %{n}"
 msgstr ""
 
-#: web/src/components/CommunityCard.vue:120
+#: web/src/components/CommunityCard.vue:116
 msgid "Now: %{text}"
 msgstr ""
 
-#: web/src/components/CommunityCard.vue:120
+#: web/src/components/CommunityCard.vue:116
 msgid "not translated"
 msgstr ""
 
-#: web/src/components/CommunityCard.vue:123
+#: web/src/components/CommunityCard.vue:119
 msgid "Suggested: %{text}"
 msgstr ""
 
-#: web/src/components/CommunityCard.vue:127
+#: web/src/components/CommunityCard.vue:123
 msgid "Why, shown to the translator"
 msgstr ""
 
-#: web/src/components/CommunityCard.vue:131
-#: web/src/components/CommunityCard.vue:145
+#: web/src/components/CommunityCard.vue:127
+#: web/src/components/CommunityCard.vue:141
 #: web/src/views/maintain/PartnersAdmin.vue:215
 #: web/src/views/maintain/PartnersAdmin.vue:317
 msgid "Decline"
 msgstr ""
 
-#: web/src/components/CommunityCard.vue:134
+#: web/src/components/CommunityCard.vue:130
 #: web/src/components/MarketPreview.vue:264
 #: web/src/components/MarketPreview.vue:291
 #: web/src/components/MarketPreview.vue:324
@@ -380,48 +376,48 @@ msgstr ""
 msgid "Cancel"
 msgstr ""
 
-#: web/src/components/CommunityCard.vue:139
+#: web/src/components/CommunityCard.vue:135
 msgid "Accept the edit"
 msgstr ""
 
-#: web/src/components/CommunityCard.vue:139
+#: web/src/components/CommunityCard.vue:135
 msgid "Accept"
 msgstr ""
 
-#: web/src/components/CommunityCard.vue:142
+#: web/src/components/CommunityCard.vue:138
 msgid "Edit and accept"
 msgstr ""
 
-#: web/src/components/CommunityCard.vue:151
+#: web/src/components/CommunityCard.vue:147
 msgid "No suggestions are waiting."
 msgstr ""
 
-#: web/src/components/CommunityCard.vue:157
+#: web/src/components/CommunityCard.vue:153
 msgid "Community translations, pull request #%{n}"
 msgstr ""
 
-#: web/src/components/CommunityCard.vue:157
+#: web/src/components/CommunityCard.vue:153
 #: web/src/lib/changeKinds.ts:17
 msgid "Community translations"
 msgstr ""
 
-#: web/src/components/CommunityCard.vue:160
+#: web/src/components/CommunityCard.vue:156
 msgid "%{batches} batches with %{strings} translations, waiting for the merge."
 msgstr ""
 
-#: web/src/components/CommunityCard.vue:163
+#: web/src/components/CommunityCard.vue:159
 #: web/src/views/maintain/AllPlugins.vue:286
 msgid "View on GitHub"
 msgstr ""
 
-#: web/src/components/CommunityCard.vue:165
+#: web/src/components/CommunityCard.vue:161
 #: web/src/components/PendingChange.vue:16
 #: web/src/views/plugin/PluginLayout.vue:82
 #: web/src/views/plugin/PluginStore.vue:266
 msgid "View progress"
 msgstr ""
 
-#: web/src/components/CommunityCard.vue:170
+#: web/src/components/CommunityCard.vue:166
 msgid "Accepted translations go into one pull request, with the translators as co-authors of each commit."
 msgstr ""
 
@@ -684,7 +680,7 @@ msgid "Add a README"
 msgstr ""
 
 #: web/src/components/MarketPreview.vue:425
-#: web/src/components/PluginCard.vue:193
+#: web/src/components/PluginCard.vue:194
 msgid "README"
 msgstr ""
 
@@ -819,20 +815,20 @@ msgid "A maintainer asked for changes. See the review on the change page."
 msgstr ""
 
 #: web/src/components/PluginCard.vue:121
-#: web/src/components/PluginCard.vue:186
+#: web/src/components/PluginCard.vue:187
 #: web/src/lib/pluginSections.ts:16
 msgid "Translations"
 msgstr ""
 
 #: web/src/components/PluginCard.vue:124
-#: web/src/components/PluginCard.vue:189
+#: web/src/components/PluginCard.vue:190
 #: web/src/lib/pluginSections.ts:15
 #: web/src/views/plugin/PluginScreenshots.vue:260
 msgid "Screenshots"
 msgstr ""
 
 #: web/src/components/PluginCard.vue:126
-#: web/src/components/PluginCard.vue:191
+#: web/src/components/PluginCard.vue:192
 msgid "%{dark} of %{total} with dark"
 msgstr ""
 
@@ -894,43 +890,43 @@ msgstr ""
 msgid "%{n} for this version"
 msgstr ""
 
-#: web/src/components/PluginCard.vue:193
+#: web/src/components/PluginCard.vue:194
 msgid "Provided"
 msgstr ""
 
-#: web/src/components/PluginCard.vue:193
+#: web/src/components/PluginCard.vue:194
 msgid "Not provided"
 msgstr ""
 
-#: web/src/components/PluginCard.vue:205
-#: web/src/components/PluginCard.vue:217
-#: web/src/components/PluginCard.vue:243
+#: web/src/components/PluginCard.vue:206
+#: web/src/components/PluginCard.vue:218
+#: web/src/components/PluginCard.vue:244
 #: web/src/lib/pluginSections.ts:14
 #: web/src/views/plugin/PluginScreenshots.vue:336
 #: web/src/views/plugin/PluginTranslations.vue:388
 msgid "Store details"
 msgstr ""
 
-#: web/src/components/PluginCard.vue:210
+#: web/src/components/PluginCard.vue:211
 msgid "Organization page"
 msgstr ""
 
-#: web/src/components/PluginCard.vue:222
+#: web/src/components/PluginCard.vue:223
 #: web/src/lib/pluginSections.ts:17
 msgid "Release preflight"
 msgstr ""
 
-#: web/src/components/PluginCard.vue:227
+#: web/src/components/PluginCard.vue:228
 #: web/src/lib/pluginSections.ts:18
 #: web/src/views/plugin/PluginVersions.vue:130
 msgid "Versions"
 msgstr ""
 
-#: web/src/components/PluginCard.vue:231
+#: web/src/components/PluginCard.vue:232
 msgid "Catalog page"
 msgstr ""
 
-#: web/src/components/PluginCard.vue:238
+#: web/src/components/PluginCard.vue:239
 msgid "View the review"
 msgstr ""
 
@@ -1743,38 +1739,30 @@ msgid "Delisted"
 msgstr ""
 
 #: web/src/lib/labels.ts:62
-#: web/src/views/plugin/PluginStore.vue:192
+#: web/src/views/plugin/PluginStore.vue:193
 msgid "Repository, following the default branch"
 msgstr ""
 
 #: web/src/lib/labels.ts:64
-#: web/src/views/plugin/PluginStore.vue:193
-msgid "Repository, following releases"
-msgstr ""
-
-#: web/src/lib/labels.ts:66
 #: web/src/views/plugin/PluginStore.vue:194
 msgid "Hosted by the catalog"
 msgstr ""
 
-#: web/src/lib/labels.ts:68
-msgid "The manifest of the newest release"
+#: web/src/lib/labels.ts:67
+#: web/src/views/plugin/PluginStore.vue:192
+msgid "Repository, following releases"
 msgstr ""
 
-#: web/src/lib/labels.ts:75
+#: web/src/lib/labels.ts:74
 msgid "Repository, default branch"
 msgstr ""
 
-#: web/src/lib/labels.ts:77
-msgid "Repository, with releases"
-msgstr ""
-
-#: web/src/lib/labels.ts:79
+#: web/src/lib/labels.ts:76
 msgid "Catalog hosted"
 msgstr ""
 
-#: web/src/lib/labels.ts:81
-msgid "Release manifest"
+#: web/src/lib/labels.ts:78
+msgid "Repository, with releases"
 msgstr ""
 
 #: web/src/lib/pluginSections.ts:19
@@ -4445,11 +4433,11 @@ msgid "Publishers edit this"
 msgstr ""
 
 #: web/src/views/plugin/PluginStore.vue:192
-msgid "plugin.store.json in %{repo}, live minutes after it is merged."
+msgid "plugin.store.json in %{repo} goes live with the next release, so screenshots of unreleased features stay off the listing. Needs no setting."
 msgstr ""
 
 #: web/src/views/plugin/PluginStore.vue:193
-msgid "Goes live with the next release, so screenshots of unreleased features stay off the listing."
+msgid "plugin.store.json in %{repo}, live minutes after it is merged."
 msgstr ""
 
 #: web/src/views/plugin/PluginStore.vue:194
@@ -4550,7 +4538,7 @@ msgid "Current"
 msgstr ""
 
 #: web/src/views/plugin/PluginStore.vue:366
-msgid "The store texts come from the manifest of each release now. Submitting creates the first store document."
+msgid "There is no plugin.store.json yet, so the store texts come from plugin.json. Submitting adds the file to the repository."
 msgstr ""
 
 #: web/src/views/plugin/PluginStore.vue:367

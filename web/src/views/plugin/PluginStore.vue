@@ -189,8 +189,8 @@ const locked = computed(() => {
 })
 
 const sources = computed(() => [
+  { value: 'repo-release' as const, title: $gettext('Repository, following releases'), text: $gettext('plugin.store.json in %{repo} goes live with the next release, so screenshots of unreleased features stay off the listing. Needs no setting.', { repo: state.value?.repo ?? plugin.value.repo ?? '' }) },
   { value: 'repo-branch' as const, title: $gettext('Repository, following the default branch'), text: $gettext('plugin.store.json in %{repo}, live minutes after it is merged.', { repo: state.value?.repo ?? plugin.value.repo ?? '' }) },
-  { value: 'repo-release' as const, title: $gettext('Repository, following releases'), text: $gettext('Goes live with the next release, so screenshots of unreleased features stay off the listing.') },
   { value: 'catalog' as const, title: $gettext('Hosted by the catalog'), text: $gettext('Kept in the catalog repository and live at its next update. For plugins without a public repository.') },
 ])
 
@@ -358,13 +358,13 @@ const name = computed(() => localized(doc.value.name) || localized(plugin.value.
                 <span class="dot" />
                 <span class="min-w-0">
                   <span class="font-500">{{ option.title }}</span>
-                  <ATag v-if="S.source === option.value" class="ml-2 m-0" color="blue">{{ $gettext('Current') }}</ATag>
+                  <ATag v-if="S.source === option.value || (S.source === 'release' && option.value === 'repo-release')" class="ml-2 m-0" color="blue">{{ $gettext('Current') }}</ATag>
                   <span class="block text-3 op-65 mt-1">{{ option.text }}</span>
                 </span>
               </button>
             </div>
-            <AAlert v-if="S.source === 'release'" type="info" class="mt-3" :title="$gettext('The store texts come from the manifest of each release now. Submitting creates the first store document.')" />
-            <AAlert v-else-if="sourceChanged" type="warning" class="mt-3" :title="$gettext('Moving the store source is reviewed by a maintainer.')" />
+            <AAlert v-if="!S.fromFile && !sourceChanged && source !== 'catalog'" type="info" class="mt-3" :title="$gettext('There is no plugin.store.json yet, so the store texts come from plugin.json. Submitting adds the file to the repository.')" />
+            <AAlert v-else-if="sourceChanged && (source === 'catalog' || S.source === 'catalog')" type="warning" class="mt-3" :title="$gettext('Moving the store source is reviewed by a maintainer.')" />
           </ACard>
 
           <ACard :title="$gettext('Changes to publish')">

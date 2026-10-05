@@ -60,12 +60,11 @@ export function storeSourceLabel(source: string): string {
   switch (source) {
     case 'repo-branch':
       return $gettext('Repository, following the default branch')
-    case 'repo-release':
-      return $gettext('Repository, following releases')
     case 'catalog':
       return $gettext('Hosted by the catalog')
+    // Without a store field the document follows the release.
     default:
-      return $gettext('The manifest of the newest release')
+      return $gettext('Repository, following releases')
   }
 }
 
@@ -73,12 +72,10 @@ export function storeSourceShort(source: string): string {
   switch (source) {
     case 'repo-branch':
       return $gettext('Repository, default branch')
-    case 'repo-release':
-      return $gettext('Repository, with releases')
     case 'catalog':
       return $gettext('Catalog hosted')
     default:
-      return $gettext('Release manifest')
+      return $gettext('Repository, with releases')
   }
 }
 
