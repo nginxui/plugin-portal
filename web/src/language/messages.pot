@@ -183,7 +183,7 @@ msgstr ""
 #: web/src/components/CommandPalette.vue:130
 #: web/src/layouts/PortalLayout.vue:65
 #: web/src/layouts/PortalLayout.vue:103
-#: web/src/views/maintain/AuditLog.vue:135
+#: web/src/views/maintain/AuditLog.vue:183
 #: web/src/views/review/ReviewQueue.vue:420
 msgid "Audit log"
 msgstr ""
@@ -195,7 +195,7 @@ msgstr ""
 #: web/src/components/CommandPalette.vue:131
 #: web/src/layouts/PortalLayout.vue:67
 #: web/src/layouts/PortalLayout.vue:105
-#: web/src/lib/audit.ts:14
+#: web/src/lib/audit.ts:15
 #: web/src/views/maintain/Settings.vue:184
 msgid "Settings"
 msgstr ""
@@ -693,7 +693,7 @@ msgid "The checks passed and the pull request is open"
 msgstr ""
 
 #: web/src/components/NotificationBell.vue:41
-#: web/src/lib/audit.ts:37
+#: web/src/lib/audit.ts:38
 msgid "The checks found problems"
 msgstr ""
 
@@ -856,7 +856,7 @@ msgstr ""
 
 #: web/src/components/PluginCard.vue:163
 #: web/src/views/maintain/AllPlugins.vue:178
-#: web/src/views/maintain/AuditLog.vue:92
+#: web/src/views/maintain/AuditLog.vue:140
 #: web/src/views/MyPlugins.vue:73
 #: web/src/views/plugin/PluginTranslations.vue:104
 msgid "All"
@@ -1188,211 +1188,211 @@ msgstr ""
 msgid "Account menu"
 msgstr ""
 
-#: web/src/lib/audit.ts:7
+#: web/src/lib/audit.ts:8
 #: web/src/views/review/ReviewQueue.vue:395
 msgid "Review"
 msgstr ""
 
-#: web/src/lib/audit.ts:8
+#: web/src/lib/audit.ts:9
 msgid "Self service"
 msgstr ""
 
-#: web/src/lib/audit.ts:9
+#: web/src/lib/audit.ts:10
 msgid "Submission"
 msgstr ""
 
-#: web/src/lib/audit.ts:10
+#: web/src/lib/audit.ts:11
 msgid "System"
 msgstr ""
 
-#: web/src/lib/audit.ts:11
+#: web/src/lib/audit.ts:12
 msgid "Sign in"
 msgstr ""
 
-#: web/src/lib/audit.ts:12
+#: web/src/lib/audit.ts:13
 msgid "Maintainer action"
 msgstr ""
 
-#: web/src/lib/audit.ts:13
+#: web/src/lib/audit.ts:14
 #: web/src/lib/categories.ts:15
 msgid "AI"
 msgstr ""
 
-#: web/src/lib/audit.ts:35
+#: web/src/lib/audit.ts:36
 msgid "Opened pull request #%{n} for review"
 msgstr ""
 
-#: web/src/lib/audit.ts:36
+#: web/src/lib/audit.ts:37
 msgid "Committed the change to the catalog"
 msgstr ""
 
-#: web/src/lib/audit.ts:38
+#: web/src/lib/audit.ts:39
 msgid "The change was refused by the catalog rules"
 msgstr ""
 
-#: web/src/lib/audit.ts:39
+#: web/src/lib/audit.ts:40
 msgid "The change is not supported yet"
 msgstr ""
 
-#: web/src/lib/audit.ts:40
+#: web/src/lib/audit.ts:41
 msgid "The checks could not finish"
 msgstr ""
 
-#: web/src/lib/audit.ts:49
+#: web/src/lib/audit.ts:50
 msgid "Signed in"
 msgstr ""
 
-#: web/src/lib/audit.ts:50
+#: web/src/lib/audit.ts:51
 msgid "Submitted the plugin for review"
 msgstr ""
 
-#: web/src/lib/audit.ts:52
+#: web/src/lib/audit.ts:53
 msgid "Published the catalog, %{n} changes went live"
 msgstr ""
 
-#: web/src/lib/audit.ts:53
+#: web/src/lib/audit.ts:54
 msgid "Approved and merged #%{n}"
 msgstr ""
 
-#: web/src/lib/audit.ts:54
+#: web/src/lib/audit.ts:55
 msgid "Requested changes on #%{n}"
 msgstr ""
 
-#: web/src/lib/audit.ts:55
+#: web/src/lib/audit.ts:56
 msgid "Rejected #%{n}"
 msgstr ""
 
-#: web/src/lib/audit.ts:56
+#: web/src/lib/audit.ts:57
 msgid "Submitted %{n} store changes"
 msgstr ""
 
-#: web/src/lib/audit.ts:57
+#: web/src/lib/audit.ts:58
 msgid "Accepted %{a} and declined %{d} community translations"
 msgstr ""
 
-#: web/src/lib/audit.ts:58
+#: web/src/lib/audit.ts:59
 msgid "Turned community translation on"
 msgstr ""
 
-#: web/src/lib/audit.ts:59
+#: web/src/lib/audit.ts:60
 msgid "Turned community translation off"
 msgstr ""
 
-#: web/src/lib/audit.ts:60
+#: web/src/lib/audit.ts:61
 msgid "Drafted a translation into %{lang} with %{model}"
 msgstr ""
 
-#: web/src/lib/audit.ts:61
+#: web/src/lib/audit.ts:62
 msgid "Added the AI model %{name}"
 msgstr ""
 
-#: web/src/lib/audit.ts:62
+#: web/src/lib/audit.ts:63
 msgid "Changed the AI model %{name}: drafts per author per day %{from} to %{to}"
 msgstr ""
 
-#: web/src/lib/audit.ts:62
+#: web/src/lib/audit.ts:63
 msgid "Changed the AI model %{name}"
 msgstr ""
 
-#: web/src/lib/audit.ts:63
+#: web/src/lib/audit.ts:64
 msgid "Removed the AI model %{name}"
 msgstr ""
 
-#: web/src/lib/audit.ts:64
+#: web/src/lib/audit.ts:65
 msgid "Made an AI pre-review with %{n} findings"
 msgstr ""
 
-#: web/src/lib/audit.ts:65
+#: web/src/lib/audit.ts:66
 msgid "Published the announcement %{title}"
 msgstr ""
 
-#: web/src/lib/audit.ts:66
+#: web/src/lib/audit.ts:67
 msgid "Changed the announcement %{title}"
 msgstr ""
 
-#: web/src/lib/audit.ts:67
+#: web/src/lib/audit.ts:68
 msgid "Removed the announcement %{title}"
 msgstr ""
 
-#: web/src/lib/audit.ts:68
+#: web/src/lib/audit.ts:69
 msgid "Set the mail service, sender %{from}, with a new key"
 msgstr ""
 
-#: web/src/lib/audit.ts:68
+#: web/src/lib/audit.ts:69
 msgid "Set the mail service, sender %{from}"
 msgstr ""
 
-#: web/src/lib/audit.ts:69
+#: web/src/lib/audit.ts:70
 msgid "Removed the mail service settings"
 msgstr ""
 
-#: web/src/lib/audit.ts:70
+#: web/src/lib/audit.ts:71
 msgid "Set the bot account @%{login} with a new token"
 msgstr ""
 
-#: web/src/lib/audit.ts:70
+#: web/src/lib/audit.ts:71
 msgid "Set the bot account @%{login}"
 msgstr ""
 
-#: web/src/lib/audit.ts:71
+#: web/src/lib/audit.ts:72
 msgid "Removed the bot account settings"
 msgstr ""
 
-#: web/src/lib/audit.ts:72
+#: web/src/lib/audit.ts:73
 msgid "Read the glossary again, %{n} languages"
 msgstr ""
 
-#: web/src/lib/audit.ts:77
+#: web/src/lib/audit.ts:78
 msgid "Yanked %{versions}"
 msgstr ""
 
-#: web/src/lib/audit.ts:79
+#: web/src/lib/audit.ts:80
 msgid "Restored %{versions}"
 msgstr ""
 
-#: web/src/lib/audit.ts:81
+#: web/src/lib/audit.ts:82
 msgid "Revoked signer %{ids}"
 msgstr ""
 
-#: web/src/lib/audit.ts:83
+#: web/src/lib/audit.ts:84
 msgid "Set the categories to %{list}"
 msgstr ""
 
-#: web/src/lib/audit.ts:106
+#: web/src/lib/audit.ts:107
 msgid "Change: %{id}"
 msgstr ""
 
-#: web/src/lib/audit.ts:109
+#: web/src/lib/audit.ts:110
 msgid "Pull request: #%{n}"
 msgstr ""
 
-#: web/src/lib/audit.ts:112
+#: web/src/lib/audit.ts:113
 msgid "Commit: %{sha}"
 msgstr ""
 
-#: web/src/lib/audit.ts:115
+#: web/src/lib/audit.ts:116
 msgid "Workflow run: %{id}"
 msgstr ""
 
-#: web/src/lib/audit.ts:118
+#: web/src/lib/audit.ts:119
 #: web/src/views/ChangeView.vue:370
-#: web/src/views/maintain/AuditLog.vue:210
+#: web/src/views/maintain/AuditLog.vue:259
 #: web/src/views/maintain/PartnersAdmin.vue:188
 #: web/src/views/translate/TranslatePage.vue:289
 msgid "Reason: %{reason}"
 msgstr ""
 
-#: web/src/lib/audit.ts:124
+#: web/src/lib/audit.ts:125
 msgid "Went live: %{list}"
 msgstr ""
 
-#: web/src/lib/audit.ts:124
+#: web/src/lib/audit.ts:125
 #: web/src/views/maintain/PartnersAdmin.vue:76
 #: web/src/views/owners/OwnerPage.vue:157
 msgid "none"
 msgstr ""
 
-#: web/src/lib/audit.ts:128
+#: web/src/lib/audit.ts:129
 msgid "Name in %{lang}: %{name}"
 msgstr ""
 
@@ -1544,8 +1544,8 @@ msgstr ""
 
 #: web/src/lib/checks.ts:10
 #: web/src/views/maintain/AllPlugins.vue:317
-#: web/src/views/maintain/AuditLog.vue:158
-#: web/src/views/maintain/AuditLog.vue:158
+#: web/src/views/maintain/AuditLog.vue:206
+#: web/src/views/maintain/AuditLog.vue:206
 #: web/src/views/owners/VendorPage.vue:359
 #: web/src/views/SubmitPlugin.vue:303
 msgid "Plugin ID"
@@ -2211,7 +2211,7 @@ msgstr ""
 
 #: web/src/views/maintain/AiModels.vue:147
 #: web/src/views/maintain/AiModels.vue:183
-#: web/src/views/maintain/AuditLog.vue:169
+#: web/src/views/maintain/AuditLog.vue:217
 #: web/src/views/maintain/PartnersAdmin.vue:236
 msgid "Kind"
 msgstr ""
@@ -2589,120 +2589,126 @@ msgstr ""
 msgid "Leave empty to block the plugin id only."
 msgstr ""
 
-#: web/src/views/maintain/AuditLog.vue:97
+#: web/src/views/maintain/AuditLog.vue:145
 msgid "Last 7 days"
 msgstr ""
 
-#: web/src/views/maintain/AuditLog.vue:98
+#: web/src/views/maintain/AuditLog.vue:146
 msgid "Last 30 days"
 msgstr ""
 
-#: web/src/views/maintain/AuditLog.vue:99
+#: web/src/views/maintain/AuditLog.vue:147
 msgid "All time"
 msgstr ""
 
-#: web/src/views/maintain/AuditLog.vue:105
+#: web/src/views/maintain/AuditLog.vue:153
 msgid "%{n} records in the last 7 days"
 msgstr ""
 
-#: web/src/views/maintain/AuditLog.vue:107
+#: web/src/views/maintain/AuditLog.vue:155
 msgid "%{n} records in the last 30 days"
 msgstr ""
 
-#: web/src/views/maintain/AuditLog.vue:108
+#: web/src/views/maintain/AuditLog.vue:156
 msgid "%{n} records"
 msgstr ""
 
-#: web/src/views/maintain/AuditLog.vue:112
+#: web/src/views/maintain/AuditLog.vue:160
 msgid "Developer portal"
 msgstr ""
 
-#: web/src/views/maintain/AuditLog.vue:121
+#: web/src/views/maintain/AuditLog.vue:169
 msgid "%{repo} commit %{sha}"
 msgstr ""
 
-#: web/src/views/maintain/AuditLog.vue:124
+#: web/src/views/maintain/AuditLog.vue:172
 msgid "%{repo} pull request #%{n}"
 msgstr ""
 
-#: web/src/views/maintain/AuditLog.vue:138
+#: web/src/views/maintain/AuditLog.vue:186
 msgid "Every action in the developer portal. Actions that change the catalog link to a commit or pull request that can be checked on GitHub."
 msgstr ""
 
-#: web/src/views/maintain/AuditLog.vue:143
+#: web/src/views/maintain/AuditLog.vue:191
 msgid "Export CSV"
 msgstr ""
 
-#: web/src/views/maintain/AuditLog.vue:146
+#: web/src/views/maintain/AuditLog.vue:194
 msgid "Export JSON"
 msgstr ""
 
-#: web/src/views/maintain/AuditLog.vue:151
+#: web/src/views/maintain/AuditLog.vue:199
 msgid "The audit log could not be loaded."
 msgstr ""
 
-#: web/src/views/maintain/AuditLog.vue:157
-#: web/src/views/maintain/AuditLog.vue:157
-#: web/src/views/maintain/AuditLog.vue:168
-#: web/src/views/maintain/AuditLog.vue:251
+#: web/src/views/maintain/AuditLog.vue:205
+#: web/src/views/maintain/AuditLog.vue:205
+#: web/src/views/maintain/AuditLog.vue:216
+#: web/src/views/maintain/AuditLog.vue:304
 msgid "Actor"
 msgstr ""
 
-#: web/src/views/maintain/AuditLog.vue:159
+#: web/src/views/maintain/AuditLog.vue:207
 msgid "Time range"
 msgstr ""
 
-#: web/src/views/maintain/AuditLog.vue:167
-#: web/src/views/maintain/AuditLog.vue:249
+#: web/src/views/maintain/AuditLog.vue:215
+#: web/src/views/maintain/AuditLog.vue:302
 msgid "Time"
 msgstr ""
 
-#: web/src/views/maintain/AuditLog.vue:170
+#: web/src/views/maintain/AuditLog.vue:218
 msgid "Action"
 msgstr ""
 
-#: web/src/views/maintain/AuditLog.vue:171
-#: web/src/views/maintain/AuditLog.vue:260
+#: web/src/views/maintain/AuditLog.vue:219
+#: web/src/views/maintain/AuditLog.vue:313
 msgid "Record"
 msgstr ""
 
-#: web/src/views/maintain/AuditLog.vue:204
+#: web/src/views/maintain/AuditLog.vue:253
 msgid "deploy run #%{run}"
 msgstr ""
 
-#: web/src/views/maintain/AuditLog.vue:220
+#: web/src/views/maintain/AuditLog.vue:263
+msgid "%{n} step by the system"
+msgid_plural "%{n} steps by the system"
+msgstr[0] ""
+msgstr[1] ""
+
+#: web/src/views/maintain/AuditLog.vue:273
 msgid "Portal"
 msgstr ""
 
-#: web/src/views/maintain/AuditLog.vue:225
+#: web/src/views/maintain/AuditLog.vue:278
 msgid "No records match these filters."
 msgstr ""
 
-#: web/src/views/maintain/AuditLog.vue:232
+#: web/src/views/maintain/AuditLog.vue:285
 msgid "Newer"
 msgstr ""
 
-#: web/src/views/maintain/AuditLog.vue:235
+#: web/src/views/maintain/AuditLog.vue:288
 msgid "Older"
 msgstr ""
 
-#: web/src/views/maintain/AuditLog.vue:242
+#: web/src/views/maintain/AuditLog.vue:295
 msgid "The catalog follows its git history. Should this log be lost, every catalog change can still be traced from its commits and pull requests."
 msgstr ""
 
-#: web/src/views/maintain/AuditLog.vue:243
+#: web/src/views/maintain/AuditLog.vue:296
 msgid "Sign ins, settings and AI use are recorded only here and kept for one year."
 msgstr ""
 
-#: web/src/views/maintain/AuditLog.vue:246
+#: web/src/views/maintain/AuditLog.vue:299
 msgid "Record details"
 msgstr ""
 
-#: web/src/views/maintain/AuditLog.vue:254
+#: web/src/views/maintain/AuditLog.vue:307
 msgid "Subject"
 msgstr ""
 
-#: web/src/views/maintain/AuditLog.vue:264
+#: web/src/views/maintain/AuditLog.vue:317
 msgid "Change %{id}"
 msgstr ""
 

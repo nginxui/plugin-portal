@@ -1826,6 +1826,10 @@ msgstr "记录"
 msgid "deploy run #%{run}"
 msgstr "deploy 运行 #%{run}"
 
+msgid "%{n} step by the system"
+msgid_plural "%{n} steps by the system"
+msgstr[0] "系统处理 %{n} 步"
+
 msgid "Portal"
 msgstr "开发者中心"
 

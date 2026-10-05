@@ -1,6 +1,7 @@
 import type { AuditEntry, AuditKind } from '@/api/audit'
 import { categoryLabel } from './categories'
 import { $gettext } from './gettext'
+import { joinList } from './labels'
 
 export function auditKindLabel(kind: AuditKind): string {
   switch (kind) {
@@ -27,7 +28,7 @@ export const AUDIT_KIND_COLORS: Record<AuditKind, string> = {
 }
 
 function versions(list: string[]): string {
-  return list.map(v => `v${v}`).join(', ')
+  return joinList(list.map(v => `v${v}`))
 }
 
 function outcomeText(outcome: unknown, pr: unknown): string {
@@ -78,9 +79,9 @@ export function auditLines(entry: AuditEntry): string[] {
       if (ops.unyank?.length)
         lines.push($gettext('Restored %{versions}', { versions: versions(ops.unyank) }))
       if (ops.revoke_signers?.length)
-        lines.push($gettext('Revoked signer %{ids}', { ids: ops.revoke_signers.join(', ') }))
+        lines.push($gettext('Revoked signer %{ids}', { ids: joinList(ops.revoke_signers) }))
       if (ops.categories)
-        lines.push($gettext('Set the categories to %{list}', { list: ops.categories.map(categoryLabel).join(', ') }))
+        lines.push($gettext('Set the categories to %{list}', { list: joinList(ops.categories.map(categoryLabel)) }))
       return lines.length ? lines : [entry.action]
     }
     default: return [entry.action]
@@ -121,7 +122,7 @@ export function auditDetailLines(entry: AuditEntry): string[] {
         lines.push(outcomeText(value, d.pr))
         break
       case 'live':
-        lines.push($gettext('Went live: %{list}', { list: Array.isArray(value) && value.length ? value.join(', ') : $gettext('none') }))
+        lines.push($gettext('Went live: %{list}', { list: Array.isArray(value) && value.length ? joinList(value) : $gettext('none') }))
         break
       case 'names':
         for (const [locale, name] of Object.entries(value as Record<string, string>))

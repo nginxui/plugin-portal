@@ -35,6 +35,54 @@ const query = computed<AuditQuery>(() => ({
 }))
 
 const entries = ref<AuditEntry[]>([])
+
+// The steps the system takes for a change, checks, commit and deploy, follow
+// the record of whoever started it, oldest first. A filtered list stays flat.
+// Groups start folded; a record opens to show its steps.
+const expanded = ref(new Set<number>())
+function toggleGroup(id: number) {
+  const next = new Set(expanded.value)
+  if (!next.delete(id))
+    next.add(id)
+  expanded.value = next
+}
+
+const rows = computed<{ entry: AuditEntry, child: boolean, steps: number }[]>(() => {
+  if (kind.value !== 'all')
+    return entries.value.map(entry => ({ entry, child: false, steps: 0 }))
+  const changesOf = (e: AuditEntry): string[] => [
+    ...(typeof e.detail?.change === 'string' ? [e.detail.change] : []),
+    ...(Array.isArray(e.detail?.live) ? e.detail.live.filter((c: unknown): c is string => typeof c === 'string') : []),
+  ]
+  const parentOf = new Map<string, AuditEntry>()
+  for (const e of entries.value) {
+    if (e.kind !== 'system' && typeof e.detail?.change === 'string' && !parentOf.has(e.detail.change))
+      parentOf.set(e.detail.change, e)
+  }
+  const children = new Map<number, AuditEntry[]>()
+  const placed = new Set<number>()
+  for (const e of entries.value) {
+    if (e.kind !== 'system')
+      continue
+    const parent = changesOf(e).map(c => parentOf.get(c)).find(p => p && p.at <= e.at)
+    if (!parent)
+      continue
+    children.set(parent.id, [...(children.get(parent.id) ?? []), e])
+    placed.add(e.id)
+  }
+  const out: { entry: AuditEntry, child: boolean, steps: number }[] = []
+  for (const e of entries.value) {
+    if (placed.has(e.id))
+      continue
+    const steps = children.get(e.id) ?? []
+    out.push({ entry: e, child: false, steps: steps.length })
+    if (expanded.value.has(e.id)) {
+      for (const c of [...steps].sort((a, b) => a.at - b.at || a.id - b.id))
+        out.push({ entry: c, child: true, steps: 0 })
+    }
+  }
+  return out
+})
 const total = ref(0)
 const loading = ref(false)
 const failed = ref(false)
@@ -173,16 +221,17 @@ const detailText = computed(() => selected.value ? auditDetailLines(selected.val
             </thead>
             <tbody>
               <tr
-                v-for="entry in entries"
+                v-for="{ entry, child, steps } in rows"
                 :key="entry.id"
                 class="record-row"
-                :class="{ focus: selected?.id === entry.id }"
+                :class="{ focus: selected?.id === entry.id, child }"
                 tabindex="0"
                 @click="selected = entry"
                 @keydown.enter="selected = entry"
               >
                 <td class="nowrap">
-                  <span class="op-85">{{ dayjs.unix(entry.at).format('MM-DD HH:mm') }}</span>
+                  <span v-if="child" class="op-65"><span class="branch">└</span>{{ dayjs.unix(entry.at).format('HH:mm:ss') }}</span>
+                  <span v-else class="op-85">{{ dayjs.unix(entry.at).format('MM-DD HH:mm:ss') }}</span>
                 </td>
                 <td class="nowrap">
                   <span class="actor">
@@ -209,6 +258,10 @@ const detailText = computed(() => selected.value ? auditDetailLines(selected.val
                   <div v-if="auditNote(entry)" class="text-3 op-65">
                     {{ $gettext('Reason: %{reason}', { reason: auditNote(entry) }) }}
                   </div>
+                  <button v-if="steps" type="button" class="steps-toggle" :aria-expanded="expanded.has(entry.id)" @click.stop="toggleGroup(entry.id)">
+                    <span :class="expanded.has(entry.id) ? 'i-tabler-chevron-down' : 'i-tabler-chevron-right'" />
+                    {{ $ngettext('%{n} step by the system', '%{n} steps by the system', steps, { n: String(steps) }) }}
+                  </button>
                 </td>
                 <td class="nowrap">
                   <template v-if="entry.record">
@@ -324,6 +377,33 @@ const detailText = computed(() => selected.value ? auditDetailLines(selected.val
 
 .nowrap {
   white-space: nowrap;
+}
+
+.record-row.child td {
+  padding-top: 4px;
+  padding-bottom: 4px;
+  border-top: 0;
+  font-size: 12px;
+}
+
+.steps-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  margin-top: 4px;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--portal-primary);
+  font: inherit;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.branch {
+  display: inline-block;
+  margin-inline: 8px 6px;
+  opacity: 0.6;
 }
 
 .actor {
