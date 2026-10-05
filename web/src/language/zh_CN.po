@@ -550,8 +550,17 @@ msgstr "%{kind}审核中，等待你处理"
 msgid "%{kind} in review, waiting for a maintainer"
 msgstr "%{kind}审核中，等待维护者处理"
 
+msgid "Downloads per day, last %{n} days"
+msgstr "每日下载次数，最近 %{n} 天"
+
+msgid "%{n} downloads in all"
+msgstr "共 %{n} 次"
+
 msgid "Downloads GitHub counts, last %{n} versions"
 msgstr "GitHub 统计的下载次数，近 %{n} 个版本"
+
+msgid "Downloads GitHub counts"
+msgstr "GitHub 统计的下载次数"
 
 msgid "%{n} for this version"
 msgstr "本版本 %{n} 次"

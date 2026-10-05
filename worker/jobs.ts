@@ -1,5 +1,6 @@
 import type { Env } from './env'
 import { event } from './lib/changes'
+import { snapshotDownloads } from './lib/downloads'
 import { syncGlossary } from './lib/glossary'
 import { sendMail } from './lib/mail'
 import { now } from './lib/time'
@@ -60,7 +61,7 @@ export async function mail(env: Env): Promise<number> {
 const DAY = 86400
 const AUDIT_KEEP = 365 * DAY
 
-/** Daily work: the glossary read again, audit records past a year removed. */
+/** Daily work: the glossary read again, download totals written down, audit records past a year removed. */
 export async function daily(env: Env): Promise<boolean> {
   const t = now()
   const last = Number(await state(env, 'daily.ran') ?? 0)
@@ -69,6 +70,7 @@ export async function daily(env: Env): Promise<boolean> {
   await setState(env, 'daily.ran', String(t))
   await env.DB.prepare('DELETE FROM audit WHERE at < ?').bind(t - AUDIT_KEEP).run()
   await syncGlossary(env).catch(error => console.error('glossary sync failed', error))
+  await snapshotDownloads(env).catch(error => console.error('download snapshot failed', error))
   return true
 }
 

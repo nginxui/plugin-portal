@@ -52,6 +52,18 @@ async function actionsToken(env: Env): Promise<string> {
   return access.token
 }
 
+/** A read only token of the Deploy App, for public data such as release downloads. */
+export async function readToken(env: Env): Promise<string> {
+  const jwt = await appJwt(env.DEPLOY_APP_ID, env.DEPLOY_APP_PRIVATE_KEY)
+  const installation = await github<{ id: number }>(`/repos/${env.CATALOG_REPO}/installation`, jwt)
+  const access = await github<{ token: string }>(`/app/installations/${installation.id}/access_tokens`, jwt, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ permissions: { metadata: 'read' } }),
+  })
+  return access.token
+}
+
 /** Starts apply.yml in the catalog repository for a change. */
 export async function dispatchApply(env: Env, change: string, payload: unknown): Promise<void> {
   const token = await actionsToken(env)

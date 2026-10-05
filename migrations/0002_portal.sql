@@ -95,3 +95,13 @@ INSERT INTO announcements (date, title_json, text_json, created_at, updated_at) 
    '{"en":"Store texts in every Nginx UI language","zh_CN":"商店资料支持 14 种语言"}',
    '{"en":"Names, descriptions and screenshot captions follow the 14 interface languages of Nginx UI. A language a plugin leaves out shows English.","zh_CN":"与 Nginx UI 界面语言一致，未翻译的语言显示英文。"}',
    strftime('%s', 'now'), strftime('%s', 'now'));
+
+-- GitHub keeps only running totals of downloads, so the daily job writes the
+-- total of each plugin down once a day; the difference of two days is that day's
+-- downloads.
+CREATE TABLE download_snapshots (
+  plugin_id TEXT NOT NULL,
+  day TEXT NOT NULL,
+  total INTEGER NOT NULL,
+  PRIMARY KEY (plugin_id, day)
+);
