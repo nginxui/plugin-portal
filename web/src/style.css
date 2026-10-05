@@ -20,7 +20,14 @@
   --portal-ai-text: #722ed1;
   --portal-ai-bg: #f9f0ff;
   --portal-ai-border: #d3adf7;
-  --portal-wall-filter: none;
+  --portal-wall-bg: #f0f0f0;
+  --portal-wall-blue: #1677ff;
+  --portal-wall-cyan: #13a8a8;
+  --portal-wall-green: #389e0d;
+  --portal-wall-purple: #722ed1;
+  --portal-wall-orange: #d46b08;
+  --portal-wall-magenta: #c41d7f;
+  --portal-wall-red: #cf1322;
 }
 
 html.dark {
@@ -45,7 +52,14 @@ html.dark {
   --portal-ai-text: #b37feb;
   --portal-ai-bg: #1a1325;
   --portal-ai-border: #391085;
-  --portal-wall-filter: brightness(1.35) saturate(0.9);
+  --portal-wall-bg: #0a0a0a;
+  --portal-wall-blue: #4096ff;
+  --portal-wall-cyan: #36cfc9;
+  --portal-wall-green: #73d13d;
+  --portal-wall-purple: #9254de;
+  --portal-wall-orange: #ffa940;
+  --portal-wall-magenta: #f759ab;
+  --portal-wall-red: #ff7875;
 }
 
 html,
