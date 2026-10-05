@@ -559,8 +559,8 @@ msgstr "本版本 %{n} 次"
 msgid "Provided"
 msgstr "已提供"
 
-msgid "Missing"
-msgstr "缺失"
+msgid "Not provided"
+msgstr "未提供"
 
 msgid "Store details"
 msgstr "商店资料"
@@ -3347,6 +3347,9 @@ msgstr "，需审核"
 
 msgid "Store source: %{source}"
 msgstr "商店来源：%{source}"
+
+msgid "Missing"
+msgstr "缺失"
 
 msgid "%{n} texts imported."
 msgstr "已导入 %{n} 条。"

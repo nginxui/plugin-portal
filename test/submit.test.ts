@@ -307,7 +307,7 @@ describe('apply report', () => {
 
     listed = true
     await caches.default.delete(`${env.CATALOG_URL}/v1/index.json`)
-    body = await (await call(`/api/changes/${change}`, { cookie })).json() as { change: { stage: string, prUrl: string } }
+    body = await (await call(`/api/changes/${change}`, { cookie })).json() as typeof body
     expect(body.change.stage).toBe('live')
     expect(await env.DB.prepare('SELECT state FROM plugins WHERE plugin_id = ?').bind('io.github.octo-author.geoip').first()).toEqual({ state: 'listed' })
   })
