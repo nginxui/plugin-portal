@@ -452,20 +452,41 @@ msgstr "添加 README"
 msgid "README"
 msgstr "README"
 
-msgid "The catalog"
-msgstr "插件目录"
+msgid "Waiting for you"
+msgstr "等待你处理"
 
-msgid "The checks passed and the pull request is open"
-msgstr "检查已通过，拉取请求已开启"
+msgid "Other progress"
+msgstr "其他进展"
+
+msgid "Recent progress"
+msgstr "最近进展"
+
+msgid "Pull request #%{n} is open, ready for you to merge"
+msgstr "拉取请求 #%{n} 已创建，等待你合并"
+
+msgid "The files are ready for you to commit"
+msgstr "文件已生成，等待你提交到仓库"
+
+msgid "The checks passed, waiting for a maintainer"
+msgstr "检查已通过，等待维护者审核"
 
 msgid "The checks found problems"
 msgstr "检查发现问题"
 
+msgid "The checks could not finish"
+msgstr "检查未能完成"
+
 msgid "%{who} asked for changes"
 msgstr "%{who} 要求修改"
 
-msgid "%{who} merged it"
-msgstr "%{who} 已合并"
+msgid "A maintainer asked for changes"
+msgstr "维护者要求修改"
+
+msgid "Committed to the catalog"
+msgstr "已提交到目录"
+
+msgid "%{who} approved and merged it"
+msgstr "%{who} 已批准并合并"
 
 msgid "It was merged"
 msgstr "已合并"
@@ -476,17 +497,96 @@ msgstr "已在插件目录中上线"
 msgid "%{who} rejected it"
 msgstr "%{who} 已拒绝"
 
-msgid "It has waited for you for a while"
-msgstr "已等待你处理一段时间"
+msgid "The pull request was closed"
+msgstr "拉取请求已关闭"
+
+msgid "Still waiting for you"
+msgstr "仍在等待你处理"
 
 msgid "It was withdrawn"
 msgstr "已撤回"
 
+msgid "More translations were added to the pull request"
+msgstr "拉取请求中加入了新的翻译"
+
 msgid "Notifications"
 msgstr "通知"
 
-msgid "Nothing new."
-msgstr "暂无新动态。"
+msgid "Notification settings"
+msgstr "通知设置"
+
+msgid "Back to the notifications"
+msgstr "返回通知列表"
+
+msgid "Notifications in the Developer Center are turned off."
+msgstr "开发者中心内的通知已关闭。"
+
+msgid "No notifications yet."
+msgstr "暂无通知。"
+
+msgid "Progress of your submissions and changes shows here."
+msgstr "你提交的插件与更改有进展时，会显示在这里。"
+
+msgid "Clear the list"
+msgstr "清空"
+
+msgid "Unread"
+msgstr "未读"
+
+msgid "Choose an address verified on your GitHub account."
+msgstr "请选择在你的 GitHub 账号中已验证的邮箱。"
+
+msgid "%{email} (primary)"
+msgstr "%{email}（主邮箱）"
+
+msgid "In the Developer Center"
+msgstr "开发者中心内"
+
+msgid "Tell me in the portal when a change moves"
+msgstr "进度变化时在开发者中心提醒"
+
+msgid "By email"
+msgstr "邮件"
+
+msgid "Email me when I need to act"
+msgstr "需要我处理时发送邮件"
+
+msgid "Email me when a listing goes live"
+msgstr "上架完成时发送邮件"
+
+msgid "Choose an address"
+msgstr "选择邮箱"
+
+msgid "Email address"
+msgstr "邮箱地址"
+
+msgid "Choose an address to get the mail."
+msgstr "选择邮箱后才会收到邮件。"
+
+msgid "Only addresses verified on your GitHub account can be chosen."
+msgstr "只能选择在你的 GitHub 账号中已验证的邮箱。"
+
+msgid ""
+"Your GitHub account has no verified address that receives mail. Add one on "
+"GitHub, then open this again."
+msgstr "你的 GitHub 账号中没有可接收邮件的已验证邮箱。请先在 GitHub 上添加，然后重新打开此设置。"
+
+msgid "Email settings on GitHub"
+msgstr "前往 GitHub 邮箱设置"
+
+msgid ""
+"To send mail, the Developer Center needs to read the verified addresses of "
+"your GitHub account."
+msgstr "发送邮件需要开发者中心读取你在 GitHub 账号中已验证的邮箱。"
+
+msgid "Sign in again to allow it"
+msgstr "重新登录以授权"
+
+msgid "Email is not available yet."
+msgstr "暂不支持邮件通知。"
+
+msgid "The notification settings could not be loaded."
+msgstr "无法加载通知设置。"
 
 msgid "%{kind} is in progress. Other changes can be made once it is done."
 msgstr "“%{kind}”正在处理，完成后才能进行其他更改。"
@@ -805,9 +905,6 @@ msgstr "变更不符合插件目录的规则"
 
 msgid "The change is not supported yet"
 msgstr "暂不支持该变更"
-
-msgid "The checks could not finish"
-msgstr "检查未能完成"
 
 msgid "Signed in"
 msgstr "登录"
@@ -1289,9 +1386,6 @@ msgstr "用户可见"
 msgid "Checks"
 msgstr "检查"
 
-msgid "Committed to the catalog"
-msgstr "已提交到目录"
-
 msgid "Live in the catalog"
 msgstr "已在目录中上线"
 
@@ -1300,9 +1394,6 @@ msgstr "已合并"
 
 msgid "Waited %{time}"
 msgstr "已等待 %{time}"
-
-msgid "Waiting for you"
-msgstr "等待你处理"
 
 msgid "Passed"
 msgstr "已通过"
@@ -1418,9 +1509,6 @@ msgstr "维护者已拒绝"
 msgid "Pull request closed"
 msgstr "拉取请求已关闭"
 
-msgid "A maintainer asked for changes"
-msgstr "维护者要求修改"
-
 msgid "Waited %{h} hours for you, a reminder was sent"
 msgstr "已等待你 %{h} 小时，已发送提醒"
 
@@ -1528,21 +1616,6 @@ msgstr "审核在 GitHub 上公开进行。拉取请求中提及了你，GitHub 
 
 msgid "Your other changes in progress"
 msgstr "其他进行中的更改"
-
-msgid "Tell me in the portal when a change moves"
-msgstr "进度变化时在开发者中心提醒"
-
-msgid "Email me when I need to act"
-msgstr "需要我处理时发送邮件"
-
-msgid "Email me when a listing goes live"
-msgstr "上架完成时发送邮件"
-
-msgid "Email address"
-msgstr "邮箱地址"
-
-msgid "Email is not available yet."
-msgstr "暂不支持邮件通知。"
 
 msgid "Every plugin page shows the progress at the top"
 msgstr "每个插件页面顶部都会显示进度"
@@ -4401,8 +4474,29 @@ msgstr "名称建议"
 msgid "An accepted name still goes to a maintainer before it is listed."
 msgstr "名称建议被采纳后，仍需维护者审核才会显示。"
 
+#~ msgid "Enter a valid email address."
+#~ msgstr "请输入有效的邮箱地址。"
+
+#~ msgid "Enter an address to get the mail."
+#~ msgstr "填写邮箱地址后才会收到邮件。"
+
 #~ msgid "Progress"
 #~ msgstr "进度"
+
+#~ msgid "The catalog"
+#~ msgstr "插件目录"
+
+#~ msgid "The checks passed and the pull request is open"
+#~ msgstr "检查已通过，拉取请求已开启"
+
+#~ msgid "%{who} merged it"
+#~ msgstr "%{who} 已合并"
+
+#~ msgid "It has waited for you for a while"
+#~ msgstr "已等待你处理一段时间"
+
+#~ msgid "Nothing new."
+#~ msgstr "暂无新动态。"
 
 #~ msgid "A store change of this plugin is in progress."
 #~ msgstr "此插件有一项商店更改正在进行中。"
