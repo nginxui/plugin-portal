@@ -125,7 +125,7 @@ function toggle(id: string) {
 }
 
 .meta .warn {
-  color: #d48806;
+  color: var(--portal-warn-text);
   opacity: 1;
 }
 

@@ -3,6 +3,7 @@ import type { PartnerRequest, PartnersAdmin } from '@/api/maintain'
 import { computed, onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { approveRequest, createVendor, declineRequest, getPartnersAdmin, revokePartner } from '@/api/maintain'
+import { useFailure } from '@/lib/feedback'
 import { $gettext } from '@/lib/gettext'
 import { initials } from '@/lib/labels'
 import { fromNow } from '@/lib/time'
@@ -11,6 +12,7 @@ import { fromNow } from '@/lib/time'
 // requests, the partner table, new vendors, and revoking a key at once.
 
 const router = useRouter()
+const failure = useFailure()
 const data = ref<PartnersAdmin | null>(null)
 const failed = ref(false)
 async function load() {
@@ -39,6 +41,9 @@ async function approve(r: PartnerRequest) {
     const { change } = await approveRequest(r.id)
     router.push(`/changes/${change}`)
   }
+  catch {
+    failure()
+  }
   finally {
     busy.value = null
   }
@@ -49,14 +54,20 @@ const declineReason = ref('')
 async function decline() {
   if (!declining.value || !declineReason.value.trim())
     return
-  await declineRequest(declining.value.id, declineReason.value.trim())
+  try {
+    await declineRequest(declining.value.id, declineReason.value.trim())
+  }
+  catch {
+    failure()
+    return
+  }
   declining.value = null
   declineReason.value = ''
   await load()
 }
 
 // A new vendor.
-const vendor = ref({ name: '', slug: '', partner: '', admins: '' })
+const vendor = ref({ name: '', partner: '', admins: '' })
 const vendorError = ref('')
 const vendorDone = ref('')
 const slugFromName = computed(() => vendor.value.name.toLowerCase().trim().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, ''))
@@ -72,9 +83,9 @@ async function addVendor() {
   vendorError.value = ''
   vendorDone.value = ''
   try {
-    const result = await createVendor({ name: vendor.value.name.trim(), slug: vendor.value.slug || slugFromName.value, partner: vendor.value.partner || undefined, admins: vendor.value.admins.split(/[\s,]+/).filter(Boolean) })
+    const result = await createVendor({ name: vendor.value.name.trim(), slug: slugFromName.value, partner: vendor.value.partner || undefined, admins: vendor.value.admins.split(/[\s,]+/).filter(Boolean) })
     vendorDone.value = $gettext('Created with the admins %{list}.', { list: result.admins.join(', ') || $gettext('none') })
-    vendor.value = { name: '', slug: '', partner: '', admins: '' }
+    vendor.value = { name: '', partner: '', admins: '' }
     vendorOpen.value = false
     await load()
   }
@@ -99,9 +110,14 @@ const expiring = computed(() => (data.value?.partners ?? []).filter(p => p.state
 async function revoke() {
   if (!revokeName.value || !revokeReason.value.trim())
     return
-  const { change } = await revokePartner(revokeName.value, revokeReason.value.trim())
-  revoking.value = false
-  router.push(`/changes/${change}`)
+  try {
+    const { change } = await revokePartner(revokeName.value, revokeReason.value.trim())
+    revoking.value = false
+    router.push(`/changes/${change}`)
+  }
+  catch {
+    failure()
+  }
 }
 
 const profileUrl = (login: string) => `https://github.com/${login}`
@@ -413,10 +429,10 @@ function stateTag(state: string, expires: string | null) {
 }
 
 .c-ok {
-  color: #389e0d;
+  color: var(--portal-ok-text);
 }
 
 .c-warn {
-  color: #d48806;
+  color: var(--portal-warn-text);
 }
 </style>

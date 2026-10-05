@@ -31,7 +31,7 @@ const features = computed(() => [
   {
     icon: 'i-tabler-bolt',
     title: $gettext('Manage on your own'),
-    text: $gettext('Yank versions, revoke signers and change categories. Saved changes take effect immediately.'),
+    text: $gettext('Yank versions, revoke signers and change categories. The changes take effect within minutes, without a review.'),
   },
   {
     icon: 'i-tabler-shield-check',

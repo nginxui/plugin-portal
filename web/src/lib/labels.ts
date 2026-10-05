@@ -89,6 +89,11 @@ export function joinClauses(items: string[]): string {
   return items.join(gettext.current.startsWith('zh') ? '，' : ', ')
 }
 
+/** Sentences one after another, with the space the language of the portal puts between them. */
+export function joinSentences(items: (string | false | null | undefined)[]): string {
+  return items.filter(Boolean).join(gettext.current.startsWith('zh') ? '' : ' ')
+}
+
 /** Two letters for an avatar: the first letters of the first two words, or the first two letters. */
 export function initials(name: string | null | undefined): string {
   const words = (name ?? '?').split(/[\s._-]+/).filter(Boolean)

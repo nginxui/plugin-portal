@@ -129,7 +129,7 @@ async function confirm() {
 
     <ACard v-if="props.section === 'versions'" :title="$gettext('Versions')" :styles="{ body: { padding: 0 } }">
       <template #extra>
-        <span class="text-3 op-65">{{ $gettext('Yanking and restoring take effect at the next catalog update, usually within minutes') }}</span>
+        <span class="text-3 op-65 extra-hint">{{ $gettext('Yanking and restoring take effect at the next catalog update, usually within minutes') }}</span>
       </template>
       <div v-if="selected.length" class="batch-bar">
         <span class="font-500">{{ $gettext('%{n} versions selected', { n: String(selected.length) }) }}</span>

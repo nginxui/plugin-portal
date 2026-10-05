@@ -10,6 +10,16 @@
   --portal-warn-bg: #fffbe6;
   --portal-warn-border: #ffe58f;
   --portal-icon-muted: rgba(0, 0, 0, 0.45);
+  --portal-ok-text: #389e0d;
+  --portal-ok-bg: #f6ffed;
+  --portal-ok-border: #b7eb8f;
+  --portal-warn-text: #d48806;
+  --portal-err-text: #cf1322;
+  --portal-err-bg: #fff1f0;
+  --portal-err-border: #ffccc7;
+  --portal-ai-text: #722ed1;
+  --portal-ai-bg: #f9f0ff;
+  --portal-ai-border: #d3adf7;
 }
 
 html.dark {
@@ -24,6 +34,16 @@ html.dark {
   --portal-warn-bg: #2b2111;
   --portal-warn-border: #594214;
   --portal-icon-muted: rgba(255, 255, 255, 0.45);
+  --portal-ok-text: #6abe39;
+  --portal-ok-bg: #162312;
+  --portal-ok-border: #274916;
+  --portal-warn-text: #e8b339;
+  --portal-err-text: #e86e6b;
+  --portal-err-bg: #2c1618;
+  --portal-err-border: #58181c;
+  --portal-ai-text: #b37feb;
+  --portal-ai-bg: #1a1325;
+  --portal-ai-border: #391085;
 }
 
 html,
@@ -84,6 +104,83 @@ html.dark body {
 
 .col-side {
   flex: 1 1 320px;
+  min-width: 0;
+}
+
+/* A plugin on My plugins, listed or still a draft. */
+.pcard {
+  display: flex;
+  flex-direction: column;
+  border: 1px solid var(--portal-border);
+  border-radius: 8px;
+  background: var(--portal-card);
+  min-width: 0;
+}
+
+.pcard-head {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px;
+  border-bottom: 1px solid var(--portal-border);
+}
+
+.pcard-body {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 16px;
+  flex: 1;
+}
+
+.pcard-foot {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  padding: 8px 10px;
+  border-top: 1px solid var(--portal-border);
+}
+
+/* Four steps as bars: done in the primary color, the current one in amber. */
+.pcard-steps {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 4px;
+}
+
+.pcard-steps span {
+  height: 4px;
+  border-radius: 2px;
+  background: var(--portal-border-strong);
+}
+
+.pcard-steps .done {
+  background: var(--portal-primary);
+}
+
+.pcard-steps .cur,
+.pcard-steps .warn {
+  background: #faad14;
+}
+
+/* A hint beside a card title gives way to the title on a phone. */
+@media (max-width: 640px) {
+  .extra-hint {
+    display: none;
+  }
+}
+
+/* A row of options wider than the screen scrolls by itself. */
+.scroll-x {
+  max-width: 100%;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+/* The text beside an icon and buttons in a head row: the buttons move under
+   it once it would get narrower than this. */
+.head-main {
+  flex: 1 1 240px;
   min-width: 0;
 }
 

@@ -5,7 +5,8 @@ import { useRoute, useRouter } from 'vue-router'
 import { getChange, retryChange, withdrawChange } from '@/api/changes'
 import { getPrefs, savePrefs } from '@/api/notifications'
 import { categoryLabel } from '@/lib/categories'
-import { kindLabel } from '@/lib/changeKinds'
+import { changePath, kindLabel } from '@/lib/changeKinds'
+import { useFailure } from '@/lib/feedback'
 import { $gettext } from '@/lib/gettext'
 import { localized } from '@/lib/labels'
 import { itemLabel } from '@/lib/storeDiff'
@@ -14,6 +15,7 @@ import { useCrumbs } from '@/stores/crumbs'
 import { usePluginStore } from '@/stores/plugin'
 
 const route = useRoute()
+const failure = useFailure()
 const data = ref<{ change: Change, canRetry: boolean, canWithdraw: boolean, others: Change[], events: ChangeEvent[] } | null>(null)
 const missing = ref(false)
 const retrying = ref(false)
@@ -66,11 +68,9 @@ const headPlugin = computed(() => {
 // author's repository waits for the author's merge instead.
 const selfService = computed(() => change.value?.class === 'self_service')
 const repoStore = computed(() => change.value?.delivery === 'bot' || change.value?.delivery === 'patch')
-const stages = computed(() => repoStore.value
-  ? ['submitted', 'checks', 'review', 'merged', 'live']
-  : selfService.value
-    ? ['submitted', 'checks', 'merged', 'live']
-    : ['submitted', 'checks', 'review', 'merged', 'live'])
+const stages = computed(() => selfService.value && !repoStore.value
+  ? ['submitted', 'checks', 'merged', 'live']
+  : ['submitted', 'checks', 'review', 'merged', 'live'])
 
 const current = computed(() => {
   const c = change.value
@@ -79,10 +79,15 @@ const current = computed(() => {
   return c.stage === 'live' ? stages.value.length : stages.value.indexOf(c.stage)
 })
 
-const stepStatus = computed<'process' | 'error' | 'finish'>(() => {
+// A change that was withdrawn or rejected goes no further.
+const stopped = computed(() => change.value?.state === 'withdrawn' || change.value?.state === 'rejected')
+
+const stepStatus = computed<'process' | 'error' | 'finish' | 'wait'>(() => {
   const c = change.value
   if (!c)
     return 'process'
+  if (c.state === 'withdrawn')
+    return 'wait'
   if (c.state === 'rejected' || (c.stage === 'checks' && c.waitingOn === 'author'))
     return 'error'
   return c.stage === 'live' ? 'finish' : 'process'
@@ -126,7 +131,7 @@ const steps = computed(() => {
     else if (index < current.value && !reached && stage === 'checks') {
       lines.push($gettext('Passed'))
     }
-    else if (index > current.value) {
+    else if (index > current.value && !stopped.value) {
       if (stage === 'merged' && repoStore.value)
         lines.push($gettext('Within minutes of the merge'))
       else if (stage === 'live')
@@ -201,6 +206,15 @@ const requested = computed(() => {
   return rows
 })
 
+// What a maintainer asked for last, while the review waits for the author.
+const asked = computed(() => {
+  const c = change.value
+  if (!c || c.state !== 'open' || c.stage !== 'review' || c.waitingOn !== 'author' || repoStore.value)
+    return null
+  const found = [...(data.value?.events ?? [])].reverse().find(e => e.stage === 'changes_requested')
+  return { by: found?.actor ?? null, text: typeof found?.detail?.comment === 'string' ? found.detail.comment : '' }
+})
+
 const status = computed<{ type: 'success' | 'info' | 'warning' | 'error', text: string } | null>(() => {
   const c = change.value
   if (!c)
@@ -211,6 +225,13 @@ const status = computed<{ type: 'success' | 'info' | 'warning' | 'error', text: 
     return { type: 'success', text: $gettext('The plugin is listed in the catalog.') }
   if (c.state === 'rejected')
     return { type: 'error', text: $gettext('The pull request was closed without merging.') }
+  if (c.state === 'withdrawn')
+    return { type: 'info', text: $gettext('This change was withdrawn and goes no further.') }
+  if (asked.value) {
+    return { type: 'warning', text: asked.value.by
+      ? $gettext('@%{login} asked for changes. Make them, then run the checks again.', { login: asked.value.by })
+      : $gettext('A maintainer asked for changes. Make them, then run the checks again.') }
+  }
   if (c.stage === 'checks' && c.waitingOn === 'author')
     return { type: 'warning', text: $gettext('The checks found problems. Fix them in a new release, then run the checks again.') }
   if (c.stage === 'checks' && c.outcome?.outcome === 'dispatch_failed')
@@ -270,6 +291,9 @@ async function withdraw() {
     withdrawOpen.value = false
     await load()
   }
+  catch {
+    failure($gettext('The change could not be withdrawn. Please try again.'))
+  }
   finally {
     withdrawing.value = false
   }
@@ -282,13 +306,13 @@ async function setPref(key: 'inApp' | 'emailOnAction' | 'emailOnLive', value: bo
   if (!prefs.value)
     return
   prefs.value = { ...prefs.value, [key]: value }
-  await savePrefs(prefs.value)
+  await savePrefs(prefs.value).catch(() => failure())
 }
 async function setEmail(value: string) {
   if (!prefs.value)
     return
   prefs.value = { ...prefs.value, email: value || null }
-  await savePrefs(prefs.value).catch(() => {})
+  await savePrefs(prefs.value).catch(() => failure())
 }
 
 // A small track of another change.
@@ -312,6 +336,9 @@ async function retry() {
   try {
     await retryChange(changeId.value)
     await load()
+  }
+  catch {
+    failure($gettext('The checks could not be started. Please try again later.'))
   }
   finally {
     retrying.value = false
@@ -365,14 +392,17 @@ async function retry() {
               </AFlex>
             </div>
             <AAlert v-if="status && !(repoStore && change.state === 'open' && change.stage === 'review')" :type="status.type" show-icon :title="status.text" class="mt-5">
-              <template v-if="problems.length || rejectReason || (change.outcome?.outcome === 'rejected' && change.outcome.message)" #description>
+              <template v-if="asked?.text || problems.length || rejectReason || (change.outcome?.outcome === 'rejected' && change.outcome.message)" #description>
+                <div v-if="asked?.text" class="whitespace-pre-wrap">
+                  {{ asked.text }}
+                </div>
                 <div v-if="rejectReason" class="mb-2 whitespace-pre-wrap">
                   {{ $gettext('Reason: %{reason}', { reason: rejectReason }) }}
                 </div>
-                <div v-if="change.outcome?.outcome === 'rejected' && change.outcome.message" class="mb-2">
+                <div v-if="change.outcome?.outcome === 'rejected' && change.outcome.message && !asked" class="mb-2">
                   {{ change.outcome.message }}
                 </div>
-                <ul v-if="problems.length" class="m-0 pl-5">
+                <ul v-if="problems.length && !asked" class="m-0 pl-5">
                   <li v-for="(line, index) in problems" :key="index">
                     {{ line }}
                   </li>
@@ -412,34 +442,32 @@ async function retry() {
             </div>
           </ACard>
           <ACard v-if="change.items?.length" :title="$gettext('Each item')" :styles="{ body: { padding: 0 } }">
-            <table class="items">
-              <thead>
-                <tr>
-                  <th>{{ $gettext('Item') }}</th>
-                  <th>{{ $gettext('Needs review') }}</th>
-                  <th>{{ $gettext('Progress') }}</th>
-                  <th>{{ $gettext('Current state') }}</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr v-for="item in change.items" :key="item.label">
-                  <td>
-                    {{ itemLabel(item, (change.entry ?? {}) as never) }}
-                    <span v-if="item.value" class="text-3 op-65 ml-1">{{ item.value }}</span>
-                  </td>
-                  <td>
-                    <ATag v-if="item.review" color="blue" class="m-0">
-                      {{ $gettext('Name review after the merge') }}
-                    </ATag>
-                    <span v-else class="text-3 op-65">{{ $gettext('No review') }}</span>
-                  </td>
-                  <td>
-                    <span class="mini-track"><span v-for="(st, i) in miniTrack(change)" :key="i" :class="st" /></span>
-                  </td>
-                  <td>{{ itemState(item) }}</td>
-                </tr>
-              </tbody>
-            </table>
+            <div class="overflow-x-auto">
+              <table class="items">
+                <thead>
+                  <tr>
+                    <th>{{ $gettext('Item') }}</th>
+                    <th>{{ $gettext('Needs review') }}</th>
+                    <th>{{ $gettext('Current state') }}</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr v-for="item in change.items" :key="item.label">
+                    <td>
+                      {{ itemLabel(item, (change.entry ?? {}) as never) }}
+                      <span v-if="item.value" class="text-3 op-65 ml-1">{{ item.value }}</span>
+                    </td>
+                    <td>
+                      <ATag v-if="item.review" color="blue" class="m-0">
+                        {{ $gettext('Name review after the merge') }}
+                      </ATag>
+                      <span v-else class="text-3 op-65">{{ $gettext('No review') }}</span>
+                    </td>
+                    <td>{{ itemState(item) }}</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
           </ACard>
           <ACard>
             <template #title>
@@ -482,7 +510,7 @@ async function retry() {
             </ATypographyParagraph>
           </ACard>
           <ACard v-if="data.others.length" :title="$gettext('Your other changes in progress')">
-            <RouterLink v-for="o in data.others" :key="o.id" :to="`/changes/${o.id}`" class="other">
+            <RouterLink v-for="o in data.others" :key="o.id" :to="changePath(o)" class="other">
               <PluginIcon :src="null" :name="localized(o.entry?.name) || o.pluginId || ''" :size="36" />
               <div class="min-w-0 flex-1">
                 <div class="font-500">
@@ -620,7 +648,7 @@ async function retry() {
 }
 
 .c-warn-text {
-  color: #d48806;
+  color: var(--portal-warn-text);
 }
 
 .change-steps :deep(.step-lines) {
@@ -688,7 +716,7 @@ async function retry() {
 
 .change-steps :deep(.step-dot.current) {
   border-color: #faad14;
-  color: #d48806;
+  color: var(--portal-warn-text);
 }
 
 .change-steps :deep(.step-dot.failed) {
@@ -719,38 +747,23 @@ async function retry() {
 }
 
 .op-icon.warn {
-  color: #d46b08;
-  background: #fff7e6;
+  color: var(--portal-warn-text);
+  background: var(--portal-warn-bg);
 }
 
 .op-icon.ok {
-  color: #389e0d;
-  background: #f6ffed;
+  color: var(--portal-ok-text);
+  background: var(--portal-ok-bg);
 }
 
 .op-icon.bad {
-  color: #cf1322;
-  background: #fff1f0;
+  color: var(--portal-err-text);
+  background: var(--portal-err-bg);
 }
 
 .op-icon.info {
   color: var(--portal-primary-text);
   background: var(--portal-primary-bg);
-}
-
-:global(html.dark) .op-icon.warn {
-  color: #e89a3c;
-  background: #2b1d11;
-}
-
-:global(html.dark) .op-icon.ok {
-  color: #6abe39;
-  background: #162312;
-}
-
-:global(html.dark) .op-icon.bad {
-  color: #e86e6b;
-  background: #2c1618;
 }
 
 .op-value {

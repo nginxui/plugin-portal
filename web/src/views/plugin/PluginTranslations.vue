@@ -196,8 +196,10 @@ function setCell(key: string, locale: string, text: string, drafted: boolean) {
   draft.setText(key, locale, text, drafted)
 }
 
+// Leaving the field saves what was typed; a text left as it is stays an
+// unconfirmed draft.
 function save() {
-  if (!cell.value || !cellEditable.value)
+  if (!cell.value || !cellEditable.value || value.value.trim() === textIn(cell.value.key, cell.value.locale))
     return
   setCell(cell.value.key, cell.value.locale, value.value.trim(), false)
 }
@@ -251,7 +253,7 @@ async function draftMissing() {
       <ACard :title="$gettext('Languages')">
         <template #extra>
           <AFlex align="center" gap="middle" wrap>
-            <span class="text-3 op-65">{{ $gettext('The %{n} interface languages of Nginx UI. Pick the columns to show.', { n: String(HOST_LOCALES.length) }) }}</span>
+            <span class="text-3 op-65 extra-hint">{{ $gettext('The %{n} interface languages of Nginx UI. Pick the columns to show.', { n: String(HOST_LOCALES.length) }) }}</span>
             <AButton v-if="ai.enabled" type="primary" :loading="!!batch" :disabled="!S.canEdit.texts" @click="draftMissing">
               <span class="i-tabler-sparkles" />
               {{ batch ? $gettext('Drafting %{done} of %{total}', { done: String(batch.done), total: String(batch.total) }) : $gettext('AI draft the missing texts') }}
@@ -277,7 +279,7 @@ async function draftMissing() {
 
       <ACard :styles="{ body: { padding: '12px 16px' } }">
         <AFlex justify="space-between" align="center" gap="middle" wrap>
-          <ASegmented v-model:value="filter" :options="filters" />
+          <ASegmented v-model:value="filter" :options="filters" class="scroll-x" />
           <span class="text-3 op-65">{{ $gettext('A text left out in a language shows in English there') }}</span>
         </AFlex>
       </ACard>
@@ -285,7 +287,7 @@ async function draftMissing() {
       <div class="cols">
         <ACard class="col-main" :styles="{ body: { padding: 0 } }">
           <div class="overflow-x-auto">
-            <table class="wb-table">
+            <table class="wb-table" :style="{ minWidth: `${140 + columns.length * 160}px` }">
               <thead>
                 <tr>
                   <th class="field-col">
@@ -330,7 +332,12 @@ async function draftMissing() {
                     <span v-else class="missing"><span class="i-tabler-plus" />{{ $gettext('Fill in') }}</span>
                   </td>
                 </tr>
-                <template v-if="runtime.length">
+                <tr v-if="!shownRows.length">
+                  <td :colspan="columns.length + 1" class="op-65">
+                    {{ $gettext('No store text matches this filter.') }}
+                  </td>
+                </tr>
+                <template v-if="shownRuntime.length">
                   <tr class="group">
                     <td :colspan="columns.length + 1">
                       {{ $gettext('Permission notes, live after the merge') }}
@@ -367,9 +374,9 @@ async function draftMissing() {
               </tbody>
             </table>
           </div>
-          <AFlex justify="space-between" align="center" gap="middle" wrap class="foot">
+          <AFlex v-if="runtime.length" justify="space-between" align="center" gap="middle" wrap class="foot">
             <span class="text-3 op-65">{{ $gettext('Translated permission notes go to the store document with the other texts and show once it is merged. Their English stays in plugin.json. Export and import move them as JSON shaped like the i18n of plugin.json.') }}</span>
-            <AFlex v-if="runtime.length" gap="small">
+            <AFlex gap="small">
               <AButton size="small" @click="exportRuntime">
                 <span class="i-tabler-download" />{{ $gettext('Export') }}
               </AButton>
@@ -404,7 +411,7 @@ async function draftMissing() {
               </p>
             </div>
             <div class="text-3 op-65 mb-1">
-              {{ $gettext('Translation') }}
+              {{ cell.locale === 'en' ? $gettext('Text') : $gettext('Translation') }}
             </div>
             <ATextarea v-model:value="value" :rows="cell.key === 'description' || cell.key.startsWith('reason:') ? 4 : 2" :dir="RTL_LOCALES.includes(cell.locale) ? 'rtl' : 'auto'" :disabled="!cellEditable" @blur="save" />
             <div v-if="usedTerms.length" class="text-3 op-65 mt-2">
@@ -432,7 +439,7 @@ async function draftMissing() {
             </ATypographyText>
           </ACard>
 
-          <CommunityCard v-if="community" :plugin-id="plugin.id" :state="community" :doc="doc" :store-source="S.source" @changed="loadCommunity" />
+          <CommunityCard v-if="community" :plugin-id="plugin.id" :state="community" :doc="doc" @changed="loadCommunity" />
         </AFlex>
       </div>
     </template>
@@ -489,7 +496,6 @@ async function draftMissing() {
 
 .wb-table {
   width: 100%;
-  min-width: 720px;
   border-collapse: collapse;
   font-size: 13px;
   table-layout: fixed;
@@ -559,8 +565,8 @@ async function draftMissing() {
 }
 
 .tag.ai {
-  color: #722ed1;
-  background: #f9f0ff;
+  color: var(--portal-ai-text);
+  background: var(--portal-ai-bg);
 }
 
 .tag.info {
@@ -569,18 +575,8 @@ async function draftMissing() {
 }
 
 .tag.warn {
-  color: #d48806;
-  background: #fffbe6;
-}
-
-:global(html.dark) .tag.ai {
-  color: #b37feb;
-  background: #1a1325;
-}
-
-:global(html.dark) .tag.warn {
-  color: #e8b339;
-  background: #2b2111;
+  color: var(--portal-warn-text);
+  background: var(--portal-warn-bg);
 }
 
 .missing {
@@ -590,7 +586,7 @@ async function draftMissing() {
   padding: 2px 8px;
   border: 1px dashed #faad14;
   border-radius: 6px;
-  color: #d48806;
+  color: var(--portal-warn-text);
   font-size: 12px;
 }
 

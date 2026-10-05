@@ -277,13 +277,13 @@ plugins.get('/:id', async (c) => {
     return c.json({ error: 'no_access' }, 403)
   const [entry, pending, open, people, community] = await Promise.all([
     catalogEntry(c.env, id),
-    c.env.DB.prepare(`SELECT id, kind FROM changes WHERE plugin_id = ? AND class = 'self_service' AND state IN ('open', 'merged') ORDER BY created_at DESC LIMIT 1`)
+    c.env.DB.prepare(`SELECT id, number, kind FROM changes WHERE plugin_id = ? AND class = 'self_service' AND state IN ('open', 'merged') ORDER BY created_at DESC LIMIT 1`)
       .bind(id)
-      .first<{ id: string, kind: string }>(),
-    c.env.DB.prepare(`SELECT id, kind, class, stage, waiting_on, pr_number, payload_json, created_at, updated_at FROM changes
+      .first<{ id: string, number: number | null, kind: string }>(),
+    c.env.DB.prepare(`SELECT id, number, kind, class, stage, waiting_on, pr_number, payload_json, created_at, updated_at FROM changes
       WHERE plugin_id = ? AND state IN ('open', 'merged') ORDER BY created_at DESC LIMIT 5`)
       .bind(id)
-      .all<{ id: string, kind: string, class: string, stage: string, waiting_on: string | null, pr_number: number | null, payload_json: string | null, created_at: number, updated_at: number }>(),
+      .all<{ id: string, number: number | null, kind: string, class: string, stage: string, waiting_on: string | null, pr_number: number | null, payload_json: string | null, created_at: number, updated_at: number }>(),
     // Portal users whose permission on the repository was read lately.
     summary.repo
       ? c.env.DB.prepare(`SELECT u.login, u.avatar_url, r.permission, r.checked_at FROM repo_permissions r JOIN users u ON u.id = r.user_id
@@ -315,6 +315,7 @@ plugins.get('/:id', async (c) => {
     // Changes still on their way, for the strip under the plugin header.
     openChanges: open.results.map(row => ({
       id: row.id,
+      number: row.number,
       kind: row.kind,
       class: row.class,
       stage: row.stage,

@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import type { PreviewDoc, PreviewManifest } from './MarketPreview.vue'
 import { computed, ref } from 'vue'
-import gettext, { $gettext, $ngettext } from '@/lib/gettext'
-import { joinList } from '@/lib/labels'
+import { $gettext, $ngettext } from '@/lib/gettext'
+import { joinList, joinSentences } from '@/lib/labels'
 
 // What users will see before and after a change, side by side, as an overlay
 // with a slider, or with the changed parts only (spec 11.5).
@@ -57,7 +57,7 @@ const summary = computed(() => {
     parts.push($gettext('Only the names need review this time, the other changes are for reference.'))
   if (mode.value === 'side' && props.before)
     parts.push($gettext('Switch to the slider to overlay the same spot.'))
-  return parts.join(gettext.current.startsWith('zh') ? '' : ' ')
+  return joinSentences(parts)
 })
 
 // The parts that changed only, with everything else dropped.

@@ -24,6 +24,7 @@ const shots = computed(() => doc.value.screenshots ?? [])
 const canEdit = computed(() => !!state.value?.canEdit.all && !('screenshots' in (state.value?.overrides ?? {})))
 const imageOf = (path: string | undefined) => path ? (state.value?.images[path] ?? (path.startsWith('media:') ? `/api/media/${path.slice(6)}` : null)) : null
 
+const MAX_SHOTS = 8
 const selectedId = ref<string | null>(null)
 const selected = computed(() => shots.value.find(s => s.id === selectedId.value) ?? null)
 watch(shots, (list) => {
@@ -88,6 +89,10 @@ function openFile(file: File | undefined, target: 'new' | 'light' | 'dark') {
     return
   if (!/^image\/(?:png|jpeg|webp)$/.test(file.type)) {
     uploadError.value = $gettext('Use a PNG, JPEG or WebP image.')
+    return
+  }
+  if (target === 'new' && shots.value.length >= MAX_SHOTS) {
+    uploadError.value = $gettext('A listing holds at most %{n} screenshots.', { n: String(MAX_SHOTS) })
     return
   }
   if (file.size > 20 * 1024 * 1024) {
@@ -260,8 +265,8 @@ const THUMB = {
         <ACard class="col-main" :title="$gettext('Screenshots')">
           <template #extra>
             <AFlex align="center" gap="middle">
-              <span class="text-3 op-65">{{ $gettext('16:10, light and dark in pairs') }}</span>
-              <AButton type="primary" :disabled="!canEdit || !S.uploads || shots.length >= 8" @click="pick('new')">
+              <span class="text-3 op-65 extra-hint">{{ $gettext('16:10, light and dark in pairs') }}</span>
+              <AButton type="primary" :disabled="!canEdit || !S.uploads || shots.length >= MAX_SHOTS" @click="pick('new')">
                 <span class="i-tabler-upload" />
                 {{ $gettext('Add a screenshot') }}
               </AButton>
@@ -312,7 +317,7 @@ const THUMB = {
             </div>
           </div>
           <div
-            v-if="canEdit && S.uploads"
+            v-if="canEdit && S.uploads && shots.length < MAX_SHOTS"
             class="dropzone"
             :class="{ over: dropping }"
             role="button"
@@ -360,7 +365,7 @@ const THUMB = {
               <ImageCropper v-if="liveUrl && canEdit && S.uploads && !liveFailed" ref="live" :key="liveUrl" :src="liveUrl" @adjusted="adjusted = $event" @failed="liveFailed = true" />
               <img v-else-if="liveUrl" :src="liveUrl" alt="" referrerpolicy="no-referrer">
               <div v-else class="missing big" :class="{ clickable: canEdit && S.uploads }" @click="canEdit && S.uploads && pick(side)">
-                {{ $gettext('No dark screenshot') }}
+                {{ side === 'dark' ? $gettext('No dark screenshot') : $gettext('The image is missing') }}
                 <span v-if="canEdit && S.uploads" class="block text-3">{{ $gettext('Click to upload') }}</span>
               </div>
             </div>
@@ -409,9 +414,11 @@ const THUMB = {
               </div>
               <AAlert v-if="aiError" type="error" show-icon class="mt-2" :title="aiError" />
             </div>
-            <AButton danger class="mt-3" :disabled="!canEdit" @click="remove">
-              {{ $gettext('Delete this screenshot') }}
-            </AButton>
+            <APopconfirm :title="$gettext('Delete this screenshot and its captions?')" :ok-text="$gettext('Delete')" :cancel-text="$gettext('Cancel')" :disabled="!canEdit" @confirm="remove">
+              <AButton danger class="mt-3" :disabled="!canEdit">
+                {{ $gettext('Delete this screenshot') }}
+              </AButton>
+            </APopconfirm>
           </ACard>
           <AAlert v-if="uploadError && !pending" type="error" show-icon :title="uploadError" />
         </AFlex>
@@ -482,7 +489,7 @@ const THUMB = {
   place-items: center;
   box-sizing: border-box;
   border: 1px dashed #faad14;
-  color: #d48806;
+  color: var(--portal-warn-text);
   font-size: 12px;
   text-align: center;
 }
@@ -490,11 +497,7 @@ const THUMB = {
 .missing.clickable {
   cursor: pointer;
   align-content: center;
-  background: #fffbe6;
-}
-
-:global(html.dark) .missing.clickable {
-  background: #2b2111;
+  background: var(--portal-warn-bg);
 }
 
 .ai-line {
@@ -508,15 +511,9 @@ const THUMB = {
   padding: 0 6px;
   border-radius: 4px;
   font-size: 12px;
-  color: #722ed1;
-  background: #f9f0ff;
-  border: 1px solid #d3adf7;
-}
-
-:global(html.dark) .ai-tag {
-  color: #b37feb;
-  background: #1a1325;
-  border-color: #391085;
+  color: var(--portal-ai-text);
+  background: var(--portal-ai-bg);
+  border: 1px solid var(--portal-ai-border);
 }
 
 .missing.big {

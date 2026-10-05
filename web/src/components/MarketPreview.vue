@@ -121,7 +121,7 @@ const facts = computed(() => {
 const readmeHtml = computed(() => renderMarkdown(props.readme, props.readmeBase))
 
 // Editing in place.
-const editing = ref<{ key: string, value: string, source: string, drafted: boolean } | null>(null)
+const editing = ref<{ key: string, value: string, original: string, source: string, drafted: boolean } | null>(null)
 const drafting = ref(false)
 const field = useTemplateRef<{ focus: () => void }>('field')
 
@@ -143,8 +143,11 @@ function valueOf(key: string): { own: string, source: string } {
 async function edit(key: string) {
   if (!props.editable || props.locked[key] || (key === 'readme' && !props.readmeEditable))
     return
+  // A text typed in another field is kept, not dropped.
+  if (editing.value && editing.value.key !== key && editing.value.value.trim() !== editing.value.original.trim())
+    done()
   const { own, source } = valueOf(key)
-  editing.value = { key, value: own, source: props.locale === 'en' || key === 'homepage_url' || key === 'readme' ? '' : source, drafted: props.aiKeys.includes(`${key}.${props.locale}`) }
+  editing.value = { key, value: own, original: own, source: props.locale === 'en' || key === 'homepage_url' || key === 'readme' ? '' : source, drafted: props.aiKeys.includes(`${key}.${props.locale}`) }
   await nextTick()
   // Inside the screenshot list the ref holds an array.
   const target = field.value as unknown as { focus: () => void } | { focus: () => void }[] | null
@@ -200,6 +203,7 @@ function onKey(event: KeyboardEvent) {
 defineExpose({ edit })
 
 const isEditing = (key: string) => editing.value?.key === key
+const canPickCategories = computed(() => props.editable && !props.locked.categories)
 function editableClass(key: string, missing = false) {
   return {
     editable: props.editable && !props.locked[key] && (key !== 'readme' || props.readmeEditable),
@@ -306,11 +310,11 @@ const SHOT = {
       <dl class="list">
         <div v-if="categories.length" class="row">
           <dt>{{ L('categories') }}</dt>
-          <dd class="pill-row" :class="{ editable }" role="button" :tabindex="editable ? 0 : -1" @click="editable && emit('categories')" @keydown.enter="editable && emit('categories')">
+          <dd class="pill-row" :class="{ editable: canPickCategories }" :role="canPickCategories ? 'button' : undefined" :tabindex="canPickCategories ? 0 : -1" @click="canPickCategories && emit('categories')" @keydown.enter="canPickCategories && emit('categories')">
             <span v-for="item in categories" :key="item" class="pill">{{ categoryText(locale, item) }}</span>
           </dd>
         </div>
-        <div v-if="doc.homepage_url || repository || editable" class="row">
+        <div v-if="doc.homepage_url || editable" class="row">
           <dt>{{ L('homepage') }}</dt>
           <dd>
             <span v-if="!isEditing('homepage_url')" :class="editableClass('homepage_url')" :data-hl="highlight.homepage_url" class="link" role="button" :tabindex="editable ? 0 : -1" @click="edit('homepage_url')" @keydown.enter="edit('homepage_url')">
@@ -338,7 +342,7 @@ const SHOT = {
         </div>
       </dl>
 
-      <section v-if="shots.length || editable" class="section" :class="{ editable }">
+      <section v-if="shots.length || editable" class="section">
         <div class="section-head">
           <h4>{{ L('screenshots') }}</h4>
           <button v-if="editable && !locked.screenshots" type="button" class="edit-pill" @click="emit('studio')">
@@ -842,7 +846,7 @@ const SHOT = {
 /* The caption editor opens below the captions of the strip. */
 .section > .editor.pop {
   top: calc(100% - 8px);
-  left: 0;
+  inset-inline-start: 0;
 }
 
 .hl {
@@ -938,6 +942,11 @@ const SHOT = {
   line-height: 18px;
   color: #722ed1;
   background: #f9f0ff;
+}
+
+.dark .ai-tag {
+  color: #b37feb;
+  background: #1a1325;
 }
 
 .btn {

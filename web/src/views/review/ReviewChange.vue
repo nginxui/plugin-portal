@@ -8,6 +8,7 @@ import { approveChange, commentOnChange, getAiReview, getQueue, getReview, makeA
 import { categoryLabel } from '@/lib/categories'
 import { kindLabel } from '@/lib/changeKinds'
 import { checkRunLabel } from '@/lib/checkRuns'
+import { useFailure } from '@/lib/feedback'
 import gettext, { $gettext, $ngettext } from '@/lib/gettext'
 import { HOST_LOCALES } from '@/lib/hostLocales'
 import { joinList, localized, trustLabel } from '@/lib/labels'
@@ -23,6 +24,7 @@ const route = useRoute()
 const router = useRouter()
 const reviewStore = useReviewStore()
 const palette = usePaletteStore()
+const failure = useFailure()
 const data = ref<ReviewDetail | null>(null)
 const missing = ref(false)
 const id = computed(() => String(route.params.id))
@@ -65,6 +67,8 @@ const status = computed(() => {
     return { color: 'success', text: $gettext('Merged') }
   if (c.state === 'rejected')
     return { color: 'default', text: $gettext('Closed') }
+  if (c.state === 'withdrawn')
+    return { color: 'default', text: $gettext('Withdrawn') }
   if (c.waitingOn === 'author')
     return { color: 'warning', text: $gettext('Waiting for the author') }
   if (c.stage === 'checks')
@@ -364,6 +368,9 @@ async function sendComment() {
     comment.value = ''
     await load()
   }
+  catch {
+    failure($gettext('The comment could not be posted. Please try again.'))
+  }
   finally {
     commenting.value = false
   }
@@ -427,8 +434,8 @@ onKeyStroke('k', e => !typing(e) && step(-1))
     <template v-else-if="detail && change">
       <ACard>
         <div class="head">
-          <PluginIcon :name="name" :size="56" />
-          <div class="flex-1 min-w-0">
+          <PluginIcon :src="detail.listing?.iconUrl" :name="name" :size="56" />
+          <div class="head-main">
             <AFlex gap="small" align="center" wrap>
               <h1 class="page-title m-0">
                 {{ kindLabel(change.kind) }}
@@ -540,7 +547,7 @@ onKeyStroke('k', e => !typing(e) && step(-1))
 
           <ACard v-if="changedNames.length" :title="$gettext('Names by language')" :styles="{ body: { padding: 0 } }">
             <template #extra>
-              <span class="text-3 op-65">{{ $gettext('Uncheck a name to keep it as listed') }}</span>
+              <span class="text-3 op-65 extra-hint">{{ $gettext('Uncheck a name to keep it as listed') }}</span>
             </template>
             <div class="overflow-x-auto">
               <table class="diff">
@@ -606,17 +613,15 @@ onKeyStroke('k', e => !typing(e) && step(-1))
 
           <ACard v-if="detail.before" :title="$gettext('What changes')">
             <template #extra>
-              <span class="text-3 op-65">{{ detail.before ? $gettext('Compared with the current listing') : $gettext('Not listed yet') }}</span>
+              <span class="text-3 op-65">{{ $gettext('Compared with the current listing') }}</span>
             </template>
             <div class="overflow-x-auto">
               <table class="diff">
                 <thead>
                   <tr>
                     <th>{{ $gettext('Field') }}</th>
-                    <th v-if="detail.before">
-                      {{ $gettext('Current') }}
-                    </th>
-                    <th>{{ detail.before ? $gettext('After the change') : $gettext('Listed as') }}</th>
+                    <th>{{ $gettext('Current') }}</th>
+                    <th>{{ $gettext('After the change') }}</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -624,12 +629,12 @@ onKeyStroke('k', e => !typing(e) && step(-1))
                     <td class="field">
                       {{ row.label }}
                     </td>
-                    <td v-if="detail.before" :class="{ old: row.changed }">
+                    <td :class="{ old: row.changed }">
                       <div v-for="(line, i) in row.before" :key="i" :class="{ mono: row.key === 'author_public_key' }">
                         {{ line }}
                       </div>
                     </td>
-                    <td :class="{ new: row.changed && detail.before }">
+                    <td :class="{ new: row.changed }">
                       <div v-for="(line, i) in row.after" :key="i" :class="{ mono: row.key === 'author_public_key' }">
                         {{ line }}
                       </div>
@@ -655,7 +660,7 @@ onKeyStroke('k', e => !typing(e) && step(-1))
               <span class="i-tabler-shield-check mr-2 op-65" />{{ $gettext('Permissions, as users see them') }}
             </template>
             <template #extra>
-              <span class="text-3 op-65">{{ $gettext('This change does not touch the permissions') }}</span>
+              <span class="text-3 op-65 extra-hint">{{ $gettext('This change does not touch the permissions') }}</span>
             </template>
             <ul class="perm-list">
               <li v-for="p in permissions" :key="p.id">
@@ -771,10 +776,12 @@ onKeyStroke('k', e => !typing(e) && step(-1))
 
           <ACard :title="$gettext('Shortcuts')">
             <dl class="shortcuts">
-              <dt>{{ approveLabel }}</dt>
-              <dd><kbd class="keycap">a</kbd></dd>
-              <dt>{{ $gettext('Request changes') }}</dt>
-              <dd><kbd class="keycap">r</kbd></dd>
+              <template v-if="isOpen">
+                <dt>{{ approveLabel }}</dt>
+                <dd><kbd class="keycap">a</kbd></dd>
+                <dt>{{ $gettext('Request changes') }}</dt>
+                <dd><kbd class="keycap">r</kbd></dd>
+              </template>
               <dt>{{ $gettext('Switch the comparison') }}</dt>
               <dd><kbd class="keycap">v</kbd></dd>
               <dt>{{ $gettext('Next and previous') }}</dt>
@@ -830,7 +837,11 @@ onKeyStroke('k', e => !typing(e) && step(-1))
       </div>
 
       <AModal v-model:open="approveOpen" :title="$gettext('Approve and merge')" :confirm-loading="approving" :ok-text="$gettext('Approve and merge')" @ok="approve">
-        <p>{{ $gettext('Approve pull request #%{n} and merge it as you. The plugin is listed at the next deploy.', { n: String(detail.pull?.number ?? '') }) }}</p>
+        <p>
+          {{ change.kind === 'new_listing'
+            ? $gettext('Approve pull request #%{n} and merge it as you. The plugin is listed at the next catalog update.', { n: String(detail.pull?.number ?? '') })
+            : $gettext('Approve pull request #%{n} and merge it as you. The change takes effect at the next catalog update.', { n: String(detail.pull?.number ?? '') }) }}
+        </p>
         <AAlert v-if="!checksPassed" type="warning" show-icon :title="$gettext('Some checks of the pull request have not passed.')" />
         <AAlert v-if="unchecked.length" type="info" show-icon class="mt-3" :title="$gettext('The names in %{list} stay as listed: they are taken out of the pull request before it is merged.', { list: unchecked.map(localeName).join(', ') })" />
       </AModal>
@@ -895,23 +906,17 @@ a.source:hover {
   padding: 0 6px;
   border-radius: 4px;
   font-size: 12px;
-  color: #722ed1;
-  background: #f9f0ff;
-  border: 1px solid #d3adf7;
-}
-
-:global(html.dark) .ai-badge {
-  color: #b37feb;
-  background: #1a1325;
-  border-color: #391085;
+  color: var(--portal-ai-text);
+  background: var(--portal-ai-bg);
+  border: 1px solid var(--portal-ai-border);
 }
 
 .c-warn {
-  color: #d48806;
+  color: var(--portal-warn-text);
 }
 
 .c-ok {
-  color: #389e0d;
+  color: var(--portal-ok-text);
 }
 
 .keycap {

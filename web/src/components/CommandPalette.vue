@@ -5,7 +5,7 @@ import { computed, nextTick, ref, useTemplateRef, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { getMyPlugins } from '@/api/plugins'
 import { getCatalog, getQueue } from '@/api/review'
-import { kindLabel } from '@/lib/changeKinds'
+import { changePath, kindLabel } from '@/lib/changeKinds'
 import { $gettext } from '@/lib/gettext'
 import { localized } from '@/lib/labels'
 import { waited } from '@/lib/time'
@@ -20,6 +20,7 @@ interface Item {
   to: string
   icon?: string
   plugin?: string
+  pluginIcon?: string | null
   avatar?: string
   search: string
 }
@@ -86,7 +87,7 @@ const all = computed<Item[]>(() => {
       group: g.reviews,
       title: $gettext('%{name}: %{kind}', { name, kind: kindLabel(change.kind) }),
       sub: $gettext('%{state}, waiting %{time}', { state: risk, time: waited(change.updatedAt) }),
-      to: `/review/${change.id}`,
+      to: changePath(change, '/review'),
       plugin: name,
       search: `${name} ${change.pluginId} ${change.author} ${kindLabel(change.kind)}`,
     })
@@ -95,7 +96,7 @@ const all = computed<Item[]>(() => {
   for (const plugin of mine.value) {
     seen.add(plugin.id)
     const name = localized(plugin.name) || plugin.id
-    items.push({ key: `plugin:${plugin.id}`, group: g.plugins, title: name, sub: $gettext('%{id}, %{state}', { id: plugin.id, state: stateText(plugin.state) }), to: `/plugins/${plugin.id}`, plugin: name, search: `${name} ${plugin.id} ${plugin.owner?.login ?? ''}` })
+    items.push({ key: `plugin:${plugin.id}`, group: g.plugins, title: name, sub: $gettext('%{id}, %{state}', { id: plugin.id, state: stateText(plugin.state) }), to: `/plugins/${plugin.id}`, plugin: name, pluginIcon: plugin.iconUrl, search: `${name} ${plugin.id} ${plugin.owner?.login ?? ''}` })
   }
   for (const plugin of catalog.value) {
     if (seen.has(plugin.id))
@@ -122,12 +123,16 @@ const all = computed<Item[]>(() => {
   const pages: [string, string, string, string][] = [
     ['/plugins', 'i-tabler-layout-grid', $gettext('My plugins'), $gettext('Plugins you manage')],
     ['/submit', 'i-tabler-plus', $gettext('Submit a plugin'), $gettext('List a new plugin in the catalog')],
+    ['/translate', 'i-tabler-language', $gettext('Contribute translations'), $gettext('Suggest translations for other plugins')],
     ['/owners', 'i-tabler-building', $gettext('Organizations'), $gettext('Owners of your plugins')],
   ]
   if (session.isMaintainer) {
     pages.push(
       ['/review', 'i-tabler-inbox', $gettext('Review queue'), $gettext('Changes waiting for a review')],
+      ['/maintain/plugins', 'i-tabler-apps', $gettext('All plugins'), $gettext('Trust, delisting and the block list')],
+      ['/maintain/partners', 'i-tabler-building-store', $gettext('Partner management'), $gettext('Partner requests, keys and vendors')],
       ['/audit', 'i-tabler-history', $gettext('Audit log'), $gettext('Every action in the developer portal')],
+      ['/ai', 'i-tabler-sparkles', $gettext('AI models'), $gettext('Models for translation drafts')],
       ['/maintain/settings', 'i-tabler-settings', $gettext('Settings'), $gettext('Announcements, mail service and bot account')],
     )
   }
@@ -268,7 +273,7 @@ function onKeydown(e: KeyboardEvent) {
             @mousemove="active = index"
             @click="go(item, $event.metaKey || $event.ctrlKey)"
           >
-            <PluginIcon v-if="item.plugin" :name="item.plugin" :size="28" />
+            <PluginIcon v-if="item.plugin" :src="item.pluginIcon" :name="item.plugin" :size="28" />
             <AAvatar v-else-if="item.avatar" :size="28">
               {{ item.avatar.slice(0, 1).toUpperCase() }}
             </AAvatar>

@@ -34,7 +34,7 @@ const people = computed(() => store.detail?.access.people ?? [])
           <AAvatar :src="session.user?.avatarUrl ?? undefined" :size="40">
             {{ session.user?.login.slice(0, 1).toUpperCase() }}
           </AAvatar>
-          <div class="flex-1 min-w-0">
+          <div class="head-main">
             <AFlex gap="small" align="center">
               <span class="font-600">{{ session.user?.login }}</span>
               <ATag :color="access.role ? 'blue' : 'default'" class="m-0">
@@ -56,7 +56,7 @@ const people = computed(() => store.detail?.access.people ?? [])
       </ACard>
       <ACard :title="$gettext('Roles')">
         <template #extra>
-          <ATypographyText type="secondary" class="text-3">
+          <ATypographyText type="secondary" class="text-3 extra-hint">
             {{ $gettext('The Developer Center keeps no separate members or roles') }}
           </ATypographyText>
         </template>

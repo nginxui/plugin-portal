@@ -104,7 +104,7 @@ async function sendApply() {
           <AAvatar :src="D.owner.avatarUrl ?? undefined" :size="56" shape="square">
             {{ initials(D.owner.login) }}
           </AAvatar>
-          <div class="flex-1 min-w-0">
+          <div class="head-main">
             <AFlex align="center" gap="small" wrap>
               <h1 class="page-title m-0">
                 {{ D.owner.login }}
@@ -131,7 +131,7 @@ async function sendApply() {
         <AFlex vertical gap="middle" class="col-main">
           <ACard :title="$gettext('Plugins')">
             <template #extra>
-              <span class="text-3 op-65">{{ $gettext('Every plugin of this account in the catalog, with your role from each repository') }}</span>
+              <span class="text-3 op-65 extra-hint">{{ $gettext('Every plugin of this account in the catalog, with your role from each repository') }}</span>
             </template>
             <AEmpty v-if="!D.plugins.length" :description="$gettext('This account lists no plugin yet.')" />
             <div v-for="plugin in D.plugins" :key="plugin.id" class="row">
@@ -247,11 +247,6 @@ async function sendApply() {
                   {{ $gettext('Vendor without a public repository') }}
                 </div>
               </div>
-              <RouterLink :to="`/vendors/${v.id}`">
-                <AButton size="small">
-                  {{ $gettext('Open') }}
-                </AButton>
-              </RouterLink>
             </div>
           </ACard>
         </AFlex>

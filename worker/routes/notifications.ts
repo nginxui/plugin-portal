@@ -27,16 +27,17 @@ notifications.get('/', async (c) => {
   if (!prefs.in_app)
     return c.json({ items: [], unread: 0 })
   const { results } = await c.env.DB.prepare(
-    `SELECT e.id, e.stage, e.at, e.detail_json, ch.id AS change_id, ch.kind, ch.plugin_id, ch.entry_json, u.login AS actor
+    `SELECT e.id, e.stage, e.at, e.detail_json, ch.id AS change_id, ch.number AS change_number, ch.kind, ch.plugin_id, ch.entry_json, u.login AS actor
      FROM change_events e JOIN changes ch ON ch.id = e.change_id LEFT JOIN users u ON u.id = e.actor_id
      WHERE ch.author_id = ? AND (e.actor_id IS NULL OR e.actor_id != ?) AND e.stage != 'submitted'
      ORDER BY e.at DESC, e.id DESC LIMIT 30`,
-  ).bind(user, user).all<{ id: number, stage: string, at: number, detail_json: string | null, change_id: string, kind: string, plugin_id: string | null, entry_json: string | null, actor: string | null }>()
+  ).bind(user, user).all<{ id: number, stage: string, at: number, detail_json: string | null, change_id: string, change_number: number | null, kind: string, plugin_id: string | null, entry_json: string | null, actor: string | null }>()
   const items = results.map(r => ({
     id: r.id,
     stage: r.stage,
     at: r.at,
     change: r.change_id,
+    number: r.change_number,
     kind: r.kind,
     pluginId: r.plugin_id,
     name: r.entry_json ? (JSON.parse(r.entry_json) as { name?: Record<string, string> }).name ?? null : null,

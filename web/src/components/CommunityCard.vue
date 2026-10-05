@@ -9,7 +9,7 @@ import { localeName } from '@/lib/locales'
 
 // Community translation of one plugin: the switch, the open languages, the
 // suggestions waiting for review and the rolling pull request (spec 9).
-const props = defineProps<{ pluginId: string, state: CommunityState, doc: PreviewDoc, storeSource: string }>()
+const props = defineProps<{ pluginId: string, state: CommunityState, doc: PreviewDoc }>()
 const emit = defineEmits<{ changed: [] }>()
 
 const busy = ref(false)
@@ -21,6 +21,9 @@ async function toggle(enabled: boolean) {
   try {
     await setCommunity(props.pluginId, enabled, props.state.locales)
     emit('changed')
+  }
+  catch {
+    error.value = $gettext('The setting could not be saved. Please try again.')
   }
   finally {
     busy.value = false
@@ -39,6 +42,10 @@ async function saveLocales() {
     await setCommunity(props.pluginId, props.state.enabled, chosen.value.length === others.length ? null : chosen.value)
     editing.value = false
     emit('changed')
+  }
+  catch {
+    editing.value = false
+    error.value = $gettext('The setting could not be saved. Please try again.')
   }
   finally {
     busy.value = false

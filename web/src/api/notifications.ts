@@ -5,6 +5,7 @@ export interface NotificationItem {
   stage: string
   at: number
   change: string
+  number?: number | null
   kind: string
   pluginId: string | null
   name: Record<string, string> | null

@@ -4,7 +4,7 @@ import { useIntervalFn } from '@vueuse/core'
 import { onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { getNotifications, markRead } from '@/api/notifications'
-import { kindLabel } from '@/lib/changeKinds'
+import { changePath, kindLabel } from '@/lib/changeKinds'
 import { $gettext } from '@/lib/gettext'
 import { localized } from '@/lib/labels'
 import { fromNow } from '@/lib/time'
@@ -51,7 +51,7 @@ function text(item: NotificationItem): string {
 
 function go(item: NotificationItem) {
   open.value = false
-  router.push(`/changes/${item.change}`)
+  router.push(changePath({ id: item.change, number: item.number }))
 }
 </script>
 
