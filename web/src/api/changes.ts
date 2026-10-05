@@ -3,6 +3,7 @@ import { api } from './client'
 export type Stage = 'submitted' | 'checks' | 'review' | 'merged' | 'live'
 
 export interface Change {
+  number?: number | null
   id: string
   pluginId: string | null
   kind: string

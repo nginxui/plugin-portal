@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { Change, ChangeEvent } from '@/api/changes'
 import { computed, h, onBeforeUnmount, ref, watch } from 'vue'
-import { useRoute } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import { getChange, retryChange, withdrawChange } from '@/api/changes'
 import { getPrefs, savePrefs } from '@/api/notifications'
 import { categoryLabel } from '@/lib/categories'
@@ -19,14 +19,20 @@ const missing = ref(false)
 const retrying = ref(false)
 let timer: ReturnType<typeof setTimeout> | undefined
 
+const router = useRouter()
 const id = computed(() => String(route.params.id))
 const change = computed(() => data.value?.change ?? null)
+// Actions use the internal id; the address shows the short number.
+const changeId = computed(() => change.value?.id ?? id.value)
 
 async function load() {
   clearTimeout(timer)
   try {
     data.value = await getChange(id.value)
     missing.value = false
+    const number = data.value.change.number
+    if (number && id.value !== String(number))
+      router.replace(`/changes/${number}`)
   }
   catch {
     missing.value = true
@@ -37,7 +43,11 @@ async function load() {
     timer = setTimeout(load, 15000)
 }
 
-watch(id, load, { immediate: true })
+// Moving to the numbered address needs no second load.
+watch(id, (value) => {
+  if (!change.value || String(change.value.number) !== value)
+    load()
+}, { immediate: true })
 onBeforeUnmount(() => clearTimeout(timer))
 
 // The plugin the change belongs to, for the plugin head; a new listing the
@@ -132,7 +142,7 @@ const title = computed(() => localized(headPlugin.value?.name) || localized(chan
 useCrumbs(() => [
   { title: $gettext('My plugins'), to: '/plugins' },
   ...(change.value?.pluginId ? [{ title: title.value, to: `/plugins/${change.value.pluginId}` }] : []),
-  { title: $gettext('Change progress') },
+  { title: change.value?.number ? $gettext('Change #%{n}', { n: String(change.value.number) }) : $gettext('Change progress') },
 ])
 
 // Where each item of a store change stands.
@@ -256,7 +266,7 @@ const withdrawOpen = ref(false)
 async function withdraw() {
   withdrawing.value = true
   try {
-    await withdrawChange(id.value)
+    await withdrawChange(changeId.value)
     withdrawOpen.value = false
     await load()
   }
@@ -300,7 +310,7 @@ function otherText(c: Change) {
 async function retry() {
   retrying.value = true
   try {
-    await retryChange(id.value)
+    await retryChange(changeId.value)
     await load()
   }
   finally {

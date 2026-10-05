@@ -4,7 +4,7 @@ import { mapLimit } from '../lib/access'
 import { audit } from '../lib/audit'
 import { cached } from '../lib/cache'
 import { catalogEntry, loadCatalog, repoOf } from '../lib/catalog'
-import { event, newChangeId } from '../lib/changes'
+import { event, newChangeId, NEXT_NUMBER } from '../lib/changes'
 import { dispatchApply } from '../lib/deployApp'
 import { github } from '../lib/github'
 import { storeSourceOf } from '../lib/insights'
@@ -35,8 +35,8 @@ async function maintainerChange(env: Env, session: Session, pluginId: string, ki
   const full = { ...payload, kind: 'maintainer_update', plugin_id: pluginId, submitter: { login: session.user.login, id: session.user.id }, eligibility: `@${session.user.login} is a maintainer` }
   await env.DB.batch([
     env.DB.prepare(
-      `INSERT INTO changes (id, plugin_id, author_id, kind, class, state, stage, waiting_on, payload_json, dispatched_at, created_at, updated_at)
-       VALUES (?, ?, ?, ?, 'maintainer', 'open', 'checks', 'system', ?, ?, ?, ?)`,
+      `INSERT INTO changes (number, id, plugin_id, author_id, kind, class, state, stage, waiting_on, payload_json, dispatched_at, created_at, updated_at)
+       VALUES (${NEXT_NUMBER}, ?, ?, ?, ?, 'maintainer', 'open', 'checks', 'system', ?, ?, ?, ?)`,
     ).bind(change, pluginId, session.user.id, kind, JSON.stringify(full), t, t, t),
     event(env, change, 'submitted', session.user.id, payload),
   ])
@@ -240,8 +240,8 @@ async function partnerChange(env: Env, session: Session, partner: Record<string,
   const payload = { kind: 'partner_update', partner, submitter: { login: session.user.login, id: session.user.id }, eligibility: `@${session.user.login} is a maintainer` }
   await env.DB.batch([
     env.DB.prepare(
-      `INSERT INTO changes (id, plugin_id, author_id, kind, class, state, stage, waiting_on, payload_json, dispatched_at, created_at, updated_at)
-       VALUES (?, NULL, ?, 'partner', 'maintainer', 'open', 'checks', 'system', ?, ?, ?, ?)`,
+      `INSERT INTO changes (number, id, plugin_id, author_id, kind, class, state, stage, waiting_on, payload_json, dispatched_at, created_at, updated_at)
+       VALUES (${NEXT_NUMBER}, ?, NULL, ?, 'partner', 'maintainer', 'open', 'checks', 'system', ?, ?, ?, ?)`,
     ).bind(change, session.user.id, JSON.stringify(payload), t, t, t),
     event(env, change, 'submitted', session.user.id),
   ])

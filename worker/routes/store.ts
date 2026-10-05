@@ -5,7 +5,7 @@ import { Hono } from 'hono'
 import { atLeast } from '../lib/access'
 import { audit } from '../lib/audit'
 import { botEnabled, openBotPullRequest } from '../lib/bot'
-import { event, getChange, newChangeId } from '../lib/changes'
+import { event, getChange, newChangeId, NEXT_NUMBER } from '../lib/changes'
 import { dispatchApply } from '../lib/deployApp'
 import { draftKey, imageUrl, MAX_BYTES, MAX_SIDE, mediaBytes, mediaEnabled, mediaShas, publishedKey, publishMedia, sha256Hex, webpSize } from '../lib/media'
 import { pluginContext } from '../lib/pluginContext'
@@ -255,8 +255,8 @@ store.post('/plugins/:id/store/submit', requireSession, async (c) => {
 
   statements.push(
     c.env.DB.prepare(
-      `INSERT INTO changes (id, plugin_id, author_id, kind, class, state, stage, waiting_on, pr_number, payload_json, dispatched_at, created_at, updated_at)
-       VALUES (?, ?, ?, 'store', 'self_service', 'open', ?, ?, ?, ?, ?, ?, ?)`,
+      `INSERT INTO changes (number, id, plugin_id, author_id, kind, class, state, stage, waiting_on, pr_number, payload_json, dispatched_at, created_at, updated_at)
+       VALUES (${NEXT_NUMBER}, ?, ?, ?, 'store', 'self_service', 'open', ?, ?, ?, ?, ?, ?, ?)`,
     ).bind(change, ctx.id, session.user.id, stage, waitingOn, prNumber, JSON.stringify(payload), target === 'catalog' ? t : null, t, t),
     event(c.env, change, 'submitted', session.user.id, { delivery, items: items.length }),
     c.env.DB.prepare('DELETE FROM store_drafts WHERE plugin_id = ? AND author_id = ?').bind(ctx.id, session.user.id),
@@ -274,8 +274,8 @@ store.post('/plugins/:id/store/submit', requireSession, async (c) => {
     const movePayload = { kind: 'entry_update', plugin_id: ctx.id, operations: { store: payload.set_source }, reason: '', submitter, eligibility }
     await c.env.DB.batch([
       c.env.DB.prepare(
-        `INSERT INTO changes (id, plugin_id, author_id, kind, class, state, stage, waiting_on, payload_json, dispatched_at, created_at, updated_at)
-         VALUES (?, ?, ?, 'store_source', 'reviewed', 'open', 'checks', 'system', ?, ?, ?, ?)`,
+        `INSERT INTO changes (number, id, plugin_id, author_id, kind, class, state, stage, waiting_on, payload_json, dispatched_at, created_at, updated_at)
+         VALUES (${NEXT_NUMBER}, ?, ?, ?, 'store_source', 'reviewed', 'open', 'checks', 'system', ?, ?, ?, ?)`,
       ).bind(moveChange, ctx.id, session.user.id, JSON.stringify(movePayload), t, t, t),
       event(c.env, moveChange, 'submitted', session.user.id, { store: payload.set_source }),
     ])

@@ -25,6 +25,7 @@ const DAY = 86400
 
 interface AuditRow {
   id: number
+  change_number?: number | null
   actor_id: number | null
   login: string | null
   avatar_url: string | null
@@ -54,14 +55,14 @@ export function kindOf(action: string, actorId: number | null): Kind {
 
 // Where a record can be checked: a commit or pull request in the catalog
 // repository, else the portal change.
-function recordOf(env: Env, detail: Record<string, unknown> | null) {
+function recordOf(env: Env, detail: Record<string, unknown> | null, changeNumber: number | null = null) {
   const repo = env.CATALOG_REPO
   if (typeof detail?.commit === 'string')
     return { label: detail.commit.slice(0, 7), url: `https://github.com/${repo}/commit/${detail.commit}` }
   if (typeof detail?.pr === 'number')
     return { label: `PR #${detail.pr}`, url: `https://github.com/${repo}/pull/${detail.pr}` }
   if (typeof detail?.change === 'string')
-    return { label: detail.change, url: `/changes/${detail.change}` }
+    return changeNumber ? { label: `#${changeNumber}`, url: `/changes/${changeNumber}` } : { label: detail.change, url: `/changes/${detail.change}` }
   return null
 }
 
@@ -76,7 +77,7 @@ function present(env: Env, row: AuditRow) {
     action: row.action,
     subject: row.subject,
     detail,
-    record: recordOf(env, detail),
+    record: recordOf(env, detail, row.change_number ?? null),
   }
 }
 
@@ -101,7 +102,8 @@ function filters(query: Record<string, string | undefined>) {
   return { where, binds }
 }
 
-const SELECT = `SELECT a.*, u.login, u.avatar_url FROM audit a LEFT JOIN users u ON u.id = a.actor_id`
+const SELECT = `SELECT a.*, u.login, u.avatar_url, ch.number AS change_number FROM audit a LEFT JOIN users u ON u.id = a.actor_id
+  LEFT JOIN changes ch ON ch.id = json_extract(a.detail_json, '$.change')`
 
 function csvCell(value: unknown): string {
   const text = value === null || value === undefined ? '' : typeof value === 'string' ? value : JSON.stringify(value)

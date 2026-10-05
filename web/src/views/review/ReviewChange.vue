@@ -27,24 +27,33 @@ const data = ref<ReviewDetail | null>(null)
 const missing = ref(false)
 const id = computed(() => String(route.params.id))
 const detail = computed(() => data.value)
+// Actions use the internal id; the address shows the short number.
+const changeId = computed(() => data.value?.change.id ?? id.value)
 
 async function load() {
   try {
     data.value = await getReview(id.value)
     missing.value = false
+    const number = data.value.change.number
+    if (number && id.value !== String(number))
+      router.replace(`/review/${number}`)
   }
   catch {
     missing.value = true
   }
 }
-watch(id, load, { immediate: true })
+// Moving to the numbered address needs no second load.
+watch(id, (value) => {
+  if (!data.value || String(data.value.change.number) !== value)
+    load()
+}, { immediate: true })
 
 const change = computed(() => detail.value?.change ?? null)
 const entry = computed(() => (change.value?.entry ?? null) as Record<string, any> | null)
 const name = computed(() => localized(entry.value?.name) || change.value?.pluginId || '')
 useCrumbs(() => [
   { title: $gettext('Review queue'), to: '/review' },
-  ...(change.value ? [{ title: name.value }, { title: kindLabel(change.value.kind) }] : []),
+  ...(change.value ? [{ title: name.value }, { title: change.value.number ? `${kindLabel(change.value.kind)} #${change.value.number}` : kindLabel(change.value.kind) }] : []),
 ])
 const isOpen = computed(() => change.value?.state === 'open' && change.value.stage === 'review' && detail.value?.pull?.state === 'open')
 
@@ -245,7 +254,7 @@ watch([id, () => gettext.current], async () => {
   ai.value = null
   aiPicked.value = []
   aiError.value = ''
-  ai.value = await getAiReview(id.value, gettext.current).catch(() => null)
+  ai.value = await getAiReview(changeId.value, gettext.current).catch(() => null)
   pickWarnings()
 }, { immediate: true })
 function pickWarnings() {
@@ -255,7 +264,7 @@ async function runAi() {
   aiBusy.value = true
   aiError.value = ''
   try {
-    const result = await makeAiReview(id.value, gettext.current)
+    const result = await makeAiReview(changeId.value, gettext.current)
     ai.value = { enabled: true, review: result.review }
     pickWarnings()
   }
@@ -289,7 +298,7 @@ async function approve() {
   approving.value = true
   actionError.value = ''
   try {
-    await approveChange(id.value, '', unchecked.value)
+    await approveChange(changeId.value, '', unchecked.value)
     approveOpen.value = false
     await Promise.all([load(), reviewStore.refresh()])
   }
@@ -310,7 +319,7 @@ async function sendRequest() {
   requesting.value = true
   actionError.value = ''
   try {
-    await requestChanges(id.value, requestText.value)
+    await requestChanges(changeId.value, requestText.value)
     requestOpen.value = false
     requestText.value = ''
     await Promise.all([load(), reviewStore.refresh()])
@@ -333,7 +342,7 @@ async function sendReject() {
   rejecting.value = true
   actionError.value = ''
   try {
-    await rejectChange(id.value, rejectText.value)
+    await rejectChange(changeId.value, rejectText.value)
     rejectOpen.value = false
     rejectText.value = ''
     await Promise.all([load(), reviewStore.refresh()])
@@ -351,7 +360,7 @@ async function sendComment() {
     return
   commenting.value = true
   try {
-    await commentOnChange(id.value, comment.value)
+    await commentOnChange(changeId.value, comment.value)
     comment.value = ''
     await load()
   }
@@ -403,7 +412,7 @@ onKeyStroke('v', (e) => {
   compareMode.value = order[(order.indexOf(compareMode.value) + 1) % order.length]
 })
 function step(by: number) {
-  const at = queueIds.value.indexOf(id.value)
+  const at = queueIds.value.indexOf(changeId.value)
   const next = queueIds.value[at + by]
   if (next)
     router.push(`/review/${next}`)

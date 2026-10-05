@@ -1245,6 +1245,9 @@ msgstr "合并后几分钟内"
 msgid "Once Nginx UI refreshes its marketplace"
 msgstr "Nginx UI 刷新插件市场后"
 
+msgid "Change #%{n}"
+msgstr "更改 #%{n}"
+
 msgid "Change progress"
 msgstr "更改进度"
 
