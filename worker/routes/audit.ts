@@ -8,11 +8,11 @@ import { requireMaintainer, requireSession } from '../middleware/auth'
 
 const KINDS = {
   review: `a.action LIKE 'review.%'`,
-  self_service: `a.action IN ('change.self_service', 'store.submit', 'community.decide')`,
-  submission: `a.action = 'change.submit'`,
+  self_service: `(a.action IN ('change.self_service', 'change.withdraw', 'store.submit', 'community.decide') OR a.action LIKE 'vendor.%')`,
+  submission: `(a.action = 'change.submit' OR a.action LIKE 'partner.%')`,
   maintainer: `a.action LIKE 'maintain.%'`,
-  ai: `a.action = 'ai.draft'`,
-  settings: `(a.action LIKE 'ai.provider_%' OR a.action LIKE 'settings.%' OR a.action LIKE 'community.enable' OR a.action LIKE 'community.disable')`,
+  ai: `a.action IN ('ai.draft', 'ai.review')`,
+  settings: `(a.action LIKE 'ai.provider_%' OR a.action = 'ai.glossary_sync' OR a.action LIKE 'settings.%' OR a.action IN ('community.enable', 'community.disable'))`,
   system: `a.actor_id IS NULL`,
   account: `a.action LIKE 'auth.%'`,
 } as const
@@ -40,15 +40,15 @@ export function kindOf(action: string, actorId: number | null): Kind {
     return 'system'
   if (action.startsWith('review.'))
     return 'review'
-  if (action === 'change.self_service' || action === 'store.submit' || action === 'community.decide')
+  if (['change.self_service', 'change.withdraw', 'store.submit', 'community.decide'].includes(action) || action.startsWith('vendor.'))
     return 'self_service'
-  if (action === 'change.submit')
+  if (action === 'change.submit' || action.startsWith('partner.'))
     return 'submission'
   if (action.startsWith('maintain.'))
     return 'maintainer'
-  if (action === 'ai.draft')
+  if (action === 'ai.draft' || action === 'ai.review')
     return 'ai'
-  if (action.startsWith('ai.provider_') || action.startsWith('settings.') || action === 'community.enable' || action === 'community.disable')
+  if (action.startsWith('ai.') || action.startsWith('settings.') || action === 'community.enable' || action === 'community.disable')
     return 'settings'
   return 'account'
 }

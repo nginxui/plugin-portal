@@ -49,6 +49,9 @@ function pick(code: string) {
             <span class="pct">{{ item.pct }}%</span>
           </button>
         </template>
+        <div v-if="!items.length" class="group">
+          {{ $gettext('No language matches the search.') }}
+        </div>
         <template v-if="todo.length">
           <div class="group">
             {{ $gettext('Not translated, shows English') }}

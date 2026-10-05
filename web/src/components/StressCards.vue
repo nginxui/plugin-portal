@@ -53,7 +53,7 @@ function verdict(key: string) {
 <template>
   <ACard :title="$gettext('Marketplace cards')">
     <template #extra>
-      <span class="text-3 op-65">{{ $gettext('Cards in the list have a fixed width, a long name is cut short') }}</span>
+      <span class="text-3 op-65 extra-hint">{{ $gettext('Cards in the list have a fixed width, a long name is cut short') }}</span>
     </template>
     <div class="grid3" :class="theme">
       <div v-for="sample in samples" :key="sample.key" class="sample">
@@ -139,10 +139,10 @@ function verdict(key: string) {
 }
 
 .c-bad {
-  color: #cf1322;
+  color: var(--portal-err-text);
 }
 
 .c-ok {
-  color: #389e0d;
+  color: var(--portal-ok-text);
 }
 </style>

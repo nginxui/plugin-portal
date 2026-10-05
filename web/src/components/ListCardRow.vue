@@ -97,7 +97,8 @@ watch(() => [props.doc, props.stress, props.locale], measure, { deep: true })
         <span v-if="cut[l]" class="flag"><span class="i-tabler-cut" />{{ $gettext('Name cut short') }}</span>
       </article>
     </div>
-    <div v-if="estimate" class="hint">
+    <!-- With a stress test on, the results beside the preview say this. -->
+    <div v-if="estimate && stress === 'off'" class="hint">
       <span class="i-tabler-alert-triangle" />
       {{ estimateText(estimate) }}
     </div>
@@ -111,7 +112,7 @@ watch(() => [props.doc, props.stress, props.locale], measure, { deep: true })
   gap: 6px;
   margin-top: 8px;
   font-size: 12px;
-  color: #d48806;
+  color: var(--portal-warn-text);
 }
 
 .head {

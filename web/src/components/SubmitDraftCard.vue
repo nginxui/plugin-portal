@@ -38,7 +38,7 @@ const steps = computed(() => [1, 2, 3, 4].map(n => (n < props.draft.step ? 'done
       </div>
     </div>
     <div class="pcard-body">
-      <div class="steps" aria-hidden="true">
+      <div class="pcard-steps" aria-hidden="true">
         <span v-for="(state, i) in steps" :key="i" :class="state" />
       </div>
       <div class="text-3 op-65">
@@ -63,61 +63,7 @@ const steps = computed(() => [1, 2, 3, 4].map(n => (n < props.draft.step ? 'done
 </template>
 
 <style scoped>
-.pcard {
-  display: flex;
-  flex-direction: column;
-  border: 1px solid var(--portal-border);
-  border-radius: 8px;
-  background: var(--portal-card);
-  min-width: 0;
-}
-
-.pcard-head {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 16px;
-  border-bottom: 1px solid var(--portal-border);
-}
-
-.pcard-body {
-  display: flex;
-  flex-direction: column;
-  gap: 14px;
-  padding: 16px;
-  flex: 1;
-}
-
-.pcard-foot {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 4px;
-  padding: 8px 10px;
-  border-top: 1px solid var(--portal-border);
-}
-
-.steps {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 4px;
-}
-
-.steps span {
-  height: 4px;
-  border-radius: 2px;
-  background: var(--portal-border-strong);
-}
-
-.steps .done {
-  background: var(--portal-primary);
-}
-
-.steps .cur {
-  background: var(--portal-primary);
-  opacity: 0.4;
-}
-
 .c-warn {
-  color: #d48806;
+  color: var(--portal-warn-text);
 }
 </style>

@@ -72,13 +72,8 @@ const forThisPlugin = computed(() => signer.value?.pluginId === props.draft.id)
 }
 
 .chain.broken {
-  border-color: #ffccc7;
-  background: #fff2f0;
-}
-
-:global(html.dark) .chain.broken {
-  border-color: #58181c;
-  background: #2c1618;
+  border-color: var(--portal-err-border);
+  background: var(--portal-err-bg);
 }
 
 .link {
@@ -105,18 +100,10 @@ const forThisPlugin = computed(() => signer.value?.pluginId === props.draft.id)
 }
 
 .good {
-  color: #389e0d;
+  color: var(--portal-ok-text);
 }
 
 .bad {
-  color: #cf1322;
-}
-
-:global(html.dark) .good {
-  color: #6abe39;
-}
-
-:global(html.dark) .bad {
-  color: #e86e6b;
+  color: var(--portal-err-text);
 }
 </style>

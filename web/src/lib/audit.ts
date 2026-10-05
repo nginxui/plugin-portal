@@ -1,7 +1,7 @@
 import type { AuditEntry, AuditKind } from '@/api/audit'
 import { categoryLabel } from './categories'
 import { $gettext } from './gettext'
-import { joinList } from './labels'
+import { joinList, roleLabel, trustLabel } from './labels'
 
 export function auditKindLabel(kind: AuditKind): string {
   switch (kind) {
@@ -71,6 +71,19 @@ export function auditLines(entry: AuditEntry): string[] {
     case 'settings.bot': return [d.tokenChanged ? $gettext('Set the bot account @%{login} with a new token', { login: String(d.login ?? '') }) : $gettext('Set the bot account @%{login}', { login: String(d.login ?? '') })]
     case 'settings.bot_clear': return [$gettext('Removed the bot account settings')]
     case 'ai.glossary_sync': return [$gettext('Read the glossary again, %{n} languages', { n: String(d.locales ?? 0) })]
+    case 'change.withdraw': return [$gettext('Withdrew the change')]
+    case 'maintain.trust': return [$gettext('Asked to change the trust to %{trust}', { trust: trustLabel(String(d.trust ?? '')) || String(d.trust ?? '') })]
+    case 'maintain.delist': return [$gettext('Asked to delist the plugin')]
+    case 'maintain.block': return [$gettext('Asked to add it to the block list')]
+    case 'maintain.partner_approve': return [$gettext('Approved a partner request')]
+    case 'maintain.partner_decline': return [$gettext('Declined a partner request')]
+    case 'maintain.partner_revoke': return [$gettext('Revoked the partner key')]
+    case 'maintain.vendor_create': return [$gettext('Created the vendor %{name}', { name: String(d.name ?? entry.subject ?? '') })]
+    case 'partner.apply': return [$gettext('Applied to become a partner')]
+    case 'partner.key_request': return [String(d.kind ?? '').includes('revocation') ? $gettext('Asked for the partner key to be revoked') : $gettext('Asked for a new partner key')]
+    case 'vendor.member_add': return [$gettext('Added @%{login} as %{role}', { login: String(d.login ?? ''), role: roleLabel(d.role) })]
+    case 'vendor.member_role': return [$gettext('Changed the role of a member to %{role}', { role: roleLabel(d.role) })]
+    case 'vendor.member_remove': return [$gettext('Removed a member')]
     case 'change.self_service': {
       const ops = (d.operations ?? {}) as { yank?: string[], unyank?: string[], revoke_signers?: string[], categories?: string[] }
       const lines: string[] = []

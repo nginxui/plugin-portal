@@ -1,5 +1,10 @@
 import { $gettext } from './gettext'
 
+/** The page of a change, by its number once it has one. */
+export function changePath(change: { id: string, number?: number | null }, base = '/changes'): string {
+  return `${base}/${change.number ?? change.id}`
+}
+
 export function kindLabel(kind: string): string {
   switch (kind) {
     case 'new_listing': return $gettext('New listing')

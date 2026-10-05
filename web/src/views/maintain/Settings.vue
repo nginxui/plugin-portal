@@ -3,14 +3,17 @@ import type { Announcement, AnnouncementInput, PortalSettings } from '@/api/sett
 import { onMounted, ref } from 'vue'
 import { ApiError } from '@/api/client'
 import { clearBot, clearMail, createAnnouncement, deleteAnnouncement, getSettings, saveBot, saveMail, testMail, updateAnnouncement } from '@/api/settings'
+import { useFailure } from '@/lib/feedback'
 import gettext, { $gettext } from '@/lib/gettext'
 import { formatDay } from '@/lib/time'
 
 // Settings of the portal kept in its database: announcements for authors, the
 // mail service and the bot account. Secrets can be replaced, never read back.
 
+const failure = useFailure()
 const data = ref<PortalSettings | null>(null)
 const loading = ref(true)
+const failed = ref(false)
 const mail = ref({ url: '', from: '', key: '' })
 const bot = ref({ login: '', token: '' })
 
@@ -20,6 +23,10 @@ async function load() {
     data.value = await getSettings()
     mail.value = { url: data.value.mail.url, from: data.value.mail.from, key: '' }
     bot.value = { login: data.value.bot.login, token: '' }
+    failed.value = false
+  }
+  catch {
+    failed.value = true
   }
   finally {
     loading.value = false
@@ -100,7 +107,12 @@ async function saveAnnouncement() {
 }
 
 async function removeAnnouncement(item: Announcement) {
-  await deleteAnnouncement(item.id)
+  try {
+    await deleteAnnouncement(item.id)
+  }
+  catch {
+    failure()
+  }
   await load()
 }
 
@@ -129,9 +141,14 @@ async function submitMail() {
 }
 
 async function removeMail() {
-  const view = await clearMail()
-  data.value = { ...data.value!, ...view }
-  mail.value = { url: '', from: '', key: '' }
+  try {
+    const view = await clearMail()
+    data.value = { ...data.value!, ...view }
+    mail.value = { url: '', from: '', key: '' }
+  }
+  catch {
+    failure()
+  }
 }
 
 async function sendTest() {
@@ -171,9 +188,14 @@ async function submitBot() {
 }
 
 async function removeBot() {
-  const view = await clearBot()
-  data.value = { ...data.value!, ...view }
-  bot.value = { login: '', token: '' }
+  try {
+    const view = await clearBot()
+    data.value = { ...data.value!, ...view }
+    bot.value = { login: '', token: '' }
+  }
+  catch {
+    failure()
+  }
 }
 </script>
 
@@ -188,7 +210,15 @@ async function removeBot() {
       </ATypographyText>
     </div>
 
-    <AFlex vertical gap="middle">
+    <AAlert v-if="failed" type="error" show-icon :title="$gettext('The settings could not be loaded.')">
+      <template #action>
+        <AButton size="small" @click="load">
+          {{ $gettext('Retry') }}
+        </AButton>
+      </template>
+    </AAlert>
+
+    <AFlex v-else vertical gap="middle">
       <ACard :title="$gettext('Announcements')" :loading="loading">
         <template #extra>
           <AButton type="primary" size="small" @click="startCreate">
@@ -340,10 +370,10 @@ async function removeBot() {
 }
 
 .c-ok {
-  color: #389e0d;
+  color: var(--portal-ok-text);
 }
 
 .c-err {
-  color: #cf1322;
+  color: var(--portal-err-text);
 }
 </style>

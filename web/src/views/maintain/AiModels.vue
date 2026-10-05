@@ -2,12 +2,14 @@
 import type { Provider, ProviderInput } from '@/api/ai'
 import { computed, onMounted, ref } from 'vue'
 import { addProvider, getProviders, removeProvider, syncGlossary, testProvider, updateProvider } from '@/api/ai'
+import { useFailure } from '@/lib/feedback'
 import { $gettext } from '@/lib/gettext'
 import { formatTime } from '@/lib/time'
 
 // AI providers for drafts in the translation workbench (spec 9). Authors can
 // neither see nor change anything here.
 
+const failure = useFailure()
 const providers = ref<Provider[]>([])
 const usage = ref({ authors: 0, requests: 0, inputTokens: 0, outputTokens: 0 })
 const loading = ref(true)
@@ -17,6 +19,9 @@ async function syncNow() {
   syncing.value = true
   try {
     glossary.value = await syncGlossary()
+  }
+  catch {
+    failure()
   }
   finally {
     syncing.value = false
@@ -34,6 +39,9 @@ async function load() {
       glossary.value = data.glossary
     if (selectedId.value === null && data.providers.length)
       select(data.providers[0])
+  }
+  catch {
+    failure($gettext('The models could not be loaded.'))
   }
   finally {
     loading.value = false
@@ -92,15 +100,20 @@ async function save() {
 }
 
 async function makeDefault(p: Provider) {
-  await updateProvider(p.id, { is_default: true })
+  await updateProvider(p.id, { is_default: true }).catch(() => failure())
   await load()
 }
 
 async function remove() {
   if (typeof selectedId.value !== 'number')
     return
-  await removeProvider(selectedId.value)
-  selectedId.value = null
+  try {
+    await removeProvider(selectedId.value)
+    selectedId.value = null
+  }
+  catch {
+    failure()
+  }
   await load()
 }
 
@@ -111,6 +124,9 @@ async function runTest() {
   try {
     const result = await testProvider(selectedId.value)
     test.value = { ok: result.ok, text: result.ok ? $gettext('Connected in %{ms} ms: %{text}', { ms: String(result.ms ?? 0), text: result.text ?? '' }) : (result.message ?? $gettext('The provider did not answer.')) }
+  }
+  catch {
+    test.value = { ok: false, text: $gettext('The provider did not answer.') }
   }
   finally {
     testing.value = false
@@ -221,9 +237,11 @@ const host = (url: string | null, kind: string) => url ? url.replace(/^https:\/\
             <AButton v-if="typeof selectedId === 'number'" :loading="testing" @click="runTest">
               {{ $gettext('Test the connection') }}
             </AButton>
-            <AButton v-if="typeof selectedId === 'number'" danger @click="remove">
-              {{ $gettext('Remove') }}
-            </AButton>
+            <APopconfirm v-if="typeof selectedId === 'number'" :title="$gettext('Remove this model?')" :ok-text="$gettext('Remove')" :cancel-text="$gettext('Cancel')" @confirm="remove">
+              <AButton danger>
+                {{ $gettext('Remove') }}
+              </AButton>
+            </APopconfirm>
             <span v-if="test" class="text-3" :class="test.ok ? 'c-ok' : 'c-err'">
               <span :class="test.ok ? 'i-tabler-circle-check' : 'i-tabler-alert-circle'" /> {{ test.text }}
             </span>
@@ -320,6 +338,6 @@ const host = (url: string | null, kind: string) => url ? url.replace(/^https:\/\
 }
 
 .c-err {
-  color: #cf1322;
+  color: var(--portal-err-text);
 }
 </style>

@@ -322,31 +322,19 @@ const icons: Record<Tone, string> = {
 }
 
 .status.success {
-  color: #389e0d;
+  color: var(--portal-ok-text);
 }
 
 .status.warning {
-  color: #d48806;
+  color: var(--portal-warn-text);
 }
 
 .status.danger {
-  color: #cf1322;
+  color: var(--portal-err-text);
 }
 
 .status.secondary {
   opacity: 0.6;
-}
-
-:global(html.dark) .status.success {
-  color: #6abe39;
-}
-
-:global(html.dark) .status.warning {
-  color: #e8b339;
-}
-
-:global(html.dark) .status.danger {
-  color: #e86e6b;
 }
 
 .place-note {

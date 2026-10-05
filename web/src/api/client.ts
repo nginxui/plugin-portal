@@ -4,6 +4,15 @@ export class ApiError extends Error {
   }
 }
 
+// A session that ended sends the user to sign in again, then back to the page.
+let leaving = false
+function signInAgain() {
+  if (leaving || window.location.pathname === '/signin')
+    return
+  leaving = true
+  window.location.assign(`/signin?next=${encodeURIComponent(window.location.pathname + window.location.search)}`)
+}
+
 export async function api<T>(path: string, init: RequestInit & { json?: unknown } = {}): Promise<T> {
   const headers = new Headers(init.headers)
   const method = init.method ?? 'GET'
@@ -18,6 +27,8 @@ export async function api<T>(path: string, init: RequestInit & { json?: unknown 
   if (response.status === 204)
     return undefined as T
   const data = await response.json().catch(() => ({}))
+  if (response.status === 401 && path !== '/me' && !path.startsWith('/auth/'))
+    signInAgain()
   if (!response.ok)
     throw new ApiError(response.status, (data as { error?: string }).error ?? 'unknown')
   return data as T

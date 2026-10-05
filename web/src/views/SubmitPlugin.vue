@@ -365,7 +365,7 @@ onMounted(async () => {
               </div>
             </div>
             <ATypographyParagraph type="secondary" class="mt-4 mb-0 text-3">
-              {{ $gettext('Names in every language are reviewed with the submission. The description and screenshots come from plugin.json and update with every release.') }}
+              {{ $gettext('Names in every language are reviewed with the submission. The description and screenshots come from the store texts of each release and update with it.') }}
             </ATypographyParagraph>
           </ACard>
         </AFlex>
@@ -459,32 +459,18 @@ onMounted(async () => {
   gap: 4px;
   margin-left: 10px;
   font-size: 12px;
-  color: #389e0d;
-}
-
-:global(html.dark) .key-ok {
-  color: #6abe39;
+  color: var(--portal-ok-text);
 }
 
 .checks-banner {
   border-radius: 8px;
-  border: 1px solid #b7eb8f;
-  background: #f6ffed;
+  border: 1px solid var(--portal-ok-border);
+  background: var(--portal-ok-bg);
 }
 
 .checks-banner.warn {
-  border-color: #ffe58f;
-  background: #fffbe6;
-}
-
-:global(html.dark) .checks-banner {
-  border-color: #274916;
-  background: #162312;
-}
-
-:global(html.dark) .checks-banner.warn {
-  border-color: #594214;
-  background: #2b2111;
+  border-color: var(--portal-warn-border);
+  background: var(--portal-warn-bg);
 }
 
 .checks-summary {

@@ -5,7 +5,7 @@ import { computed, onMounted, ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { ApiError } from '@/api/client'
 import { approveBatch, approveChange, getQueue, requestChanges } from '@/api/review'
-import { kindLabel } from '@/lib/changeKinds'
+import { changePath, kindLabel } from '@/lib/changeKinds'
 import { $gettext } from '@/lib/gettext'
 import { localized } from '@/lib/labels'
 import { fromNow, waited } from '@/lib/time'
@@ -41,6 +41,7 @@ async function load() {
     recent.value = queue.recent
     done.value = queue.done ?? []
     reviewStore.count(items.value)
+    failed.value = false
     selected.value = selected.value.filter(id => items.value.some(i => i.id === id && batchable(i)))
   }
   catch {
@@ -109,6 +110,15 @@ function kindColor(kind: string): string {
 
 const checkIcon: Record<string, string> = { ok: 'i-tabler-circle-check', fail: 'i-tabler-circle-x', run: 'i-tabler-clock' }
 
+// How a finished change ended.
+function outcome(item: QueueItem): { color: string, text: string } {
+  if (item.state === 'rejected')
+    return { color: 'error', text: $gettext('Rejected') }
+  if (item.state === 'withdrawn')
+    return { color: 'default', text: $gettext('Withdrawn') }
+  return { color: 'success', text: $gettext('Merged') }
+}
+
 function checkState(item: QueueItem): { tone: string, text: string } {
   if (item.stage === 'checks' && item.waitingOn === 'system' && !item.outcome)
     return { tone: 'run', text: $gettext('Running') }
@@ -117,13 +127,9 @@ function checkState(item: QueueItem): { tone: string, text: string } {
   return { tone: 'ok', text: $gettext('Passed check') }
 }
 
-function open(item: QueueItem | undefined, newTab = false) {
-  if (!item)
-    return
-  if (newTab)
-    window.open(router.resolve(`/review/${item.id}`).href, '_blank', 'noopener')
-  else
-    router.push(`/review/${item.id}`)
+function open(item: QueueItem | undefined) {
+  if (item)
+    router.push(changePath(item, '/review'))
 }
 
 function toggle(item: QueueItem, on = !selected.value.includes(item.id)) {
@@ -299,7 +305,7 @@ onKeyStroke('/', (e) => {
     <div class="cols">
       <ACard :loading="loading" class="col-main" :styles="{ body: { padding: 0 } }">
         <div class="toolbar">
-          <ASegmented v-model:value="filter" :options="filters" />
+          <ASegmented v-model:value="filter" :options="filters" class="scroll-x" />
           <span class="flex-1" />
           <ASelect v-model:value="kindFilter" :options="kindOptions" class="w-36" :aria-label="$gettext('Kind of change')" />
           <AInput ref="searchInput" v-model:value="search" class="search" allow-clear :placeholder="$gettext('Plugin ID or author')" :aria-label="$gettext('Search')">
@@ -337,8 +343,8 @@ onKeyStroke('/', (e) => {
                 <th>{{ $gettext('Kind of change') }}</th>
                 <th>{{ $gettext('Plugin') }}</th>
                 <th>{{ $gettext('Author') }}</th>
-                <th>{{ $gettext('Checks') }}</th>
-                <th>{{ $gettext('Waiting') }}</th>
+                <th>{{ filter === 'done' ? $gettext('Outcome') : $gettext('Checks') }}</th>
+                <th>{{ filter === 'done' ? $gettext('Finished') : $gettext('Waiting') }}</th>
                 <th>{{ $gettext('Actions') }}</th>
               </tr>
             </thead>
@@ -384,15 +390,18 @@ onKeyStroke('/', (e) => {
                   @{{ item.author }}
                 </td>
                 <td class="nowrap">
-                  <span class="check" :class="checkState(item).tone"><span :class="checkIcon[checkState(item).tone]" />{{ checkState(item).text }}</span>
+                  <ATag v-if="filter === 'done'" :color="outcome(item).color" class="m-0">
+                    {{ outcome(item).text }}
+                  </ATag>
+                  <span v-else class="check" :class="checkState(item).tone"><span :class="checkIcon[checkState(item).tone]" />{{ checkState(item).text }}</span>
                 </td>
                 <td class="nowrap">
-                  <span class="op-75">{{ waited(item.updatedAt) }}</span>
+                  <span class="op-75">{{ filter === 'done' ? fromNow(item.updatedAt) : waited(item.updatedAt) }}</span>
                 </td>
                 <td class="nowrap text-right">
-                  <RouterLink :to="`/review/${item.id}`">
+                  <RouterLink :to="changePath(item, '/review')">
                     <AButton size="small" :type="index === focus ? 'primary' : 'default'">
-                      {{ $gettext('Review') }}
+                      {{ filter === 'done' ? $gettext('View') : $gettext('Review') }}
                     </AButton>
                   </RouterLink>
                 </td>
@@ -421,7 +430,7 @@ onKeyStroke('/', (e) => {
             </RouterLink>
           </template>
           <div v-if="recent.length" class="timeline">
-            <RouterLink v-for="change in recent" :key="change.id" :to="`/changes/${change.id}`" class="tl-item">
+            <RouterLink v-for="change in recent" :key="change.id" :to="changePath(change)" class="tl-item">
               <span class="tl-dot" :class="change.kind === 'yank' || change.kind === 'revoke_signer' ? 'warn' : change.state === 'live' ? 'ok' : ''" />
               <div class="min-w-0">
                 <div class="tl-text">
@@ -667,23 +676,15 @@ onKeyStroke('/', (e) => {
 }
 
 .check.ok {
-  color: #389e0d;
+  color: var(--portal-ok-text);
 }
 
 .check.fail {
-  color: #cf1322;
+  color: var(--portal-err-text);
 }
 
 .check.run {
   opacity: 0.7;
-}
-
-:global(html.dark) .check.ok {
-  color: #6abe39;
-}
-
-:global(html.dark) .check.fail {
-  color: #e86e6b;
 }
 
 .keys {

@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { kindLabel } from '@/lib/changeKinds'
+import { changePath, kindLabel } from '@/lib/changeKinds'
 import { $gettext } from '@/lib/gettext'
 import { localized } from '@/lib/labels'
 import { pluginSections } from '@/lib/pluginSections'
@@ -48,7 +48,7 @@ const strip = computed(() => {
   else
     text = $gettext('%{kind}, being checked', { kind: kindLabel(change.kind) })
   return {
-    id: change.id,
+    to: changePath(change),
     warn: change.waitingOn === 'author',
     text: $gettext('%{text}, waiting %{time}', { text, time: waited(change.updatedAt) }),
     track: STAGES.map((_, i) => i < at ? 'done' : i === at ? (change.waitingOn === 'author' ? 'warn' : 'cur') : ''),
@@ -74,7 +74,7 @@ const strip = computed(() => {
     <ASkeleton v-else-if="!plugin" active avatar />
     <template v-else>
       <PluginHeader :plugin="plugin">
-        <RouterLink v-if="strip" :to="`/changes/${strip.id}`" class="track-strip" :class="{ warn: strip.warn }">
+        <RouterLink v-if="strip" :to="strip.to" class="track-strip" :class="{ warn: strip.warn }">
           <span class="font-500 nowrap">{{ $gettext('Change in progress') }}</span>
           <span class="mini-track" aria-hidden="true"><span v-for="(state, i) in strip.track" :key="i" :class="state" /></span>
           <span class="flex-1 min-w-0 truncate">{{ strip.text }}</span>

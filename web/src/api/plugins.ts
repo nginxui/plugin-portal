@@ -56,7 +56,7 @@ export interface PluginDetail {
   releases: Release[]
   revokedSigners: string[]
   // The newest self service change still in progress, or merged and not live.
-  pending: { id: string, kind: string } | null
+  pending: { id: string, number?: number | null, kind: string } | null
   openChanges: OpenChange[]
   store: { source: 'repo' | 'catalog', follow?: 'branch' | 'release' } | null
   listed: boolean
@@ -73,6 +73,7 @@ export interface PluginDetail {
 
 export interface OpenChange {
   id: string
+  number?: number | null
   kind: string
   class: string
   stage: string

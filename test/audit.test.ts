@@ -51,6 +51,31 @@ describe('audit', () => {
     expect(await get('subject=%25')).toEqual([])
   })
 
+  // Every action falls under the kind its filter finds it by.
+  it('files withdrawals, vendor members, partner requests and AI reviews under a kind', async () => {
+    const cookie = await maintainer()
+    const t = Math.floor(Date.now() / 1000)
+    const actions = ['change.withdraw', 'vendor.member_add', 'partner.apply', 'ai.review', 'ai.glossary_sync', 'maintain.trust']
+    await env.DB.batch([
+      env.DB.prepare(`INSERT INTO users (id, login, created_at, last_seen_at) VALUES (77, 'octo', ?, ?)`).bind(t, t),
+      ...actions.map((action, i) => env.DB.prepare(`INSERT INTO audit (actor_id, action, subject, at) VALUES (77, ?, 'x', ?)`).bind(action, t - 60 + i)),
+    ])
+    const body = await (await call('/api/audit?actor=octo', { cookie })).json() as { entries: { action: string, kind: string }[] }
+    expect(Object.fromEntries(body.entries.map(e => [e.action, e.kind]))).toEqual({
+      'change.withdraw': 'self_service',
+      'vendor.member_add': 'self_service',
+      'partner.apply': 'submission',
+      'ai.review': 'ai',
+      'ai.glossary_sync': 'settings',
+      'maintain.trust': 'maintainer',
+    })
+    for (const kind of ['self_service', 'submission', 'ai', 'settings', 'maintainer']) {
+      const found = await (await call(`/api/audit?actor=octo&kind=${kind}`, { cookie })).json() as { entries: { kind: string }[] }
+      expect(found.entries.length).toBeGreaterThan(0)
+      expect(found.entries.every(e => e.kind === kind)).toBe(true)
+    }
+  })
+
   it('exports CSV without formulas', async () => {
     const cookie = await maintainer()
     await seed()

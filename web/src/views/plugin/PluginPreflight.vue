@@ -43,6 +43,9 @@ watch(() => plugin.value.id, async (id) => {
     target.value = refs.value.default.name
     run()
   }
+  else {
+    failed.value = $gettext('The branches and tags of the repository could not be read. Please try again later.')
+  }
 }, { immediate: true })
 
 async function run() {
@@ -94,8 +97,6 @@ function title(row: DiffRow): string {
 function code(row: DiffRow): string {
   if (row.kind === 'min_nginx_ui_version' || row.kind === 'name' || row.kind === 'description')
     return ''
-  if (row.kind === 'permission')
-    return row.subject
   return row.subject
 }
 
@@ -373,33 +374,18 @@ const SIGNS = { add: '+', del: '−', mod: '~' }
 }
 
 .sign.add {
-  color: #389e0d;
-  background: #f6ffed;
+  color: var(--portal-ok-text);
+  background: var(--portal-ok-bg);
 }
 
 .sign.del {
-  color: #cf1322;
-  background: #fff1f0;
+  color: var(--portal-err-text);
+  background: var(--portal-err-bg);
 }
 
 .sign.mod {
-  color: #d48806;
-  background: #fffbe6;
-}
-
-:global(html.dark) .sign.add {
-  color: #6abe39;
-  background: #162312;
-}
-
-:global(html.dark) .sign.del {
-  color: #e86e6b;
-  background: #2a1215;
-}
-
-:global(html.dark) .sign.mod {
-  color: #e8b339;
-  background: #2b2111;
+  color: var(--portal-warn-text);
+  background: var(--portal-warn-bg);
 }
 
 .code {

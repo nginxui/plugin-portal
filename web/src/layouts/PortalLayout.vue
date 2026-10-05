@@ -125,8 +125,17 @@ const languageItems = computed<MenuProps['items']>(() =>
   Object.entries(languages).map(([key, label]) => ({ key, label })),
 )
 
+// On a phone the language and the theme move into the account menu, so the
+// header keeps room for the name of the page.
 const userItems = computed<MenuProps['items']>(() => [
   { key: 'github', label: $gettext('GitHub profile'), icon: icon('i-tabler-brand-github') },
+  ...(isMobile.value
+    ? [
+        { type: 'divider' as const },
+        { key: 'theme', label: isDark.value ? $gettext('Light mode') : $gettext('Dark mode'), icon: icon(isDark.value ? 'i-tabler-sun' : 'i-tabler-moon') },
+        ...Object.entries(languages).map(([key, label]) => ({ key: `language:${key}`, label, icon: icon(key === gettext.current ? 'i-tabler-check' : 'i-tabler-world') })),
+      ]
+    : []),
   { type: 'divider' },
   { key: 'logout', label: $gettext('Sign out'), icon: icon('i-tabler-logout') },
 ])
@@ -138,6 +147,12 @@ function onLanguageMenu({ key }: { key: string | number }) {
 async function onUserMenu({ key }: { key: string | number }) {
   if (key === 'github' && session.user) {
     window.open(`https://github.com/${session.user.login}`, '_blank', 'noopener')
+  }
+  else if (key === 'theme') {
+    toggleTheme()
+  }
+  else if (String(key).startsWith('language:')) {
+    setLanguage(String(key).slice(9))
   }
   else if (key === 'logout') {
     await session.logout()
@@ -160,7 +175,7 @@ async function onUserMenu({ key }: { key: string | number }) {
           <span class="i-tabler-menu-2 text-5" />
         </AButton>
         <div class="crumbs">
-          <span v-if="isMobile && crumbs.length" class="truncate">{{ crumbs[crumbs.length - 1].title }}</span>
+          <span v-if="isMobile && crumbs.length" class="truncate font-500">{{ crumbs[crumbs.length - 1].title }}</span>
           <ABreadcrumb v-else-if="crumbs.length" :items="crumbItems" />
         </div>
         <AButton type="text" :aria-label="$gettext('Search and commands')" @click="palette.show()">
@@ -168,13 +183,13 @@ async function onUserMenu({ key }: { key: string | number }) {
           <span v-if="!isMobile" class="search-hint"><kbd>{{ palette.modifier }}</kbd><kbd>K</kbd></span>
         </AButton>
         <NotificationBell v-if="session.user" />
-        <ADropdown :menu="{ items: languageItems, selectable: true, selectedKeys: [gettext.current], onClick: onLanguageMenu }">
+        <ADropdown v-if="!isMobile" :menu="{ items: languageItems, selectable: true, selectedKeys: [gettext.current], onClick: onLanguageMenu }">
           <AButton type="text" :aria-label="$gettext('Language')">
             <span class="i-tabler-world text-4" />
-            <span v-if="!isMobile">{{ languages[gettext.current] }}</span>
+            <span>{{ languages[gettext.current] }}</span>
           </AButton>
         </ADropdown>
-        <AButton type="text" :aria-label="$gettext('Toggle dark mode')" @click="toggleTheme">
+        <AButton v-if="!isMobile" type="text" :aria-label="$gettext('Toggle dark mode')" @click="toggleTheme">
           <span :class="isDark ? 'i-tabler-sun' : 'i-tabler-moon'" class="text-4" />
         </AButton>
         <ADropdown v-if="session.user" :menu="{ items: userItems, onClick: onUserMenu }">
@@ -183,7 +198,7 @@ async function onUserMenu({ key }: { key: string | number }) {
               {{ session.user.login.slice(0, 1).toUpperCase() }}
             </AAvatar>
             <span v-if="!isMobile">{{ session.user.login }}</span>
-            <span class="i-tabler-chevron-down text-3" />
+            <span v-if="!isMobile" class="i-tabler-chevron-down text-3" />
           </AButton>
         </ADropdown>
       </ALayoutHeader>

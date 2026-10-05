@@ -20,7 +20,7 @@ const tabs = computed(() => pluginSections(router, props.plugin.id))
   <div class="head-card">
     <AFlex gap="middle" align="center" wrap class="head">
       <PluginIcon :src="plugin.iconUrl" :name="name" :size="64" />
-      <div class="flex-1 min-w-0">
+      <div class="head-main">
         <AFlex gap="small" align="center" wrap>
           <h1 class="page-title m-0">
             {{ name }}

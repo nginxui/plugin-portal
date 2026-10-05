@@ -2,6 +2,7 @@
 import type { TranslatePlugin, TranslatorOverview } from '@/api/community'
 import { computed, onMounted, ref, watch } from 'vue'
 import { getGlossary, getTranslatePlugin, getTranslator, setTranslatorLangs, suggest } from '@/api/community'
+import { useFailure } from '@/lib/feedback'
 import gettext, { $gettext } from '@/lib/gettext'
 import { termsIn } from '@/lib/glossary'
 import { HOST_LOCALES, RTL_LOCALES } from '@/lib/hostLocales'
@@ -13,6 +14,7 @@ import { fromNow } from '@/lib/time'
 // open to community translation that lack them, a grid to suggest in, and the
 // user's suggestions through review.
 
+const failure = useFailure()
 const overview = ref<TranslatorOverview | null>(null)
 const failed = ref(false)
 const sort = ref<'missing' | 'installs' | 'updated'>('missing')
@@ -33,7 +35,11 @@ onMounted(load)
 const others = HOST_LOCALES.filter(l => l !== 'en')
 const adding = ref(false)
 async function setLangs(locales: string[]) {
-  const result = await setTranslatorLangs(locales)
+  const result = await setTranslatorLangs(locales).catch(() => null)
+  if (!result) {
+    failure()
+    return
+  }
   if (overview.value)
     overview.value.langs = result.locales
   if (!lang.value || !result.locales.includes(lang.value))
@@ -66,10 +72,15 @@ const sending = ref(false)
 const sent = ref('')
 const error = ref('')
 
-async function open(id: string) {
+// What the user already suggested and waits for review, by field.
+const waiting = ref<Record<string, string>>({})
+
+async function open(id: string, keepNotice = false) {
   current.value = await getTranslatePlugin(id).catch(() => null)
-  values.value = Object.fromEntries((current.value?.mine ?? []).filter(m => m.locale === lang.value).map(m => [m.field, m.text]))
-  sent.value = ''
+  waiting.value = Object.fromEntries((current.value?.mine ?? []).filter(m => m.locale === lang.value).map(m => [m.field, m.text]))
+  values.value = { ...waiting.value }
+  if (!keepNotice)
+    sent.value = ''
   error.value = ''
 }
 watch(lang, () => {
@@ -77,17 +88,18 @@ watch(lang, () => {
     open(current.value.pluginId)
 })
 
-function fieldLabel(field: string, index: number) {
+function fieldLabel(field: string) {
   if (field === 'name')
     return $gettext('Name')
   if (field === 'description')
     return $gettext('Description')
-  return $gettext('Caption of screenshot %{n}', { n: String(index - 1) })
+  const captions = (current.value?.rows ?? []).filter(r => r.field.startsWith('caption:'))
+  return $gettext('Caption of screenshot %{n}', { n: String(captions.findIndex(r => r.field === field) + 1) })
 }
 
 const changed = computed(() => Object.entries(values.value).filter(([field, text]) => {
   const row = current.value?.rows.find(r => r.field === field)
-  return text.trim() && text.trim() !== (row?.all[lang.value!] ?? '')
+  return text.trim() && text.trim() !== (row?.all[lang.value!] ?? '') && text.trim() !== (waiting.value[field] ?? '')
 }))
 
 async function send() {
@@ -99,7 +111,7 @@ async function send() {
     for (const [field, text] of changed.value)
       await suggest(current.value.pluginId, field, lang.value, text.trim())
     sent.value = $gettext('%{n} suggestions sent for review.', { n: String(changed.value.length) })
-    await load()
+    await Promise.all([load(), open(current.value.pluginId, true)])
   }
   catch {
     error.value = $gettext('Some suggestions could not be sent. Check them for words a name may not hold.')
@@ -182,7 +194,7 @@ const PROGRESS: Record<string, { text: (n: number | null) => string, track: stri
       <AFlex vertical gap="middle" class="col-main">
         <ACard :title="lang ? $gettext('Plugins that need %{lang}', { lang: localeName(lang) }) : ''">
           <template #extra>
-            <span class="text-3 op-65">{{ $gettext('%{n} plugins welcome community translation', { n: String(overview?.open.length ?? 0) }) }}</span>
+            <span class="text-3 op-65 extra-hint">{{ $gettext('%{n} plugins welcome community translation', { n: String(overview?.open.length ?? 0) }) }}</span>
           </template>
           <AEmpty v-if="!plugins.length" :image-style="{ height: '40px' }" :description="$gettext('No plugin is open to community translation in this language yet.')" />
           <div v-for="p in plugins" :key="p.pluginId" class="need">
@@ -226,8 +238,8 @@ const PROGRESS: Record<string, { text: (n: number | null) => string, track: stri
                 </tr>
               </thead>
               <tbody>
-                <tr v-for="(row, i) in current.rows.filter(r => r.en)" :key="row.field">
-                  <td>{{ fieldLabel(row.field, i) }}</td>
+                <tr v-for="row in current.rows.filter(r => r.en)" :key="row.field">
+                  <td>{{ fieldLabel(row.field) }}</td>
                   <td>{{ row.en }}</td>
                   <td :dir="RTL_LOCALES.includes(lang) ? 'rtl' : 'ltr'">
                     <span v-if="row.all[lang]">{{ row.all[lang] }}</span>
@@ -369,7 +381,7 @@ const PROGRESS: Record<string, { text: (n: number | null) => string, track: stri
 }
 
 .c-ok {
-  color: #389e0d;
+  color: var(--portal-ok-text);
 }
 
 .need {

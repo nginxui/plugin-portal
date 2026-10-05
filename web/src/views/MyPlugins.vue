@@ -7,7 +7,7 @@ import { computed, onMounted, ref } from 'vue'
 import { getChanges } from '@/api/changes'
 import { getInsights, getMyPlugins } from '@/api/plugins'
 import { getAnnouncements } from '@/api/settings'
-import { kindLabel } from '@/lib/changeKinds'
+import { changePath, kindLabel } from '@/lib/changeKinds'
 import gettext, { $gettext } from '@/lib/gettext'
 import { joinList, localized } from '@/lib/labels'
 import { localeName } from '@/lib/locales'
@@ -87,10 +87,12 @@ const shown = computed(() => ownerFilter.value === 'all'
 
 const changeOf = (id: string) => changes.value.find(c => c.pluginId === id && c.state === 'open')
 const nameOf = (id: string | null) => localized(plugins.value.find(p => p.id === id)?.name) || id || ''
+const iconOf = (id: string | null) => plugins.value.find(p => p.id === id)?.iconUrl ?? null
 
 interface Todo {
   key: string
   plugin: string
+  icon?: string | null
   title: string
   sub: string
   action: string
@@ -109,13 +111,13 @@ const todos = computed<Todo[]>(() => {
       const sub = change.askedBy && change.askedFor
         ? $gettext('%{name}, @%{login} asked %{time}: %{text}', { name, login: change.askedBy, time: formatTime(change.askedAt ?? change.updatedAt), text: change.askedFor.length > 40 ? `${change.askedFor.slice(0, 40)}…` : change.askedFor })
         : $gettext('%{name}, a maintainer asked for changes %{time}', { name, time: fromNow(change.updatedAt) })
-      out.push({ key: change.id, plugin: name, title: $gettext('Answer the review'), sub, action: $gettext('View'), to: `/changes/${change.id}`, primary: true })
+      out.push({ key: change.id, plugin: name, icon: iconOf(change.pluginId), title: $gettext('Answer the review'), sub, action: $gettext('View'), to: changePath(change), primary: true })
     }
     else if (change.stage === 'review') {
-      out.push({ key: change.id, plugin: name, title: $gettext('Merge the store change'), sub: $gettext('%{name}, pull request #%{n} waiting %{time}', { name, n: String(change.prNumber ?? ''), time: waited(change.updatedAt) }), action: $gettext('Follow the change'), to: `/changes/${change.id}` })
+      out.push({ key: change.id, plugin: name, icon: iconOf(change.pluginId), title: $gettext('Merge the store change'), sub: $gettext('%{name}, pull request #%{n} waiting %{time}', { name, n: String(change.prNumber ?? ''), time: waited(change.updatedAt) }), action: $gettext('Follow the change'), to: changePath(change) })
     }
     else {
-      out.push({ key: change.id, plugin: name, title: $gettext('Fix what the checks found'), sub: $gettext('%{name}, %{kind}', { name, kind: kindLabel(change.kind) }), action: $gettext('View'), to: `/changes/${change.id}`, primary: true })
+      out.push({ key: change.id, plugin: name, icon: iconOf(change.pluginId), title: $gettext('Fix what the checks found'), sub: $gettext('%{name}, %{kind}', { name, kind: kindLabel(change.kind) }), action: $gettext('View'), to: changePath(change), primary: true })
     }
   }
   for (const plugin of plugins.value) {
@@ -125,13 +127,14 @@ const todos = computed<Todo[]>(() => {
     const name = localized(plugin.name)
     if (i.screenshots.total > i.screenshots.dark) {
       const missing = i.screenshots.total - i.screenshots.dark
-      out.push({ key: `${plugin.id}:dark`, plugin: name, title: $gettext('Add dark screenshots'), sub: $gettext('%{name}, %{n} screenshots have only a light version', { name, n: String(missing) }), action: $gettext('Screenshot studio'), to: `/plugins/${plugin.id}/screenshots` })
+      out.push({ key: `${plugin.id}:dark`, plugin: name, icon: plugin.iconUrl, title: $gettext('Add dark screenshots'), sub: $gettext('%{name}, %{n} screenshots have only a light version', { name, n: String(missing) }), action: $gettext('Screenshot studio'), to: `/plugins/${plugin.id}/screenshots` })
     }
     if (i.untranslated.length) {
       const names = joinList(i.untranslated.slice(0, 5).map(localeName))
       out.push({
         key: `${plugin.id}:i18n`,
         plugin: name,
+        icon: plugin.iconUrl,
         title: $gettext('Translate into %{n} more languages', { n: String(i.untranslated.length) }),
         sub: i.untranslated.length > 5 ? $gettext('%{name}, %{list} and more', { name, list: names }) : $gettext('%{name}, %{list}', { name, list: names }),
         action: $gettext('Translation workbench'),
@@ -150,7 +153,7 @@ const recentReleases = computed(() => plugins.value
 
 const activity = computed(() => plugins.value
   .filter(p => p.repo && typeof insights.value[p.id]?.openIssues === 'number')
-  .map(p => ({ id: p.id, name: localized(p.name), repo: p.repo!, issues: insights.value[p.id].openIssues ?? 0 })))
+  .map(p => ({ id: p.id, name: localized(p.name), icon: p.iconUrl, repo: p.repo!, issues: insights.value[p.id].openIssues ?? 0 })))
 </script>
 
 <template>
@@ -194,7 +197,7 @@ const activity = computed(() => plugins.value
             </ATag>
           </template>
           <div v-for="todo in todos" :key="todo.key" class="todo">
-            <PluginIcon :name="todo.plugin" :size="28" />
+            <PluginIcon :src="todo.icon" :name="todo.plugin" :size="28" />
             <div class="min-w-0 flex-1">
               <div>{{ todo.title }}</div>
               <div class="text-3 op-65">
@@ -210,19 +213,19 @@ const activity = computed(() => plugins.value
         </ACard>
 
         <ASkeleton v-if="loading" active />
-        <ACard v-else-if="shown.length === 0 && !drafts.length">
+        <ACard v-else-if="!failed && shown.length === 0 && !drafts.length">
           <AEmpty :description="$gettext('You have no role on any listed plugin yet.')">
             <ATypographyText type="secondary" class="text-3">
               {{ $gettext('Plugins appear here when you have admin, maintain, write or triage permission on their repository.') }}
             </ATypographyText>
           </AEmpty>
         </ACard>
-        <div v-else class="grid">
+        <div v-else-if="!failed" class="grid">
           <PluginCard v-for="plugin in shown" :key="plugin.id" :plugin="plugin" :insights="insights[plugin.id]" :change="changeOf(plugin.id)" />
           <SubmitDraftCard v-for="draft in ownerFilter === 'all' ? drafts : []" :key="draft.repo" :draft="draft" @discard="savedDrafts = savedDrafts.filter(d => d.repo !== draft.repo)" />
         </div>
 
-        <ACard :title="$gettext('Repositories you can submit')" :loading="loading">
+        <ACard v-if="!failed" :title="$gettext('Repositories you can submit')" :loading="loading">
           <template #extra>
             <a :href="installUrl" target="_blank" rel="noopener" class="text-3">
               {{ $gettext('Install the app on another repository') }}
@@ -299,7 +302,7 @@ const activity = computed(() => plugins.value
           <AFlex vertical gap="10">
             <AFlex v-for="item in activity" :key="item.id" justify="space-between" align="center" gap="small">
               <AFlex align="center" gap="small" class="min-w-0">
-                <PluginIcon :name="item.name" :size="24" />
+                <PluginIcon :src="item.icon" :name="item.name" :size="24" />
                 <span class="truncate">{{ item.name }}</span>
               </AFlex>
               <a v-if="item.issues" :href="`https://github.com/${item.repo}/issues`" target="_blank" rel="noopener" class="text-3 nowrap">{{ $gettext('%{n} open issues', { n: String(item.issues) }) }}</a>
@@ -314,7 +317,10 @@ const activity = computed(() => plugins.value
                 {{ inPortalLanguage(item.title) }}
               </div>
               <div class="text-3 op-65">
-                {{ inPortalLanguage(item.text) }} {{ formatDay(item.date) }}
+                {{ inPortalLanguage(item.text) }}
+              </div>
+              <div class="text-3 op-50">
+                {{ formatDay(item.date) }}
               </div>
             </div>
             <span v-if="!announcements.length" class="text-3 op-65">{{ $gettext('No announcements.') }}</span>
@@ -383,6 +389,10 @@ const activity = computed(() => plugins.value
 
 .tl-dot.warn {
   background: #faad14;
+}
+
+.tl-dot.info {
+  background: var(--portal-primary);
 }
 
 .link-row {

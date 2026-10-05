@@ -20,13 +20,15 @@ const emit = defineEmits<{ navigate: [key: string] }>()
         </div>
       </div>
     </div>
-    <AMenu
-      mode="inline"
-      :items="items"
-      :selected-keys="selectedKeys"
-      :styles="{ root: { borderInlineEnd: 'none' } }"
-      @click="({ key }) => emit('navigate', String(key))"
-    />
+    <div class="nav-menu">
+      <AMenu
+        mode="inline"
+        :items="items"
+        :selected-keys="selectedKeys"
+        :styles="{ root: { borderInlineEnd: 'none' } }"
+        @click="({ key }) => emit('navigate', String(key))"
+      />
+    </div>
     <div class="sider-foot">
       <a href="https://nginxui.com/guide/plugins.html" target="_blank" rel="noopener" class="foot-link">
         <span class="i-tabler-book" />
@@ -61,6 +63,13 @@ const emit = defineEmits<{ navigate: [key: string] }>()
   padding: 0 20px;
 }
 
+/* The menu scrolls on a short window, so the links under it stay in view. */
+.nav-menu {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+}
+
 .logo-name {
   font-weight: 600;
   font-size: 16px;
@@ -75,7 +84,6 @@ const emit = defineEmits<{ navigate: [key: string] }>()
 
 .sider-foot {
   flex: none;
-  margin-top: auto;
   padding: 8px;
   border-top: 1px solid var(--portal-border);
   display: flex;

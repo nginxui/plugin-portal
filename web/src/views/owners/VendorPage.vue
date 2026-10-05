@@ -160,7 +160,7 @@ const ROLES: Role[] = ['admin', 'publisher', 'translator']
           <AAvatar :size="56" shape="square">
             {{ initials(D.vendor.name) }}
           </AAvatar>
-          <div class="flex-1 min-w-0">
+          <div class="head-main">
             <AFlex align="center" gap="small" wrap>
               <h1 class="page-title m-0">
                 {{ D.vendor.name }}
@@ -221,7 +221,7 @@ const ROLES: Role[] = ['admin', 'publisher', 'translator']
 
           <ACard v-if="selected" :title="$gettext('Commercial details: %{name}', { name: localized(selected.name) })">
             <template #extra>
-              <span class="text-3 op-65">{{ $gettext('Shown in the catalog and the Nginx UI marketplace') }}</span>
+              <span class="text-3 op-65 extra-hint">{{ $gettext('Shown in the catalog and the Nginx UI marketplace') }}</span>
             </template>
             <AForm layout="vertical">
               <ARow :gutter="16">
@@ -338,9 +338,11 @@ const ROLES: Role[] = ['admin', 'publisher', 'translator']
               </div>
               <ASelect v-if="D.canManage" :value="m.role" size="small" class="w-24 flex-none" :options="ROLES.map(r => ({ value: r, label: roleLabel(r) }))" @change="(v: Role) => changeRole(m.userId, v)" />
               <span v-else class="text-3">{{ roleLabel(m.role) }}</span>
-              <AButton v-if="D.canManage" type="text" size="small" :aria-label="$gettext('Remove %{login}', { login: m.login ?? '' })" @click="remove(m.userId)">
-                <span class="i-tabler-x" />
-              </AButton>
+              <APopconfirm v-if="D.canManage" :title="$gettext('Remove %{login} from the vendor?', { login: m.login ?? '' })" :ok-text="$gettext('Remove')" :cancel-text="$gettext('Cancel')" @confirm="remove(m.userId)">
+                <AButton type="text" size="small" :aria-label="$gettext('Remove %{login}', { login: m.login ?? '' })">
+                  <span class="i-tabler-x" />
+                </AButton>
+              </APopconfirm>
             </div>
             <AFlex v-if="D.canManage" gap="small" class="mt-3">
               <AInput v-model:value="newLogin" size="small" :placeholder="$gettext('GitHub username')" :aria-label="$gettext('GitHub username')" @press-enter="add" />

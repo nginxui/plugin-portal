@@ -7,6 +7,7 @@ import { useRoute } from 'vue-router'
 import { auditExportUrl, getAudit } from '@/api/audit'
 import { AUDIT_KIND_COLORS, auditDetailLines, auditKindLabel, auditLines, auditNote } from '@/lib/audit'
 import { $gettext } from '@/lib/gettext'
+import { joinSentences } from '@/lib/labels'
 
 const route = useRoute()
 
@@ -200,7 +201,7 @@ const detailText = computed(() => selected.value ? auditDetailLines(selected.val
 
     <ACard :styles="{ body: { padding: 0 } }">
       <div class="toolbar">
-        <ASegmented v-model:value="kind" :options="kinds" />
+        <ASegmented v-model:value="kind" :options="kinds" class="scroll-x" />
         <AFlex gap="small" wrap>
           <AInput v-model:value="actor" allow-clear class="w-28" :placeholder="$gettext('Actor')" :aria-label="$gettext('Actor')" />
           <AInput v-model:value="subject" allow-clear class="w-36" :placeholder="$gettext('Plugin ID')" :aria-label="$gettext('Plugin ID')" />
@@ -292,8 +293,7 @@ const detailText = computed(() => selected.value ? auditDetailLines(selected.val
     </ACard>
 
     <ATypographyParagraph type="secondary" class="text-3 mt-3 mb-0">
-      {{ $gettext('The catalog follows its git history. Should this log be lost, every catalog change can still be traced from its commits and pull requests.') }}
-      {{ $gettext('Sign ins, settings and AI use are recorded only here and kept for one year.') }}
+      {{ joinSentences([$gettext('The catalog follows its git history. Should this log be lost, every catalog change can still be traced from its commits and pull requests.'), $gettext('Sign ins, settings and AI use are recorded only here and kept for one year.')]) }}
     </ATypographyParagraph>
 
     <ADrawer :open="!!selected" :title="$gettext('Record details')" :size="420" :mask="false" :classes="{ root: 'record-drawer' }" :styles="{ wrapper: { top: '64px' } }" @close="selected = null">

@@ -136,6 +136,13 @@ watch(stress, (value, previous) => {
   }
 })
 
+// Picking a language by hand ends the stress test, which shows its own.
+function pickLocale(value: string) {
+  chosenLocale = null
+  stress.value = 'off'
+  locale.value = value
+}
+
 // What the chosen stress test shows and what to look for.
 const stressNote = computed(() => {
   switch (stress.value) {
@@ -182,6 +189,7 @@ const locked = computed(() => {
   if ('screenshots' in overrides)
     out.screenshots = $gettext('Set in the catalog entry')
   if (!state.value?.canEdit.all) {
+    out.categories = $gettext('Publishers edit this')
     out.homepage_url = $gettext('Publishers edit this')
     out.screenshots = $gettext('Publishers edit this')
   }
@@ -193,6 +201,9 @@ const sources = computed(() => [
   { value: 'repo-branch' as const, title: $gettext('Repository, following the default branch'), text: $gettext('plugin.store.json in %{repo}, live minutes after it is merged.', { repo: state.value?.repo ?? plugin.value.repo ?? '' }) },
   { value: 'catalog' as const, title: $gettext('Hosted by the catalog'), text: $gettext('Kept in the catalog repository and live at its next update. For plugins without a public repository.') },
 ])
+
+// A move to or from the catalog is reviewed; one inside the repository is not.
+const sourceReviewed = computed(() => sourceChanged.value && (source.value === 'catalog' || state.value?.source === 'catalog'))
 
 const readmeNote = computed(() => source.value === 'catalog'
   ? $gettext('Kept in the catalog')
@@ -227,6 +238,11 @@ const confirming = ref(false)
 const submitting = ref(false)
 const submitError = ref('')
 
+function openConfirm() {
+  submitError.value = ''
+  confirming.value = true
+}
+
 async function submit() {
   submitting.value = true
   submitError.value = ''
@@ -259,20 +275,10 @@ const name = computed(() => localized(doc.value.name) || localized(plugin.value.
     <AAlert v-if="failed" type="error" show-icon :title="$gettext('The store texts could not be loaded.')" />
     <ASkeleton v-else-if="!state" active />
     <template v-else>
-      <AAlert v-if="S.pending" type="info" show-icon :title="$gettext('A store change of this plugin is in progress.')">
-        <template #action>
-          <RouterLink :to="`/changes/${S.pending}`">
-            <AButton size="small">
-              {{ $gettext('View progress') }}
-            </AButton>
-          </RouterLink>
-        </template>
-      </AAlert>
-
       <ACard :styles="{ body: { padding: '12px 16px' } }">
         <AFlex justify="space-between" align="center" gap="middle" wrap>
           <AFlex align="center" gap="middle" wrap>
-            <LanguagePicker v-model="locale" :coverage="coverage" />
+            <LanguagePicker :model-value="locale" :coverage="coverage" @update:model-value="pickLocale" />
             <span v-if="locale === 'en'" class="text-3 op-65">{{ $gettext('Translated into %{n} of %{total} languages, the others show English', { n: String(translated), total: String(HOST_LOCALES.length) }) }}</span>
             <span v-else class="text-3 op-65">{{ $gettext('Click any text in the preview to translate it,') }} <kbd class="key">Tab</kbd> {{ $gettext('goes to the next untranslated text') }}</span>
           </AFlex>
@@ -364,16 +370,16 @@ const name = computed(() => localized(doc.value.name) || localized(plugin.value.
               </button>
             </div>
             <AAlert v-if="!S.fromFile && !sourceChanged && source !== 'catalog'" type="info" class="mt-3" :title="$gettext('There is no plugin.store.json yet, so the store texts come from plugin.json. Submitting adds the file to the repository.')" />
-            <AAlert v-else-if="sourceChanged && (source === 'catalog' || S.source === 'catalog')" type="warning" class="mt-3" :title="$gettext('Moving the store source is reviewed by a maintainer.')" />
+            <AAlert v-else-if="sourceReviewed" type="warning" class="mt-3" :title="$gettext('Moving the store source is reviewed by a maintainer.')" />
           </ACard>
 
           <ACard :title="$gettext('Changes to publish')">
             <template #extra>
-              <ATag v-if="items.length" class="m-0">
-                {{ $gettext('%{n} items', { n: String(items.length + (readmeChanged ? 1 : 0)) }) }}
+              <ATag v-if="dirty" class="m-0">
+                {{ $gettext('%{n} items', { n: String(items.length + (readmeChanged ? 1 : 0) + (sourceChanged ? 1 : 0)) }) }}
               </ATag>
             </template>
-            <div v-if="items.length || readmeChanged" class="items">
+            <div v-if="dirty" class="items">
               <div v-for="item in items" :key="item.label" class="item">
                 <span :class="item.review ? 'i-tabler-shield-check c-info' : 'i-tabler-bolt c-ok'" />
                 <div class="min-w-0">
@@ -387,17 +393,26 @@ const name = computed(() => localized(doc.value.name) || localized(plugin.value.
                 <span class="i-tabler-bolt c-ok" />
                 <div>README</div>
               </div>
+              <div v-if="sourceChanged" class="item">
+                <span :class="sourceReviewed ? 'i-tabler-shield-check c-info' : 'i-tabler-bolt c-ok'" />
+                <div class="min-w-0">
+                  <div>{{ $gettext('Store source: %{source}', { source: sources.find(s => s.value === source)?.title ?? '' }) }}</div>
+                  <div class="text-3 op-65">
+                    {{ sourceReviewed ? $gettext('Reviewed by a maintainer') : $gettext('Live after the merge') }}
+                  </div>
+                </div>
+              </div>
             </div>
             <ATypographyText v-else type="secondary" class="text-3">
               {{ $gettext('Click a text in the preview to change it.') }}
             </ATypographyText>
             <AAlert v-if="problems.length" type="error" class="mt-3" :title="problems.join('; ')" />
             <AFlex vertical gap="small" class="mt-4">
-              <AButton type="primary" block :disabled="!dirty || !!S.pending || problems.length > 0" @click="confirming = true">
+              <AButton type="primary" block :disabled="!dirty || !!S.pending || problems.length > 0" @click="openConfirm">
                 <span class="i-tabler-git-pull-request" />
                 {{ $gettext('Submit changes') }}
               </AButton>
-              <span class="text-3 op-65">{{ delivery.text }}</span>
+              <span class="text-3 op-65">{{ S.pending ? $gettext('A store change of this plugin is in progress. Another can be sent once it is done.') : delivery.text }}</span>
               <AFlex v-if="savedAt" justify="space-between" class="text-3 op-65">
                 <span>{{ saving ? $gettext('Saving the draft') : $gettext('Draft saved %{time}', { time: fromNow(savedAt) }) }}</span>
                 <a v-if="dirty" role="button" tabindex="0" @click="discard" @keydown.enter="discard">{{ $gettext('Discard the draft') }}</a>
@@ -454,7 +469,7 @@ const name = computed(() => localized(doc.value.name) || localized(plugin.value.
                 </div>
               </template>
               <template v-for="(isCut, lang) in cut" :key="lang">
-                <div v-if="isCut" class="item">
+                <div v-if="isCut && !(stressResults?.longest.cut && stressResults.longest.locale === lang)" class="item">
                   <span class="i-tabler-cut c-warn" />
                   <div>
                     <div>{{ $gettext('The name in %{lang} is cut short in the list card', { lang: localeName(String(lang)) }) }}</div>
@@ -465,10 +480,6 @@ const name = computed(() => localized(doc.value.name) || localized(plugin.value.
               <div v-if="!Object.values(cut).some(Boolean)" class="item">
                 <span class="i-tabler-check c-ok" />
                 <div>{{ $gettext('Every name fits the list card') }}</div>
-              </div>
-              <div v-if="stress === 'rtl'" class="item">
-                <span class="i-tabler-text-direction-rtl c-info" />
-                <div>{{ $gettext('Check that the page reads right to left without overlapping text') }}</div>
               </div>
               <div v-if="estimate" class="item">
                 <span class="i-tabler-alert-triangle c-warn" />
@@ -591,7 +602,7 @@ const name = computed(() => localized(doc.value.name) || localized(plugin.value.
 }
 
 .c-ai {
-  color: #722ed1;
+  color: var(--portal-ai-text);
 }
 
 .text-row {

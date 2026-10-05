@@ -1,10 +1,10 @@
 <script setup lang="ts">
 import type { AdminPlugin, AdminPlugins } from '@/api/maintain'
-import { computed, onMounted, ref } from 'vue'
+import { computed, onMounted, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { addBlock, delist, getAllPlugins, setTrust } from '@/api/maintain'
 import { $gettext } from '@/lib/gettext'
-import { joinClauses, localized, storeSourceShort, trustLabel } from '@/lib/labels'
+import { joinClauses, joinSentences, localized, storeSourceShort, trustLabel } from '@/lib/labels'
 import { fromNow } from '@/lib/time'
 
 // Every plugin of the catalog and what a maintainer may do to it (spec
@@ -23,6 +23,7 @@ async function load() {
   }
 }
 const blockOpen = ref(false)
+// When the block list last grew.
 const lastBlocked = computed(() => (data.value?.blocked ?? []).map(b => b.added_at ?? '').filter(Boolean).sort().at(-1) ?? null)
 
 const state = ref<'all' | 'listed' | 'review' | 'delisted'>('all')
@@ -31,6 +32,8 @@ const source = ref<'all' | 'github' | 'vendor'>('all')
 const search = ref('')
 const PAGE = 20
 const page = ref(1)
+// A filter starts again from the first page.
+watch([state, trust, source, search], () => (page.value = 1))
 
 const shown = computed(() => {
   const q = search.value.trim().toLowerCase()
@@ -79,7 +82,6 @@ onMounted(async () => {
   }
 })
 
-// When the block list last grew.
 function onMenu(p: AdminPlugin, key: string) {
   if (key === 'audit')
     router.push({ path: '/audit', query: { q: p.id } })
@@ -175,7 +177,7 @@ const title = computed(() => {
       <AFlex vertical gap="middle">
         <ACard :styles="{ body: { padding: 0 } }">
           <div class="toolbar">
-            <ASegmented v-model:value="state" :options="[{ value: 'all', label: $gettext('All') }, { value: 'listed', label: $gettext('Listed') }, { value: 'review', label: $gettext('In review') }, { value: 'delisted', label: $gettext('Delisted') }]" @change="page = 1" />
+            <ASegmented v-model:value="state" class="scroll-x" :options="[{ value: 'all', label: $gettext('All') }, { value: 'listed', label: $gettext('Listed') }, { value: 'review', label: $gettext('In review') }, { value: 'delisted', label: $gettext('Delisted') }]" />
             <AFlex gap="small" wrap>
               <ASelect v-model:value="trust" class="w-36" :options="[{ value: 'all', label: $gettext('Any trust') }, { value: 'official', label: $gettext('Official') }, { value: 'verified', label: $gettext('Partner') }, { value: 'community', label: $gettext('Community') }]" />
               <ASelect v-model:value="source" class="w-36" :options="[{ value: 'all', label: $gettext('Any source') }, { value: 'github', label: $gettext('GitHub releases') }, { value: 'vendor', label: $gettext('Vendor feed') }]" />
@@ -262,6 +264,7 @@ const title = computed(() => {
                 </tr>
               </tbody>
             </table>
+            <AEmpty v-if="!shown.length" class="py-8" :description="$gettext('No plugin matches these filters.')" />
           </div>
           <AFlex justify="space-between" align="center" class="foot">
             <span class="text-3 op-65">{{ shown.length ? $gettext('%{n} in all, showing %{a} to %{b}', { n: String(shown.length), a: String((page - 1) * PAGE + 1), b: String(Math.min(page * PAGE, shown.length)) }) : $gettext('%{n} plugins', { n: '0' }) }}</span>
@@ -278,7 +281,7 @@ const title = computed(() => {
       </AFlex>
     </template>
 
-    <ADrawer v-if="data" v-model:open="blockOpen" :size="420" :styles="{ wrapper: { top: '64px' } }">
+    <ADrawer v-if="data" v-model:open="blockOpen" :size="420">
       <template #title>
         <span class="i-tabler-ban mr-2 op-65" />{{ $gettext('Block list') }}
       </template>
@@ -303,12 +306,11 @@ const title = computed(() => {
         <span class="i-tabler-plus" />{{ $gettext('Add an entry') }}
       </AButton>
       <ATypographyParagraph type="secondary" class="text-3 mt-4 mb-0">
-        {{ $gettext('Delisting removes a plugin from the catalog and leaves installed copies alone. Blocking also keeps the same plugin id or repository from being listed again.') }}
-        {{ $gettext('Both need a reason, which goes to the audit log and to the admins of the plugin.') }}
+        {{ joinSentences([$gettext('Delisting removes a plugin from the catalog and leaves installed copies alone. Blocking also keeps the same plugin id or repository from being listed again.'), $gettext('Both need a reason, which goes to the audit log and to the admins of the plugin.')]) }}
       </ATypographyParagraph>
     </ADrawer>
 
-    <AModal :open="!!action" :title="title" :confirm-loading="sending" :ok-text="action?.kind === 'trust' ? $gettext('Open the pull request') : $gettext('Open the pull request')" :ok-button-props="{ danger: action?.kind !== 'trust' }" @ok="confirm" @cancel="action = null">
+    <AModal :open="!!action" :title="title" :confirm-loading="sending" :ok-text="$gettext('Open the pull request')" :ok-button-props="{ danger: action?.kind !== 'trust' }" @ok="confirm" @cancel="action = null">
       <AForm v-if="action" layout="vertical">
         <AFormItem v-if="action.kind === 'trust'" :label="$gettext('Trust')">
           <ASegmented v-model:value="form.trust" :options="[{ value: 'official', label: $gettext('Official') }, { value: 'verified', label: $gettext('Partner') }, { value: 'community', label: $gettext('Community') }]" />
