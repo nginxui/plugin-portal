@@ -1,5 +1,6 @@
 import type { AppEnv } from '../env'
 import { Hono } from 'hono'
+import { pluginIcons } from '../lib/catalog'
 import { mailEnabled } from '../lib/mail'
 import { now } from '../lib/time'
 import { requireSession } from '../middleware/auth'
@@ -32,11 +33,13 @@ notifications.get('/', async (c) => {
      WHERE ch.author_id = ? AND (e.actor_id IS NULL OR e.actor_id != ?) AND e.stage != 'submitted'
      ORDER BY e.at DESC, e.id DESC LIMIT 30`,
   ).bind(user, user).all<{ id: number, stage: string, at: number, detail_json: string | null, change_id: string, change_number: number | null, kind: string, plugin_id: string | null, entry_json: string | null, actor: string | null }>()
+  const icons = results.length ? await pluginIcons(c.env) : new Map<string, string>()
   const items = results.map(r => ({
     id: r.id,
     stage: r.stage,
     at: r.at,
     change: r.change_id,
+    iconUrl: icons.get(r.plugin_id ?? '') ?? null,
     number: r.change_number,
     kind: r.kind,
     pluginId: r.plugin_id,

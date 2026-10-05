@@ -8,7 +8,7 @@ import { categoryLabel } from '@/lib/categories'
 import { changePath, kindLabel } from '@/lib/changeKinds'
 import { useFailure } from '@/lib/feedback'
 import { $gettext } from '@/lib/gettext'
-import { localized } from '@/lib/labels'
+import { joinClauses, localized } from '@/lib/labels'
 import { itemLabel } from '@/lib/storeDiff'
 import { formatTime, fromNow, waited } from '@/lib/time'
 import { useCrumbs } from '@/stores/crumbs'
@@ -511,10 +511,10 @@ async function retry() {
           </ACard>
           <ACard v-if="data.others.length" :title="$gettext('Your other changes in progress')">
             <RouterLink v-for="o in data.others" :key="o.id" :to="changePath(o)" class="other">
-              <PluginIcon :src="null" :name="localized(o.entry?.name) || o.pluginId || ''" :size="36" />
+              <PluginIcon :src="o.iconUrl" :name="localized(o.entry?.name) || o.pluginId || ''" :size="36" />
               <div class="min-w-0 flex-1">
                 <div class="font-500">
-                  {{ localized(o.entry?.name) || o.pluginId }}, {{ kindLabel(o.kind) }}
+                  {{ joinClauses([localized(o.entry?.name) || o.pluginId || '', kindLabel(o.kind)]) }}
                 </div>
                 <AFlex align="center" gap="small" class="text-3 op-65 mt-1">
                   <span class="mini-track"><span v-for="(st, i) in miniTrack(o)" :key="i" :class="st" /></span>
