@@ -51,6 +51,12 @@ export async function loadCatalog(env: Env): Promise<CatalogIndex> {
   return JSON.parse(body)
 }
 
+/** Icons of the listed plugins by id; none when the index cannot be read. */
+export async function pluginIcons(env: Env): Promise<Map<string, string>> {
+  const catalog = await loadCatalog(env).catch(() => null)
+  return new Map((catalog?.plugins ?? []).flatMap(p => p.icon_url ? [[p.id, p.icon_url] as const] : []))
+}
+
 // "owner/repo" of a GitHub repository URL, or null for anything else.
 export function repoOf(url: string | undefined | null): string | null {
   if (!url)

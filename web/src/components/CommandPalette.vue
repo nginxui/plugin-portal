@@ -89,6 +89,7 @@ const all = computed<Item[]>(() => {
       sub: $gettext('%{state}, waiting %{time}', { state: risk, time: waited(change.updatedAt) }),
       to: changePath(change, '/review'),
       plugin: name,
+      pluginIcon: change.iconUrl,
       search: `${name} ${change.pluginId} ${change.author} ${kindLabel(change.kind)}`,
     })
   }
@@ -102,7 +103,7 @@ const all = computed<Item[]>(() => {
     if (seen.has(plugin.id))
       continue
     const name = localized(plugin.name ?? undefined) || plugin.id
-    items.push({ key: `plugin:${plugin.id}`, group: g.plugins, title: name, sub: $gettext('%{id}, %{state}', { id: plugin.id, state: stateText(plugin.state, plugin.yanked) }), to: `/plugins/${plugin.id}`, plugin: name, search: `${name} ${plugin.id} ${plugin.owner ?? ''}` })
+    items.push({ key: `plugin:${plugin.id}`, group: g.plugins, title: name, sub: $gettext('%{id}, %{state}', { id: plugin.id, state: stateText(plugin.state, plugin.yanked) }), to: `/plugins/${plugin.id}`, plugin: name, pluginIcon: plugin.iconUrl, search: `${name} ${plugin.id} ${plugin.owner ?? ''}` })
   }
   const owners = new Map<string, number>()
   for (const plugin of catalog.value) {

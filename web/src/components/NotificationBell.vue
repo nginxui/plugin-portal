@@ -6,7 +6,7 @@ import { useRouter } from 'vue-router'
 import { getNotifications, markRead } from '@/api/notifications'
 import { changePath, kindLabel } from '@/lib/changeKinds'
 import { $gettext } from '@/lib/gettext'
-import { localized } from '@/lib/labels'
+import { joinClauses, localized } from '@/lib/labels'
 import { fromNow } from '@/lib/time'
 
 // What happened to the user's changes, by others or by the catalog.
@@ -69,8 +69,9 @@ function go(item: NotificationItem) {
         </div>
         <button v-for="item in items" :key="item.id" type="button" class="item" :class="{ unread: item.unread }" @click="go(item)">
           <span class="dot" />
-          <span class="min-w-0">
-            <span class="block font-500 truncate">{{ localized(item.name ?? undefined) || item.pluginId }}, {{ kindLabel(item.kind) }}</span>
+          <PluginIcon :src="item.iconUrl" :name="localized(item.name ?? undefined) || item.pluginId || ''" :size="28" />
+          <span class="min-w-0 flex-1">
+            <span class="block font-500 truncate">{{ joinClauses([localized(item.name ?? undefined) || item.pluginId || '', kindLabel(item.kind)]) }}</span>
             <span class="block text-3">{{ text(item) }}</span>
             <span class="block text-3 op-50">{{ fromNow(item.at) }}</span>
           </span>
@@ -115,7 +116,7 @@ function go(item: NotificationItem) {
   flex: none;
   width: 8px;
   height: 8px;
-  margin-top: 6px;
+  margin-top: 10px;
   border-radius: 50%;
 }
 

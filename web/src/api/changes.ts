@@ -4,6 +4,8 @@ export type Stage = 'submitted' | 'checks' | 'review' | 'merged' | 'live'
 
 export interface Change {
   number?: number | null
+  // The icon of the plugin, where the list it comes in carries one.
+  iconUrl?: string | null
   id: string
   pluginId: string | null
   kind: string

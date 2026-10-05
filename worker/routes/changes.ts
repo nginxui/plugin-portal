@@ -5,7 +5,7 @@ import { mapLimit, repoAccess } from '../lib/access'
 import { audit } from '../lib/audit'
 import { botEnabled, botToken } from '../lib/bot'
 import { cached } from '../lib/cache'
-import { loadCatalog } from '../lib/catalog'
+import { loadCatalog, pluginIcons } from '../lib/catalog'
 import { event, getChange } from '../lib/changes'
 import { dispatchApply, dispatchDeploy } from '../lib/deployApp'
 import { github } from '../lib/github'
@@ -229,11 +229,12 @@ changes.get('/:id', async (c) => {
   const others = await c.env.DB.prepare(
     `SELECT * FROM changes WHERE author_id = ? AND id != ? AND state IN ('open', 'merged') ORDER BY updated_at DESC LIMIT 5`,
   ).bind(session.user.id, change.id).all<ChangeRow>()
+  const icons = others.results.length ? await pluginIcons(c.env) : new Map<string, string>()
   return c.json({
     change: present(c.env, change),
     canRetry: change.author_id === session.user.id && retryable(change),
     canWithdraw: change.author_id === session.user.id && change.state === 'open',
-    others: others.results.map(row => present(c.env, row)),
+    others: others.results.map(row => ({ ...present(c.env, row), iconUrl: icons.get(row.plugin_id ?? '') ?? null })),
     events: results.map(e => ({ stage: e.stage, actor: e.actor, at: e.at, detail: e.detail_json ? JSON.parse(e.detail_json) : null })),
   })
 })

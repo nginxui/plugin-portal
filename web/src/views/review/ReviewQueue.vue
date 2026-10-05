@@ -375,7 +375,7 @@ onKeyStroke('/', (e) => {
                 </td>
                 <td>
                   <div class="plugin">
-                    <PluginIcon :name="localized(item.entry?.name) || item.pluginId || ''" :size="28" />
+                    <PluginIcon :src="item.iconUrl" :name="localized(item.entry?.name) || item.pluginId || ''" :size="28" />
                     <div class="min-w-0">
                       <div class="font-600 nowrap">
                         {{ localized(item.entry?.name) || item.pluginId }}

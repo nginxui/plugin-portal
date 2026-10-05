@@ -5,7 +5,7 @@ import { AiError, defaultProvider } from '../lib/ai'
 import { preReview, reviewTarget } from '../lib/aiReview'
 import { audit } from '../lib/audit'
 import { cached } from '../lib/cache'
-import { loadCatalog, repoOf } from '../lib/catalog'
+import { loadCatalog, pluginIcons, repoOf } from '../lib/catalog'
 import { event, getChange } from '../lib/changes'
 import { github, GitHubError } from '../lib/github'
 import { isHostLocale } from '../lib/locales'
@@ -101,15 +101,19 @@ review.get('/queue', async (c) => {
      LEFT JOIN plugins p ON p.plugin_id = c.plugin_id
      WHERE c.class != 'self_service' AND c.state IN ('live', 'rejected', 'withdrawn') ORDER BY c.updated_at DESC LIMIT 50`,
   ).all<QueueRow>()
+  // A plugin already listed shows its icon; a new listing has none yet.
+  const icons = await pluginIcons(c.env)
+  const iconOf = (row: QueueRow) => icons.get(row.plugin_id ?? '') ?? null
   return c.json({
     changes: results.map(row => ({
       ...present(c.env, row),
+      iconUrl: iconOf(row),
       author: row.author_login,
       repo: row.repo_full_name,
       risk: risk(row),
     })),
-    recent: (await recent).results.map(row => ({ ...present(c.env, row), author: row.author_login })),
-    done: done.results.map(row => ({ ...present(c.env, row), author: row.author_login, repo: row.repo_full_name, risk: risk(row) })),
+    recent: (await recent).results.map(row => ({ ...present(c.env, row), iconUrl: iconOf(row), author: row.author_login })),
+    done: done.results.map(row => ({ ...present(c.env, row), iconUrl: iconOf(row), author: row.author_login, repo: row.repo_full_name, risk: risk(row) })),
   })
 })
 
@@ -123,6 +127,7 @@ review.get('/catalog', async (c) => {
   const listed = catalog.plugins.map(p => ({
     id: p.id,
     name: p.name,
+    iconUrl: p.icon_url ?? null,
     owner: repoOf(p.repository_url)?.split('/')[0] ?? null,
     state: 'listed',
     yanked: !!p.releases?.length && p.releases.every(r => r.yanked),
@@ -131,6 +136,7 @@ review.get('/catalog', async (c) => {
   const pending = drafts.results.filter(row => !known.has(row.plugin_id)).map(row => ({
     id: row.plugin_id,
     name: null,
+    iconUrl: null,
     owner: row.repo_full_name?.split('/')[0] ?? null,
     state: row.state,
     yanked: false,

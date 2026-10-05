@@ -78,6 +78,7 @@ export function commentOnChange(id: string, comment: string) {
 export interface CatalogItem {
   id: string
   name: Record<string, string> | null
+  iconUrl?: string | null
   owner: string | null
   state: string
   yanked: boolean

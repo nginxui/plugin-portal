@@ -6,6 +6,7 @@ export interface NotificationItem {
   at: number
   change: string
   number?: number | null
+  iconUrl?: string | null
   kind: string
   pluginId: string | null
   name: Record<string, string> | null
