@@ -37,7 +37,7 @@ export function sender(from: string): { name?: string, email: string } {
 }
 
 export const smtp = {
-  async send(config: SmtpConfig, to: string, subject: string, text: string): Promise<void> {
+  async send(config: SmtpConfig, to: string, subject: string, text: string, html?: string): Promise<void> {
     await WorkerMailer.send({
       host: config.host,
       port: config.port,
@@ -47,6 +47,6 @@ export const smtp = {
       authType: ['plain', 'login', 'cram-md5'],
       socketTimeoutMs: 15000,
       responseTimeoutMs: 15000,
-    }, { from: sender(config.from), to, subject, text })
+    }, { from: sender(config.from), to, subject, text, ...(html ? { html } : {}) })
   },
 }

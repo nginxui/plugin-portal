@@ -27,6 +27,11 @@ function icon(name: string) {
   return h('span', { class: `${name} text-4` })
 }
 
+// The language picked here is also the one the user's mail comes in.
+watch([() => gettext.current, () => session.user?.id], ([current]) => {
+  session.syncLocale(current)
+}, { immediate: true })
+
 const palette = usePaletteStore()
 onKeyStroke('k', (e) => {
   if (!(e.metaKey || e.ctrlKey) || e.altKey || e.shiftKey)

@@ -3,6 +3,7 @@ import { Hono } from 'hono'
 import { audit } from '../lib/audit'
 import { github, GitHubError } from '../lib/github'
 import { sendMail } from '../lib/mail'
+import { buildMail } from '../lib/mailText'
 import { saveSettings, settingsView } from '../lib/settings'
 import { now } from '../lib/time'
 import { requireMaintainer, requireSession } from '../middleware/auth'
@@ -172,7 +173,9 @@ settings.post('/settings/mail/test', async (c) => {
   const to = String((await c.req.json<{ to?: string }>()).to ?? '').trim()
   if (!EMAIL.test(to))
     return c.json({ error: 'to' }, 422)
-  const result = await sendMail(c.env, to, 'Test mail from the Nginx UI developer portal', 'This is a test. Authors who turn on email get progress mail from this sender.')
+  const locale = (await c.env.DB.prepare('SELECT locale FROM users WHERE id = ?').bind(c.get('session').user.id).first<{ locale: string | null }>())?.locale ?? null
+  const { subject, text, html } = buildMail({ kind: 'test', locale, url: c.env.PORTAL_ORIGIN, origin: c.env.PORTAL_ORIGIN })
+  const result = await sendMail(c.env, to, subject, text, html)
   return result.ok ? c.json({ ok: true }) : c.json({ error: 'send_failed', status: result.status ?? null, message: result.message ?? null }, 502)
 })
 
