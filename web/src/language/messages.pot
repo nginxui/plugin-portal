@@ -657,13 +657,6 @@ msgstr ""
 msgid "Name cut short"
 msgstr ""
 
-#: web/src/components/ListingCard.vue:36
-#: web/src/lib/labels.ts:42
-#: web/src/views/maintain/AllPlugins.vue:182
-#: web/src/views/maintain/AllPlugins.vue:316
-msgid "Community"
-msgstr ""
-
 #: web/src/components/MarketPreview.vue:246
 msgid "Nginx UI marketplace, as users see it"
 msgstr ""
@@ -1965,6 +1958,12 @@ msgstr ""
 #: web/src/views/owners/OwnerPage.vue:170
 #: web/src/views/owners/VendorPage.vue:169
 msgid "Partner"
+msgstr ""
+
+#: web/src/lib/labels.ts:42
+#: web/src/views/maintain/AllPlugins.vue:182
+#: web/src/views/maintain/AllPlugins.vue:316
+msgid "Community"
 msgstr ""
 
 #: web/src/lib/labels.ts:51

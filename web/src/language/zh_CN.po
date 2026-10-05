@@ -413,9 +413,6 @@ msgstr "%{lang}，显示英文"
 msgid "Name cut short"
 msgstr "名称显示不全"
 
-msgid "Community"
-msgstr "社区"
-
 msgid "Nginx UI marketplace, as users see it"
 msgstr "Nginx UI 插件市场预览，与用户看到的一致"
 
@@ -1333,6 +1330,9 @@ msgstr "官方"
 
 msgid "Partner"
 msgstr "合作伙伴"
+
+msgid "Community"
+msgstr "社区"
 
 msgid "Listed"
 msgstr "已上架"
