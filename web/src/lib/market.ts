@@ -1,6 +1,6 @@
+import { bundledText, describePermission, permissionLabel, trustText as trustWith } from '@nginxui/plugin-market-ui'
 import DOMPurify from 'dompurify'
 import { marked } from 'marked'
-import { MARKET_CAPABILITIES, MARKET_CATEGORIES, MARKET_CREDENTIALS, MARKET_LABELS, MARKET_PERMISSIONS, MARKET_UNKNOWN } from './marketStrings'
 
 // How the store preview reads texts: in the preview language, falling back to
 // English as Nginx UI does.
@@ -41,42 +41,19 @@ export function resolve(value: Localized | undefined, locale: string): Resolved 
   return { text, fallback }
 }
 
-/** A label of the preview chrome in the preview language. */
-export function label(locale: string, key: string, value?: string): string {
-  const table = MARKET_LABELS[locale] ?? MARKET_LABELS.en
-  let text = String(table[key] ?? MARKET_LABELS.en[key] ?? key)
-  if (value !== undefined)
-    text = text.replace('{x}', value)
-  return text
-}
-
 export function installLabel(locale: string): string {
   return INSTALL[locale] ?? INSTALL.en
 }
 
+/** A trust level in the wording of Nginx UI, in the given language. */
 export function trustText(locale: string, trust: string | null | undefined): string {
-  const table = (MARKET_LABELS[locale] ?? MARKET_LABELS.en).trust as Record<string, string>
-  return trust ? table[trust] ?? trust : ''
+  return trust ? trustWith(bundledText(locale), trust).label : ''
 }
 
-export function categoryText(locale: string, id: string): string {
-  return MARKET_CATEGORIES[id]?.[locale] ?? MARKET_CATEGORIES[id]?.en ?? id
-}
-
-export function capabilityText(locale: string, id: string): string {
-  return MARKET_CAPABILITIES[id]?.label[locale] ?? MARKET_CAPABILITIES[id]?.label.en ?? id
-}
-
+/** A permission in the wording of Nginx UI, in the given language. */
 export function permissionText(locale: string, permission: string): { label: string, description: string } {
-  const pick = (table: Record<string, string>) => table[locale] ?? table.en
-  if (permission.startsWith('credentials.read:')) {
-    const kind = permission.slice('credentials.read:'.length)
-    return { label: pick(MARKET_CREDENTIALS.label).replace('{x}', kind), description: pick(MARKET_CREDENTIALS.description).replace('{x}', kind) }
-  }
-  const known = MARKET_PERMISSIONS[permission]
-  return known
-    ? { label: pick(known.label), description: pick(known.description) }
-    : { label: pick(MARKET_UNKNOWN.label), description: pick(MARKET_UNKNOWN.description) }
+  const t = bundledText(locale)
+  return { label: permissionLabel(t, permission), description: describePermission(t, permission) }
 }
 
 /** README Markdown as safe HTML; relative images resolve against base. */

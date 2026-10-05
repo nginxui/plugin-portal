@@ -17,11 +17,11 @@
     "gettext:extract": "vue-gettext-extract",
     "deploy:staging": "CLOUDFLARE_ENV=staging vite build && wrangler deploy",
     "db:migrate:staging": "wrangler d1 migrations apply portal-staging --remote --env staging",
-    "db:migrate": "wrangler d1 migrations apply portal --remote",
-    "strings:market": "node scripts/sync-market-strings.mjs"
+    "db:migrate": "wrangler d1 migrations apply portal --remote"
   },
   "dependencies": {
     "@antdv-next/icons": "^1.1.2",
+    "@nginxui/plugin-market-ui": "^0.1.0",
     "@vueuse/core": "^15.0.0",
     "antdv-next": "^1.6.0",
     "dayjs": "^1.11.23",
