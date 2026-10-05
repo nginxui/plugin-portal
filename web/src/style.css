@@ -20,6 +20,7 @@
   --portal-ai-text: #722ed1;
   --portal-ai-bg: #f9f0ff;
   --portal-ai-border: #d3adf7;
+  --portal-wall-filter: none;
 }
 
 html.dark {
@@ -44,6 +45,7 @@ html.dark {
   --portal-ai-text: #b37feb;
   --portal-ai-bg: #1a1325;
   --portal-ai-border: #391085;
+  --portal-wall-filter: brightness(1.35) saturate(0.9);
 }
 
 html,

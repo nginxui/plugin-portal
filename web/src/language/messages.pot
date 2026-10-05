@@ -1137,11 +1137,6 @@ msgstr ""
 msgid "Plugin sections"
 msgstr ""
 
-#: web/src/components/PluginRow.vue:37
-#: web/src/views/owners/VendorPage.vue:216
-msgid "Manage"
-msgstr ""
-
 #: web/src/components/RepoPicker.vue:32
 msgid "Search repositories"
 msgstr ""
@@ -1270,12 +1265,12 @@ msgid "Developer Center"
 msgstr ""
 
 #: web/src/components/SiderNav.vue:35
-#: web/src/views/SignIn.vue:81
+#: web/src/views/SignIn.vue:163
 msgid "Developer docs"
 msgstr ""
 
 #: web/src/components/SiderNav.vue:40
-#: web/src/views/SignIn.vue:82
+#: web/src/views/SignIn.vue:164
 msgid "Plugin catalog"
 msgstr ""
 
@@ -1356,10 +1351,12 @@ msgstr ""
 
 #: web/src/layouts/PortalLayout.vue:205
 #: web/src/views/review/ReviewChange.vue:558
+#: web/src/views/SignIn.vue:74
 msgid "Language"
 msgstr ""
 
 #: web/src/layouts/PortalLayout.vue:210
+#: web/src/views/SignIn.vue:79
 msgid "Toggle dark mode"
 msgstr ""
 
@@ -3863,6 +3860,10 @@ msgid "Waiting for its review"
 msgstr ""
 
 #: web/src/views/owners/VendorPage.vue:216
+msgid "Manage"
+msgstr ""
+
+#: web/src/views/owners/VendorPage.vue:216
 msgid "Continue"
 msgstr ""
 
@@ -5840,56 +5841,76 @@ msgstr ""
 msgid "The author is notified on GitHub and can resubmit from the change page."
 msgstr ""
 
-#: web/src/views/SignIn.vue:15
+#: web/src/views/SignIn.vue:23
 msgid "Sign in was cancelled on GitHub."
 msgstr ""
 
-#: web/src/views/SignIn.vue:17
+#: web/src/views/SignIn.vue:25
 msgid "The sign in request has expired. Please try again."
 msgstr ""
 
-#: web/src/views/SignIn.vue:19
+#: web/src/views/SignIn.vue:27
 msgid "GitHub could not complete the sign in. Please try again later."
 msgstr ""
 
-#: web/src/views/SignIn.vue:28
+#: web/src/views/SignIn.vue:36
 msgid "Submit plugins"
 msgstr ""
 
-#: web/src/views/SignIn.vue:29
+#: web/src/views/SignIn.vue:37
 msgid "Choose a repository and the release and plugin details are read for you. Preview the listing before you submit."
 msgstr ""
 
-#: web/src/views/SignIn.vue:33
+#: web/src/views/SignIn.vue:41
 msgid "Manage on your own"
 msgstr ""
 
-#: web/src/views/SignIn.vue:34
+#: web/src/views/SignIn.vue:42
 msgid "Yank versions, revoke signers and change categories. The changes take effect within minutes, without a review."
 msgstr ""
 
-#: web/src/views/SignIn.vue:38
+#: web/src/views/SignIn.vue:46
 msgid "Public review"
 msgstr ""
 
-#: web/src/views/SignIn.vue:39
+#: web/src/views/SignIn.vue:47
 msgid "New listings and key changes are reviewed by maintainers, and every review is public."
 msgstr ""
 
-#: web/src/views/SignIn.vue:51
-msgid "Nginx UI Developer Center"
-msgstr ""
-
-#: web/src/views/SignIn.vue:54
-msgid "Submit plugins, manage your listings and follow their review."
+#: web/src/views/SignIn.vue:59
+msgid "Your public GitHub profile"
 msgstr ""
 
 #: web/src/views/SignIn.vue:60
+msgid "Your verified email addresses, for the notifications you turn on"
+msgstr ""
+
+#: web/src/views/SignIn.vue:61
+msgid "Your role on the repositories of your plugins"
+msgstr ""
+
+#: web/src/views/SignIn.vue:87
+msgid "Nginx UI Developer Center"
+msgstr ""
+
+#: web/src/views/SignIn.vue:91
+msgid "Publish and maintain your Nginx UI plugins"
+msgstr ""
+
+#: web/src/views/SignIn.vue:121
+msgid "Features"
+msgstr ""
+
+#: web/src/views/SignIn.vue:140
 msgid "Sign in with GitHub"
 msgstr ""
 
-#: web/src/views/SignIn.vue:63
-msgid "Signing in only confirms your GitHub identity. It grants no write access to your repositories."
+#: web/src/views/SignIn.vue:146
+msgid "Signing in grants no write access to your repositories."
+msgstr ""
+
+#: web/src/views/SignIn.vue:149
+msgid "After you sign in, the Developer Center reads"
 msgstr ""
 
 #: web/src/views/SubmitPlugin.vue:53
