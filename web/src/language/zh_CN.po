@@ -2742,11 +2742,19 @@ msgstr "此引用下没有 plugin.json"
 msgid "The manifest names another plugin: %{id}"
 msgstr "清单指向另一个插件：%{id}"
 
-msgid "Version %{version} is not newer than the listed %{listed}"
-msgstr "版本 %{version} 不比已上架的 %{listed} 新"
+msgid "Version %{version} has been released already"
+msgstr "版本 %{version} 已经发布过"
 
 msgid "Raise the version before releasing."
 msgstr "请在发布前提升版本号。"
+
+msgid "Version %{version} is not newer than the listed %{listed}"
+msgstr "版本 %{version} 不比已上架的 %{listed} 新"
+
+msgid ""
+"Official plugins are signed with the Nginx UI key and need no signer "
+"certificate"
+msgstr "官方插件使用 Nginx UI 官方密钥签名，不需要签名者证书"
 
 msgid "The signer certificate was issued by your primary key"
 msgstr "签名者证书由主公钥签发"
@@ -2842,6 +2850,10 @@ msgid ""
 "New permissions and network hosts are explained to users before they update,"
 " and maintainers look at them first."
 msgstr "新增的权限与网络访问会在更新前向用户说明，并在审核时优先查看。"
+
+msgid ""
+"Fix the failed checks first, then the release can be created from here."
+msgstr "请先解决未通过的检查，之后可以在这里创建发布版本。"
 
 msgid "Create the v%{version} release on GitHub"
 msgstr "在 GitHub 上创建 v%{version} 发布"

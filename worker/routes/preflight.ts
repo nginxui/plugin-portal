@@ -6,6 +6,7 @@ import { github } from '../lib/github'
 import { pluginContext } from '../lib/pluginContext'
 import { preflightChecks, runtimeDiff, storeDiff } from '../lib/preflight'
 import { docFromManifest, headOf, readStore } from '../lib/store'
+import { repoReleases } from '../lib/submission'
 import { requireSession } from '../middleware/auth'
 
 // Preflight for publishers: pick a branch, tag or commit and see what
@@ -71,12 +72,13 @@ preflight.get('/plugins/:id/preflight', requireSession, async (c) => {
   const ref = c.req.query('ref') ?? ''
   if (!REF.test(ref) || ref.includes('..'))
     return c.json({ error: 'invalid_ref' }, 422)
-  const [listedState, nextManifestText, nextStoreText, certificate, certificateSignature] = await Promise.all([
+  const [listedState, nextManifestText, nextStoreText, certificate, certificateSignature, released] = await Promise.all([
     readStore(c.env, ctx.token, { id: ctx.id, repo: ctx.repo, tag: ctx.tag, entry: ctx.entry }),
     raw(ctx.repo, ref, 'plugin.json'),
     raw(ctx.repo, ref, 'plugin.store.json'),
     raw(ctx.repo, ref, 'plugin.signer'),
     raw(ctx.repo, ref, 'plugin.signer.minisig'),
+    repoReleases(ctx.token, ctx.repo),
   ])
   const listed = listedState.manifest
   const next = parse<Manifest>(nextManifestText)
@@ -97,6 +99,8 @@ preflight.get('/plugins/:id/preflight', requireSession, async (c) => {
   const checks = preflightChecks({
     id: ctx.id,
     listedVersion: ctx.version,
+    released: released.map(r => r.version),
+    official: (ctx.listing?.trust ?? ctx.entry?.trust) === 'official',
     manifest: next,
     primaryKey: (ctx.entry?.author_public_key as string | undefined) ?? null,
     certificate,
@@ -119,6 +123,7 @@ preflight.get('/plugins/:id/preflight', requireSession, async (c) => {
       to: version,
       added: runtime.permissions.filter(r => r.sign === 'add').map(r => ({ kind: r.kind, subject: r.subject })),
     },
-    releaseUrl: version ? `https://github.com/${ctx.repo}/releases/new?tag=${encodeURIComponent(`v${version}`)}&target=${encodeURIComponent(ref)}` : null,
+    // Only a ref that passes every check is offered for release.
+    releaseUrl: version && !checks.some(check => check.status === 'fail') ? `https://github.com/${ctx.repo}/releases/new?tag=${encodeURIComponent(`v${version}`)}&target=${encodeURIComponent(ref)}` : null,
   })
 })

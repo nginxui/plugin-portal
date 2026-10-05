@@ -38,6 +38,16 @@ describe('preflight', () => {
     expect(newer('1.2.0-beta.1', '1.2.0')).toBe(false)
     expect(newer('1.2.0', '1.2.0-beta.1')).toBe(true)
     const checks = preflightChecks({ id: 'io.x.y', listedVersion: '1.2.0', manifest: { id: 'io.x.y', version: '1.1.0' }, primaryKey: publicKey, certificate: null, certificateSignature: null, images: [{ id: 'b', problem: 'size:3000000' }] })
-    expect(checks.map(c => [c.key, c.status])).toEqual([['manifest', 'warn'], ['signer', 'warn'], ['screenshot', 'fail']])
+    expect(checks.map(c => [c.key, c.status])).toEqual([['manifest', 'fail'], ['signer', 'warn'], ['screenshot', 'fail']])
+  })
+
+  it('stops a version that is released already', () => {
+    const checks = preflightChecks({ id: 'io.x.y', listedVersion: null, released: ['1.2.0'], manifest: { id: 'io.x.y', version: '1.2.0' }, primaryKey: publicKey, certificate: null, certificateSignature: null, images: [] })
+    expect(checks[0]).toMatchObject({ key: 'manifest', status: 'fail', params: { reason: 'released' } })
+  })
+
+  it('asks no signer certificate of an official plugin', () => {
+    const checks = preflightChecks({ id: 'com.nginxui.x', listedVersion: '1.0.0', official: true, manifest: { id: 'com.nginxui.x', version: '1.1.0' }, primaryKey: null, certificate: null, certificateSignature: null, images: [] })
+    expect(checks.map(c => [c.key, c.status, c.params?.reason])).toEqual([['manifest', 'pass', undefined], ['signer', 'pass', 'official']])
   })
 })

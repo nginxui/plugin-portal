@@ -5,6 +5,7 @@ import { checkMaintainer } from '../middleware/auth'
 import { repoAccess } from './access'
 import { catalogEntry, loadCatalog, repoOf } from './catalog'
 import { userToken } from './session'
+import { repoReleases } from './submission'
 
 // A plugin as the pages that edit it need it: the listing, its repository,
 // the release it is listed with, its entry on main and the user's role.
@@ -41,7 +42,15 @@ export async function pluginContext(env: Env, session: Session, id: string): Pro
   }
   if (!listing && !entry && !repo)
     return null
-  const release = listing?.releases?.find(r => !r.yanked && (r.channel ?? 'stable') === 'stable') ?? listing?.releases?.[0] ?? null
+  let release = listing?.releases?.find(r => !r.yanked && (r.channel ?? 'stable') === 'stable') ?? listing?.releases?.[0] ?? null
+  // A plugin the published index does not list yet: its newest release, as
+  // the catalog reads it at the next update.
+  if (!listing && repo) {
+    const found = await repoReleases(token, repo)
+    const newest = found.find(r => !r.version.includes('-')) ?? found[0]
+    if (newest)
+      release = { version: newest.version, release_notes_url: newest.url }
+  }
   const access = repo ? await repoAccess(env, session.user.id, token, repo) : null
   const role = access?.role ?? null
   const isMaintainer = role ? false : await checkMaintainer(env, session.id)

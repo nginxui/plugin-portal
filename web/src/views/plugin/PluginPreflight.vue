@@ -136,9 +136,13 @@ function checkText(check: Check): { title: string, detail?: string } {
       return { title: $gettext('There is no plugin.json at this ref') }
     if (p.reason === 'id')
       return { title: $gettext('The manifest names another plugin: %{id}', { id: p.id }) }
+    if (p.reason === 'released')
+      return { title: $gettext('Version %{version} has been released already', { version: p.version }), detail: $gettext('Raise the version before releasing.') }
     return { title: $gettext('Version %{version} is not newer than the listed %{listed}', { version: p.version || '?', listed: p.listed }), detail: $gettext('Raise the version before releasing.') }
   }
   if (check.key === 'signer') {
+    if (p.reason === 'official')
+      return { title: $gettext('Official plugins are signed with the Nginx UI key and need no signer certificate') }
     if (check.status === 'pass')
       return { title: $gettext('The signer certificate was issued by your primary key') }
     if (p.reason === 'missing')
@@ -315,6 +319,11 @@ const SIGNS = { add: '+', del: '−', mod: '~' }
           <ATypographyParagraph type="secondary" class="text-3 mt-3 mb-0">
             {{ $gettext('New permissions and network hosts are explained to users before they update, and maintainers look at them first.') }}
           </ATypographyParagraph>
+        </ACard>
+        <ACard v-if="!result.releaseUrl && result.version">
+          <div class="text-3 op-65">
+            {{ $gettext('Fix the failed checks first, then the release can be created from here.') }}
+          </div>
         </ACard>
         <ACard v-if="result.releaseUrl">
           <AButton type="primary" block :href="result.releaseUrl" target="_blank">
