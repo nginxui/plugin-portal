@@ -77,6 +77,7 @@ declare module 'vue' {
     PluginCard: typeof import('./web/src/components/PluginCard.vue')['default']
     PluginHeader: typeof import('./web/src/components/PluginHeader.vue')['default']
     PluginIcon: typeof import('./web/src/components/PluginIcon.vue')['default']
+    PluginWall: typeof import('./web/src/components/PluginWall.vue')['default']
     RepoPicker: typeof import('./web/src/components/RepoPicker.vue')['default']
     ReviewCompare: typeof import('./web/src/components/ReviewCompare.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']

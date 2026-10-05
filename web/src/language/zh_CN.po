@@ -729,9 +729,6 @@ msgstr "仓库"
 msgid "Plugin sections"
 msgstr "插件页面"
 
-msgid "Manage"
-msgstr "管理"
-
 msgid "Search repositories"
 msgstr "搜索仓库"
 
@@ -2781,6 +2778,9 @@ msgstr "发布源已配置，等待提交审核"
 msgid "Waiting for its review"
 msgstr "等待审核"
 
+msgid "Manage"
+msgstr "管理"
+
 msgid "Continue"
 msgstr "继续"
 
@@ -4369,19 +4369,32 @@ msgid ""
 "is public."
 msgstr "新上架与关键信息变更由维护者审核，审核记录公开可查。"
 
+msgid "Your public GitHub profile"
+msgstr "你的 GitHub 公开资料"
+
+msgid "Your verified email addresses, for the notifications you turn on"
+msgstr "你已验证的邮箱地址，仅用于你开启的通知"
+
+msgid "Your role on the repositories of your plugins"
+msgstr "你在插件仓库中的角色"
+
 msgid "Nginx UI Developer Center"
 msgstr "Nginx UI 开发者中心"
 
-msgid "Submit plugins, manage your listings and follow their review."
-msgstr "提交插件，管理上架内容，查看审核进度。"
+msgid "Publish and maintain your Nginx UI plugins"
+msgstr "发布并维护你的 Nginx UI 插件"
+
+msgid "Features"
+msgstr "功能"
 
 msgid "Sign in with GitHub"
 msgstr "使用 GitHub 登录"
 
-msgid ""
-"Signing in only confirms your GitHub identity. It grants no write access to "
-"your repositories."
-msgstr "登录仅用于确认你的 GitHub 身份，不会获得你仓库的写入权限。"
+msgid "Signing in grants no write access to your repositories."
+msgstr "登录不会获得你仓库的写入权限。"
+
+msgid "After you sign in, the Developer Center reads"
+msgstr "登录后，开发者中心会读取"
 
 msgid "%{total} checks passed, %{n} with a warning"
 msgstr "%{total} 项检查已通过，其中 %{n} 项有警告"
@@ -4631,6 +4644,25 @@ msgstr "名称建议"
 
 msgid "An accepted name still goes to a maintainer before it is listed."
 msgstr "名称建议被采纳后，仍需维护者审核才会显示。"
+
+#~ msgid ""
+#~ "Submit a plugin from its GitHub repository, keep its store page and "
+#~ "translations current, and follow every review in one place."
+#~ msgstr ""
+#~ "从 GitHub 仓库提交插件，持续维护商店资料和翻译，并在同一处跟进每一次审核。"
+
+#~ msgid ""
+#~ "Use your GitHub account. The plugins and organizations you manage on "
+#~ "GitHub appear here."
+#~ msgstr "使用 GitHub 账号登录。你在 GitHub 上管理的插件和组织会显示在这里。"
+
+#~ msgid "Submit plugins, manage your listings and follow their review."
+#~ msgstr "提交插件，管理上架内容，查看审核进度。"
+
+#~ msgid ""
+#~ "Signing in only confirms your GitHub identity. It grants no write access "
+#~ "to your repositories."
+#~ msgstr "登录仅用于确认你的 GitHub 身份，不会获得你仓库的写入权限。"
 
 #~ msgid ""
 #~ "Authors who turn on email get mail about the progress of their changes. "
