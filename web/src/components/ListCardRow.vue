@@ -1,15 +1,19 @@
 <script setup lang="ts">
+import type { MarketEntry } from '@nginxui/plugin-market-ui'
 import type { PreviewDoc } from './MarketPreview.vue'
 import type { Stress } from '@/lib/market'
-import { nextTick, onMounted, ref, watch } from 'vue'
+import { bundledText, MarketCard } from '@nginxui/plugin-market-ui'
+import { theme as antTheme } from 'antdv-next'
+import { computed, nextTick, onMounted, ref, useTemplateRef, watch } from 'vue'
 import { $gettext } from '@/lib/gettext'
 import { HOST_LOCALES, RTL_LOCALES } from '@/lib/hostLocales'
 import { localeName } from '@/lib/locales'
-import { resolve, trustText } from '@/lib/market'
+import { resolve } from '@/lib/market'
 
 // Marketplace list cards at the width Nginx UI gives them, one per language,
-// so a name cut short shows before it is listed. Each card shows its own
-// language as users see it, whatever the stress test does to the preview.
+// so a name cut short shows before it is listed. Each card is the one Nginx
+// UI draws, in its own language as users see it, whatever the stress test
+// does to the preview.
 const props = defineProps<{ doc: PreviewDoc, locale: string, stress: Stress, trust: string | null, theme: 'light' | 'dark', author?: string | null, iconUrl?: string | null }>()
 const emit = defineEmits<{ results: [cut: Record<string, boolean>], estimate: [estimate: Estimate | null] }>()
 
@@ -23,7 +27,9 @@ export interface Estimate {
 const GROWTH = 1.3
 
 const CARD_WIDTH = 320
-const names = ref<HTMLElement[]>([])
+// A name wraps to a second line before the card cuts it.
+const NAME_LINES = 2
+const row = useTemplateRef<HTMLElement>('row')
 const cut = ref<Record<string, boolean>>({})
 const estimate = ref<Estimate | null>(null)
 
@@ -35,14 +41,27 @@ function estimateText(e: Estimate): string {
     : $gettext('In a longer language such as German, the name may be cut short. Keep the English name to about %{n} characters.', { n: String(e.maxChars) })
 }
 
+const themeConfig = computed(() => ({ algorithm: props.theme === 'dark' ? antTheme.darkAlgorithm : antTheme.defaultAlgorithm }))
+
+// With a stress test on, the line under the name names each card's language instead.
+const entry = computed<MarketEntry>(() => ({
+  id: '',
+  name: props.doc.name,
+  description: props.doc.description,
+  author: props.stress === 'off' ? props.author ?? undefined : undefined,
+  icon_url: props.iconUrl ?? undefined,
+  trust: props.trust ?? undefined,
+}))
+
 async function measure() {
   await nextTick()
   const out: Record<string, boolean> = {}
-  for (const el of names.value)
-    out[el.dataset.locale!] = el.scrollWidth > el.clientWidth + 1
+  const names = [...(row.value?.querySelectorAll<HTMLElement>('[data-locale] .pmu-card-name') ?? [])]
+  for (const el of names)
+    out[el.closest<HTMLElement>('[data-locale]')!.dataset.locale!] = el.scrollHeight > el.clientHeight + 1
   cut.value = out
   emit('results', out)
-  estimate.value = estimateOf(names.value[0])
+  estimate.value = estimateOf(names[0])
   emit('estimate', estimate.value)
 }
 
@@ -55,7 +74,7 @@ function estimateOf(el: HTMLElement | undefined): Estimate | null {
     return null
   context.font = getComputedStyle(el).font
   const width = (text: string) => context.measureText(text).width
-  const available = el.clientWidth
+  const available = el.clientWidth * NAME_LINES
   const enWidth = width(en)
   if (enWidth > available)
     return { now: true, maxChars: Math.max(1, Math.floor(en.length * available / enWidth)) }
@@ -81,22 +100,20 @@ watch(() => [props.doc, props.stress, props.locale], measure, { deep: true })
         <span class="text-3 op-65">{{ $gettext('%{n} names are cut short', { n: String(Object.values(cut).filter(Boolean).length) }) }}</span>
       </template>
     </div>
-    <div class="row" :class="theme">
-      <article v-for="l in locales()" :key="l" class="card" :style="{ width: `${CARD_WIDTH}px` }" :dir="RTL_LOCALES.includes(l) ? 'rtl' : 'ltr'">
-        <div class="card-head">
-          <PluginIcon :src="iconUrl" :name="resolve(doc.name, 'en').text || '?'" :size="40" />
-          <div class="min-w-0 flex-1">
-            <span ref="names" class="name" :data-locale="l">{{ resolve(doc.name, l).text }}</span>
-            <span class="sub">{{ stress === 'off' ? (author ?? '') : resolve(doc.name, l).fallback ? $gettext('%{lang}, shows English', { lang: localeName(l) }) : localeName(l) }}</span>
+    <AConfigProvider :theme="themeConfig">
+      <AFlex class="row">
+        <div ref="row" class="cards">
+          <div v-for="l in locales()" :key="l" class="slot" :data-locale="l" :style="{ width: `${CARD_WIDTH}px` }" :dir="RTL_LOCALES.includes(l) ? 'rtl' : 'ltr'">
+            <MarketCard :entry="entry" :locale="l" :translate="bundledText(l)">
+              <template v-if="stress !== 'off'" #sub>
+                <span>{{ resolve(doc.name, l).fallback ? $gettext('%{lang}, shows English', { lang: localeName(l) }) : localeName(l) }}</span>
+              </template>
+            </MarketCard>
+            <span v-if="cut[l]" class="flag"><span class="i-tabler-cut" />{{ $gettext('Name cut short') }}</span>
           </div>
-          <span v-if="trust" class="trust">{{ trustText(l, trust) }}</span>
         </div>
-        <p class="desc">
-          {{ resolve(doc.description, l).text }}
-        </p>
-        <span v-if="cut[l]" class="flag"><span class="i-tabler-cut" />{{ $gettext('Name cut short') }}</span>
-      </article>
-    </div>
+      </AFlex>
+    </AConfigProvider>
     <!-- With a stress test on, the results beside the preview say this. -->
     <div v-if="estimate && stress === 'off'" class="hint">
       <span class="i-tabler-alert-triangle" />
@@ -124,76 +141,21 @@ watch(() => [props.doc, props.stress, props.locale], measure, { deep: true })
 }
 
 .row {
-  display: flex;
-  gap: 12px;
   overflow-x: auto;
-  padding: 12px;
+  padding: 16px 12px 12px;
   border: 1px solid var(--portal-border);
   border-radius: 10px;
-  background: #f5f5f5;
+  background: var(--ant-color-bg-layout);
 }
 
-.row.dark {
-  background: #000;
-}
-
-.card {
-  flex: none;
-  position: relative;
-  box-sizing: border-box;
-  padding: 14px;
-  border-radius: 10px;
-  background: #fff;
-  color: rgba(0, 0, 0, 0.88);
-  border: 1px solid rgba(5, 5, 5, 0.06);
-}
-
-.dark .card {
-  background: #141414;
-  color: rgba(255, 255, 255, 0.85);
-  border-color: #303030;
-}
-
-.card-head {
+.cards {
   display: flex;
-  align-items: center;
-  gap: 10px;
+  gap: 16px;
 }
 
-.name {
-  display: block;
-  font-weight: 600;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.sub {
-  font: 11px/1.4 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
-  opacity: 0.55;
-}
-
-.trust {
+.slot {
+  position: relative;
   flex: none;
-  padding: 0 8px;
-  border-radius: 999px;
-  font-size: 12px;
-  line-height: 20px;
-  background: rgba(0, 0, 0, 0.06);
-}
-
-.dark .trust {
-  background: rgba(255, 255, 255, 0.1);
-}
-
-.desc {
-  display: -webkit-box;
-  margin: 10px 0 0;
-  overflow: hidden;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-  font-size: 13px;
-  opacity: 0.65;
 }
 
 .flag {
