@@ -35,14 +35,31 @@ bun run gettext:extract   # refresh web/src/language after changing strings
 ## Deployment
 
 One Worker serves both the interface (static assets) and the API, on the
-custom domain `portal.nginxui.com`.
+custom domain `portal.nginxui.com`; `portal-staging.nginxui.com` runs the
+same code against the test catalog `nginxui/plugins-staging` (the `staging`
+environment of `wrangler.jsonc`).
 
-1. `wrangler d1 create portal` and put the id into `wrangler.jsonc`.
-2. `wrangler d1 migrations apply portal --remote`
-3. Set the secrets:
-   `wrangler secret put GITHUB_CLIENT_SECRET` and
-   `wrangler secret put SESSION_KEY` (`openssl rand -base64 32`).
-4. `bun run deploy`
+CI (`.github/workflows/ci.yml`) lints, type checks, tests and builds every
+change. A push to main then applies the D1 migrations and deploys staging;
+production deploys only when the workflow is run by hand with target
+`production`. Each GitHub environment, `staging` and `production`, needs
+`CLOUDFLARE_API_TOKEN` with Workers, D1 and R2 edit on the account.
+
+By hand:
+
+```bash
+bun run db:migrate:staging && bun run deploy:staging
+bun run db:migrate && bun run deploy
+```
+
+Worker secrets, set with `wrangler secret put <NAME>` (`--env staging` for
+staging), are listed at the end of `wrangler.jsonc`: the Portal App client
+secret, `SESSION_KEY` (`openssl rand -base64 32`) and the Deploy App key are
+required; the bot account, AI key and mail service are optional, and the
+maintainer Settings page can set the bot and the mail service too.
+
+The marketplace previews draw the components Nginx UI uses, from
+[`@nginxui/plugin-market-ui`](https://github.com/nginxui/plugin-market-ui).
 
 ## License
 
