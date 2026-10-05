@@ -16,6 +16,9 @@ ALTER TABLE notify_prefs ADD COLUMN read_at INTEGER;
 -- When a user last cleared their notification list.
 ALTER TABLE notify_prefs ADD COLUMN cleared_at INTEGER;
 
+-- The interface language a user picked, for the mail the portal sends them.
+ALTER TABLE users ADD COLUMN locale TEXT;
+
 -- Partner applications and key requests, decided by maintainers. An approved
 -- one becomes a pull request on partners/<name>.json in the catalog.
 CREATE TABLE partner_requests (

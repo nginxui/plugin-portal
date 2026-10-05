@@ -18,13 +18,14 @@ export interface MailResult {
   message?: string
 }
 
-export async function sendMail(env: Env, to: string, subject: string, text: string): Promise<MailResult> {
+/** Sends one mail; html, when given, goes with the text as its other form. */
+export async function sendMail(env: Env, to: string, subject: string, text: string, html?: string): Promise<MailResult> {
   const config = await mailConfig(env)
   if (!config || !/^[^\s@]+@[^\s@][^\s.@]*\.[^\s@]+$/.test(to))
     return { ok: false }
   if (config.kind === 'smtp') {
     try {
-      await smtp.send(config, to, subject, text)
+      await smtp.send(config, to, subject, text, html)
       return { ok: true }
     }
     catch (error) {
@@ -37,7 +38,7 @@ export async function sendMail(env: Env, to: string, subject: string, text: stri
       method: 'POST',
       // Resend and others refuse a request without a User-Agent.
       headers: { 'Authorization': `Bearer ${config.key}`, 'Content-Type': 'application/json', 'User-Agent': 'nginxui-plugin-portal' },
-      body: JSON.stringify({ from: config.from, to, subject, text }),
+      body: JSON.stringify({ from: config.from, to, subject, text, ...(html ? { html } : {}) }),
     })
   }
   catch (error) {

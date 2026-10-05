@@ -99,7 +99,33 @@ describe('tracker', () => {
       return json({ id: 'm1' })
     })
     expect(await mail(env)).toBe(1)
-    expect(sent[0]).toMatchObject({ to: 'octo@example.com', from: 'portal@nginxui.com' })
+    expect(sent[0]).toMatchObject({ to: 'octo@example.com', from: 'portal@nginxui.com', subject: 'A maintainer asked for changes to io.x.y' })
     expect(await mail(env)).toBe(0)
+
+    // Checks that found problems wait for the author; checks that could not
+    // run wait for a maintainer and send nothing.
+    await env.DB.batch([
+      env.DB.prepare(`INSERT INTO change_events (change_id, stage, actor_id, detail_json, at) VALUES ('c_track0000001', 'checks', NULL, '{"outcome":"error"}', ?)`).bind(t),
+      env.DB.prepare(`INSERT INTO change_events (change_id, stage, actor_id, detail_json, at) VALUES ('c_track0000001', 'checks', NULL, '{"outcome":"checks_failed"}', ?)`).bind(t),
+    ])
+    expect(await mail(env)).toBe(1)
+    expect((sent[1] as { subject: string, text: string }).subject).toBe('The checks found problems in your change to io.x.y')
+    expect((sent[1] as { text: string }).text).toContain('/changes/')
+
+    // Mail comes in the language the user picked, with the plugin's name in it.
+    expect((await call('/api/me/locale', { method: 'PUT', mutate: true, cookie, json: { locale: 'fr_FR' } })).status).toBe(422)
+    expect((await call('/api/me/locale', { method: 'PUT', mutate: true, cookie, json: { locale: 'zh_CN' } })).status).toBe(200)
+    await env.DB.batch([
+      env.DB.prepare(`UPDATE changes SET entry_json = '{"name":{"en":"Uptime Probe","zh_CN":"可用性探针"}}' WHERE id = 'c_track0000001'`),
+      env.DB.prepare(`INSERT INTO change_events (change_id, stage, actor_id, detail_json, at) VALUES ('c_track0000001', 'rejected', NULL, '{"comment":"Copies <b>another</b> plugin"}', ?)`).bind(t),
+    ])
+    expect(await mail(env)).toBe(1)
+    const rejected = sent[2] as { subject: string, text: string, html: string }
+    expect(rejected.subject).toBe('“可用性探针”的更改已被拒绝')
+    // The HTML form carries the maintainer's words escaped, and a button to the change.
+    expect(rejected.text).toContain('Copies <b>another</b> plugin')
+    expect(rejected.html).toContain('Copies &lt;b&gt;another&lt;/b&gt; plugin')
+    expect(rejected.html).toMatch(/<a href="[^"]+\/changes\/[^"]+"[^>]*>查看更改<\/a>/)
+    expect(rejected.html).toContain(`${env.PORTAL_ORIGIN}/mail-logo.png`)
   })
 })
