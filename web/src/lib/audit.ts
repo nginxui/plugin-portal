@@ -62,6 +62,13 @@ export function auditLines(entry: AuditEntry): string[] {
     case 'ai.provider_change': return [d.quota ? $gettext('Changed the AI model %{name}: drafts per author per day %{from} to %{to}', { name: entry.subject ?? '', from: String(d.quota.from), to: String(d.quota.to) }) : $gettext('Changed the AI model %{name}', { name: entry.subject ?? '' })]
     case 'ai.provider_remove': return [$gettext('Removed the AI model %{name}', { name: entry.subject ?? '' })]
     case 'ai.review': return [$gettext('Made an AI pre-review with %{n} findings', { n: String(d.findings ?? 0) })]
+    case 'settings.announcement_create': return [$gettext('Published the announcement %{title}', { title: String(d.title ?? '') })]
+    case 'settings.announcement_update': return [$gettext('Changed the announcement %{title}', { title: String(d.title ?? '') })]
+    case 'settings.announcement_delete': return [$gettext('Removed the announcement %{title}', { title: String(d.title ?? '') })]
+    case 'settings.mail': return [d.keyChanged ? $gettext('Set the mail service, sender %{from}, with a new key', { from: String(d.from ?? '') }) : $gettext('Set the mail service, sender %{from}', { from: String(d.from ?? '') })]
+    case 'settings.mail_clear': return [$gettext('Removed the mail service settings')]
+    case 'settings.bot': return [d.tokenChanged ? $gettext('Set the bot account @%{login} with a new token', { login: String(d.login ?? '') }) : $gettext('Set the bot account @%{login}', { login: String(d.login ?? '') })]
+    case 'settings.bot_clear': return [$gettext('Removed the bot account settings')]
     case 'ai.glossary_sync': return [$gettext('Read the glossary again, %{n} languages', { n: String(d.locales ?? 0) })]
     case 'change.self_service': {
       const ops = (d.operations ?? {}) as { yank?: string[], unyank?: string[], revoke_signers?: string[], categories?: string[] }

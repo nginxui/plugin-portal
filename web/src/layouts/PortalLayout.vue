@@ -64,6 +64,7 @@ const menuItems = computed<MenuProps['items']>(() => {
         { key: '/maintain/partners', icon: icon('i-tabler-building-store'), label: $gettext('Partner management') },
         { key: '/audit', icon: icon('i-tabler-history'), label: $gettext('Audit log') },
         { key: '/ai', icon: icon('i-tabler-sparkles'), label: $gettext('AI models') },
+        { key: '/maintain/settings', icon: icon('i-tabler-settings'), label: $gettext('Settings') },
       ],
     })
   }
@@ -101,6 +102,7 @@ const crumbs = computed<Crumb[]>(() => {
     case 'partners-admin': return [maintenance, { title: $gettext('Partner management') }]
     case 'audit': return [maintenance, { title: $gettext('Audit log') }]
     case 'ai': return [maintenance, { title: $gettext('AI models') }]
+    case 'settings': return [maintenance, { title: $gettext('Settings') }]
     default: return []
   }
 })

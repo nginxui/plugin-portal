@@ -1,5 +1,6 @@
 import type { Env } from '../env'
 import { github, GitHubError } from './github'
+import { botConfig } from './settings'
 
 // Pull requests from a fork of the bot (spec 7.2): the bot needs no
 // permission on the author's repository, so the portal can never push code
@@ -20,8 +21,16 @@ export interface BotPullRequest {
   files: BotFile[]
 }
 
-export function botEnabled(env: Env): boolean {
-  return !!env.BOT_TOKEN && !!env.BOT_LOGIN
+export async function botEnabled(env: Env): Promise<boolean> {
+  return !!await botConfig(env)
+}
+
+/** The bot's token; only called once botEnabled said yes. */
+export async function botToken(env: Env): Promise<string> {
+  const config = await botConfig(env)
+  if (!config)
+    throw new Error('no bot account is configured')
+  return config.token
 }
 
 function base64(bytes: Uint8Array): string {
@@ -33,8 +42,7 @@ function base64(bytes: Uint8Array): string {
 
 const json = (body: unknown): RequestInit => ({ method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) })
 
-async function forkOf(env: Env, repo: string): Promise<string> {
-  const token = env.BOT_TOKEN!
+async function forkOf(token: string, repo: string): Promise<string> {
   const fork = await github<{ full_name: string }>(`/repos/${repo}/forks`, token, json({ default_branch_only: true }))
   // Forking is asynchronous; the fork answers once its git data exists.
   for (let attempt = 0; attempt < 10; attempt++) {
@@ -53,10 +61,10 @@ async function forkOf(env: Env, repo: string): Promise<string> {
 
 /** Opens or updates the bot's pull request; returns its number and URL. */
 export async function openBotPullRequest(env: Env, pr: BotPullRequest): Promise<{ number: number, url: string }> {
-  const token = env.BOT_TOKEN!
+  const token = await botToken(env)
   const upstream = await github<{ default_branch: string }>(`/repos/${pr.repo}`, token)
   const base = pr.base ?? upstream.default_branch
-  const fork = await forkOf(env, pr.repo)
+  const fork = await forkOf(token, pr.repo)
   const head = await github<{ object: { sha: string } }>(`/repos/${pr.repo}/git/ref/heads/${encodeURIComponent(base)}`, token)
   const parent = await github<{ tree: { sha: string } }>(`/repos/${pr.repo}/git/commits/${head.object.sha}`, token)
   const tree = []

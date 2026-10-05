@@ -57,7 +57,7 @@ notifications.post('/read', async (c) => {
 
 notifications.get('/prefs', async (c) => {
   const prefs = await c.env.DB.prepare('SELECT * FROM notify_prefs WHERE user_id = ?').bind(c.get('session').user.id).first<Prefs>() ?? DEFAULTS
-  return c.json({ inApp: !!prefs.in_app, emailOnAction: !!prefs.email_on_action, emailOnLive: !!prefs.email_on_live, email: prefs.email, mail: mailEnabled(c.env) })
+  return c.json({ inApp: !!prefs.in_app, emailOnAction: !!prefs.email_on_action, emailOnLive: !!prefs.email_on_live, email: prefs.email, mail: await mailEnabled(c.env) })
 })
 
 notifications.put('/prefs', async (c) => {

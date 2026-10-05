@@ -128,6 +128,7 @@ const all = computed<Item[]>(() => {
     pages.push(
       ['/review', 'i-tabler-inbox', $gettext('Review queue'), $gettext('Changes waiting for a review')],
       ['/audit', 'i-tabler-history', $gettext('Audit log'), $gettext('Every action in the developer portal')],
+      ['/maintain/settings', 'i-tabler-settings', $gettext('Settings'), $gettext('Announcements, mail service and bot account')],
     )
   }
   for (const [to, icon, title, sub] of pages)

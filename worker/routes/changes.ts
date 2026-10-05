@@ -3,6 +3,7 @@ import type { ChangeRow } from '../lib/changes'
 import { Hono } from 'hono'
 import { mapLimit, repoAccess } from '../lib/access'
 import { audit } from '../lib/audit'
+import { botEnabled, botToken } from '../lib/bot'
 import { cached } from '../lib/cache'
 import { loadCatalog } from '../lib/catalog'
 import { event, getChange } from '../lib/changes'
@@ -274,8 +275,8 @@ changes.post('/:id/withdraw', async (c) => {
   if (change.state !== 'open')
     return c.json({ error: 'not_open' }, 409)
   const payload = change.payload_json ? JSON.parse(change.payload_json) as { delivery?: string, repo?: string } : {}
-  if ((change.kind === 'store' || change.kind === 'translations') && payload.delivery === 'bot' && change.pr_number && payload.repo && c.env.BOT_TOKEN) {
-    await github(`/repos/${payload.repo}/pulls/${change.pr_number}`, c.env.BOT_TOKEN, {
+  if ((change.kind === 'store' || change.kind === 'translations') && payload.delivery === 'bot' && change.pr_number && payload.repo && await botEnabled(c.env)) {
+    await github(`/repos/${payload.repo}/pulls/${change.pr_number}`, await botToken(c.env), {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ state: 'closed' }),

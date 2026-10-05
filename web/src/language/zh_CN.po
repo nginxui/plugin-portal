@@ -114,6 +114,12 @@ msgstr "审计日志"
 msgid "Every action in the developer portal"
 msgstr "开发者中心中的每项操作"
 
+msgid "Settings"
+msgstr "设置"
+
+msgid "Announcements, mail service and bot account"
+msgstr "公告、邮件服务与机器人账号"
+
 msgid "Search the audit log for “%{q}”"
 msgstr "在审计日志中搜索“%{q}”"
 
@@ -738,20 +744,6 @@ msgstr "切换深色模式"
 msgid "Account menu"
 msgstr "账户菜单"
 
-msgid "Store texts in every Nginx UI language"
-msgstr "商店资料支持 14 种语言"
-
-msgid ""
-"Names, descriptions and screenshot captions follow the 14 interface "
-"languages of Nginx UI. A language a plugin leaves out shows English."
-msgstr "与 Nginx UI 界面语言一致，未翻译的语言显示英文。"
-
-msgid "Name changes are reviewed"
-msgstr "名称修改需要审核"
-
-msgid "A changed name in any language goes to review before it is listed."
-msgstr "各语言的插件名称变更都会进入审核。"
-
 msgid "Review"
 msgstr "审核"
 
@@ -772,9 +764,6 @@ msgstr "维护者操作"
 
 msgid "AI"
 msgstr "AI"
-
-msgid "Settings"
-msgstr "设置"
 
 msgid "Opened pull request #%{n} for review"
 msgstr "已开启拉取请求 #%{n} 等待审核"
@@ -839,6 +828,33 @@ msgstr "移除了 AI 模型 %{name}"
 
 msgid "Made an AI pre-review with %{n} findings"
 msgstr "生成 AI 预审摘要，共 %{n} 条"
+
+msgid "Published the announcement %{title}"
+msgstr "发布公告“%{title}”"
+
+msgid "Changed the announcement %{title}"
+msgstr "修改公告“%{title}”"
+
+msgid "Removed the announcement %{title}"
+msgstr "删除公告“%{title}”"
+
+msgid "Set the mail service, sender %{from}, with a new key"
+msgstr "设置邮件服务，发件人 %{from}，更换了密钥"
+
+msgid "Set the mail service, sender %{from}"
+msgstr "设置邮件服务，发件人 %{from}"
+
+msgid "Removed the mail service settings"
+msgstr "清除邮件服务设置"
+
+msgid "Set the bot account @%{login} with a new token"
+msgstr "设置机器人账号 @%{login}，更换了令牌"
+
+msgid "Set the bot account @%{login}"
+msgstr "设置机器人账号 @%{login}"
+
+msgid "Removed the bot account settings"
+msgstr "清除机器人账号设置"
 
 msgid "Read the glossary again, %{n} languages"
 msgstr "重新读取术语表，共 %{n} 种语言"
@@ -1999,6 +2015,150 @@ msgstr "吊销合作伙伴密钥"
 msgid "Revoke"
 msgstr "撤销"
 
+msgid "Enter a date."
+msgstr "请填写日期。"
+
+msgid "Enter an English title of at most 80 characters."
+msgstr "请填写英文标题，不超过 80 个字符。"
+
+msgid "Enter an English text of at most 400 characters."
+msgstr "请填写英文内容，不超过 400 个字符。"
+
+msgid "Enter the address of the mail service, starting with https://."
+msgstr "请填写邮件服务的地址，以 https:// 开头。"
+
+msgid "Enter the sender as an email address, with a name if you like."
+msgstr "请填写发件人邮箱地址，可以带上名称。"
+
+msgid "Enter the API key of the mail service."
+msgstr "请填写邮件服务的 API 密钥。"
+
+msgid "Enter an email address to send the test to."
+msgstr "请填写接收测试邮件的邮箱地址。"
+
+msgid ""
+"The mail service did not accept the test mail. Check the address, the sender"
+" and the key."
+msgstr "邮件服务没有接受测试邮件，请检查地址、发件人和密钥。"
+
+msgid "Enter the GitHub account of the bot."
+msgstr "请填写机器人的 GitHub 账号。"
+
+msgid "Enter an access token of the bot account."
+msgstr "请填写机器人账号的访问令牌。"
+
+msgid "The token belongs to another GitHub account."
+msgstr "该令牌属于另一个 GitHub 账号。"
+
+msgid "GitHub did not accept the token."
+msgstr "GitHub 不接受该令牌。"
+
+msgid "The settings could not be saved. Please try again."
+msgstr "无法保存设置，请重试。"
+
+msgid "In use"
+msgstr "已启用"
+
+msgid "From the Worker config"
+msgstr "使用 Worker 配置"
+
+msgid "Not set up"
+msgstr "未配置"
+
+msgid "The test mail was sent."
+msgstr "测试邮件已发送。"
+
+msgid ""
+"Announcements for authors, and the services the portal sends mail and opens "
+"pull requests with. Changes are kept in the audit log."
+msgstr "面向作者的公告，以及开发者中心发送邮件、开启拉取请求所用的服务。所有修改都记录在审计日志中。"
+
+msgid "Announcements"
+msgstr "公告"
+
+msgid "New announcement"
+msgstr "新建公告"
+
+msgid ""
+"Shown on My plugins, the newest five first, in the language of the portal or"
+" else in English."
+msgstr "显示在“我的插件”页面，最新的 5 条在前，按开发者中心的语言显示，没有对应语言时显示英文。"
+
+msgid "No announcements."
+msgstr "暂无公告。"
+
+msgid ", no Chinese version"
+msgstr "，没有中文版本"
+
+msgid "Remove this announcement?"
+msgstr "删除这条公告？"
+
+msgid "Mail service"
+msgstr "邮件服务"
+
+msgid ""
+"Authors who turn on email get mail about the progress of their changes. The "
+"service takes from, to, subject and text, as Resend and similar services do."
+msgstr ""
+"作者开启邮件通知后，会收到更改进度邮件。邮件服务需接收 from、to、subject、text 四个字段，Resend 等服务可直接使用。"
+
+msgid "Address"
+msgstr "地址"
+
+msgid "Sender"
+msgstr "发件人"
+
+msgid "Remove the mail service settings?"
+msgstr "清除邮件服务设置？"
+
+msgid "Send a test mail"
+msgstr "发送测试邮件"
+
+msgid "Send"
+msgstr "发送"
+
+msgid "Bot account"
+msgstr "机器人账号"
+
+msgid ""
+"When authors send store changes through the bot, it opens a pull request on "
+"their repository from a fork of its own, and the author merges it. The token"
+" needs the public_repo scope."
+msgstr "作者选择由机器人提交商店资料时，机器人从自己的复刻向插件仓库开启拉取请求，由作者合并。令牌需要 public_repo 权限。"
+
+msgid "GitHub account"
+msgstr "GitHub 账号"
+
+msgid "Access token"
+msgstr "访问令牌"
+
+msgid "Remove the bot account settings?"
+msgstr "清除机器人账号设置？"
+
+msgid "Edit the announcement"
+msgstr "编辑公告"
+
+msgid "Publish"
+msgstr "发布"
+
+msgid "Date"
+msgstr "日期"
+
+msgid "Title in English"
+msgstr "英文标题"
+
+msgid "Text in English"
+msgstr "英文内容"
+
+msgid "Title in Simplified Chinese"
+msgstr "简体中文标题"
+
+msgid "Text in Simplified Chinese"
+msgstr "简体中文内容"
+
+msgid "Without a Chinese version, the English shows."
+msgstr "没有中文版本时显示英文。"
+
 msgid ""
 "%{n} plugins, from your account and %{orgs} organizations. Roles come from "
 "your permission on each GitHub repository."
@@ -2132,9 +2292,6 @@ msgstr "%{n} 个未关闭的 issue"
 
 msgid "No open issues"
 msgstr "无未关闭的 issue"
-
-msgid "Announcements"
-msgstr "公告"
 
 msgid "Getting started"
 msgstr "开始之前"
@@ -2461,9 +2618,6 @@ msgstr "申请密钥轮换"
 
 msgid "Ask for a key revocation"
 msgstr "申请密钥吊销"
-
-msgid "Send"
-msgstr "发送"
 
 msgid "New partner public key"
 msgstr "新的合作伙伴公钥"
@@ -4116,6 +4270,23 @@ msgstr "名称建议"
 msgid "An accepted name still goes to a maintainer before it is listed."
 msgstr "名称建议被采纳后，仍需维护者审核才会显示。"
 
+#~ msgid "On"
+#~ msgstr "开启"
+
+#~ msgid "Store texts in every Nginx UI language"
+#~ msgstr "商店资料支持 14 种语言"
+
+#~ msgid ""
+#~ "Names, descriptions and screenshot captions follow the 14 interface "
+#~ "languages of Nginx UI. A language a plugin leaves out shows English."
+#~ msgstr "与 Nginx UI 界面语言一致，未翻译的语言显示英文。"
+
+#~ msgid "Name changes are reviewed"
+#~ msgstr "名称修改需要审核"
+
+#~ msgid "A changed name in any language goes to review before it is listed."
+#~ msgstr "各语言的插件名称变更都会进入审核。"
+
 #~ msgid "Uploads are not available yet."
 #~ msgstr "暂不支持上传。"
 
@@ -4190,9 +4361,6 @@ msgstr "名称建议被采纳后，仍需维护者审核才会显示。"
 #~ msgid ""
 #~ "The Worker secret AI_KEY is not set, so provider keys cannot be saved yet."
 #~ msgstr "Worker 密钥 AI_KEY 尚未设置，暂时无法保存服务商密钥。"
-
-#~ msgid "On"
-#~ msgstr "开启"
 
 #~ msgid "Reviewed in %{h} hours on average"
 #~ msgstr "平均 %{h} 小时完成审核"
