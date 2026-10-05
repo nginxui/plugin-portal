@@ -347,7 +347,7 @@ onMounted(async () => {
             <template #extra>
               <ASegmented v-model:value="previewMode" size="small" :options="[{ value: 'card', label: $gettext('Card') }, { value: 'detail', label: $gettext('Details page') }]" />
             </template>
-            <ListingCard v-if="previewMode === 'card'" :draft="draft" :categories="chosen" />
+            <ListingCard v-if="previewMode === 'card'" :draft="draft" />
             <MarketPreview
               v-else
               :doc="{ name: draft.name, description: draft.description }"
