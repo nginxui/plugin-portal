@@ -291,11 +291,6 @@ onKeyStroke('/', (e) => {
           {{ $gettext('New listings and changes that need a review, highest risk first. Self service changes take effect directly and are kept in the audit log.') }}
         </ATypographyText>
       </div>
-      <AButton @click="palette.show()">
-        <span class="i-tabler-search" />
-        {{ $gettext('Search and commands') }}
-        <span class="keycap"><kbd>{{ palette.modifier }}</kbd><kbd>K</kbd></span>
-      </AButton>
     </AFlex>
 
     <AAlert v-if="failed" type="error" show-icon :title="$gettext('The queue could not be loaded.')" />

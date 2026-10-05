@@ -113,4 +113,20 @@ describe('maintainer actions', () => {
     expect(list.counts.listed).toBe(1)
     expect(list.plugins[0].openChanges).toBe(2)
   })
+
+  it('lists a plugin the published index has not caught up with as listed', async () => {
+    const t = Math.floor(Date.now() / 1000)
+    await env.DB.prepare(`INSERT INTO plugins (plugin_id, repo_full_name, state, created_at, updated_at) VALUES ('io.github.acme.probe', 'acme/probe', 'listed', ?, ?)`).bind(t, t).run()
+    const cookie = await user(true)
+    vi.restoreAllMocks()
+    mockFetch(
+      url => url.pathname === '/repos/acme/probe/releases' ? json([{ tag_name: 'v0.2.0', prerelease: false, draft: false, html_url: '#', published_at: '2026-10-01T00:00:00Z', assets: [] }]) : undefined,
+      url => url.href === `https://raw.githubusercontent.com/${env.CATALOG_REPO}/main/plugins/io.github.acme.probe.json` ? json({ id: 'io.github.acme.probe', name: { en: 'Probe' }, trust: 'community' }) : undefined,
+      ...routes(),
+      ...githubOAuth({ push: true }),
+    )
+    const list = await (await call('/api/maintain/plugins', { cookie })).json() as { plugins: { id: string, state: string, version: string | null, name: Record<string, string> }[], counts: { listed: number } }
+    expect(list.plugins.find(p => p.id === 'io.github.acme.probe')).toMatchObject({ state: 'listed', version: '0.2.0', name: { en: 'Probe' } })
+    expect(list.counts.listed).toBe(2)
+  })
 })

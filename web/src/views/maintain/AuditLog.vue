@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { AuditEntry, AuditKind, AuditQuery } from '@/api/audit'
-import { refDebounced } from '@vueuse/core'
+import { refDebounced, useEventListener } from '@vueuse/core'
 import dayjs from 'dayjs'
 import { computed, ref, watch } from 'vue'
 import { useRoute } from 'vue-router'
@@ -44,6 +44,14 @@ const current = ref<number | undefined>()
 const next = ref<number | null>(null)
 const selected = ref<AuditEntry | null>(null)
 
+// The details close on a click anywhere but the drawer or another record,
+// which shows that record instead.
+useEventListener(document, 'pointerdown', (event) => {
+  const target = event.target as Element | null
+  if (selected.value && target && !target.closest('.record-drawer, .record-row'))
+    selected.value = null
+})
+
 async function load(before?: number) {
   loading.value = true
   try {
@@ -53,8 +61,8 @@ async function load(before?: number) {
     next.value = page.next
     current.value = before
     failed.value = false
-    if (!selected.value || !page.entries.some(e => e.id === selected.value?.id))
-      selected.value = page.entries[0] ?? null
+    if (selected.value && !page.entries.some(e => e.id === selected.value?.id))
+      selected.value = null
   }
   catch {
     failed.value = true
@@ -120,7 +128,7 @@ const detailText = computed(() => selected.value ? auditDetailLines(selected.val
 </script>
 
 <template>
-  <div class="page">
+  <div class="page" :class="{ 'beside-drawer': selected }">
     <AFlex justify="space-between" align="flex-start" gap="middle" wrap>
       <div>
         <h1 class="page-title">
@@ -142,134 +150,125 @@ const detailText = computed(() => selected.value ? auditDetailLines(selected.val
 
     <AAlert v-if="failed" type="error" show-icon :title="$gettext('The audit log could not be loaded.')" />
 
-    <div class="cols">
-      <ACard class="col-main" :styles="{ body: { padding: 0 } }">
-        <div class="toolbar">
-          <ASegmented v-model:value="kind" :options="kinds" />
-          <AFlex gap="small" wrap>
-            <AInput v-model:value="actor" allow-clear class="w-28" :placeholder="$gettext('Actor')" :aria-label="$gettext('Actor')" />
-            <AInput v-model:value="subject" allow-clear class="w-36" :placeholder="$gettext('Plugin ID')" :aria-label="$gettext('Plugin ID')" />
-            <ASelect v-model:value="days" :options="ranges" class="w-32" :aria-label="$gettext('Time range')" />
-          </AFlex>
+    <ACard :styles="{ body: { padding: 0 } }">
+      <div class="toolbar">
+        <ASegmented v-model:value="kind" :options="kinds" />
+        <AFlex gap="small" wrap>
+          <AInput v-model:value="actor" allow-clear class="w-28" :placeholder="$gettext('Actor')" :aria-label="$gettext('Actor')" />
+          <AInput v-model:value="subject" allow-clear class="w-36" :placeholder="$gettext('Plugin ID')" :aria-label="$gettext('Plugin ID')" />
+          <ASelect v-model:value="days" :options="ranges" class="w-32" :aria-label="$gettext('Time range')" />
+        </AFlex>
+      </div>
+      <ASpin :spinning="loading">
+        <div class="overflow-x-auto">
+          <table class="log">
+            <thead>
+              <tr>
+                <th>{{ $gettext('Time') }}</th>
+                <th>{{ $gettext('Actor') }}</th>
+                <th>{{ $gettext('Kind') }}</th>
+                <th>{{ $gettext('Action') }}</th>
+                <th>{{ $gettext('Record') }}</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr
+                v-for="entry in entries"
+                :key="entry.id"
+                class="record-row"
+                :class="{ focus: selected?.id === entry.id }"
+                tabindex="0"
+                @click="selected = entry"
+                @keydown.enter="selected = entry"
+              >
+                <td class="nowrap">
+                  <span class="op-85">{{ dayjs.unix(entry.at).format('MM-DD HH:mm') }}</span>
+                </td>
+                <td class="nowrap">
+                  <span class="actor">
+                    <AAvatar v-if="entry.actor" :src="entry.actorAvatar ?? undefined" :size="20">{{ entry.actor.slice(0, 1).toUpperCase() }}</AAvatar>
+                    <span v-else class="portal-mark"><span class="i-tabler-refresh" /></span>
+                    {{ entry.actor ?? actorName(entry) }}
+                  </span>
+                </td>
+                <td class="nowrap">
+                  <ATag :color="AUDIT_KIND_COLORS[entry.kind]" class="m-0">
+                    {{ auditKindLabel(entry.kind) }}
+                  </ATag>
+                </td>
+                <td>
+                  <div v-for="line in auditLines(entry)" :key="line">
+                    {{ line }}
+                  </div>
+                  <div v-if="entry.action === 'catalog.deployed' && entry.detail?.run" class="text-3 op-65">
+                    {{ $gettext('deploy run #%{run}', { run: String(entry.detail.run) }) }}
+                  </div>
+                  <div v-else-if="entry.subject" class="text-3 op-65 mono">
+                    {{ entry.subject }}
+                  </div>
+                  <div v-if="auditNote(entry)" class="text-3 op-65">
+                    {{ $gettext('Reason: %{reason}', { reason: auditNote(entry) }) }}
+                  </div>
+                </td>
+                <td class="nowrap">
+                  <template v-if="entry.record">
+                    <a v-if="isExternal(entry.record.url)" :href="entry.record.url" target="_blank" rel="noopener" class="mono" @click.stop>{{ entry.record.label }}</a>
+                    <RouterLink v-else :to="entry.record.url" class="mono" @click.stop>
+                      {{ entry.record.label }}
+                    </RouterLink>
+                  </template>
+                  <span v-else class="op-50">{{ $gettext('Portal') }}</span>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+          <AEmpty v-if="!loading && entries.length === 0" class="py-8" :description="$gettext('No records match these filters.')" />
         </div>
-        <ASpin :spinning="loading">
-          <div class="overflow-x-auto">
-            <table class="log">
-              <thead>
-                <tr>
-                  <th>{{ $gettext('Time') }}</th>
-                  <th>{{ $gettext('Actor') }}</th>
-                  <th>{{ $gettext('Kind') }}</th>
-                  <th>{{ $gettext('Action') }}</th>
-                  <th>{{ $gettext('Record') }}</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr
-                  v-for="entry in entries"
-                  :key="entry.id"
-                  :class="{ focus: selected?.id === entry.id }"
-                  tabindex="0"
-                  @click="selected = entry"
-                  @keydown.enter="selected = entry"
-                >
-                  <td class="nowrap">
-                    <span class="op-85">{{ dayjs.unix(entry.at).format('MM-DD HH:mm') }}</span>
-                  </td>
-                  <td class="nowrap">
-                    <span class="actor">
-                      <AAvatar v-if="entry.actor" :src="entry.actorAvatar ?? undefined" :size="20">{{ entry.actor.slice(0, 1).toUpperCase() }}</AAvatar>
-                      <span v-else class="portal-mark"><span class="i-tabler-refresh" /></span>
-                      {{ entry.actor ?? actorName(entry) }}
-                    </span>
-                  </td>
-                  <td class="nowrap">
-                    <ATag :color="AUDIT_KIND_COLORS[entry.kind]" class="m-0">
-                      {{ auditKindLabel(entry.kind) }}
-                    </ATag>
-                  </td>
-                  <td>
-                    <div v-for="line in auditLines(entry)" :key="line">
-                      {{ line }}
-                    </div>
-                    <div v-if="entry.action === 'catalog.deployed' && entry.detail?.run" class="text-3 op-65">
-                      {{ $gettext('deploy run #%{run}', { run: String(entry.detail.run) }) }}
-                    </div>
-                    <div v-else-if="entry.subject" class="text-3 op-65 mono">
-                      {{ entry.subject }}
-                    </div>
-                    <div v-if="auditNote(entry)" class="text-3 op-65">
-                      {{ $gettext('Reason: %{reason}', { reason: auditNote(entry) }) }}
-                    </div>
-                  </td>
-                  <td class="nowrap">
-                    <template v-if="entry.record">
-                      <a v-if="isExternal(entry.record.url)" :href="entry.record.url" target="_blank" rel="noopener" class="mono" @click.stop>{{ entry.record.label }}</a>
-                      <RouterLink v-else :to="entry.record.url" class="mono" @click.stop>
-                        {{ entry.record.label }}
-                      </RouterLink>
-                    </template>
-                    <span v-else class="op-50">{{ $gettext('Portal') }}</span>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-            <AEmpty v-if="!loading && entries.length === 0" class="py-8" :description="$gettext('No records match these filters.')" />
-          </div>
-        </ASpin>
-        <div class="foot">
-          <span class="text-3 op-65">{{ totalText }}</span>
-          <AFlex gap="small">
-            <AButton size="small" :disabled="cursors.length === 0" @click="newer">
-              {{ $gettext('Newer') }}
-            </AButton>
-            <AButton size="small" :disabled="next === null" @click="older">
-              {{ $gettext('Older') }}
-            </AButton>
-          </AFlex>
-        </div>
-      </ACard>
+      </ASpin>
+      <div class="foot">
+        <span class="text-3 op-65">{{ totalText }}</span>
+        <AFlex gap="small">
+          <AButton size="small" :disabled="cursors.length === 0" @click="newer">
+            {{ $gettext('Newer') }}
+          </AButton>
+          <AButton size="small" :disabled="next === null" @click="older">
+            {{ $gettext('Older') }}
+          </AButton>
+        </AFlex>
+      </div>
+    </ACard>
 
-      <AFlex vertical gap="middle" class="col-side">
-        <ACard :title="$gettext('Record details')">
-          <template v-if="selected">
-            <dl class="kv">
-              <dt>{{ $gettext('Time') }}</dt>
-              <dd>{{ dayjs.unix(selected.at).format('YYYY-MM-DD HH:mm:ss') }}</dd>
-              <dt>{{ $gettext('Actor') }}</dt>
-              <dd>{{ actorName(selected) }}</dd>
-              <template v-if="selected.subject">
-                <dt>{{ $gettext('Subject') }}</dt>
-                <dd class="mono break-all">
-                  {{ selected.subject }}
-                </dd>
-              </template>
-              <template v-if="selected.record">
-                <dt>{{ $gettext('Record') }}</dt>
-                <dd class="break-all">
-                  <a v-if="isExternal(selected.record.url)" :href="selected.record.url" target="_blank" rel="noopener">{{ recordText(selected.record.url) }}</a>
-                  <RouterLink v-else :to="selected.record.url">
-                    {{ $gettext('Change %{id}', { id: selected.record.label }) }}
-                  </RouterLink>
-                </dd>
-              </template>
-            </dl>
-            <pre v-if="detailText" class="codeblock">{{ detailText }}</pre>
+    <ATypographyParagraph type="secondary" class="text-3 mt-3 mb-0">
+      {{ $gettext('The catalog follows its git history. Should this log be lost, every catalog change can still be traced from its commits and pull requests.') }}
+      {{ $gettext('Sign ins, settings and AI use are recorded only here and kept for one year.') }}
+    </ATypographyParagraph>
+
+    <ADrawer :open="!!selected" :title="$gettext('Record details')" :size="420" :mask="false" :classes="{ root: 'record-drawer' }" :styles="{ wrapper: { top: '64px' } }" @close="selected = null">
+      <template v-if="selected">
+        <dl class="kv">
+          <dt>{{ $gettext('Time') }}</dt>
+          <dd>{{ dayjs.unix(selected.at).format('YYYY-MM-DD HH:mm:ss') }}</dd>
+          <dt>{{ $gettext('Actor') }}</dt>
+          <dd>{{ actorName(selected) }}</dd>
+          <template v-if="selected.subject">
+            <dt>{{ $gettext('Subject') }}</dt>
+            <dd class="mono break-all">
+              {{ selected.subject }}
+            </dd>
           </template>
-          <ATypographyText v-else type="secondary">
-            {{ $gettext('Select a record to see its details.') }}
-          </ATypographyText>
-        </ACard>
-        <ACard :title="$gettext('Retention')">
-          <ATypographyParagraph class="text-3">
-            {{ $gettext('The catalog follows its git history. Should this log be lost, every catalog change can still be traced from its commits and pull requests.') }}
-          </ATypographyParagraph>
-          <ATypographyParagraph type="secondary" class="text-3 mb-0">
-            {{ $gettext('Sign ins, settings and AI use are recorded only here and kept for one year.') }}
-          </ATypographyParagraph>
-        </ACard>
-      </AFlex>
-    </div>
+          <template v-if="selected.record">
+            <dt>{{ $gettext('Record') }}</dt>
+            <dd class="break-all">
+              <a v-if="isExternal(selected.record.url)" :href="selected.record.url" target="_blank" rel="noopener">{{ recordText(selected.record.url) }}</a>
+              <RouterLink v-else :to="selected.record.url">
+                {{ $gettext('Change %{id}', { id: selected.record.label }) }}
+              </RouterLink>
+            </dd>
+          </template>
+        </dl>
+        <pre v-if="detailText" class="codeblock">{{ detailText }}</pre>
+      </template>
+    </ADrawer>
   </div>
 </template>
 
