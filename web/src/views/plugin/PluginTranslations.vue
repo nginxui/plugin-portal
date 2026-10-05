@@ -5,6 +5,7 @@ import { useLocalStorage } from '@vueuse/core'
 import { computed, onMounted, ref, watch } from 'vue'
 import { aiDraft, aiStatus, getCommunity, getGlossary } from '@/api/community'
 import gettext, { $gettext } from '@/lib/gettext'
+import { termsIn } from '@/lib/glossary'
 import { HOST_LOCALES, RTL_LOCALES } from '@/lib/hostLocales'
 import { localeName } from '@/lib/locales'
 import { permissionText } from '@/lib/market'
@@ -187,7 +188,7 @@ watch(() => gettext.current, async (value) => {
 }, { immediate: true })
 
 const source = computed(() => cell.value ? textIn(cell.value.key, 'en') : '')
-const usedTerms = computed(() => Object.entries(terms.value).filter(([en]) => new RegExp(`\\b${en.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}`, 'i').test(source.value)))
+const usedTerms = computed(() => termsIn(terms.value, source.value))
 const cellLabel = computed(() => cell.value ? `${localeName(cell.value.locale)}: ${allRows.value.find(r => r.key === cell.value!.key)?.label ?? ''}` : '')
 const cellEditable = computed(() => !!cell.value && S.value.canEdit.texts)
 

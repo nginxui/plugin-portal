@@ -3,6 +3,7 @@ import type { TranslatePlugin, TranslatorOverview } from '@/api/community'
 import { computed, onMounted, ref, watch } from 'vue'
 import { getGlossary, getTranslatePlugin, getTranslator, setTranslatorLangs, suggest } from '@/api/community'
 import gettext, { $gettext } from '@/lib/gettext'
+import { termsIn } from '@/lib/glossary'
 import { HOST_LOCALES, RTL_LOCALES } from '@/lib/hostLocales'
 import { joinClauses, localized } from '@/lib/labels'
 import { localeName } from '@/lib/locales'
@@ -112,6 +113,8 @@ const terms = ref<Record<string, string>>({})
 watch(lang, async (value) => {
   terms.value = value ? (await getGlossary(value).catch(() => ({ terms: {} }))).terms : {}
 }, { immediate: true })
+// Only the terms the plugin's English texts use.
+const usedTerms = computed(() => termsIn(terms.value, (current.value?.rows ?? []).map(r => r.en ?? '').join('\n')))
 
 // The glossary is keyed by the English terms; show them in the language of
 // the portal when Nginx UI translates them.
@@ -304,12 +307,12 @@ const PROGRESS: Record<string, { text: (n: number | null) => string, track: stri
             </div>
           </div>
         </ACard>
-        <ACard v-if="lang && Object.keys(terms).length" :title="$gettext('Glossary')">
+        <ACard v-if="lang && usedTerms.length" :title="$gettext('Glossary')">
           <template #extra>
             <span class="text-3 op-65">{{ $gettext('As Nginx UI translates them') }}</span>
           </template>
           <dl class="kv">
-            <template v-for="(tr, en) in terms" :key="en">
+            <template v-for="[en, tr] in usedTerms" :key="en">
               <dt>{{ uiTerms[en] ?? en }}</dt>
               <dd>{{ tr }}</dd>
             </template>
