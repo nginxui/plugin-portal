@@ -1,12 +1,14 @@
 <script setup lang="ts">
+import type { MarketEntry } from '@nginxui/plugin-market-ui'
 import type { PreviewDoc } from './MarketPreview.vue'
-import { computed, nextTick, onMounted, ref, watch } from 'vue'
+import { bundledText, MarketCard } from '@nginxui/plugin-market-ui'
+import { theme as antTheme } from 'antdv-next'
+import { computed, nextTick, onMounted, ref, useTemplateRef, watch } from 'vue'
 import { $gettext } from '@/lib/gettext'
 import { localeName } from '@/lib/locales'
-import { resolve, trustText } from '@/lib/market'
 
-// The stress tests side by side, each as a marketplace list card at
-// the width Nginx UI gives it, with what it found.
+// The stress tests side by side, each as the marketplace list card Nginx UI
+// draws, at the width it gives it, with what it found.
 
 export interface StressResults {
   longest: { locale: string, cut: boolean }
@@ -21,18 +23,28 @@ const RTL = 'ar'
 
 const longestLocale = computed(() => Object.entries(props.doc.name ?? {}).reduce((a, b) => (b[1].length > a[1].length ? b : a), ['en', ''])[0])
 const samples = computed(() => [
-  { key: 'longest' as const, title: $gettext('Longest language: %{lang}', { lang: localeName(longestLocale.value) }), locale: longestLocale.value, name: resolve(props.doc.name, longestLocale.value).text, rtl: false },
-  { key: 'rtl' as const, title: $gettext('Right to left: %{lang}', { lang: localeName(RTL) }), locale: RTL, name: resolve(props.doc.name, RTL).text, rtl: true },
+  { key: 'longest' as const, title: $gettext('Longest language: %{lang}', { lang: localeName(longestLocale.value) }), locale: longestLocale.value, rtl: false },
+  { key: 'rtl' as const, title: $gettext('Right to left: %{lang}', { lang: localeName(RTL) }), locale: RTL, rtl: true },
 ])
 
-const names = ref<HTMLElement[]>([])
+const themeConfig = computed(() => ({ algorithm: props.theme === 'dark' ? antTheme.darkAlgorithm : antTheme.defaultAlgorithm }))
+const entry = computed<MarketEntry>(() => ({
+  id: '',
+  name: props.doc.name,
+  description: props.doc.description,
+  author: props.author ?? undefined,
+  icon_url: props.iconUrl ?? undefined,
+  trust: props.trust ?? undefined,
+}))
+
+const grid = useTemplateRef<HTMLElement>('grid')
 const cut = ref<Record<string, boolean>>({})
 
 async function measure() {
   await nextTick()
   const out: Record<string, boolean> = {}
-  for (const el of names.value)
-    out[el.dataset.key!] = el.scrollWidth > el.clientWidth + 1
+  for (const el of grid.value?.querySelectorAll<HTMLElement>('[data-key] .pmu-card-name') ?? [])
+    out[el.closest<HTMLElement>('[data-key]')!.dataset.key!] = el.scrollHeight > el.clientHeight + 1
   cut.value = out
   emit('results', {
     longest: { locale: longestLocale.value, cut: !!out.longest },
@@ -55,94 +67,52 @@ function verdict(key: string) {
     <template #extra>
       <span class="text-3 op-65 extra-hint">{{ $gettext('Cards in the list have a fixed width, a long name is cut short') }}</span>
     </template>
-    <div class="grid3" :class="theme">
-      <div v-for="sample in samples" :key="sample.key" class="sample">
-        <div class="text-3 op-65 mb-2">
-          {{ sample.title }}
-        </div>
-        <article class="card" :style="{ maxWidth: `${CARD_WIDTH}px` }" :dir="sample.rtl ? 'rtl' : 'ltr'">
-          <div class="card-head">
-            <PluginIcon :src="iconUrl" :name="resolve(doc.name, 'en').text || '?'" :size="40" />
-            <div class="min-w-0 flex-1">
-              <span ref="names" class="name" :class="{ cut: cut[sample.key] }" :data-key="sample.key">{{ sample.name }}</span>
-              <span class="sub">{{ author }}</span>
+    <AConfigProvider :theme="themeConfig">
+      <AFlex class="stage">
+        <div ref="grid" class="grid3">
+          <div v-for="sample in samples" :key="sample.key" class="sample">
+            <div class="text-3 op-65 mb-2">
+              {{ sample.title }}
             </div>
-            <span v-if="trust" class="trust">{{ trustText(sample.locale, trust) }}</span>
+            <div class="card-slot" :class="{ cut: cut[sample.key] }" :data-key="sample.key" :style="{ maxWidth: `${CARD_WIDTH}px` }" :dir="sample.rtl ? 'rtl' : 'ltr'">
+              <MarketCard :entry="entry" :locale="sample.locale" :translate="bundledText(sample.locale)" />
+            </div>
+            <div class="text-3 mt-2" :class="verdict(sample.key).tone === 'bad' ? 'c-bad' : 'c-ok'">
+              {{ verdict(sample.key).text }}
+            </div>
           </div>
-        </article>
-        <div class="text-3 mt-2" :class="verdict(sample.key).tone === 'bad' ? 'c-bad' : 'c-ok'">
-          {{ verdict(sample.key).text }}
         </div>
-      </div>
-    </div>
+      </AFlex>
+    </AConfigProvider>
   </ACard>
 </template>
 
 <style scoped>
+.stage {
+  display: block;
+  padding: 12px;
+  border-radius: 10px;
+  background: var(--ant-color-bg-layout);
+  color: var(--ant-color-text);
+}
+
 .grid3 {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
   gap: 16px;
 }
 
-.card {
-  box-sizing: border-box;
-  padding: 14px;
-  border-radius: 10px;
-  background: #fff;
-  color: rgba(0, 0, 0, 0.88);
-  border: 1px solid rgba(5, 5, 5, 0.08);
-}
-
-.dark .card {
-  background: #141414;
-  color: rgba(255, 255, 255, 0.85);
-  border-color: #303030;
-}
-
-.card-head {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-
-.name {
-  display: block;
-  font-weight: 600;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+.card-slot.cut :deep(.pmu-card-name) {
   border-radius: 4px;
-}
-
-.name.cut {
-  outline: 2px dashed #cf1322;
+  outline: 2px dashed var(--ant-color-error);
   outline-offset: 2px;
 }
 
-.sub {
-  font-size: 12px;
-  opacity: 0.55;
-}
-
-.trust {
-  flex: none;
-  padding: 0 8px;
-  border-radius: 999px;
-  font-size: 12px;
-  line-height: 20px;
-  background: rgba(0, 0, 0, 0.06);
-}
-
-.dark .trust {
-  background: rgba(255, 255, 255, 0.1);
-}
-
 .c-bad {
-  color: var(--portal-err-text);
+  color: var(--ant-color-error);
 }
 
 .c-ok {
-  color: var(--portal-ok-text);
+  color: var(--ant-color-success);
 }
 </style>

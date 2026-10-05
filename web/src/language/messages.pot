@@ -622,38 +622,38 @@ msgstr ""
 msgid "Not translated, shows English"
 msgstr ""
 
-#: web/src/components/ListCardRow.vue:34
+#: web/src/components/ListCardRow.vue:40
 #: web/src/views/plugin/PluginStore.vue:488
 msgid "The English name is cut short in the card. Keep it to about %{n} characters."
 msgstr ""
 
-#: web/src/components/ListCardRow.vue:35
+#: web/src/components/ListCardRow.vue:41
 #: web/src/views/plugin/PluginStore.vue:488
 msgid "In a longer language such as German, the name may be cut short. Keep the English name to about %{n} characters."
 msgstr ""
 
-#: web/src/components/ListCardRow.vue:76
+#: web/src/components/ListCardRow.vue:95
 msgid "Marketplace list card"
 msgstr ""
 
-#: web/src/components/ListCardRow.vue:77
-#: web/src/components/StressCards.vue:56
+#: web/src/components/ListCardRow.vue:96
+#: web/src/components/StressCards.vue:68
 msgid "Cards in the list have a fixed width, a long name is cut short"
 msgstr ""
 
-#: web/src/components/ListCardRow.vue:80
+#: web/src/components/ListCardRow.vue:99
 msgid "List cards at their real width"
 msgstr ""
 
-#: web/src/components/ListCardRow.vue:81
+#: web/src/components/ListCardRow.vue:100
 msgid "%{n} names are cut short"
 msgstr ""
 
-#: web/src/components/ListCardRow.vue:90
+#: web/src/components/ListCardRow.vue:109
 msgid "%{lang}, shows English"
 msgstr ""
 
-#: web/src/components/ListCardRow.vue:97
+#: web/src/components/ListCardRow.vue:112
 msgid "Name cut short"
 msgstr ""
 
@@ -1286,23 +1286,23 @@ msgstr ""
 msgid "Plugin catalog"
 msgstr ""
 
-#: web/src/components/StressCards.vue:24
+#: web/src/components/StressCards.vue:26
 msgid "Longest language: %{lang}"
 msgstr ""
 
-#: web/src/components/StressCards.vue:25
+#: web/src/components/StressCards.vue:27
 msgid "Right to left: %{lang}"
 msgstr ""
 
-#: web/src/components/StressCards.vue:48
+#: web/src/components/StressCards.vue:60
 msgid "The name is cut short"
 msgstr ""
 
-#: web/src/components/StressCards.vue:49
+#: web/src/components/StressCards.vue:61
 msgid "Shows in full"
 msgstr ""
 
-#: web/src/components/StressCards.vue:54
+#: web/src/components/StressCards.vue:66
 msgid "Marketplace cards"
 msgstr ""
 
