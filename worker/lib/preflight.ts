@@ -117,6 +117,10 @@ export function newer(a: string, b: string): boolean {
 export function preflightChecks(opts: {
   id: string
   listedVersion: string | null
+  // Versions the repository has released already.
+  released?: string[]
+  // Official plugins are signed with the Nginx UI key and carry no certificate.
+  official?: boolean
   manifest: Manifest | null
   primaryKey: string | null
   certificate: string | null
@@ -131,15 +135,20 @@ export function preflightChecks(opts: {
   else if (m.id !== opts.id) {
     checks.push({ key: 'manifest', status: 'fail', params: { reason: 'id', id: String(m.id ?? '') } })
   }
+  else if (m.version && opts.released?.includes(m.version)) {
+    checks.push({ key: 'manifest', status: 'fail', params: { reason: 'released', version: m.version } })
+  }
   else if (!m.version || (opts.listedVersion && !newer(m.version, opts.listedVersion))) {
-    checks.push({ key: 'manifest', status: 'warn', params: { reason: 'version', version: String(m.version ?? ''), listed: opts.listedVersion ?? '' } })
+    checks.push({ key: 'manifest', status: 'fail', params: { reason: 'version', version: String(m.version ?? ''), listed: opts.listedVersion ?? '' } })
   }
   else {
     checks.push({ key: 'manifest', status: 'pass', params: { version: m.version } })
   }
   const primary = opts.primaryKey ? parsePublicKey(opts.primaryKey) : null
   const signature = opts.certificateSignature ? parseCertificateSignature(opts.certificateSignature) : null
-  if (!opts.certificate || !signature)
+  if (opts.official)
+    checks.push({ key: 'signer', status: 'pass', params: { reason: 'official' } })
+  else if (!opts.certificate || !signature)
     checks.push({ key: 'signer', status: 'warn', params: { reason: 'missing' } })
   else if (signature.pluginId !== opts.id)
     checks.push({ key: 'signer', status: 'fail', params: { reason: 'other_plugin', id: signature.pluginId ?? '' } })
