@@ -249,8 +249,11 @@ const ROLES: Role[] = ['admin', 'publisher', 'translator']
             <AAlert type="info" show-icon class="mb-3" :title="$gettext('Payment and license checks are yours and the plugin\'s. The catalog only shows these details.')" />
             <AAlert v-if="notice" type="error" show-icon class="mb-3" :title="notice" />
             <AButton type="primary" :loading="savingCommercial" :disabled="!canPublish" @click="saveCommercial">
-              {{ $gettext('Submit for review') }}
+              {{ $gettext('Save') }}
             </AButton>
+            <div class="text-3 op-65 mt-2">
+              {{ $gettext('Committed to the catalog without a review, live at its next update.') }}
+            </div>
           </ACard>
         </AFlex>
 

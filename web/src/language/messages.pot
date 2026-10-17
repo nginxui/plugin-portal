@@ -24,6 +24,7 @@ msgstr ""
 #: web/src/views/maintain/AiModels.vue:237
 #: web/src/views/maintain/Settings.vue:326
 #: web/src/views/maintain/Settings.vue:371
+#: web/src/views/owners/VendorPage.vue:252
 #: web/src/views/plugin/PluginTranslations.vue:425
 msgid "Save"
 msgstr ""
@@ -33,7 +34,7 @@ msgid "The catalog files the plugin under these categories from its next update.
 msgstr ""
 
 #: web/src/components/CategoryPicker.vue:28
-#: web/src/views/owners/VendorPage.vue:370
+#: web/src/views/owners/VendorPage.vue:373
 #: web/src/views/review/ReviewChange.vue:134
 #: web/src/views/review/ReviewChange.vue:167
 #: web/src/views/SubmitPlugin.vue:250
@@ -329,7 +330,7 @@ msgstr ""
 #: web/src/views/maintain/PartnersAdmin.vue:251
 #: web/src/views/maintain/PartnersAdmin.vue:262
 #: web/src/views/maintain/PartnersAdmin.vue:321
-#: web/src/views/owners/VendorPage.vue:364
+#: web/src/views/owners/VendorPage.vue:367
 #: web/src/views/plugin/PluginStore.vue:88
 #: web/src/views/plugin/PluginTranslations.vue:52
 #: web/src/views/review/ReviewChange.vue:130
@@ -425,7 +426,7 @@ msgstr ""
 #: web/src/views/maintain/Settings.vue:328
 #: web/src/views/maintain/Settings.vue:373
 #: web/src/views/maintain/Settings.vue:384
-#: web/src/views/owners/VendorPage.vue:341
+#: web/src/views/owners/VendorPage.vue:344
 #: web/src/views/plugin/PluginScreenshots.vue:405
 #: web/src/views/plugin/PluginScreenshots.vue:478
 msgid "Cancel"
@@ -517,7 +518,7 @@ msgid "Certificate signer"
 msgstr ""
 
 #: web/src/components/KeyChain.vue:45
-#: web/src/views/owners/VendorPage.vue:290
+#: web/src/views/owners/VendorPage.vue:293
 msgid "Signing key"
 msgstr ""
 
@@ -1798,7 +1799,7 @@ msgstr ""
 #: web/src/views/maintain/AllPlugins.vue:319
 #: web/src/views/maintain/AuditLog.vue:207
 #: web/src/views/maintain/AuditLog.vue:207
-#: web/src/views/owners/VendorPage.vue:361
+#: web/src/views/owners/VendorPage.vue:364
 #: web/src/views/SubmitPlugin.vue:303
 msgid "Plugin ID"
 msgstr ""
@@ -1809,7 +1810,7 @@ msgstr ""
 
 #: web/src/lib/checks.ts:13
 #: web/src/views/owners/VendorPage.vue:229
-#: web/src/views/owners/VendorPage.vue:373
+#: web/src/views/owners/VendorPage.vue:376
 #: web/src/views/review/ReviewChange.vue:135
 #: web/src/views/review/ReviewChange.vue:168
 #: web/src/views/SubmitPlugin.vue:329
@@ -1989,7 +1990,7 @@ msgstr ""
 #: web/src/views/maintain/AllPlugins.vue:180
 #: web/src/views/owners/OwnerPage.vue:65
 #: web/src/views/owners/VendorPage.vue:201
-#: web/src/views/owners/VendorPage.vue:274
+#: web/src/views/owners/VendorPage.vue:277
 #: web/src/views/translate/TranslatePage.vue:142
 msgid "Listed"
 msgstr ""
@@ -2371,7 +2372,7 @@ msgstr ""
 #: web/src/views/ChangeView.vue:416
 #: web/src/views/maintain/AllPlugins.vue:336
 #: web/src/views/maintain/PartnersAdmin.vue:349
-#: web/src/views/owners/VendorPage.vue:385
+#: web/src/views/owners/VendorPage.vue:388
 #: web/src/views/plugin/PluginVersions.vue:259
 #: web/src/views/review/ReviewChange.vue:724
 msgid "Reason"
@@ -2589,7 +2590,7 @@ msgstr ""
 #: web/src/views/maintain/Settings.vue:330
 #: web/src/views/maintain/Settings.vue:373
 #: web/src/views/maintain/Settings.vue:375
-#: web/src/views/owners/VendorPage.vue:341
+#: web/src/views/owners/VendorPage.vue:344
 msgid "Remove"
 msgstr ""
 
@@ -3041,7 +3042,7 @@ msgid "Give a name. The admins are GitHub usernames."
 msgstr ""
 
 #: web/src/views/maintain/PartnersAdmin.vue:127
-#: web/src/views/owners/VendorPage.vue:294
+#: web/src/views/owners/VendorPage.vue:297
 #: web/src/views/plugin/PluginVersions.vue:220
 msgid "Revoked"
 msgstr ""
@@ -3059,7 +3060,7 @@ msgid "Key expires in %{n} days"
 msgstr ""
 
 #: web/src/views/maintain/PartnersAdmin.vue:133
-#: web/src/views/owners/VendorPage.vue:294
+#: web/src/views/owners/VendorPage.vue:297
 msgid "Valid"
 msgstr ""
 
@@ -3160,7 +3161,7 @@ msgstr ""
 #: web/src/views/maintain/PartnersAdmin.vue:254
 #: web/src/views/maintain/PartnersAdmin.vue:276
 #: web/src/views/owners/OwnerPage.vue:180
-#: web/src/views/owners/VendorPage.vue:299
+#: web/src/views/owners/VendorPage.vue:302
 #: web/src/views/review/ReviewChange.vue:197
 msgid "Key ID"
 msgstr ""
@@ -3168,7 +3169,7 @@ msgstr ""
 #: web/src/views/maintain/PartnersAdmin.vue:255
 #: web/src/views/maintain/PartnersAdmin.vue:279
 #: web/src/views/owners/OwnerPage.vue:184
-#: web/src/views/owners/VendorPage.vue:303
+#: web/src/views/owners/VendorPage.vue:306
 msgid "Valid until"
 msgstr ""
 
@@ -3436,7 +3437,7 @@ msgid "Send a test mail"
 msgstr ""
 
 #: web/src/views/maintain/Settings.vue:343
-#: web/src/views/owners/VendorPage.vue:380
+#: web/src/views/owners/VendorPage.vue:383
 #: web/src/views/review/ReviewChange.vue:968
 #: web/src/views/review/ReviewQueue.vue:508
 msgid "Send"
@@ -3776,7 +3777,7 @@ msgid "This organization is a partner. Packages signed with its partner key show
 msgstr ""
 
 #: web/src/views/owners/OwnerPage.vue:185
-#: web/src/views/owners/VendorPage.vue:304
+#: web/src/views/owners/VendorPage.vue:307
 msgid "No end date"
 msgstr ""
 
@@ -3905,7 +3906,7 @@ msgid "A vendor whose plugins have no public repository. Its members are managed
 msgstr ""
 
 #: web/src/views/owners/VendorPage.vue:191
-#: web/src/views/owners/VendorPage.vue:359
+#: web/src/views/owners/VendorPage.vue:362
 msgid "New commercial plugin"
 msgstr ""
 
@@ -3969,137 +3970,140 @@ msgstr ""
 msgid "Payment and license checks are yours and the plugin's. The catalog only shows these details."
 msgstr ""
 
-#: web/src/views/owners/VendorPage.vue:252
-#: web/src/views/owners/VendorPage.vue:359
+#: web/src/views/owners/VendorPage.vue:255
+msgid "Committed to the catalog without a review, live at its next update."
+msgstr ""
+
+#: web/src/views/owners/VendorPage.vue:261
+#: web/src/views/owners/VendorPage.vue:370
+msgid "Release feed"
+msgstr ""
+
+#: web/src/views/owners/VendorPage.vue:264
+msgid "Readable"
+msgstr ""
+
+#: web/src/views/owners/VendorPage.vue:264
+msgid "Unreadable"
+msgstr ""
+
+#: web/src/views/owners/VendorPage.vue:268
+msgid "No feed yet"
+msgstr ""
+
+#: web/src/views/owners/VendorPage.vue:272
+msgid "Last read"
+msgstr ""
+
+#: web/src/views/owners/VendorPage.vue:275
+msgid "Newest in the feed"
+msgstr ""
+
+#: web/src/views/owners/VendorPage.vue:276
+msgid "%{n} releases"
+msgstr ""
+
+#: web/src/views/owners/VendorPage.vue:278
+msgid "Nothing yet"
+msgstr ""
+
+#: web/src/views/owners/VendorPage.vue:279
+msgid "Verification"
+msgstr ""
+
+#: web/src/views/owners/VendorPage.vue:280
+msgid "Signatures and digests valid"
+msgstr ""
+
+#: web/src/views/owners/VendorPage.vue:280
+msgid "The newest release is not verified yet"
+msgstr ""
+
+#: web/src/views/owners/VendorPage.vue:282
+msgid "Error"
+msgstr ""
+
+#: web/src/views/owners/VendorPage.vue:287
+msgid "Packages stay on your servers. The catalog verifies each new package once and pins its digest."
+msgstr ""
+
+#: web/src/views/owners/VendorPage.vue:311
+msgid "Ask for a rotation"
+msgstr ""
+
+#: web/src/views/owners/VendorPage.vue:314
+msgid "Ask for a revocation"
+msgstr ""
+
+#: web/src/views/owners/VendorPage.vue:318
+msgid "Rotation requested %{date}, waiting for a maintainer"
+msgstr ""
+
+#: web/src/views/owners/VendorPage.vue:318
+msgid "Revocation requested %{date}, waiting for a maintainer"
+msgstr ""
+
+#: web/src/views/owners/VendorPage.vue:322
+msgid "A maintainer adds the partner key once the contract is in place."
+msgstr ""
+
+#: web/src/views/owners/VendorPage.vue:326
+msgid "Members"
+msgstr ""
+
+#: web/src/views/owners/VendorPage.vue:328
+msgid "Managed by the vendor admins"
+msgstr ""
+
+#: web/src/views/owners/VendorPage.vue:339
+msgid "Added by @%{login}"
+msgstr ""
+
+#: web/src/views/owners/VendorPage.vue:344
+msgid "Remove %{login} from the vendor?"
+msgstr ""
+
+#: web/src/views/owners/VendorPage.vue:345
+msgid "Remove %{login}"
+msgstr ""
+
+#: web/src/views/owners/VendorPage.vue:351
+#: web/src/views/owners/VendorPage.vue:351
+msgid "GitHub username"
+msgstr ""
+
+#: web/src/views/owners/VendorPage.vue:354
+#: web/src/views/translate/TranslatePage.vue:184
+msgid "Add"
+msgstr ""
+
+#: web/src/views/owners/VendorPage.vue:362
 #: web/src/views/SubmitPlugin.vue:99
 #: web/src/views/SubmitPlugin.vue:384
 msgid "Submit for review"
 msgstr ""
 
-#: web/src/views/owners/VendorPage.vue:258
-#: web/src/views/owners/VendorPage.vue:367
-msgid "Release feed"
-msgstr ""
-
-#: web/src/views/owners/VendorPage.vue:261
-msgid "Readable"
-msgstr ""
-
-#: web/src/views/owners/VendorPage.vue:261
-msgid "Unreadable"
-msgstr ""
-
-#: web/src/views/owners/VendorPage.vue:265
-msgid "No feed yet"
-msgstr ""
-
-#: web/src/views/owners/VendorPage.vue:269
-msgid "Last read"
-msgstr ""
-
-#: web/src/views/owners/VendorPage.vue:272
-msgid "Newest in the feed"
-msgstr ""
-
-#: web/src/views/owners/VendorPage.vue:273
-msgid "%{n} releases"
-msgstr ""
-
-#: web/src/views/owners/VendorPage.vue:275
-msgid "Nothing yet"
-msgstr ""
-
-#: web/src/views/owners/VendorPage.vue:276
-msgid "Verification"
-msgstr ""
-
-#: web/src/views/owners/VendorPage.vue:277
-msgid "Signatures and digests valid"
-msgstr ""
-
-#: web/src/views/owners/VendorPage.vue:277
-msgid "The newest release is not verified yet"
-msgstr ""
-
-#: web/src/views/owners/VendorPage.vue:279
-msgid "Error"
-msgstr ""
-
-#: web/src/views/owners/VendorPage.vue:284
-msgid "Packages stay on your servers. The catalog verifies each new package once and pins its digest."
-msgstr ""
-
-#: web/src/views/owners/VendorPage.vue:308
-msgid "Ask for a rotation"
-msgstr ""
-
-#: web/src/views/owners/VendorPage.vue:311
-msgid "Ask for a revocation"
-msgstr ""
-
-#: web/src/views/owners/VendorPage.vue:315
-msgid "Rotation requested %{date}, waiting for a maintainer"
-msgstr ""
-
-#: web/src/views/owners/VendorPage.vue:315
-msgid "Revocation requested %{date}, waiting for a maintainer"
-msgstr ""
-
-#: web/src/views/owners/VendorPage.vue:319
-msgid "A maintainer adds the partner key once the contract is in place."
-msgstr ""
-
-#: web/src/views/owners/VendorPage.vue:323
-msgid "Members"
-msgstr ""
-
-#: web/src/views/owners/VendorPage.vue:325
-msgid "Managed by the vendor admins"
-msgstr ""
-
-#: web/src/views/owners/VendorPage.vue:336
-msgid "Added by @%{login}"
-msgstr ""
-
-#: web/src/views/owners/VendorPage.vue:341
-msgid "Remove %{login} from the vendor?"
-msgstr ""
-
-#: web/src/views/owners/VendorPage.vue:342
-msgid "Remove %{login}"
-msgstr ""
-
-#: web/src/views/owners/VendorPage.vue:348
-#: web/src/views/owners/VendorPage.vue:348
-msgid "GitHub username"
-msgstr ""
-
-#: web/src/views/owners/VendorPage.vue:351
-#: web/src/views/translate/TranslatePage.vue:184
-msgid "Add"
-msgstr ""
-
-#: web/src/views/owners/VendorPage.vue:361
+#: web/src/views/owners/VendorPage.vue:364
 msgid "A reverse domain id of your company, for example com.example.log-shipper."
 msgstr ""
 
-#: web/src/views/owners/VendorPage.vue:367
+#: web/src/views/owners/VendorPage.vue:370
 msgid "A JSON feed of your releases with package links and digests."
 msgstr ""
 
-#: web/src/views/owners/VendorPage.vue:380
+#: web/src/views/owners/VendorPage.vue:383
 msgid "Ask for a key rotation"
 msgstr ""
 
-#: web/src/views/owners/VendorPage.vue:380
+#: web/src/views/owners/VendorPage.vue:383
 msgid "Ask for a key revocation"
 msgstr ""
 
-#: web/src/views/owners/VendorPage.vue:382
+#: web/src/views/owners/VendorPage.vue:385
 msgid "New partner public key"
 msgstr ""
 
-#: web/src/views/owners/VendorPage.vue:389
+#: web/src/views/owners/VendorPage.vue:392
 msgid "Once revoked, every version signed with this key stops installing."
 msgstr ""
 

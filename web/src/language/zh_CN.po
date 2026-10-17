@@ -2838,8 +2838,8 @@ msgid ""
 "shows these details."
 msgstr "付款与许可证校验由你和插件自行负责，目录只展示以上信息。"
 
-msgid "Submit for review"
-msgstr "提交审核"
+msgid "Committed to the catalog without a review, live at its next update."
+msgstr "无需审核，直接提交到插件目录，目录下次更新时生效。"
 
 msgid "Release feed"
 msgstr "发布源"
@@ -2917,6 +2917,9 @@ msgstr "GitHub 用户名"
 
 msgid "Add"
 msgstr "添加"
+
+msgid "Submit for review"
+msgstr "提交审核"
 
 msgid ""
 "A reverse domain id of your company, for example com.example.log-shipper."
