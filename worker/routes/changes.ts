@@ -8,7 +8,7 @@ import { cached } from '../lib/cache'
 import { loadCatalog, pluginIcons } from '../lib/catalog'
 import { event, getChange } from '../lib/changes'
 import { dispatchApply, dispatchDeploy } from '../lib/deployApp'
-import { github } from '../lib/github'
+import { deletePortalBranch, github } from '../lib/github'
 import { userToken } from '../lib/session'
 import { headOf } from '../lib/store'
 import { now } from '../lib/time'
@@ -18,6 +18,7 @@ import { limit } from '../middleware/limits'
 interface PullResponse {
   state: 'open' | 'closed'
   merged: boolean
+  head?: { ref: string }
   merge_commit_sha: string | null
   merged_at: string | null
 }
@@ -76,6 +77,8 @@ export async function refresh(env: Env, token: string, change: ChangeRow): Promi
   const t = now()
   if (change.stage === 'review' && change.pr_number) {
     const pr = await github<PullResponse>(`/repos/${env.CATALOG_REPO}/pulls/${change.pr_number}`, token)
+    if (pr.merged || pr.state === 'closed')
+      await deletePortalBranch(env.CATALOG_REPO, token, pr.head?.ref)
     if (pr.merged) {
       await env.DB.batch([
         env.DB.prepare(`UPDATE changes SET state = 'merged', stage = 'merged', waiting_on = 'system', commit_sha = ?, updated_at = ? WHERE id = ?`)

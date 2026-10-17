@@ -7,7 +7,7 @@ import { audit } from '../lib/audit'
 import { cached } from '../lib/cache'
 import { catalogRef, latestRelease, loadCatalog, noteCatalogHead, pluginIcons, repoOf } from '../lib/catalog'
 import { event, getChange } from '../lib/changes'
-import { github, GitHubError } from '../lib/github'
+import { deletePortalBranch, github, GitHubError } from '../lib/github'
 import { isHostLocale } from '../lib/locales'
 import { keyIdOf } from '../lib/partners'
 import { userToken } from '../lib/session'
@@ -371,6 +371,7 @@ async function approve(env: Env, token: string, actorId: number, id: string, com
       body: JSON.stringify({ merge_method: 'squash', sha: pull.head.sha, commit_title: `${pull.title} (#${pull.number})` }),
     })
     await noteCatalogHead(env, merged.sha)
+    await deletePortalBranch(env.CATALOG_REPO, token, pull.head.ref)
     const t = now()
     await env.DB.batch([
       env.DB.prepare(`UPDATE changes SET state = 'merged', stage = 'merged', waiting_on = 'system', commit_sha = ?, updated_at = ? WHERE id = ?`)
@@ -437,6 +438,7 @@ review.post('/:id/reject', async (c) => {
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ state: 'closed' }),
   })
+  await deletePortalBranch(c.env.CATALOG_REPO, token, pull.head.ref)
   await c.env.DB.batch([
     c.env.DB.prepare(`UPDATE changes SET state = 'rejected', waiting_on = NULL, updated_at = ? WHERE id = ?`).bind(now(), change.id),
     event(c.env, change.id, 'rejected', session.user.id, { comment: body.slice(0, 500) }),

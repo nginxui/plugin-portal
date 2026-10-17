@@ -129,3 +129,15 @@ export async function repoPermission(token: string, fullName: string): Promise<{
 export function canWrite(permission: RepoPermission): boolean {
   return permission === 'admin' || permission === 'maintain' || permission === 'write'
 }
+
+/**
+ * Removes the branch of a portal pull request once it is merged or closed,
+ * so the catalog repository does not collect them. Only portal/ branches;
+ * a failure leaves the branch for a later cleanup.
+ */
+export async function deletePortalBranch(repo: string, token: string, ref: string | undefined): Promise<void> {
+  if (!ref?.startsWith('portal/'))
+    return
+  await github(`/repos/${repo}/git/refs/heads/${ref.split('/').map(encodeURIComponent).join('/')}`, token, { method: 'DELETE' })
+    .catch(error => console.error('branch delete failed', ref, error))
+}

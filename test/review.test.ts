@@ -16,7 +16,7 @@ function base64(text: string) {
 function pullRoutes(): Route[] {
   return [
     async (url, init) => {
-      const ours = url.pathname.startsWith(PR) || url.pathname.startsWith(`/repos/${env.CATALOG_REPO}/issues/12`) || url.pathname.includes('/check-runs')
+      const ours = url.pathname.startsWith(PR) || url.pathname.startsWith(`/repos/${env.CATALOG_REPO}/issues/12`) || url.pathname.includes('/check-runs') || url.pathname.startsWith(`/repos/${env.CATALOG_REPO}/git/refs/heads/`)
       if (url.hostname !== 'api.github.com' || !ours)
         return undefined
       const method = init.method ?? 'GET'
@@ -36,6 +36,8 @@ function pullRoutes(): Route[] {
         return json({ id: 2 })
       if (url.pathname.endsWith('/comments'))
         return json([])
+      if (url.pathname.startsWith(`/repos/${env.CATALOG_REPO}/git/refs/heads/`) && method === 'DELETE')
+        return new Response(null, { status: 204 })
       if (url.pathname.includes('/check-runs'))
         return json({ check_runs: [{ name: 'validate', status: 'completed', conclusion: 'success', html_url: 'https://github.com/x/runs/1' }] })
       return undefined
@@ -115,6 +117,8 @@ describe('review', () => {
     expect(calls.find(c => c.path.endsWith('/merge'))?.body).toMatchObject({ merge_method: 'squash', sha: 'abc123' })
     expect(await env.DB.prepare(`SELECT state, stage, commit_sha FROM changes WHERE id = 'c_review00000001'`).first()).toEqual({ state: 'merged', stage: 'merged', commit_sha: 'def456' })
     expect(await env.DB.prepare(`SELECT count(*) AS n FROM audit WHERE action = 'review.merge'`).first()).toEqual({ n: 1 })
+    // The merged branch goes away.
+    expect(calls.find(c => c.method === 'DELETE')?.path).toBe(`/repos/${env.CATALOG_REPO}/git/refs/heads/portal/c_review00000001`)
   })
 
   it('keeps the change in review when GitHub refuses the merge', async () => {
@@ -146,6 +150,7 @@ describe('review', () => {
     expect(calls.find(c => c.method === 'PATCH')?.body).toEqual({ state: 'closed' })
     expect(await env.DB.prepare(`SELECT state, waiting_on FROM changes WHERE id = 'c_review00000001'`).first()).toEqual({ state: 'rejected', waiting_on: null })
     expect(await env.DB.prepare(`SELECT count(*) AS n FROM audit WHERE action = 'review.reject'`).first()).toEqual({ n: 1 })
+    expect(calls.some(c => c.method === 'DELETE' && c.path.endsWith('/portal/c_review00000001'))).toBe(true)
   })
 
   it('approves together only low risk changes', async () => {
