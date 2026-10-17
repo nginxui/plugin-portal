@@ -217,6 +217,8 @@ const asked = computed(() => {
   return { by: found?.actor ?? null, text: typeof found?.detail?.comment === 'string' ? found.detail.comment : '' }
 })
 
+const hasActions = computed(() => !!(data.value?.canRetry || data.value?.canWithdraw || (asked.value && editsStore.value) || replacedBy.value))
+
 const status = computed<{ type: 'success' | 'info' | 'warning' | 'error', text: string } | null>(() => {
   const c = change.value
   if (!c)
@@ -385,7 +387,7 @@ async function retry() {
               </AFlex>
             </div>
             <AAlert v-if="status && !(repoStore && change.state === 'open' && change.stage === 'review')" :type="status.type" show-icon :title="status.text" class="mt-5">
-              <template v-if="asked?.text || problems.length || rejectReason || (change.outcome?.outcome === 'rejected' && change.outcome.message)" #description>
+              <template v-if="asked?.text || problems.length || rejectReason || (change.outcome?.outcome === 'rejected' && change.outcome.message) || hasActions" #description>
                 <div v-if="asked?.text" class="whitespace-pre-wrap">
                   {{ asked.text }}
                 </div>
@@ -400,9 +402,7 @@ async function retry() {
                     {{ line }}
                   </li>
                 </ul>
-              </template>
-              <template v-if="data.canRetry || data.canWithdraw || (asked && editsStore) || replacedBy" #action>
-                <AFlex gap="small" wrap>
+                <AFlex v-if="hasActions" gap="small" wrap class="mt-3">
                   <RouterLink v-if="asked && editsStore && change.pluginId" :to="`/plugins/${change.pluginId}`">
                     <AButton size="small" type="primary">
                       {{ $gettext('Edit store details') }}
