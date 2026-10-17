@@ -5499,7 +5499,7 @@ msgid "submitted by @%{login} at %{time}"
 msgstr ""
 
 #: web/src/views/review/ReviewChange.vue:488
-msgid "found in a new release %{time}"
+msgid "found by the catalog update %{time}"
 msgstr ""
 
 #: web/src/views/review/ReviewChange.vue:493

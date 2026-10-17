@@ -4032,8 +4032,8 @@ msgstr "高风险变更"
 msgid "submitted by @%{login} at %{time}"
 msgstr "@%{login} 于 %{time} 提交"
 
-msgid "found in a new release %{time}"
-msgstr "%{time}在新发布版本中发现"
+msgid "found by the catalog update %{time}"
+msgstr "%{time}在目录更新时发现"
 
 msgid "Request changes"
 msgstr "要求修改"
@@ -4696,6 +4696,9 @@ msgstr "名称建议"
 
 msgid "An accepted name still goes to a maintainer before it is listed."
 msgstr "名称建议被采纳后，仍需维护者审核才会显示。"
+
+#~ msgid "found in a new release %{time}"
+#~ msgstr "%{time}在新发布版本中发现"
 
 #~ msgid ""
 #~ "Suggest translations for plugins that welcome community translation. "

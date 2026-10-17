@@ -485,7 +485,7 @@ onKeyStroke('k', e => !typing(e) && step(-1))
             <div class="text-3 op-65 mt-1">
               {{ name }} <span class="mono">{{ change.pluginId }}</span>{{ comma }}{{ detail.author
                 ? $gettext('submitted by @%{login} at %{time}', { login: detail.author.login, time: formatMoment(change.createdAt) })
-                : $gettext('found in a new release %{time}', { time: fromNow(change.createdAt) }) }}
+                : $gettext('found by the catalog update %{time}', { time: fromNow(change.createdAt) }) }}
             </div>
           </div>
           <AFlex v-if="isOpen" gap="small" wrap>
