@@ -4118,6 +4118,9 @@ msgstr "其余 %{n} 种语言未设置名称，显示英文名称。"
 msgid "Listing"
 msgstr "上架信息"
 
+msgid "What this change sets"
+msgstr "此更改设置的内容"
+
 msgid "What changes"
 msgstr "变更内容"
 

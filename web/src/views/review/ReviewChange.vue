@@ -16,6 +16,7 @@ import { joinList, localized, trustLabel } from '@/lib/labels'
 import { localeName } from '@/lib/locales'
 import { permissionText } from '@/lib/market'
 import { previewRows } from '@/lib/preview'
+import { itemLabel } from '@/lib/storeDiff'
 import { isDark } from '@/lib/theme'
 import { formatDate, formatMoment, fromNow } from '@/lib/time'
 import { useChangeWatch } from '@/lib/useChangeWatch'
@@ -644,6 +645,30 @@ onKeyStroke('k', e => !typing(e) && step(-1))
                 </dd>
               </template>
             </dl>
+          </ACard>
+
+          <ACard v-if="change.kind === 'store' && change.items?.length" :title="$gettext('Store texts')" :styles="{ body: { padding: 0 } }">
+            <template #extra>
+              <span class="text-3 op-65">{{ $gettext('What this change sets') }}</span>
+            </template>
+            <table class="diff stack">
+              <thead>
+                <tr>
+                  <th>{{ $gettext('Item') }}</th>
+                  <th>{{ $gettext('After the change') }}</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr v-for="item in change.items" :key="item.label">
+                  <td class="field" :data-label="$gettext('Item')">
+                    {{ itemLabel(item, {}) }}<span v-if="item.review" class="op-65">{{ $gettext(', reviewed') }}</span>
+                  </td>
+                  <td :class="{ new: item.value !== undefined }" :data-label="$gettext('After the change')" dir="auto">
+                    {{ item.value ?? '' }}
+                  </td>
+                </tr>
+              </tbody>
+            </table>
           </ACard>
 
           <ACard v-if="detail.reason" :title="$gettext('Reason')">
