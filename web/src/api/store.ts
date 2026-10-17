@@ -8,6 +8,8 @@ export interface StoreItem {
   locale?: string
   label: string
   review: boolean
+  // For a text in one language: whether it is new or taken out.
+  change?: 'added' | 'removed'
 }
 
 export interface StoreDraft {

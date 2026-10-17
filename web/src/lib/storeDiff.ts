@@ -6,6 +6,15 @@ import { HOST_LOCALES } from './hostLocales'
 import { localeName } from './locales'
 import { permissionText } from './market'
 
+// Whether a text in one language is new, taken out or only edited.
+function textChange(before: string | undefined, after: string | undefined): { change?: 'added' | 'removed' } {
+  if (!before)
+    return { change: 'added' }
+  if (!after)
+    return { change: 'removed' }
+  return {}
+}
+
 // The same comparison the Worker makes, so pending changes show while typing.
 export function diffDoc(before: PreviewDoc, after: PreviewDoc): StoreItem[] {
   const items: StoreItem[] = []
@@ -13,7 +22,7 @@ export function diffDoc(before: PreviewDoc, after: PreviewDoc): StoreItem[] {
     const locales = new Set([...Object.keys(before[field] ?? {}), ...Object.keys(after[field] ?? {})])
     for (const locale of locales) {
       if ((before[field]?.[locale] ?? '') !== (after[field]?.[locale] ?? ''))
-        items.push({ field, locale, label: `${field}.${locale}`, review: field === 'name' })
+        items.push({ field, locale, label: `${field}.${locale}`, review: field === 'name', ...textChange(before[field]?.[locale], after[field]?.[locale]) })
     }
   }
   if ((before.homepage_url ?? '') !== (after.homepage_url ?? ''))
@@ -32,7 +41,7 @@ export function diffDoc(before: PreviewDoc, after: PreviewDoc): StoreItem[] {
       items.push({ field: 'screenshots', label: `screenshots.${shot.id}.image`, review: false })
     for (const locale of new Set([...Object.keys(was.caption ?? {}), ...Object.keys(shot.caption ?? {})])) {
       if ((was.caption?.[locale] ?? '') !== (shot.caption?.[locale] ?? ''))
-        items.push({ field: 'caption', locale, label: `screenshots.${shot.id}.caption.${locale}`, review: false })
+        items.push({ field: 'caption', locale, label: `screenshots.${shot.id}.caption.${locale}`, review: false, ...textChange(was.caption?.[locale], shot.caption?.[locale]) })
     }
   }
   for (const id of old.keys()) {
@@ -44,7 +53,7 @@ export function diffDoc(before: PreviewDoc, after: PreviewDoc): StoreItem[] {
     const b = after.permission_reasons?.[permission] ?? {}
     for (const locale of new Set([...Object.keys(a), ...Object.keys(b)])) {
       if ((a[locale] ?? '') !== (b[locale] ?? ''))
-        items.push({ field: 'permission_reasons', locale, label: `reason.${locale}.${permission}`, review: false })
+        items.push({ field: 'permission_reasons', locale, label: `reason.${locale}.${permission}`, review: false, ...textChange(a[locale], b[locale]) })
     }
   }
   return items
@@ -55,6 +64,15 @@ export function itemLabel(item: StoreItem, doc: PreviewDoc): string {
   const lang = item.locale ? localeName(item.locale) : ''
   const parts = item.label.split('.')
   const index = (id: string) => String((doc.screenshots ?? []).findIndex(s => s.id === id) + 1 || id)
+  // A text taken out says so, so a stale draft cannot remove one unnoticed.
+  if (item.change === 'removed') {
+    switch (item.field) {
+      case 'name': return $gettext('Name in %{lang} removed', { lang })
+      case 'description': return $gettext('Description in %{lang} removed', { lang })
+      case 'caption': return $gettext('Caption of screenshot %{n} in %{lang} removed', { n: index(parts[1]), lang })
+      case 'permission_reasons': return $gettext('Permission note %{name} in %{lang} removed', { name: permissionText(gettext.current, parts.slice(2).join('.')).label, lang })
+    }
+  }
   switch (item.field) {
     case 'name': return $gettext('Name in %{lang}', { lang })
     case 'description': return $gettext('Description in %{lang}', { lang })

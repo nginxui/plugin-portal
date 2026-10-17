@@ -1364,6 +1364,18 @@ msgstr "签名者"
 msgid "Access"
 msgstr "访问权限"
 
+msgid "Name in %{lang} removed"
+msgstr "删除名称（%{lang}）"
+
+msgid "Description in %{lang} removed"
+msgstr "删除描述（%{lang}）"
+
+msgid "Caption of screenshot %{n} in %{lang} removed"
+msgstr "删除截图 %{n} 的说明（%{lang}）"
+
+msgid "Permission note %{name} in %{lang} removed"
+msgstr "删除权限说明（%{name}，%{lang}）"
+
 msgid "Name in %{lang}"
 msgstr "名称（%{lang}）"
 

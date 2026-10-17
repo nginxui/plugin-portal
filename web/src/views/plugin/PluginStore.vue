@@ -202,8 +202,8 @@ const locked = computed(() => {
 })
 
 const sources = computed(() => [
-  { value: 'repo-release' as const, title: $gettext('Repository, following releases'), text: $gettext('plugin.store.json in %{repo} goes live with the next release, so screenshots of unreleased features stay off the listing. Needs no setting.', { repo: state.value?.repo ?? plugin.value.repo ?? '' }) },
-  { value: 'repo-branch' as const, title: $gettext('Repository, following the default branch'), text: $gettext('plugin.store.json in %{repo}, live minutes after it is merged.', { repo: state.value?.repo ?? plugin.value.repo ?? '' }) },
+  { value: 'repo-release' as const, title: $gettext('Repository, following releases'), text: $gettext('plugin.store.json in %{repo} goes live with the next release, so screenshots of unreleased features stay off the listing. Needs no setting.', { repo: plugin.value.repo ?? '' }) },
+  { value: 'repo-branch' as const, title: $gettext('Repository, following the default branch'), text: $gettext('plugin.store.json in %{repo}, live minutes after it is merged.', { repo: plugin.value.repo ?? '' }) },
   { value: 'catalog' as const, title: $gettext('Hosted by the catalog'), text: $gettext('Kept in the catalog repository and live at its next update. For plugins without a public repository.') },
 ])
 
@@ -231,12 +231,14 @@ const suggestions = computed(() => {
   return out
 })
 
+// Repository options and deliveries name the plugin's own repository; the
+// state names where the texts are read now, the catalog for a catalog source.
 const delivery = computed(() => {
   if (source.value === 'catalog')
     return { kind: 'catalog' as const, text: $gettext('Committed to the catalog and live at its next update. Names go to review first.') }
   if (state.value?.delivery.bot)
-    return { kind: 'bot' as const, text: $gettext('Opened as a pull request on %{repo}, which you merge on GitHub.', { repo: state.value?.repo ?? '' }) }
-  return { kind: 'patch' as const, text: $gettext('You download the files and commit them to %{repo}. The change follows once the default branch holds them.', { repo: state.value?.repo ?? '' }) }
+    return { kind: 'bot' as const, text: $gettext('Opened as a pull request on %{repo}, which you merge on GitHub.', { repo: plugin.value.repo ?? '' }) }
+  return { kind: 'patch' as const, text: $gettext('You download the files and commit them to %{repo}. The change follows once the default branch holds them.', { repo: plugin.value.repo ?? '' }) }
 })
 
 const confirming = ref(false)
