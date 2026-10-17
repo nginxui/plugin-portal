@@ -14,6 +14,7 @@ export interface ReviewDetail {
   rotation?: { oldId: string | null, newId: string | null, versions: string[], seenIn: string[] } | null
   claim: string | null
   reason: string | null
+  partner: { name: string | null, profile: Record<string, string> | null, publicKey: string | null, revoke: boolean } | null
   repository: string | null
   repositoryCreatedAt?: string | null
   before: Record<string, unknown> | null

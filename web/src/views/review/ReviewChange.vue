@@ -61,7 +61,35 @@ const change = computed(() => detail.value?.change ?? null)
 const entry = computed(() => (change.value?.entry ?? null) as Record<string, any> | null)
 // A delisting has no entry after it; the listing it removes names the plugin.
 const removal = computed(() => !!change.value && !entry.value && !!detail.value?.before)
-const name = computed(() => localized(entry.value?.name) || localized((detail.value?.before as { name?: Record<string, string> } | null)?.name) || change.value?.pluginId || '')
+const partner = computed(() => detail.value?.partner ?? null)
+const name = computed(() => partner.value ? (partner.value.profile?.display_name || partner.value.name || '') : localized(entry.value?.name) || localized((detail.value?.before as { name?: Record<string, string> } | null)?.name) || change.value?.pluginId || '')
+
+// The key ID of a minisign public key: bytes 2 to 10, little endian.
+function keyIdOf(key: string): string {
+  try {
+    const bytes = Uint8Array.from(atob(key.trim()), c => c.charCodeAt(0))
+    return [...bytes.slice(2, 10)].reverse().map(b => b.toString(16).padStart(2, '0')).join('').toUpperCase()
+  }
+  catch {
+    return ''
+  }
+}
+const partnerRows = computed(() => {
+  const p = partner.value
+  if (!p)
+    return []
+  const profile = p.profile ?? {}
+  const kinds: Record<string, string> = { github_organization: $gettext('GitHub organization'), vendor: $gettext('Vendor without a repository') }
+  return [
+    [$gettext('Partner name'), p.name ?? ''],
+    [$gettext('Display name'), profile.display_name ?? ''],
+    [$gettext('Kind'), kinds[profile.kind] ?? profile.kind ?? ''],
+    [$gettext('GitHub account'), profile.github_owner ? `@${profile.github_owner}` : ''],
+    [$gettext('Homepage'), profile.homepage_url ?? ''],
+    [$gettext('Introduction'), profile.description ?? ''],
+    [$gettext('Partner key ID'), p.publicKey ? keyIdOf(p.publicKey) : ''],
+  ].filter(([, value]) => value)
+})
 useCrumbs(() => [
   { title: $gettext('Review queue'), to: '/review' },
   ...(change.value ? [{ title: name.value }, { title: change.value.number ? `${kindLabel(change.value.kind)} #${change.value.number}` : kindLabel(change.value.kind) }] : []),
@@ -553,7 +581,18 @@ onKeyStroke('k', e => !typing(e) && step(-1))
             <AAlert v-if="aiError" type="error" show-icon class="mt-3" :title="aiError" />
           </ACard>
 
-          <ACard v-if="userVisible">
+          <ACard v-if="partner" :title="partner.revoke ? $gettext('Partner key revocation') : $gettext('Partner file')">
+            <dl class="kv">
+              <template v-for="[label, value] in partnerRows" :key="label">
+                <dt>{{ label }}</dt>
+                <dd class="whitespace-pre-wrap" :class="{ mono: label === $gettext('Partner key ID') }">
+                  {{ value }}
+                </dd>
+              </template>
+            </dl>
+          </ACard>
+
+          <ACard v-if="userVisible && !partner">
             <template #title>
               <span class="i-tabler-eye mr-2 op-65" />{{ $gettext('What users will see') }}
             </template>
@@ -623,7 +662,7 @@ onKeyStroke('k', e => !typing(e) && step(-1))
             </div>
           </ACard>
 
-          <ACard v-if="!detail.before" :title="$gettext('Listing')">
+          <ACard v-if="!detail.before && !partner" :title="$gettext('Listing')">
             <template #extra>
               <span class="text-3 op-65">{{ $gettext('Not listed yet') }}</span>
             </template>

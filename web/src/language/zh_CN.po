@@ -3941,6 +3941,15 @@ msgid ""
 "upgrading, use v1.2.0 instead."
 msgstr "会随更改一并记录，例如：升级后配置文件无法读取，请改用 v1.2.0。"
 
+msgid "Vendor without a repository"
+msgstr "没有公开仓库的厂商"
+
+msgid "Introduction"
+msgstr "简介"
+
+msgid "Partner key ID"
+msgstr "合作伙伴密钥 ID"
+
 msgid "Closed"
 msgstr "已关闭"
 
@@ -4072,6 +4081,12 @@ msgstr ""
 
 msgid "Summarize"
 msgstr "生成摘要"
+
+msgid "Partner key revocation"
+msgstr "吊销合作伙伴密钥"
+
+msgid "Partner file"
+msgstr "合作伙伴资料"
 
 msgid "What users will see"
 msgstr "用户将看到的变化"
