@@ -1,14 +1,18 @@
 import type { Env } from './env'
+import type { ChangeRow } from './lib/changes'
 import { loadCatalog } from './lib/catalog'
 import { event } from './lib/changes'
+import { readToken } from './lib/deployApp'
 import { snapshotDownloads } from './lib/downloads'
 import { syncGlossary } from './lib/glossary'
 import { sendMail } from './lib/mail'
 import { buildMail, nameIn } from './lib/mailText'
 import { now } from './lib/time'
+import { refresh } from './routes/changes'
 
-// Work on a schedule: reminders for changes that wait on their author, and
-// email for the stages users asked to hear about.
+// Work on a schedule: pull requests merged or closed on GitHub, reminders for
+// changes that wait on their author, and email for the stages users asked to
+// hear about.
 
 const REMIND_AFTER = 18 * 3600
 
@@ -29,6 +33,34 @@ async function setState(env: Env, name: string, value: string) {
 }
 
 /** A reminder for every change that waited on its author 18 hours, once. */
+// Pull requests looked at in one run, picked at random so a long queue is
+// covered over a few runs.
+const SYNC_BATCH = 20
+
+/**
+ * Follows the pull requests of changes in review that were merged or closed
+ * on GitHub rather than in the portal, which otherwise only notices when the
+ * change is opened. Returns how many changes moved on.
+ */
+export async function syncPulls(env: Env): Promise<number> {
+  const { results } = await env.DB.prepare(
+    `SELECT * FROM changes WHERE state = 'open' AND stage = 'review' AND pr_number IS NOT NULL ORDER BY random() LIMIT ?`,
+  ).bind(SYNC_BATCH).all<ChangeRow>()
+  if (!results.length)
+    return 0
+  const token = await readToken(env)
+  let moved = 0
+  for (const change of results) {
+    const after = await refresh(env, token, change).catch((error) => {
+      console.error('pull request sync failed', change.id, error)
+      return change
+    })
+    if (after.state !== change.state)
+      moved += 1
+  }
+  return moved
+}
+
 export async function remind(env: Env): Promise<number> {
   const t = now()
   const { results } = await env.DB.prepare(
@@ -91,6 +123,7 @@ export async function daily(env: Env): Promise<boolean> {
 }
 
 export async function scheduled(env: Env) {
+  await syncPulls(env).catch(error => console.error('pull request sync failed', error))
   await remind(env)
   await mail(env)
   await daily(env)

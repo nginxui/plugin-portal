@@ -1,6 +1,6 @@
 import { env } from 'cloudflare:workers'
 import { afterEach, describe, expect, it, vi } from 'vitest'
-import { daily, mail, remind } from '../worker/jobs'
+import { daily, mail, remind, syncPulls } from '../worker/jobs'
 import { call, githubUser, json, mockFetch, signIn } from './helpers'
 
 afterEach(() => {
@@ -46,6 +46,41 @@ describe('tracker', () => {
     expect((await env.DB.prepare(`SELECT action FROM audit WHERE action IN ('old', 'recent')`).all()).results).toEqual([{ action: 'recent' }])
     expect(Number((await env.DB.prepare(`SELECT value FROM job_state WHERE name = 'glossary.locales'`).first<{ value: string }>())?.value)).toBeGreaterThan(0)
     expect(await daily(env)).toBe(false)
+  })
+
+  it('follows pull requests merged or closed on GitHub', async () => {
+    const pair = await crypto.subtle.generateKey({ name: 'RSASSA-PKCS1-v1_5', modulusLength: 2048, publicExponent: new Uint8Array([1, 0, 1]), hash: 'SHA-256' }, true, ['sign', 'verify']) as CryptoKeyPair
+    const der = new Uint8Array(await crypto.subtle.exportKey('pkcs8', pair.privateKey) as ArrayBuffer)
+    Object.assign(env, { DEPLOY_APP_ID: '1', DEPLOY_APP_PRIVATE_KEY: `-----BEGIN PRIVATE KEY-----\n${btoa(String.fromCharCode(...der))}\n-----END PRIVATE KEY-----` })
+    const t = Math.floor(Date.now() / 1000)
+    await env.DB.batch([
+      env.DB.prepare(`INSERT INTO changes (id, author_id, kind, class, state, stage, waiting_on, pr_number, created_at, updated_at) VALUES ('c_sync00000001', ?, 'partner', 'maintainer', 'open', 'review', 'maintainer', 31, ?, ?)`).bind(githubUser.id, t, t),
+      env.DB.prepare(`INSERT INTO changes (id, author_id, kind, class, state, stage, waiting_on, pr_number, created_at, updated_at) VALUES ('c_sync00000002', ?, 'partner', 'maintainer', 'open', 'review', 'maintainer', 32, ?, ?)`).bind(githubUser.id, t, t),
+      env.DB.prepare(`INSERT INTO changes (id, author_id, kind, class, state, stage, waiting_on, pr_number, created_at, updated_at) VALUES ('c_sync00000003', ?, 'partner', 'maintainer', 'open', 'review', 'maintainer', 33, ?, ?)`).bind(githubUser.id, t, t),
+    ])
+    const pulls: Record<string, unknown> = {
+      31: { state: 'closed', merged: false, head: { ref: 'portal/c_sync00000001' } },
+      32: { state: 'closed', merged: true, merge_commit_sha: 'abc123', head: { ref: 'portal/c_sync00000002' } },
+      33: { state: 'open', merged: false, head: { ref: 'portal/c_sync00000003' } },
+    }
+    mockFetch(
+      url => url.pathname === `/repos/${env.CATALOG_REPO}/installation` ? json({ id: 9 }) : undefined,
+      url => url.pathname === '/app/installations/9/access_tokens' ? json({ token: 'ghs' }) : undefined,
+      url => url.pathname.endsWith('/issues/31/comments') ? json([{ body: 'Superseded by a newer key.' }]) : undefined,
+      (url, init) => init.method === 'DELETE' ? new Response(null, { status: 204 }) : undefined,
+      (url) => {
+        const number = url.pathname.match(/\/pulls\/(\d+)$/)?.[1]
+        return number ? json(pulls[number]) : undefined
+      },
+    )
+    expect(await syncPulls(env)).toBe(2)
+    const rows = (await env.DB.prepare(`SELECT id, state FROM changes WHERE id LIKE 'c_sync%' ORDER BY id`).all()).results
+    expect(rows).toEqual([
+      { id: 'c_sync00000001', state: 'rejected' },
+      { id: 'c_sync00000002', state: 'merged' },
+      { id: 'c_sync00000003', state: 'open' },
+    ])
+    expect(await env.DB.prepare(`SELECT detail_json FROM change_events WHERE change_id = 'c_sync00000001' AND stage = 'rejected'`).first()).toEqual({ detail_json: JSON.stringify({ comment: 'Superseded by a newer key.' }) })
   })
 
   it('reminds once after 18 hours of waiting on the author', async () => {
