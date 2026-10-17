@@ -646,6 +646,12 @@ onKeyStroke('k', e => !typing(e) && step(-1))
             </dl>
           </ACard>
 
+          <ACard v-if="detail.reason" :title="$gettext('Reason')">
+            <div class="whitespace-pre-wrap">
+              {{ detail.reason }}
+            </div>
+          </ACard>
+
           <ACard v-if="detail.before" :title="$gettext('What changes')">
             <template #extra>
               <span class="text-3 op-65">{{ $gettext('Compared with the current listing') }}</span>

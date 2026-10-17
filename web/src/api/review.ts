@@ -13,6 +13,7 @@ export interface ReviewDetail {
   author: { login: string, avatarUrl: string | null, changes: number, merged: number, plugins?: { id: string, name: string }[], firstListed?: string | null } | null
   rotation?: { oldId: string | null, newId: string | null, versions: string[], seenIn: string[] } | null
   claim: string | null
+  reason: string | null
   repository: string | null
   repositoryCreatedAt?: string | null
   before: Record<string, unknown> | null

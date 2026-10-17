@@ -240,7 +240,9 @@ review.get('/:id', async (c) => {
       .bind(change.author_id, change.id)
       .first<{ total: number, merged: number | null }>(),
   ])
-  const payload = change.payload_json ? JSON.parse(change.payload_json) as { eligibility?: string, repository_url?: string } : {}
+  const payload = change.payload_json
+    ? JSON.parse(change.payload_json) as { eligibility?: string, repository_url?: string, reason?: string, delist?: { reason?: string }, block?: { reason?: string } }
+    : {}
   // When the repository was created, for the author card.
   const repoName = payload.repository_url?.replace('https://github.com/', '') ?? repoOf(listing?.repository_url) ?? null
   const repoCreatedAt = repoName
@@ -275,6 +277,8 @@ review.get('/:id', async (c) => {
       : null,
     rotation,
     claim: payload.eligibility ?? null,
+    // Why a maintainer asks for a trust change, a delisting or a block.
+    reason: payload.delist?.reason ?? payload.block?.reason ?? payload.reason ?? null,
     repository: payload.repository_url ?? null,
     repositoryCreatedAt: repoCreatedAt,
     before,

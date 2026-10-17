@@ -148,7 +148,7 @@ maintain.post('/plugins/:id/trust', async (c) => {
   if (!['official', 'verified', 'community'].includes(body.trust ?? '') || !String(body.reason ?? '').trim())
     return c.json({ error: 'invalid' }, 422)
   const id = c.req.param('id')
-  const change = await maintainerChange(c.env, session, id, 'trust', { trust: body.trust })
+  const change = await maintainerChange(c.env, session, id, 'trust', { trust: body.trust, reason: String(body.reason).trim().slice(0, 500) })
   await audit(c.env.DB, { actorId: session.user.id, action: 'maintain.trust', subject: id, detail: { change, trust: body.trust, reason: String(body.reason).slice(0, 500) } })
   return c.json({ change }, 201)
 })
