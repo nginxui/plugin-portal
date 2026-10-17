@@ -55,6 +55,8 @@ export function useStoreDraft(pluginId: () => string) {
     try {
       const result = await saveDraft(pluginId(), {
         doc: doc.value,
+        // What the editor loaded, so the draft can follow later changes of it.
+        base: state.value?.doc,
         ...(readmeChanged.value ? { readme: readme.value } : {}),
         ...(sourceChanged.value ? { source: source.value } : {}),
         ...(ai.value.length ? { ai: ai.value } : {}),

@@ -11,6 +11,8 @@ const repo = { id: 77, full_name: 'octo-author/geoip', default_branch: 'main', o
 
 let dispatched: { change: string, payload: string }[] = []
 let entry: Record<string, unknown> = { id: ID, name: { en: 'GeoIP Access' } }
+// store/<id>/store.json in the catalog, for a catalog hosted plugin.
+let catalogDoc: unknown = null
 
 function routes(): Route[] {
   return [
@@ -27,6 +29,7 @@ function routes(): Route[] {
       dispatched.push(JSON.parse(await new Response(init.body).text()).inputs)
       return new Response(null, { status: 204 })
     },
+    url => catalogDoc && url.hostname === 'raw.githubusercontent.com' && url.pathname.endsWith(`/store/${ID}/store.json`) ? json(catalogDoc) : undefined,
     url => url.hostname === 'raw.githubusercontent.com' ? new Response('not found', { status: 404 }) : undefined,
   ]
 }
@@ -54,6 +57,7 @@ function webp(width: number, height: number): Uint8Array {
 beforeEach(async () => {
   dispatched = []
   entry = { id: ID, name: { en: 'GeoIP Access' } }
+  catalogDoc = null
   await caches.default.delete(`${env.CATALOG_URL}/v1/index.json`)
   await useDeployKey()
 })
@@ -131,6 +135,19 @@ describe('store editor', () => {
     const names = await call(`/api/plugins/${ID}/store/submit`, { method: 'POST', mutate: true, cookie, json: {} })
     expect(names.status).toBe(409)
     expect(await names.json()).toEqual({ error: 'names_pending' })
+  })
+
+  it('moves a draft onto texts that went live meanwhile', async () => {
+    const cookie = await signedIn()
+    entry = { ...entry, store: { source: 'catalog' } }
+    catalogDoc = { name: { en: 'GeoIP Access' }, description: { en: 'By country.' } }
+    const loaded = await (await call(`/api/plugins/${ID}/store`, { cookie })).json() as { doc: unknown }
+    await call(`/api/plugins/${ID}/store/draft`, { method: 'PUT', mutate: true, cookie, json: { doc: { name: { en: 'GeoIP Access' }, description: { en: 'By country.', ja_JP: '国別。' } }, base: loaded.doc } })
+    // A French text went live while the draft waited.
+    catalogDoc = { name: { en: 'GeoIP Access' }, description: { en: 'By country.', fr_FR: 'Par pays.' } }
+    const state = await (await call(`/api/plugins/${ID}/store`, { cookie })).json() as { draft: { doc: { description: Record<string, string> } }, items: { label: string }[] }
+    expect(state.draft.doc.description).toEqual({ en: 'By country.', ja_JP: '国別。', fr_FR: 'Par pays.' })
+    expect(state.items.map(i => i.label)).toEqual(['description.ja_JP'])
   })
 
   it('gives a patch for the repository and moves the source in a self service change', async () => {

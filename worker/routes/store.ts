@@ -9,7 +9,7 @@ import { event, getChange, newChangeId, NEXT_NUMBER } from '../lib/changes'
 import { dispatchApply } from '../lib/deployApp'
 import { draftKey, imageUrl, MAX_BYTES, MAX_SIDE, mediaBytes, mediaEnabled, mediaShas, publishedKey, publishMedia, sha256Hex, webpSize } from '../lib/media'
 import { pluginContext } from '../lib/pluginContext'
-import { cleanDoc, diffDoc, readStore, textsOnly, withoutManifestReasons } from '../lib/store'
+import { cleanDoc, diffDoc, readStore, rebaseDoc, textsOnly, withoutManifestReasons } from '../lib/store'
 import { repoFiles, storeJson } from '../lib/storeFiles'
 import { now } from '../lib/time'
 import { zip } from '../lib/zip'
@@ -30,6 +30,8 @@ interface DraftRow {
 
 interface Draft {
   doc: StoreDoc
+  // The document the draft started from, to move it onto a newer one.
+  base?: StoreDoc
   readme?: string | null
   source?: Source
   // Texts an AI drafted that no one confirmed yet, as field.locale keys.
@@ -41,6 +43,19 @@ interface Draft {
 function baseline(state: StoreState, ctx: PluginContext): StoreDoc {
   const names = { ...(state.doc.name ?? {}), ...((ctx.entry?.name as Record<string, string> | undefined) ?? ctx.listing?.name ?? {}) }
   return { ...state.doc, ...(Object.keys(names).length ? { name: names } : {}) }
+}
+
+// A draft whose document went live in a newer form meanwhile is moved onto
+// it and saved, so what went live is neither undone nor shown as a change.
+async function currentDraft(env: Env, pluginId: string, authorId: number, row: DraftRow | null, base: StoreDoc): Promise<Draft | null> {
+  if (!row)
+    return null
+  const draft = JSON.parse(row.doc_json) as Draft
+  if (!draft.base || JSON.stringify(draft.base) === JSON.stringify(base))
+    return draft
+  const moved: Draft = { ...draft, doc: rebaseDoc(draft.base, draft.doc, base), base }
+  await env.DB.prepare('UPDATE store_drafts SET doc_json = ? WHERE plugin_id = ? AND author_id = ?').bind(JSON.stringify(moved), pluginId, authorId).run()
+  return moved
 }
 
 function images(env: Env, doc: StoreDoc, state: StoreState) {
@@ -73,8 +88,9 @@ store.get('/plugins/:id/store', requireSession, async (c) => {
   const row = await c.env.DB.prepare('SELECT doc_json, updated_at FROM store_drafts WHERE plugin_id = ? AND author_id = ?')
     .bind(ctx.id, session.user.id)
     .first<DraftRow>()
-  const draft = row ? { ...(JSON.parse(row.doc_json) as Draft), updatedAt: row.updated_at } : null
   const base = baseline(state, ctx)
+  const current = await currentDraft(c.env, ctx.id, session.user.id, row, base)
+  const draft = current && row ? { ...current, updatedAt: row.updated_at } : null
   const shown = draft?.doc ?? base
   const open = await c.env.DB.prepare(`SELECT id FROM changes WHERE plugin_id = ? AND kind IN ('store', 'store_source') AND state IN ('open', 'merged') ORDER BY created_at DESC LIMIT 1`)
     .bind(ctx.id)
@@ -109,7 +125,7 @@ store.put('/plugins/:id/store/draft', requireSession, async (c) => {
   const rights = canEdit(ctx)
   if (!rights.texts)
     return c.json({ error: 'no_access' }, 403)
-  const body = await c.req.json<{ doc?: unknown, readme?: unknown, source?: unknown, ai?: unknown[] }>().catch(() => ({} as { doc?: unknown, readme?: unknown, source?: unknown, ai?: unknown[] }))
+  const body = await c.req.json<{ doc?: unknown, base?: unknown, readme?: unknown, source?: unknown, ai?: unknown[] }>().catch(() => ({} as { doc?: unknown, base?: unknown, readme?: unknown, source?: unknown, ai?: unknown[] }))
   const { doc, problems } = cleanDoc(body.doc)
   const draft: Draft = { doc }
   if (typeof body.readme === 'string')
@@ -118,11 +134,20 @@ store.put('/plugins/:id/store/draft', requireSession, async (c) => {
     draft.source = body.source
   if (Array.isArray(body.ai))
     draft.ai = body.ai.filter((k): k is string => typeof k === 'string' && k.length <= 80).slice(0, 300)
-  if (!rights.all) {
+  // The first save records what the draft starts from: the document the
+  // editor loaded, or the current one when it sent none.
+  const saved = await c.env.DB.prepare('SELECT doc_json FROM store_drafts WHERE plugin_id = ? AND author_id = ?').bind(ctx.id, session.user.id).first<{ doc_json: string }>()
+  let base = saved ? (JSON.parse(saved.doc_json) as Draft).base : undefined
+  if (!base && body.base !== undefined)
+    base = cleanDoc(body.base).doc
+  if (!base || !rights.all) {
     const state = await readStore(c.env, ctx.token, { id: ctx.id, repo: ctx.repo, tag: ctx.tag, entry: ctx.entry })
-    if (!textsOnly(baseline(state, ctx), doc) || draft.source || draft.readme !== undefined)
+    const fresh = baseline(state, ctx)
+    if (!rights.all && (!textsOnly(fresh, doc) || draft.source || draft.readme !== undefined))
       return c.json({ error: 'texts_only' }, 403)
+    base ??= fresh
   }
+  draft.base = base
   await c.env.DB.prepare(
     `INSERT INTO store_drafts (plugin_id, author_id, doc_json, updated_at) VALUES (?, ?, ?, ?)
      ON CONFLICT (plugin_id, author_id) DO UPDATE SET doc_json = excluded.doc_json, updated_at = excluded.updated_at`,
@@ -163,9 +188,9 @@ store.post('/plugins/:id/store/submit', requireSession, limit('write'), async (c
     .first<DraftRow>()
   if (!row)
     return c.json({ error: 'no_draft' }, 409)
-  const draft = JSON.parse(row.doc_json) as Draft
   const state = await readStore(c.env, ctx.token, { id: ctx.id, repo: ctx.repo, tag: ctx.tag, entry: ctx.entry })
   const base = baseline(state, ctx)
+  const draft = (await currentDraft(c.env, ctx.id, session.user.id, row, base))!
   // Without a store field the document already follows the release, so
   // writing plugin.store.json there is no move.
   const current: Source = state.source === 'release' ? 'repo-release' : state.source

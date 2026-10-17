@@ -406,3 +406,41 @@ export function textsOnly(before: StoreDoc, after: StoreDoc): boolean {
   const b = after.screenshots ?? []
   return a.length === b.length && a.every((s, i) => s.id === b[i].id && !imageChanged(s, b[i]))
 }
+
+const sameValue = (a: unknown, b: unknown) => JSON.stringify(a ?? null) === JSON.stringify(b ?? null)
+
+// One text in each language: what the author left alone follows the newer
+// document, what the author changed stays as written.
+function rebaseTexts(old: Localized | undefined, mine: Localized | undefined, theirs: Localized | undefined): Localized | undefined {
+  const out: Localized = {}
+  for (const locale of new Set([...Object.keys(old ?? {}), ...Object.keys(mine ?? {}), ...Object.keys(theirs ?? {})])) {
+    const value = (old?.[locale] ?? '') === (mine?.[locale] ?? '') ? theirs?.[locale] : mine?.[locale]
+    if (value)
+      out[locale] = value
+  }
+  return Object.keys(out).length ? out : undefined
+}
+
+/**
+ * Moves a draft started from old onto the newer document theirs, so a text
+ * that went live meanwhile is neither undone nor shown as a change. The
+ * screenshots move as a whole: the author's list, or the newer one when the
+ * author left them alone.
+ */
+export function rebaseDoc(old: StoreDoc, mine: StoreDoc, theirs: StoreDoc): StoreDoc {
+  const reasons: Record<string, Localized> = {}
+  const permissions = new Set([...Object.keys(old.permission_reasons ?? {}), ...Object.keys(mine.permission_reasons ?? {}), ...Object.keys(theirs.permission_reasons ?? {})])
+  for (const permission of permissions) {
+    const texts = rebaseTexts(old.permission_reasons?.[permission], mine.permission_reasons?.[permission], theirs.permission_reasons?.[permission])
+    if (texts)
+      reasons[permission] = texts
+  }
+  const doc: StoreDoc = {
+    name: rebaseTexts(old.name, mine.name, theirs.name),
+    description: rebaseTexts(old.description, mine.description, theirs.description),
+    homepage_url: sameValue(old.homepage_url, mine.homepage_url) ? theirs.homepage_url : mine.homepage_url,
+    screenshots: sameValue(old.screenshots, mine.screenshots) ? theirs.screenshots : mine.screenshots,
+    permission_reasons: Object.keys(reasons).length ? reasons : undefined,
+  }
+  return Object.fromEntries(Object.entries(doc).filter(([, v]) => v !== undefined)) as StoreDoc
+}
