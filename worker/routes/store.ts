@@ -97,8 +97,6 @@ function canEdit(ctx: PluginContext) {
   return { texts: atLeast(ctx.role, 'translator'), all: atLeast(ctx.role, 'publisher') }
 }
 
-// Mounted at the root, so each route names its own middleware instead of a
-// catch-all that would cover every other route too.
 /**
  * A store change of the user that a maintainer sent back, which the user's
  * next submission replaces.
@@ -108,6 +106,8 @@ function sentBack(row: ChangeRow, userId: number): boolean {
     && (JSON.parse(row.payload_json ?? '{}') as { delivery?: string }).delivery === 'catalog'
 }
 
+// Mounted at the root, so each route names its own middleware instead of a
+// catch-all that would cover every other route too.
 export const store = new Hono<AppEnv>()
 
 store.get('/plugins/:id/store', requireSession, async (c) => {
