@@ -269,6 +269,15 @@ review.get('/:id', async (c) => {
     `SELECT e.stage, e.detail_json, e.at, u.login AS actor FROM change_events e LEFT JOIN users u ON u.id = e.actor_id
      WHERE e.change_id = ? ORDER BY e.at, e.id`,
   ).bind(change.id).all<{ stage: string, detail_json: string | null, at: number, actor: string | null }>()
+  // Texts moving to the author's repository need plugin.store.json there
+  // first, or the listing falls back to the texts of plugin.json.
+  const moveTo = (payload as { operations?: { store?: { source?: string } } }).operations?.store?.source
+  const storeRepo = change.kind === 'store_source' && moveTo === 'repo'
+    ? repoName ?? (await c.env.DB.prepare('SELECT repo_full_name FROM plugins WHERE plugin_id = ?').bind(change.plugin_id).first<{ repo_full_name: string | null }>())?.repo_full_name ?? null
+    : null
+  const storeFile = storeRepo
+    ? { repo: storeRepo, present: (await fetch(`https://raw.githubusercontent.com/${storeRepo}/HEAD/plugin.store.json`).catch(() => null))?.ok ?? false }
+    : null
   // The change a maintainer sent back that this submission replaces, with
   // what was asked for.
   const replaced = await c.env.DB.prepare(
@@ -285,6 +294,7 @@ review.get('/:id', async (c) => {
       ? { login: author.login, avatarUrl: author.avatar_url, changes: history?.total ?? 0, merged: history?.merged ?? 0, plugins: owned.map(p => ({ id: p.id, name: p.name?.en ?? p.id })), firstListed }
       : null,
     rotation,
+    storeFile,
     replaces: replaced
       ? { id: replaced.id, number: replaced.number, askedBy: replaced.asked_by, asked: (replaced.asked ? JSON.parse(replaced.asked) as { comment?: string } : {}).comment ?? null }
       : null,

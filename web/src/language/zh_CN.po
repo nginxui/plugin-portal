@@ -4193,6 +4193,14 @@ msgstr "与当前上架内容对比"
 msgid "The entry fields stay as they are."
 msgstr "条目字段没有变化。"
 
+msgid "%{repo} already holds plugin.store.json."
+msgstr "%{repo} 中已有 plugin.store.json。"
+
+msgid ""
+"%{repo} does not hold plugin.store.json yet. Approved now, the listing shows "
+"the texts of plugin.json until the file is committed."
+msgstr "%{repo} 中还没有 plugin.store.json。现在批准的话，在文件提交之前上架资料会显示 plugin.json 中的文字。"
+
 msgid ""
 "Once approved, signer certificates issued by the old primary key are no "
 "longer accepted."

@@ -12,6 +12,8 @@ export interface ReviewDetail {
   change: Change & { risk: 'high' | 'normal' }
   author: { login: string, avatarUrl: string | null, changes: number, merged: number, plugins?: { id: string, name: string }[], firstListed?: string | null } | null
   rotation?: { oldId: string | null, newId: string | null, versions: string[], seenIn: string[] } | null
+  /** Whether the repository the store texts move to holds plugin.store.json. */
+  storeFile?: { repo: string, present: boolean } | null
   /** The change sent back to the author that this submission replaces. */
   replaces?: { id: string, number: number | null, askedBy: string | null, asked: string | null } | null
   claim: string | null

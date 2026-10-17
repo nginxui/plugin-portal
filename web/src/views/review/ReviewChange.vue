@@ -774,6 +774,13 @@ onKeyStroke('k', e => !typing(e) && step(-1))
                 </tbody>
               </table>
             </div>
+            <AAlert
+              v-if="detail.storeFile"
+              :type="detail.storeFile.present ? 'success' : 'warning'"
+              show-icon
+              class="m-4"
+              :title="detail.storeFile.present ? $gettext('%{repo} already holds plugin.store.json.', { repo: detail.storeFile.repo }) : $gettext('%{repo} does not hold plugin.store.json yet. Approved now, the listing shows the texts of plugin.json until the file is committed.', { repo: detail.storeFile.repo })"
+            />
             <AAlert v-if="keyRotation" type="warning" show-icon class="m-4">
               <template #title>
                 <div class="font-500">
