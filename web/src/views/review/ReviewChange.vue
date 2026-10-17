@@ -16,6 +16,7 @@ import { joinList, localized, trustLabel } from '@/lib/labels'
 import { localeName } from '@/lib/locales'
 import { permissionText } from '@/lib/market'
 import { previewRows } from '@/lib/preview'
+import { isDark } from '@/lib/theme'
 import { formatDate, formatMoment, fromNow } from '@/lib/time'
 import { useCrumbs } from '@/stores/crumbs'
 import { usePaletteStore } from '@/stores/palette'
@@ -188,7 +189,11 @@ const claimText = computed(() => {
 // What users see now and after the change.
 interface Doc { name?: Record<string, string>, description?: Record<string, string>, homepage_url?: string, screenshots?: { id: string, path: string, crop?: Crop, dark_path?: string, dark_crop?: Crop, caption?: Record<string, string> }[] }
 const compareMode = ref<'side' | 'slider' | 'changes'>('side')
-const compareTheme = ref<'light' | 'dark'>('light')
+// Previews follow the portal theme until one is picked here.
+const compareTheme = ref<'light' | 'dark'>(isDark.value ? 'dark' : 'light')
+watch(isDark, (dark) => {
+  compareTheme.value = dark ? 'dark' : 'light'
+})
 const compareLocale = ref('en')
 const localeOptions = HOST_LOCALES.map(code => ({ value: code, label: localeName(code) }))
 const beforeDoc = computed<Doc | null>(() => {

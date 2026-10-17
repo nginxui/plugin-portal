@@ -14,6 +14,7 @@ import { localized } from '@/lib/labels'
 import { localeName } from '@/lib/locales'
 import { permissionText } from '@/lib/market'
 import { coverageOf, itemLabel } from '@/lib/storeDiff'
+import { isDark } from '@/lib/theme'
 import { fromNow } from '@/lib/time'
 import { useStoreDraft } from '@/lib/useStoreDraft'
 import { usePluginStore } from '@/stores/plugin'
@@ -26,7 +27,11 @@ const draft = useStoreDraft(() => plugin.value.id)
 const { state, failed, doc, readme, readmeChanged, source, sourceChanged, items, dirty, savedAt, saving, problems, persist } = draft
 
 const locale = ref(HOST_LOCALES.includes(gettext.current) ? gettext.current : 'en')
-const theme = ref<'light' | 'dark'>('light')
+// Previews follow the portal theme until one is picked here.
+const theme = ref<'light' | 'dark'>(isDark.value ? 'dark' : 'light')
+watch(isDark, (dark) => {
+  theme.value = dark ? 'dark' : 'light'
+})
 const device = ref<'desktop' | 'phone'>('desktop')
 const stress = ref<Stress>('off')
 const categoriesOpen = ref(false)

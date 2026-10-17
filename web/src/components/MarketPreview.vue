@@ -8,6 +8,7 @@ import { computed, nextTick, ref, useTemplateRef } from 'vue'
 import { $gettext } from '@/lib/gettext'
 import { RTL_LOCALES } from '@/lib/hostLocales'
 import { installLabel, renderMarkdown, resolve } from '@/lib/market'
+import { isDark } from '@/lib/theme'
 
 // The marketplace detail of a plugin as Nginx UI shows it, in any language,
 // theme and width, with the store texts editable in place. The detail is
@@ -65,7 +66,7 @@ const props = withDefaults(defineProps<{
   highlight?: Record<string, string>
 }>(), {
   pluginId: null,
-  theme: 'light',
+  theme: () => (isDark.value ? 'dark' : 'light'),
   device: 'desktop',
   images: () => ({}),
   manifest: null,

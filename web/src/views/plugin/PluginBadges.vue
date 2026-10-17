@@ -1,11 +1,12 @@
 <script setup lang="ts">
 import type { BadgeKind, BadgePlugin } from '@/lib/badges'
 import { useClipboard } from '@vueuse/core'
-import { computed, ref } from 'vue'
+import { computed, ref, watch } from 'vue'
 import { BADGE_KINDS, BADGE_STRINGS, badgeContent, badgeDataUrl, badgeLocales, badgeSvg } from '@/lib/badges'
 import { $gettext } from '@/lib/gettext'
 import { localized } from '@/lib/labels'
 import { localeName } from '@/lib/locales'
+import { isDark } from '@/lib/theme'
 import { usePluginStore } from '@/stores/plugin'
 
 // README badges (spec 11.3): the catalog renders them with every deploy; this
@@ -18,7 +19,11 @@ const plugin = computed(() => detail.value.plugin)
 const style = ref<'' | 'square' | 'large'>('')
 const locale = ref('en')
 const format = ref<'markdown' | 'html'>('markdown')
-const theme = ref<'light' | 'dark'>('light')
+// Previews follow the portal theme until one is picked here.
+const theme = ref<'light' | 'dark'>(isDark.value ? 'dark' : 'light')
+watch(isDark, (dark) => {
+  theme.value = dark ? 'dark' : 'light'
+})
 const picked = ref<BadgeKind[]>(['status', 'version', 'translations'])
 
 function togglePick(kind: BadgeKind, on: boolean) {
