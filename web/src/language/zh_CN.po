@@ -4089,6 +4089,9 @@ msgstr "变更内容"
 msgid "Compared with the current listing"
 msgstr "与当前上架内容对比"
 
+msgid "The entry fields stay as they are."
+msgstr "条目字段没有变化。"
+
 msgid ""
 "Once approved, signer certificates issued by the old primary key are no "
 "longer accepted."

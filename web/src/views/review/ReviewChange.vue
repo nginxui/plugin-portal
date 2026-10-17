@@ -78,6 +78,15 @@ const status = computed(() => {
   return { color: 'processing', text: $gettext('Waiting for review') }
 })
 
+function storeSourceLabel(value: unknown): string {
+  const store = value as { source?: string, follow?: string } | null | undefined
+  if (store?.source === 'catalog')
+    return $gettext('Catalog hosted')
+  if (store?.follow === 'branch')
+    return $gettext('Repository, following the default branch')
+  return $gettext('Repository, following releases')
+}
+
 // Entry fields as a reviewer reads them: the current listing against the change.
 const rows = computed(() => {
   const after = entry.value ?? {}
@@ -90,7 +99,14 @@ const rows = computed(() => {
     { key: 'categories', label: $gettext('Categories'), format: v => (v ?? []).map(categoryLabel) },
     { key: 'license', label: $gettext('License'), format: v => v ? [String(v)] : [] },
     { key: 'trust', label: $gettext('Trust'), format: v => v ? [trustLabel(String(v)) || String(v)] : [] },
+    { key: 'store', label: $gettext('Store source'), format: v => [storeSourceLabel(v)] },
   ]
+  // Any other field shows as it is written, so no change goes unseen.
+  const known = new Set(['id', ...fields.map(f => f.key)])
+  for (const key of new Set([...Object.keys(after), ...Object.keys(before ?? {})])) {
+    if (!known.has(key))
+      fields.push({ key, label: key, format: v => v === undefined || v === null ? [] : [typeof v === 'string' ? v : JSON.stringify(v)] })
+  }
   return fields
     .filter(f => after[f.key] !== undefined || before?.[f.key] !== undefined)
     .map(f => ({
@@ -622,7 +638,10 @@ onKeyStroke('k', e => !typing(e) && step(-1))
             <template #extra>
               <span class="text-3 op-65">{{ $gettext('Compared with the current listing') }}</span>
             </template>
-            <div class="overflow-x-auto">
+            <div v-if="!tableRows.length" class="text-3 op-65 px-4 py-3">
+              {{ $gettext('The entry fields stay as they are.') }}
+            </div>
+            <div v-else class="overflow-x-auto">
               <table class="diff">
                 <thead>
                   <tr>
