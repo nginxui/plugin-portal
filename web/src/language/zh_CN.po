@@ -2236,9 +2236,6 @@ msgstr "原因（会展示给申请人）"
 msgid "Revoke a partner key"
 msgstr "吊销合作伙伴密钥"
 
-msgid "Revoke"
-msgstr "撤销"
-
 msgid ""
 "Once revoked, every version signed with the key stops installing. A "
 "revocation needs no review and is committed to the catalog repository at "
@@ -3897,6 +3894,9 @@ msgstr "没有版本标明签名者。"
 
 msgid "Signed %{n} releases"
 msgstr "签名了 %{n} 个版本"
+
+msgid "Revoke"
+msgstr "撤销"
 
 msgid ""
 "Revoke a signer when its signing key leaked or was lost. Restoring a revoked "

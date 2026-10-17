@@ -338,7 +338,7 @@ function stateTag(state: string, expires: string | null) {
       <ATextarea v-model:value="declineReason" :rows="3" :maxlength="500" :placeholder="$gettext('Why, shown to the applicant')" />
     </AModal>
 
-    <AModal v-model:open="revoking" :title="$gettext('Revoke a partner key')" :ok-text="$gettext('Revoke')" :ok-button-props="{ danger: true, disabled: !revokeName || !revokeReason.trim() }" @ok="revoke">
+    <AModal v-model:open="revoking" :title="$gettext('Revoke a partner key')" :ok-text="$gettext('Revoke the key')" :ok-button-props="{ danger: true, disabled: !revokeName || !revokeReason.trim() }" @ok="revoke">
       <ATypographyParagraph type="secondary" class="text-3">
         {{ $gettext('Once revoked, every version signed with the key stops installing. A revocation needs no review and is committed to the catalog repository at once.') }}
       </ATypographyParagraph>
