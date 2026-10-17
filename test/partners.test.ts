@@ -90,6 +90,15 @@ describe('vendors', () => {
     expect((await call(`/api/vendors/${id}/members/555`, { method: 'DELETE', mutate: true, cookie })).status).toBe(200)
   })
 
+  it('makes the first approved key of a vendor a vendor partner file', async () => {
+    const cookie = await user(true)
+    const { id } = await (await call('/api/maintain/vendors', { method: 'POST', mutate: true, cookie, json: { slug: 'example-cloud', name: 'Example Cloud', partner: 'example-cloud', admins: ['octo-author'] } })).json() as { id: number }
+    const key = 'RWT/c16tBDXinzwNKLtQvSIXldyAawq83FHm0CCaJu4TZjVJbjrFnAjP'
+    const { id: request } = await (await call(`/api/vendors/${id}/key-request`, { method: 'POST', mutate: true, cookie, json: { kind: 'rotation', public_key: key, reason: 'First key.' } })).json() as { id: string }
+    expect((await call(`/api/maintain/partner-requests/${request}/approve`, { method: 'POST', mutate: true, cookie })).status).toBe(200)
+    expect(JSON.parse(dispatched[0].payload)).toMatchObject({ kind: 'partner_update', partner: { name: 'example-cloud', public_key: key, profile: { kind: 'vendor', display_name: 'Example Cloud' } } })
+  })
+
   it('submits a vendor plugin through apply.yml', async () => {
     const cookie = await user(true)
     const { id } = await (await call('/api/maintain/vendors', { method: 'POST', mutate: true, cookie, json: { slug: 'example-cloud', name: 'Example Cloud', partner: 'example-cloud', admins: ['octo-author'] } })).json() as { id: number }

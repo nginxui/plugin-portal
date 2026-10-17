@@ -257,14 +257,20 @@ async function partnerChange(env: Env, session: Session, partner: Record<string,
 
 maintain.post('/partner-requests/:id/approve', async (c) => {
   const session = c.get('session')
-  const request = await c.env.DB.prepare(`SELECT * FROM partner_requests WHERE id = ? AND state = 'pending'`).bind(c.req.param('id')).first<{ id: string, kind: string, partner: string, payload_json: string, owner_login: string | null }>()
+  const request = await c.env.DB.prepare(`SELECT * FROM partner_requests WHERE id = ? AND state = 'pending'`).bind(c.req.param('id')).first<{ id: string, kind: string, partner: string, payload_json: string, owner_login: string | null, vendor_id: number | null }>()
   if (!request)
     return c.json({ error: 'not_found' }, 404)
   const payload = JSON.parse(request.payload_json) as { profile?: Record<string, string>, public_key?: string, reason?: string }
+  // A vendor's partner file says it is a vendor, which lets it list plugins
+  // without a repository, and names it as the portal does.
+  const vendor = request.vendor_id
+    ? await c.env.DB.prepare(`SELECT name FROM owners WHERE id = ? AND kind = 'vendor'`).bind(request.vendor_id).first<{ name: string }>()
+    : null
+  const vendorProfile = vendor ? { kind: 'vendor', display_name: vendor.name } : undefined
   const partner = request.kind === 'application'
     ? { name: request.partner, profile: payload.profile, public_key: payload.public_key }
     : request.kind === 'key_rotation'
-      ? { name: request.partner, public_key: payload.public_key }
+      ? { name: request.partner, public_key: payload.public_key, ...(vendorProfile ? { profile: vendorProfile } : {}) }
       : request.kind === 'key_revocation'
         ? { name: request.partner, revoke: { reason: payload.reason } }
         : { name: request.partner, profile: payload.profile }
