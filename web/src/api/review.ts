@@ -12,6 +12,8 @@ export interface ReviewDetail {
   change: Change & { risk: 'high' | 'normal' }
   author: { login: string, avatarUrl: string | null, changes: number, merged: number, plugins?: { id: string, name: string }[], firstListed?: string | null } | null
   rotation?: { oldId: string | null, newId: string | null, versions: string[], seenIn: string[] } | null
+  /** The change sent back to the author that this submission replaces. */
+  replaces?: { id: string, number: number | null, askedBy: string | null, asked: string | null } | null
   claim: string | null
   reason: string | null
   partner: { name: string | null, profile: Record<string, string> | null, publicKey: string | null, revoke: boolean } | null

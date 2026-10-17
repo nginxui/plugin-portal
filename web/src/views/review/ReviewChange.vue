@@ -545,6 +545,16 @@ onKeyStroke('k', e => !typing(e) && step(-1))
           </AFlex>
         </div>
         <AAlert v-if="actionError" type="error" show-icon class="mt-4" :title="actionError" />
+        <AAlert v-if="detail.replaces" type="info" show-icon class="mt-4" :title="detail.replaces.askedBy ? $gettext('Resubmitted after @%{login} asked for changes in change #%{number}', { login: detail.replaces.askedBy, number: detail.replaces.number ?? '' }) : $gettext('Resubmitted after changes were asked for in change #%{number}', { number: detail.replaces.number ?? '' })">
+          <template #description>
+            <div v-if="detail.replaces.asked" class="whitespace-pre-wrap">
+              {{ detail.replaces.asked }}
+            </div>
+            <RouterLink :to="`/review/${detail.replaces.number ?? detail.replaces.id}`">
+              {{ $gettext('Open the earlier change') }}
+            </RouterLink>
+          </template>
+        </AAlert>
       </ACard>
 
       <div class="cols">

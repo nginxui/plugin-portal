@@ -108,6 +108,19 @@ describe('review', () => {
     expect((body as unknown as { author: { login: string, changes: number } }).author).toMatchObject({ login: 'octo', changes: 0 })
   })
 
+  it('names the sent-back change a submission replaces and what was asked', async () => {
+    const cookie = await maintainer()
+    await seedChange()
+    const t = Math.floor(Date.now() / 1000)
+    await env.DB.batch([
+      env.DB.prepare(`INSERT INTO changes (id, number, plugin_id, author_id, kind, class, state, stage, created_at, updated_at) VALUES ('c_review00000000', 9, 'io.github.octo.hello', 77, 'store', 'reviewed', 'withdrawn', 'review', ?, ?)`).bind(t, t),
+      env.DB.prepare(`INSERT INTO change_events (change_id, stage, actor_id, detail_json, at) VALUES ('c_review00000000', 'changes_requested', 77, '{"comment":"Shorter name"}', ?)`).bind(t),
+      env.DB.prepare(`INSERT INTO change_events (change_id, stage, actor_id, detail_json, at) VALUES ('c_review00000000', 'withdrawn', 77, '{"replaced_by":"c_review00000001"}', ?)`).bind(t + 1),
+    ])
+    const body = await (await call('/api/review/c_review00000001', { cookie })).json() as { replaces: unknown }
+    expect(body.replaces).toEqual({ id: 'c_review00000000', number: 9, askedBy: 'octo', asked: 'Shorter name' })
+  })
+
   it('approves and squash merges the reviewed commit', async () => {
     const cookie = await maintainer()
     await seedChange()

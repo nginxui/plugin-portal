@@ -4086,6 +4086,15 @@ msgstr "要求修改"
 msgid "Reject"
 msgstr "拒绝"
 
+msgid "Resubmitted after @%{login} asked for changes in change #%{number}"
+msgstr "@%{login} 在更改 #%{number} 中要求修改后重新提交"
+
+msgid "Resubmitted after changes were asked for in change #%{number}"
+msgstr "在更改 #%{number} 中被要求修改后重新提交"
+
+msgid "Open the earlier change"
+msgstr "查看之前的更改"
+
 msgid "AI pre-review summary"
 msgstr "AI 预审摘要"
 

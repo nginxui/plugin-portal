@@ -269,6 +269,15 @@ review.get('/:id', async (c) => {
     `SELECT e.stage, e.detail_json, e.at, u.login AS actor FROM change_events e LEFT JOIN users u ON u.id = e.actor_id
      WHERE e.change_id = ? ORDER BY e.at, e.id`,
   ).bind(change.id).all<{ stage: string, detail_json: string | null, at: number, actor: string | null }>()
+  // The change a maintainer sent back that this submission replaces, with
+  // what was asked for.
+  const replaced = await c.env.DB.prepare(
+    `SELECT c.id, c.number,
+       (SELECT r.detail_json FROM change_events r WHERE r.change_id = c.id AND r.stage = 'changes_requested' ORDER BY r.at DESC LIMIT 1) AS asked,
+       (SELECT u.login FROM change_events r LEFT JOIN users u ON u.id = r.actor_id WHERE r.change_id = c.id AND r.stage = 'changes_requested' ORDER BY r.at DESC LIMIT 1) AS asked_by
+     FROM change_events e JOIN changes c ON c.id = e.change_id
+     WHERE e.stage = 'withdrawn' AND json_extract(e.detail_json, '$.replaced_by') = ? LIMIT 1`,
+  ).bind(change.id).first<{ id: string, number: number | null, asked: string | null, asked_by: string | null }>()
 
   return c.json({
     change: { ...present(c.env, change), risk: risk(change) },
@@ -276,6 +285,9 @@ review.get('/:id', async (c) => {
       ? { login: author.login, avatarUrl: author.avatar_url, changes: history?.total ?? 0, merged: history?.merged ?? 0, plugins: owned.map(p => ({ id: p.id, name: p.name?.en ?? p.id })), firstListed }
       : null,
     rotation,
+    replaces: replaced
+      ? { id: replaced.id, number: replaced.number, askedBy: replaced.asked_by, asked: (replaced.asked ? JSON.parse(replaced.asked) as { comment?: string } : {}).comment ?? null }
+      : null,
     claim: payload.eligibility ?? null,
     // Why a maintainer asks for a trust change, a delisting or a block.
     reason: payload.delist?.reason ?? payload.block?.reason ?? payload.partner?.revoke?.reason ?? payload.reason ?? null,
