@@ -2437,6 +2437,10 @@ msgid "Pull request #%{n}"
 msgstr ""
 
 #: web/src/views/ChangeView.vue:500
+msgid "Commit in the repository"
+msgstr ""
+
+#: web/src/views/ChangeView.vue:500
 msgid "Commit in the catalog"
 msgstr ""
 

@@ -1668,6 +1668,9 @@ msgstr "链接"
 msgid "Pull request #%{n}"
 msgstr "拉取请求 #%{n}"
 
+msgid "Commit in the repository"
+msgstr "仓库中的提交"
+
 msgid "Commit in the catalog"
 msgstr "目录中的提交"
 

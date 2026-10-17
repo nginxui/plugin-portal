@@ -83,6 +83,30 @@ describe('tracker', () => {
     expect(await env.DB.prepare(`SELECT detail_json FROM change_events WHERE change_id = 'c_sync00000001' AND stage = 'rejected'`).first()).toEqual({ detail_json: JSON.stringify({ comment: 'Superseded by a newer key.' }) })
   })
 
+  it('runs failed checks again once, not while they run', async () => {
+    const cookie = await signIn()
+    vi.restoreAllMocks()
+    const pair = await crypto.subtle.generateKey({ name: 'RSASSA-PKCS1-v1_5', modulusLength: 2048, publicExponent: new Uint8Array([1, 0, 1]), hash: 'SHA-256' }, true, ['sign', 'verify']) as CryptoKeyPair
+    const der = new Uint8Array(await crypto.subtle.exportKey('pkcs8', pair.privateKey) as ArrayBuffer)
+    Object.assign(env, { DEPLOY_APP_ID: '1', DEPLOY_APP_PRIVATE_KEY: `-----BEGIN PRIVATE KEY-----\n${btoa(String.fromCharCode(...der))}\n-----END PRIVATE KEY-----` })
+    const t = Math.floor(Date.now() / 1000)
+    await env.DB.prepare(`INSERT INTO changes (id, author_id, kind, class, state, stage, waiting_on, payload_json, outcome_json, created_at, updated_at) VALUES ('c_retry0000001', ?, 'store_source', 'reviewed', 'open', 'checks', 'author', '{"kind":"entry_update"}', '{"outcome":"checks_failed"}', ?, ?)`).bind(githubUser.id, t, t).run()
+    let dispatches = 0
+    mockFetch(
+      url => url.pathname === `/repos/${env.CATALOG_REPO}/installation` ? json({ id: 9 }) : undefined,
+      url => url.pathname === '/app/installations/9/access_tokens' ? json({ token: 'ghs' }) : undefined,
+      (url) => {
+        if (!url.pathname.endsWith('/apply.yml/dispatches'))
+          return undefined
+        dispatches += 1
+        return new Response(null, { status: 204 })
+      },
+    )
+    expect((await call('/api/changes/c_retry0000001/retry', { method: 'POST', mutate: true, cookie })).status).toBe(200)
+    expect((await call('/api/changes/c_retry0000001/retry', { method: 'POST', mutate: true, cookie })).status).toBe(409)
+    expect(dispatches).toBe(1)
+  })
+
   it('reminds once after 18 hours of waiting on the author', async () => {
     await seed()
     expect(await remind(env)).toBe(1)

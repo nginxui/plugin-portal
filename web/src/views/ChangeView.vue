@@ -273,7 +273,7 @@ function eventText(e: ChangeEvent): string {
     case 'submitted':
       if (e.detail?.retry)
         return $gettext('Checks started again')
-      return typeof (e.detail as { items?: number } | null)?.items === 'number' ? $gettext('Submitted %{n} changes', { n: String((e.detail as { items: number }).items) }) : $gettext('Submitted')
+      return (e.detail as { items?: number } | null)?.items ? $gettext('Submitted %{n} changes', { n: String((e.detail as { items: number }).items) }) : $gettext('Submitted')
     case 'checks':
       if (e.detail?.outcome === 'dispatch_failed')
         return $gettext('The checks could not be started')
@@ -497,7 +497,7 @@ async function retry() {
                 <span class="i-tabler-external-link" />
               </a>
               <a v-if="change.commitUrl" :href="change.commitUrl" target="_blank" rel="noopener">
-                {{ $gettext('Commit in the catalog') }}
+                {{ repoStore ? $gettext('Commit in the repository') : $gettext('Commit in the catalog') }}
                 <span class="i-tabler-external-link" />
               </a>
               <a v-if="change.outcome?.runUrl" :href="change.outcome.runUrl" target="_blank" rel="noopener">

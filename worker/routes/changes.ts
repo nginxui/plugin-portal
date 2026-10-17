@@ -165,6 +165,8 @@ function storeRequest(env: Env, change: ChangeRow) {
     items: (payload.items ?? []).map(item => ({ ...item, value: valueOf(item)?.slice(0, 80) })),
     ...(repoPr ? { prUrl: payload.pr_url } : {}),
     ...(payload.delivery === 'patch' ? { patchUrl: `/api/changes/${change.id}/patch` } : {}),
+    // Texts delivered to the author's repository land in a commit there.
+    ...((payload.delivery === 'bot' || payload.delivery === 'patch') && payload.repo && change.commit_sha ? { commitUrl: `https://github.com/${payload.repo}/commit/${change.commit_sha}` } : {}),
   }
 }
 
@@ -261,7 +263,8 @@ function retryable(change: ChangeRow): boolean {
   // A store change in the author's repository is followed, not run again.
   if (change.state !== 'open' || change.kind === 'store' || change.kind === 'translations')
     return false
-  return (change.stage === 'checks' && change.waiting_on !== null) || (change.stage === 'review' && change.waiting_on === 'author')
+  // Checks still running have no outcome yet.
+  return (change.stage === 'checks' && change.waiting_on !== null && change.outcome_json !== null) || (change.stage === 'review' && change.waiting_on === 'author')
 }
 
 // Runs apply.yml again for a change whose checks failed, with the newest

@@ -44,7 +44,9 @@ const SYNC_BATCH = 20
  */
 export async function syncPulls(env: Env): Promise<number> {
   const { results } = await env.DB.prepare(
-    `SELECT * FROM changes WHERE state = 'open' AND stage = 'review' AND pr_number IS NOT NULL ORDER BY random() LIMIT ?`,
+    `SELECT * FROM changes WHERE state = 'open' AND stage = 'review'
+       AND (pr_number IS NOT NULL OR (kind IN ('store', 'translations') AND waiting_on = 'author'))
+     ORDER BY random() LIMIT ?`,
   ).bind(SYNC_BATCH).all<ChangeRow>()
   if (!results.length)
     return 0
