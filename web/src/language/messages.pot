@@ -4985,6 +4985,15 @@ msgid "Changes to publish"
 msgstr ""
 
 #: web/src/views/plugin/PluginStore.vue:396
+#: web/src/views/plugin/PluginStore.vue:409
+msgid "Reviewed by a maintainer"
+msgstr ""
+
+#: web/src/views/plugin/PluginStore.vue:396
+msgid "Live at the next catalog update"
+msgstr ""
+
+#: web/src/views/plugin/PluginStore.vue:396
 msgid "Goes to name review after the merge"
 msgstr ""
 
@@ -4996,10 +5005,6 @@ msgstr ""
 #: web/src/views/plugin/PluginStore.vue:407
 #: web/src/views/plugin/PluginStore.vue:514
 msgid "Store source: %{source}"
-msgstr ""
-
-#: web/src/views/plugin/PluginStore.vue:409
-msgid "Reviewed by a maintainer"
 msgstr ""
 
 #: web/src/views/plugin/PluginStore.vue:415

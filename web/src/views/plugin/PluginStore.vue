@@ -393,7 +393,7 @@ const name = computed(() => localized(doc.value.name) || localized(plugin.value.
                 <div class="min-w-0">
                   <div>{{ itemLabel(item, doc) }}</div>
                   <div class="text-3 op-65">
-                    {{ item.review ? $gettext('Goes to name review after the merge') : $gettext('Live after the merge') }}
+                    {{ source === 'catalog' ? (item.review ? $gettext('Reviewed by a maintainer') : $gettext('Live at the next catalog update')) : item.review ? $gettext('Goes to name review after the merge') : $gettext('Live after the merge') }}
                   </div>
                 </div>
               </div>

@@ -260,7 +260,8 @@ msgstr "社区翻译"
 msgid ""
 "%{batches} batches with %{strings} translations, committed to the catalog "
 "and live at its next update."
-msgstr "已提交 %{batches} 批共 %{strings} 条译文到插件目录，目录下次更新时生效。"
+msgstr ""
+"已提交 %{batches} 批共 %{strings} 条译文到插件目录，目录下次更新时生效。"
 
 msgid ""
 "%{batches} batches with %{strings} translations, being committed to the "
@@ -3632,6 +3633,12 @@ msgstr "迁移商店来源需经维护者审核。"
 msgid "Changes to publish"
 msgstr "待发布的更改"
 
+msgid "Reviewed by a maintainer"
+msgstr "需经维护者审核"
+
+msgid "Live at the next catalog update"
+msgstr "目录下次更新时生效"
+
 msgid "Goes to name review after the merge"
 msgstr "合并后进行名称审核"
 
@@ -3640,9 +3647,6 @@ msgstr "合并后生效"
 
 msgid "Store source: %{source}"
 msgstr "商店来源：%{source}"
-
-msgid "Reviewed by a maintainer"
-msgstr "需经维护者审核"
 
 msgid "Click a text in the preview to change it."
 msgstr "点击预览中的文本进行修改。"
@@ -4587,7 +4591,8 @@ msgstr "已合并，将在目录下次更新时上架"
 msgid ""
 "Suggest translations for plugins that welcome community translation. "
 "Accepted suggestions are published with you as a co-author."
-msgstr "为开启社区翻译的插件提交译文建议，采纳后会自动发布，并将你列为共同作者。"
+msgstr ""
+"为开启社区翻译的插件提交译文建议，采纳后会自动发布，并将你列为共同作者。"
 
 msgid "The page could not be loaded."
 msgstr "无法加载此页面。"
@@ -4611,7 +4616,7 @@ msgid "Add a language you translate to see the plugins that need it."
 msgstr "添加你翻译的语言，即可查看需要该语言的插件。"
 
 msgid "Plugins that need %{lang}"
-msgstr "需要%{lang}的插件"
+msgstr "需要翻译的插件（%{lang}）"
 
 msgid "%{n} plugins welcome community translation"
 msgstr "开启社区翻译的插件中共 %{n} 个"
