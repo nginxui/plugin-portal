@@ -185,7 +185,7 @@ const title = computed(() => {
             </AFlex>
           </div>
           <div class="overflow-x-auto">
-            <table class="table">
+            <table class="stack table">
               <thead>
                 <tr>
                   <th>{{ $gettext('Plugin') }}</th>
@@ -200,7 +200,7 @@ const title = computed(() => {
               </thead>
               <tbody>
                 <tr v-for="p in paged" :key="p.id">
-                  <td>
+                  <td :data-label="$gettext('Plugin')">
                     <AFlex align="center" gap="small" class="min-w-0">
                       <PluginIcon :src="p.iconUrl" :name="localized(p.name)" :size="28" />
                       <div class="min-w-0">
@@ -213,35 +213,35 @@ const title = computed(() => {
                       </div>
                     </AFlex>
                   </td>
-                  <td class="nowrap">
+                  <td :data-label="$gettext('Owner')" class="nowrap">
                     {{ p.owner }}
                     <div class="text-3 op-65">
                       {{ p.ownerKind === 'vendor' ? $gettext('Vendor') : p.ownerType === 'organization' ? $gettext('GitHub organization') : p.ownerType === 'user' ? $gettext('Personal') : $gettext('GitHub') }}
                     </div>
                   </td>
-                  <td>
+                  <td :data-label="$gettext('Trust')">
                     <ATag v-if="p.trust" :color="p.trust === 'official' ? 'success' : p.trust === 'verified' ? 'blue' : 'default'" class="m-0">
                       {{ trustLabel(p.trust) }}
                     </ATag>
                   </td>
-                  <td class="nowrap">
+                  <td :data-label="$gettext('Version')" class="nowrap">
                     {{ p.version ? `v${p.version}` : '—' }}
                   </td>
-                  <td class="text-3 op-65 nowrap">
+                  <td :data-label="$gettext('Store source')" class="text-3 op-65 nowrap">
                     {{ storeSourceShort(p.source) }}
                   </td>
-                  <td class="nowrap">
+                  <td :data-label="$gettext('State')" class="nowrap">
                     <ATag :color="stateTag(p).color" class="m-0">
                       {{ stateTag(p).text }}
                     </ATag>
                   </td>
-                  <td class="nowrap">
+                  <td :data-label="$gettext('Pending review')" class="nowrap">
                     <RouterLink v-if="p.openChanges" to="/review">
                       {{ $gettext('%{n} changes', { n: String(p.openChanges) }) }}
                     </RouterLink>
                     <span v-else class="op-50">{{ $gettext('None') }}</span>
                   </td>
-                  <td>
+                  <td data-label="">
                     <ADropdown
                       :menu="{
                         items: [

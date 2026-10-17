@@ -156,7 +156,7 @@ const host = (url: string | null, kind: string) => url ? url.replace(/^https:\/\
       <AFlex vertical gap="middle" class="col-main">
         <ACard :loading="loading" :styles="{ body: { padding: 0 } }">
           <div class="overflow-x-auto">
-            <table class="table">
+            <table class="stack table">
               <thead>
                 <tr>
                   <th>{{ $gettext('Name') }}</th>
@@ -169,22 +169,24 @@ const host = (url: string | null, kind: string) => url ? url.replace(/^https:\/\
               </thead>
               <tbody>
                 <tr v-for="p in providers" :key="p.id" :class="{ on: p.id === selectedId }" role="button" tabindex="0" @click="select(p)" @keydown.enter="select(p)">
-                  <td class="font-500">
+                  <td :data-label="$gettext('Name')" class="font-500">
                     {{ p.name }}
                   </td>
-                  <td>{{ p.kind === 'anthropic' ? 'Anthropic' : $gettext('OpenAI compatible') }}</td>
-                  <td class="mono">
+                  <td :data-label="$gettext('Kind')">
+                    {{ p.kind === 'anthropic' ? 'Anthropic' : $gettext('OpenAI compatible') }}
+                  </td>
+                  <td :data-label="$gettext('Model')" class="mono">
                     {{ p.model }}
                   </td>
-                  <td class="mono text-3">
+                  <td :data-label="$gettext('Endpoint')" class="mono text-3">
                     {{ host(p.baseUrl, p.kind) }}
                   </td>
-                  <td>
+                  <td :data-label="$gettext('State')">
                     <ATag :color="p.enabled ? 'success' : 'default'" class="m-0">
                       {{ p.enabled ? $gettext('Working') : $gettext('Turned off') }}
                     </ATag>
                   </td>
-                  <td>
+                  <td :data-label="$gettext('Default')">
                     <ARadio :checked="p.isDefault" :aria-label="$gettext('Default')" @click.stop="makeDefault(p)" />
                   </td>
                 </tr>

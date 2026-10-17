@@ -214,3 +214,50 @@ html.dark body {
   gap: 16px;
   align-items: start;
 }
+
+/* Tables with class "stack" turn every row into a card on phones, each cell
+   led by the label of its column (data-label). Pages style the cells, so the
+   card layout needs to win over their rules. */
+@media (max-width: 767px) {
+  table.stack {
+    min-width: 0 !important;
+    width: 100%;
+  }
+
+  table.stack thead {
+    display: none;
+  }
+
+  table.stack tr {
+    display: block;
+    padding: 10px 16px;
+    border-bottom: 1px solid var(--portal-border);
+  }
+
+  table.stack td {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 12px;
+    width: auto !important;
+    padding: 4px 0 !important;
+    border: 0 !important;
+    text-align: end !important;
+    white-space: normal !important;
+  }
+
+  table.stack td::before {
+    content: attr(data-label);
+    flex-shrink: 0;
+    text-align: start;
+    opacity: 0.65;
+  }
+
+  table.stack td[data-label='']::before {
+    content: none;
+  }
+
+  table.stack td[data-label=''] {
+    justify-content: flex-start;
+  }
+}

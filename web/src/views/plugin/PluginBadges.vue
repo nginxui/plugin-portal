@@ -81,7 +81,7 @@ const yankedSample = computed(() => {
           </AFlex>
         </template>
         <div class="overflow-x-auto">
-          <table class="table">
+          <table class="stack table">
             <thead>
               <tr>
                 <th class="w-16 whitespace-nowrap">
@@ -97,15 +97,19 @@ const yankedSample = computed(() => {
             </thead>
             <tbody>
               <tr v-for="kind in BADGE_KINDS" :key="kind">
-                <td>
+                <td :data-label="$gettext('Use')">
                   <ACheckbox :checked="picked.includes(kind)" :aria-label="KIND_LABELS[kind]" @change="(e: { target: { checked: boolean } }) => togglePick(kind, e.target.checked)" />
                 </td>
-                <td>{{ KIND_LABELS[kind] }}</td>
-                <td><img :src="image(kind, 'en')" :alt="KIND_LABELS[kind]"></td>
-                <td v-if="locale !== 'en'">
+                <td :data-label="$gettext('Shows')">
+                  {{ KIND_LABELS[kind] }}
+                </td>
+                <td data-label="English">
+                  <img :src="image(kind, 'en')" :alt="KIND_LABELS[kind]">
+                </td>
+                <td v-if="locale !== 'en'" :data-label="localeName(locale)">
                   <img :src="image(kind, locale)" :alt="KIND_LABELS[kind]">
                 </td>
-                <td class="mono text-3 op-65">
+                <td :data-label="$gettext('File')" class="mono text-3 op-65">
                   {{ kind }}{{ style ? `.${style}` : '' }}.svg
                 </td>
               </tr>

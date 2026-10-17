@@ -145,7 +145,7 @@ async function confirm() {
         </AButton>
       </div>
       <div class="overflow-x-auto">
-        <table class="table">
+        <table class="stack table">
           <thead>
             <tr>
               <th class="check-col">
@@ -162,7 +162,7 @@ async function confirm() {
           </thead>
           <tbody>
             <tr v-for="release in detail.releases" :key="release.version" :class="{ picked: selected.includes(release.version) }">
-              <td class="check-col">
+              <td data-label="" class="check-col">
                 <ACheckbox
                   v-if="selectable(release)"
                   :checked="selected.includes(release.version)"
@@ -171,22 +171,22 @@ async function confirm() {
                   @change="(e: { target: { checked: boolean } }) => toggle(release.version, e.target.checked)"
                 />
               </td>
-              <td class="font-500">
+              <td :data-label="$gettext('Version')" class="font-500">
                 <a v-if="release.notesUrl" :href="release.notesUrl" target="_blank" rel="noopener">v{{ release.version }}</a>
                 <span v-else>v{{ release.version }}</span>
               </td>
-              <td>
+              <td :data-label="$gettext('Released')">
                 <span class="op-75">{{ formatDate(release.releasedAt) }}</span>
               </td>
-              <td class="mono">
+              <td :data-label="$gettext('Signer')" class="mono">
                 {{ short(release.signer) }}
               </td>
-              <td>
+              <td :data-label="$gettext('Status')">
                 <ATag :color="statusOf(release).color" class="m-0">
                   {{ statusOf(release).text }}
                 </ATag>
               </td>
-              <td class="text-right">
+              <td :data-label="$gettext('Actions')" class="text-right">
                 <AButton v-if="release.yankedBy === 'version'" size="small" :disabled="locked" @click="ask('unyank', [release.version])">
                   {{ $gettext('Restore') }}
                 </AButton>

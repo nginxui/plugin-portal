@@ -224,7 +224,7 @@ const PROGRESS: Record<string, { text: (n: number | null) => string, track: stri
             <span class="text-3 op-65">{{ $gettext('Fill in only what you add or change') }}</span>
           </template>
           <div class="overflow-x-auto">
-            <table class="tr-table">
+            <table class="stack tr-table">
               <thead>
                 <tr>
                   <th class="w-30">
@@ -239,13 +239,17 @@ const PROGRESS: Record<string, { text: (n: number | null) => string, track: stri
               </thead>
               <tbody>
                 <tr v-for="row in current.rows.filter(r => r.en)" :key="row.field">
-                  <td>{{ fieldLabel(row.field) }}</td>
-                  <td>{{ row.en }}</td>
-                  <td :dir="RTL_LOCALES.includes(lang) ? 'rtl' : 'ltr'">
+                  <td :data-label="$gettext('Text')">
+                    {{ fieldLabel(row.field) }}
+                  </td>
+                  <td data-label="English">
+                    {{ row.en }}
+                  </td>
+                  <td :data-label="$gettext('Current translation')" :dir="RTL_LOCALES.includes(lang) ? 'rtl' : 'ltr'">
                     <span v-if="row.all[lang]">{{ row.all[lang] }}</span>
                     <span v-else class="op-50">{{ $gettext('Missing') }}</span>
                   </td>
-                  <td>
+                  <td :data-label="$gettext('Your suggestion')">
                     <span v-if="row.field === 'name' && current.nameLocked" class="text-3 op-65">{{ $gettext('In review, no suggestions for now') }}</span>
                     <ATextarea
                       v-else

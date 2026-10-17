@@ -210,7 +210,7 @@ const detailText = computed(() => selected.value ? auditDetailLines(selected.val
       </div>
       <ASpin :spinning="loading">
         <div class="overflow-x-auto">
-          <table class="log">
+          <table class="stack log">
             <thead>
               <tr>
                 <th>{{ $gettext('Time') }}</th>
@@ -230,23 +230,23 @@ const detailText = computed(() => selected.value ? auditDetailLines(selected.val
                 @click="selected = entry"
                 @keydown.enter="selected = entry"
               >
-                <td class="nowrap">
+                <td :data-label="$gettext('Time')" class="nowrap">
                   <span v-if="child" class="op-65"><span class="branch">└</span>{{ dayjs.unix(entry.at).format('HH:mm:ss') }}</span>
                   <span v-else class="op-85">{{ dayjs.unix(entry.at).format('MM-DD HH:mm:ss') }}</span>
                 </td>
-                <td class="nowrap">
+                <td :data-label="$gettext('Actor')" class="nowrap">
                   <span class="actor">
                     <AAvatar v-if="entry.actor" :src="entry.actorAvatar ?? undefined" :size="20">{{ entry.actor.slice(0, 1).toUpperCase() }}</AAvatar>
                     <span v-else class="portal-mark"><span class="i-tabler-refresh" /></span>
                     {{ entry.actor ?? actorName(entry) }}
                   </span>
                 </td>
-                <td class="nowrap">
+                <td :data-label="$gettext('Kind')" class="nowrap">
                   <ATag :color="AUDIT_KIND_COLORS[entry.kind]" class="m-0">
                     {{ auditKindLabel(entry.kind) }}
                   </ATag>
                 </td>
-                <td>
+                <td :data-label="$gettext('Action')">
                   <div v-for="line in auditLines(entry)" :key="line">
                     {{ line }}
                   </div>
@@ -264,7 +264,7 @@ const detailText = computed(() => selected.value ? auditDetailLines(selected.val
                     {{ $ngettext('%{n} step by the system', '%{n} steps by the system', steps, { n: String(steps) }) }}
                   </button>
                 </td>
-                <td class="nowrap">
+                <td :data-label="$gettext('Record')" class="nowrap">
                   <template v-if="entry.record">
                     <a v-if="isExternal(entry.record.url)" :href="entry.record.url" target="_blank" rel="noopener" class="mono" @click.stop>{{ entry.record.label }}</a>
                     <RouterLink v-else :to="entry.record.url" class="mono" @click.stop>

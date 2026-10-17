@@ -61,7 +61,7 @@ const people = computed(() => store.detail?.access.people ?? [])
           </ATypographyText>
         </template>
         <div class="overflow-x-auto">
-          <table class="role-table">
+          <table class="stack role-table">
             <thead>
               <tr>
                 <th>{{ $gettext('Repository permission on GitHub') }}</th>
@@ -71,13 +71,15 @@ const people = computed(() => store.detail?.access.people ?? [])
             </thead>
             <tbody>
               <tr v-for="row in mapping" :key="row.permission">
-                <td :class="{ mono: row.role }">
+                <td :data-label="$gettext('Repository permission on GitHub')" :class="{ mono: row.role }">
                   {{ row.permission }}
                 </td>
-                <td class="whitespace-nowrap">
+                <td :data-label="$gettext('Role')" class="whitespace-nowrap">
                   {{ roleLabel(row.role) }}
                 </td>
-                <td>{{ row.allows }}</td>
+                <td :data-label="$gettext('What it allows')">
+                  {{ row.allows }}
+                </td>
               </tr>
             </tbody>
           </table>

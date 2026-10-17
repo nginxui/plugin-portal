@@ -245,7 +245,7 @@ function stateTag(state: string, expires: string | null) {
           <span class="text-3 op-65">{{ $gettext('%{n} in all', { n: String(data.partners.length) }) }}</span>
         </template>
         <div class="overflow-x-auto">
-          <table class="table">
+          <table class="stack table">
             <thead>
               <tr>
                 <th>{{ $gettext('Name') }}</th>
@@ -259,7 +259,7 @@ function stateTag(state: string, expires: string | null) {
             </thead>
             <tbody>
               <tr v-for="p in data.partners" :key="p.name">
-                <td>
+                <td :data-label="$gettext('Name')">
                   <AFlex align="center" gap="small">
                     <AAvatar :size="24" shape="square">
                       {{ initials(p.displayName) }}
@@ -267,20 +267,24 @@ function stateTag(state: string, expires: string | null) {
                     <span class="font-500">{{ p.displayName }}</span>
                   </AFlex>
                 </td>
-                <td>{{ p.kind === 'vendor' ? $gettext('Vendor without a public repository') : $gettext('GitHub organization') }}</td>
-                <td>{{ p.plugins }}</td>
-                <td class="mono text-3">
+                <td :data-label="$gettext('Kind')">
+                  {{ p.kind === 'vendor' ? $gettext('Vendor without a public repository') : $gettext('GitHub organization') }}
+                </td>
+                <td :data-label="$gettext('Plugins')">
+                  {{ p.plugins }}
+                </td>
+                <td :data-label="$gettext('Key ID')" class="mono text-3">
                   {{ p.keyId ?? '—' }}
                 </td>
-                <td class="nowrap">
+                <td :data-label="$gettext('Valid until')" class="nowrap">
                   {{ p.expires ?? '—' }}
                 </td>
-                <td>
+                <td :data-label="$gettext('State')">
                   <ATag :color="stateTag(p.state, p.expires).color" class="m-0">
                     {{ stateTag(p.state, p.expires).text }}
                   </ATag>
                 </td>
-                <td class="nowrap text-right">
+                <td data-label="" class="nowrap text-right">
                   <AButton v-if="p.state !== 'revoked'" size="small" type="text" danger @click="startRevoke(p.name)">
                     {{ $gettext('Revoke the key') }}
                   </AButton>
