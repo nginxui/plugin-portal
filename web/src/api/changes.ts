@@ -47,6 +47,10 @@ export function getChanges() {
   return api<{ changes: Change[] }>('/changes')
 }
 
+export function getChangeState(id: string) {
+  return api<{ state: string, stage: string, updatedAt: number }>(`/changes/${encodeURIComponent(id)}/state`)
+}
+
 export function getChange(id: string) {
   return api<{ change: Change, canRetry: boolean, canWithdraw: boolean, others: Change[], events: ChangeEvent[] }>(`/changes/${encodeURIComponent(id)}`)
 }

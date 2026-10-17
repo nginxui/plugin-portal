@@ -24,6 +24,17 @@ describe('tracker', () => {
     expect((await call('/api/changes/c_track0000001/withdraw', { method: 'POST', mutate: true, cookie })).status).toBe(409)
   })
 
+  it('tells an open page where a change stands without calling GitHub', async () => {
+    const cookie = await signIn()
+    vi.restoreAllMocks()
+    await seed('open', 'maintainer', 1000)
+    const fetchSpy = mockFetch()
+    const response = await call('/api/changes/c_track0000001/state', { cookie })
+    expect(await response.json()).toEqual({ state: 'open', stage: 'review', updatedAt: 1000 })
+    expect(fetchSpy).not.toHaveBeenCalled()
+    expect((await call('/api/changes/c_missing000001/state', { cookie })).status).toBe(404)
+  })
+
   it('removes audit records past a year and reads the glossary once a day', async () => {
     const t = Math.floor(Date.now() / 1000)
     await env.DB.batch([

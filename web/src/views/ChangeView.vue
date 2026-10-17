@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { Change, ChangeEvent } from '@/api/changes'
-import { computed, h, onBeforeUnmount, ref, watch } from 'vue'
+import { computed, h, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { getChange, retryChange, withdrawChange } from '@/api/changes'
 import { categoryLabel } from '@/lib/categories'
@@ -10,6 +10,7 @@ import { $gettext } from '@/lib/gettext'
 import { joinClauses, localized } from '@/lib/labels'
 import { itemLabel } from '@/lib/storeDiff'
 import { formatTime, fromNow, waited } from '@/lib/time'
+import { useChangeWatch } from '@/lib/useChangeWatch'
 import { useCrumbs } from '@/stores/crumbs'
 import { usePluginStore } from '@/stores/plugin'
 
@@ -18,7 +19,6 @@ const failure = useFailure()
 const data = ref<{ change: Change, canRetry: boolean, canWithdraw: boolean, others: Change[], events: ChangeEvent[] } | null>(null)
 const missing = ref(false)
 const retrying = ref(false)
-let timer: ReturnType<typeof setTimeout> | undefined
 
 const router = useRouter()
 const id = computed(() => String(route.params.id))
@@ -27,7 +27,6 @@ const change = computed(() => data.value?.change ?? null)
 const changeId = computed(() => change.value?.id ?? id.value)
 
 async function load() {
-  clearTimeout(timer)
   try {
     data.value = await getChange(id.value)
     missing.value = false
@@ -37,19 +36,16 @@ async function load() {
   }
   catch {
     missing.value = true
-    return
   }
-  // Checks and the deploy take minutes; follow them while the page is open.
-  if (change.value?.waitingOn === 'system')
-    timer = setTimeout(load, 15000)
 }
+// Checks, the review and the deploy take minutes; the page follows them.
+useChangeWatch(() => change.value, load)
 
 // Moving to the numbered address needs no second load.
 watch(id, (value) => {
   if (!change.value || String(change.value.number) !== value)
     load()
 }, { immediate: true })
-onBeforeUnmount(() => clearTimeout(timer))
 
 // The plugin the change belongs to, for the plugin head; a new listing the
 // user cannot open yet has none.

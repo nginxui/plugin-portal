@@ -18,6 +18,7 @@ import { permissionText } from '@/lib/market'
 import { previewRows } from '@/lib/preview'
 import { isDark } from '@/lib/theme'
 import { formatDate, formatMoment, fromNow } from '@/lib/time'
+import { useChangeWatch } from '@/lib/useChangeWatch'
 import { useCrumbs } from '@/stores/crumbs'
 import { usePaletteStore } from '@/stores/palette'
 import { useReviewStore } from '@/stores/review'
@@ -46,6 +47,9 @@ async function load() {
     missing.value = true
   }
 }
+// The checks, a merge on GitHub and the deploy move the change while it is open.
+useChangeWatch(() => data.value?.change, load, 10)
+
 // Moving to the numbered address needs no second load.
 watch(id, (value) => {
   if (!data.value || String(data.value.change.number) !== value)
@@ -326,6 +330,9 @@ async function approve() {
   try {
     await approveChange(changeId.value, '', unchecked.value)
     approveOpen.value = false
+    // Merged now; the full reload with GitHub's view follows.
+    if (data.value)
+      data.value = { ...data.value, change: { ...data.value.change, state: 'merged', stage: 'merged', waitingOn: 'system' } }
     await Promise.all([load(), reviewStore.refresh()])
   }
   catch (e) {

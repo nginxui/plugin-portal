@@ -240,6 +240,16 @@ changes.get('/:id', async (c) => {
   })
 })
 
+// Where a change stands, from the database alone, so an open page can ask
+// every few seconds whether it moved without calling GitHub.
+changes.get('/:id/state', async (c) => {
+  const session = c.get('session')
+  const found = await getChange(c.env, c.req.param('id'))
+  if (!found || !await canSee(c.env, session, await userToken(c.env, session.id), found))
+    return c.json({ error: 'not_found' }, 404)
+  return c.json({ state: found.state, stage: found.stage, updatedAt: found.updated_at })
+})
+
 // The author may run the checks again after they failed, or after a
 // maintainer asked for changes; the pull request is then updated in place.
 function retryable(change: ChangeRow): boolean {
