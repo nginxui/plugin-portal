@@ -5407,7 +5407,11 @@ msgid "Every release this key signed is yanked, and only a maintainer can restor
 msgstr ""
 
 #: web/src/views/plugin/PluginVersions.vue:256
-msgid "No release would stay installable. Publish a release signed by a new signing key first."
+msgid "No release stays installable until one signed by a new signing key is published. When the key may have leaked, revoke it now; otherwise publish the new release first."
+msgstr ""
+
+#: web/src/views/plugin/PluginVersions.vue:259
+msgid "Kept with the change, for example: the signing key was on a laptop that was lost."
 msgstr ""
 
 #: web/src/views/plugin/PluginVersions.vue:259

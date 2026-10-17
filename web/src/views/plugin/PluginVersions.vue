@@ -253,10 +253,10 @@ async function confirm() {
         </p>
         <template v-else>
           <p>{{ $gettext('Every release this key signed is yanked, and only a maintainer can restore the signer.') }}</p>
-          <AAlert v-if="leftAfterRevoking(target.values[0]) === 0" type="warning" show-icon class="mb-3" :title="$gettext('No release would stay installable. Publish a release signed by a new signing key first.')" />
+          <AAlert v-if="leftAfterRevoking(target.values[0]) === 0" type="warning" show-icon class="mb-3" :title="$gettext('No release stays installable until one signed by a new signing key is published. When the key may have leaked, revoke it now; otherwise publish the new release first.')" />
         </template>
         <AForm layout="vertical">
-          <AFormItem :label="$gettext('Reason')" :extra="$gettext('Kept with the change, for example: the configuration cannot be read after upgrading, use v1.2.0 instead.')" class="mb-0">
+          <AFormItem :label="$gettext('Reason')" :extra="target.kind === 'revoke' ? $gettext('Kept with the change, for example: the signing key was on a laptop that was lost.') : $gettext('Kept with the change, for example: the configuration cannot be read after upgrading, use v1.2.0 instead.')" class="mb-0">
             <ATextarea v-model:value="reason" :rows="3" :maxlength="500" />
           </AFormItem>
         </AForm>
