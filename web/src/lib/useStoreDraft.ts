@@ -5,6 +5,11 @@ import { computed, ref } from 'vue'
 import { discardDraft, getStore, saveDraft } from '@/api/store'
 import { diffDoc } from './storeDiff'
 
+// The document is plain JSON; structuredClone refuses the reactive proxy of a ref.
+function cloneDoc(doc: PreviewDoc): PreviewDoc {
+  return JSON.parse(JSON.stringify(doc)) as PreviewDoc
+}
+
 // The user's draft of a plugin's store texts, shared by the store editor, the
 // screenshot studio and the translation workbench. Every edit is saved as a
 // draft shortly after it is made.
@@ -25,7 +30,7 @@ export function useStoreDraft(pluginId: () => string) {
     try {
       const s = await getStore(pluginId())
       state.value = s
-      doc.value = structuredClone(s.draft?.doc ?? s.doc)
+      doc.value = cloneDoc(s.draft?.doc ?? s.doc)
       readme.value = s.draft?.readme ?? s.readme
       readmeChanged.value = s.draft?.readme !== undefined && s.draft?.readme !== null
       source.value = s.draft?.source ?? (s.source === 'release' ? 'repo-release' : s.source)
@@ -74,7 +79,7 @@ export function useStoreDraft(pluginId: () => string) {
   function setText(key: string, locale: string, value: string, drafted = false) {
     const id = `${key}.${locale}`
     ai.value = drafted && value ? [...new Set([...ai.value, id])] : ai.value.filter(k => k !== id)
-    const next = structuredClone(doc.value)
+    const next = cloneDoc(doc.value)
     const set = (target: Record<string, string> | undefined) => {
       const out = { ...(target ?? {}) }
       if (value)
