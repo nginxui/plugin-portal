@@ -156,11 +156,18 @@ async function act(accept: { id: number, text?: string }[], decline: { id: numbe
 
       <div v-if="state.rolling" class="rolling">
         <AFlex gap="6" align="center" class="font-500 text-3">
-          <span class="i-tabler-git-pull-request c-info" />
+          <span :class="state.catalog ? 'i-tabler-git-commit' : 'i-tabler-git-pull-request'" class="c-info" />
           {{ state.rolling.prNumber ? $gettext('Community translations, pull request #%{n}', { n: String(state.rolling.prNumber) }) : $gettext('Community translations') }}
         </AFlex>
         <div class="text-3 op-65 mt-1">
-          {{ $gettext('%{batches} batches with %{strings} translations, waiting for the merge.', { batches: String(state.rolling.batches), strings: String(state.rolling.strings) }) }}
+          <template v-if="state.catalog">
+            {{ state.rolling.state === 'merged'
+              ? $gettext('%{batches} batches with %{strings} translations, committed to the catalog and live at its next update.', { batches: String(state.rolling.batches), strings: String(state.rolling.strings) })
+              : $gettext('%{batches} batches with %{strings} translations, being committed to the catalog.', { batches: String(state.rolling.batches), strings: String(state.rolling.strings) }) }}
+          </template>
+          <template v-else>
+            {{ $gettext('%{batches} batches with %{strings} translations, waiting for the merge.', { batches: String(state.rolling.batches), strings: String(state.rolling.strings) }) }}
+          </template>
         </div>
         <AFlex gap="middle" class="mt-1 text-3">
           <a v-if="state.rolling.prUrl" :href="state.rolling.prUrl" target="_blank" rel="noopener">{{ $gettext('View on GitHub') }}</a>
@@ -170,7 +177,9 @@ async function act(accept: { id: number, text?: string }[], decline: { id: numbe
         </AFlex>
       </div>
       <ATypographyParagraph type="secondary" class="text-3 mt-3 mb-0">
-        {{ $gettext('Accepted translations go into one pull request, with the translators as co-authors of each commit.') }}
+        {{ state.catalog
+          ? $gettext('Accepted translations are committed to the catalog, with the translators as co-authors of each commit.')
+          : $gettext('Accepted translations go into one pull request, with the translators as co-authors of each commit.') }}
       </ATypographyParagraph>
     </template>
     <AAlert v-if="error" type="error" show-icon class="mt-3" :title="error" />

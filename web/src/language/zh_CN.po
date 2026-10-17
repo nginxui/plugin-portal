@@ -257,6 +257,16 @@ msgstr "社区翻译拉取请求 #%{n}"
 msgid "Community translations"
 msgstr "社区翻译"
 
+msgid ""
+"%{batches} batches with %{strings} translations, committed to the catalog "
+"and live at its next update."
+msgstr "已提交 %{batches} 批共 %{strings} 条译文到插件目录，目录下次更新时生效。"
+
+msgid ""
+"%{batches} batches with %{strings} translations, being committed to the "
+"catalog."
+msgstr "正在将 %{batches} 批共 %{strings} 条译文提交到插件目录。"
+
 msgid "%{batches} batches with %{strings} translations, waiting for the merge."
 msgstr "已包含 %{batches} 批共 %{strings} 条译文，等待你在 GitHub 上合并。"
 
@@ -265,6 +275,11 @@ msgstr "在 GitHub 上查看"
 
 msgid "View progress"
 msgstr "查看进度"
+
+msgid ""
+"Accepted translations are committed to the catalog, with the translators as "
+"co-authors of each commit."
+msgstr "采纳的译文会直接提交到插件目录，提交记录将译者列为共同作者。"
 
 msgid ""
 "Accepted translations go into one pull request, with the translators as co-"
@@ -4571,8 +4586,8 @@ msgstr "已合并，将在目录下次更新时上架"
 
 msgid ""
 "Suggest translations for plugins that welcome community translation. "
-"Accepted suggestions go to the plugin repository with you as a co-author."
-msgstr "为开启社区翻译的插件提交译文建议，审核通过后会自动提交到插件仓库。"
+"Accepted suggestions are published with you as a co-author."
+msgstr "为开启社区翻译的插件提交译文建议，采纳后会自动发布，并将你列为共同作者。"
 
 msgid "The page could not be loaded."
 msgstr "无法加载此页面。"
@@ -4620,9 +4635,7 @@ msgid "No change"
 msgstr "无更改"
 
 msgid "A translator or publisher of the plugin reviews your suggestions."
-msgstr ""
-"建议由插件的翻译者或发布者审核，采纳后自动加入插件的社区翻译拉取请求，并将你"
-"列为共同作者。"
+msgstr "建议由插件的翻译者或发布者审核。"
 
 msgid "Send %{n} suggestions"
 msgstr "提交 %{n} 条建议"
@@ -4659,6 +4672,11 @@ msgstr "名称建议"
 
 msgid "An accepted name still goes to a maintainer before it is listed."
 msgstr "名称建议被采纳后，仍需维护者审核才会显示。"
+
+#~ msgid ""
+#~ "Suggest translations for plugins that welcome community translation. "
+#~ "Accepted suggestions go to the plugin repository with you as a co-author."
+#~ msgstr "为开启社区翻译的插件提交译文建议，审核通过后会自动提交到插件仓库。"
 
 #~ msgid ""
 #~ "Pull request #%{n} is closed and the change stops here. You can submit "

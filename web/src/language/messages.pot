@@ -20,7 +20,7 @@ msgid "Change categories"
 msgstr ""
 
 #: web/src/components/CategoryEditModal.vue:50
-#: web/src/components/CommunityCard.vue:178
+#: web/src/components/CommunityCard.vue:187
 #: web/src/views/maintain/AiModels.vue:237
 #: web/src/views/maintain/Settings.vue:326
 #: web/src/views/maintain/Settings.vue:371
@@ -372,7 +372,7 @@ msgid "When it is on, signed in users can suggest translations of the store text
 msgstr ""
 
 #: web/src/components/CommunityCard.vue:103
-#: web/src/components/CommunityCard.vue:178
+#: web/src/components/CommunityCard.vue:187
 msgid "Open languages"
 msgstr ""
 
@@ -456,22 +456,34 @@ msgstr ""
 msgid "Community translations"
 msgstr ""
 
-#: web/src/components/CommunityCard.vue:163
-msgid "%{batches} batches with %{strings} translations, waiting for the merge."
+#: web/src/components/CommunityCard.vue:165
+msgid "%{batches} batches with %{strings} translations, committed to the catalog and live at its next update."
 msgstr ""
 
 #: web/src/components/CommunityCard.vue:166
+msgid "%{batches} batches with %{strings} translations, being committed to the catalog."
+msgstr ""
+
+#: web/src/components/CommunityCard.vue:169
+msgid "%{batches} batches with %{strings} translations, waiting for the merge."
+msgstr ""
+
+#: web/src/components/CommunityCard.vue:173
 #: web/src/views/maintain/AllPlugins.vue:289
 msgid "View on GitHub"
 msgstr ""
 
-#: web/src/components/CommunityCard.vue:168
+#: web/src/components/CommunityCard.vue:175
 #: web/src/components/PendingChange.vue:16
 #: web/src/views/plugin/PluginLayout.vue:82
 msgid "View progress"
 msgstr ""
 
-#: web/src/components/CommunityCard.vue:173
+#: web/src/components/CommunityCard.vue:181
+msgid "Accepted translations are committed to the catalog, with the translators as co-authors of each commit."
+msgstr ""
+
+#: web/src/components/CommunityCard.vue:182
 msgid "Accepted translations go into one pull request, with the translators as co-authors of each commit."
 msgstr ""
 
@@ -6164,7 +6176,7 @@ msgid "Merged, listed at the next catalog update"
 msgstr ""
 
 #: web/src/views/translate/TranslatePage.vue:153
-msgid "Suggest translations for plugins that welcome community translation. Accepted suggestions go to the plugin repository with you as a co-author."
+msgid "Suggest translations for plugins that welcome community translation. Accepted suggestions are published with you as a co-author."
 msgstr ""
 
 #: web/src/views/translate/TranslatePage.vue:156

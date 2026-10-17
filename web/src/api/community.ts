@@ -16,8 +16,9 @@ export interface CommunityState {
   translationsPr: number | null
   canManage: boolean
   canReview: boolean
+  catalog: boolean
   pending: Suggestion[]
-  rolling: { change: string, prNumber: number | null, prUrl: string | null, strings: number, batches: number } | null
+  rolling: { change: string, state: string, prNumber: number | null, prUrl: string | null, strings: number, batches: number } | null
 }
 
 export function aiStatus() {

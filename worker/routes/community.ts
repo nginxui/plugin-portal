@@ -6,7 +6,7 @@ import { AiError, defaultProvider, draft, presentProvider } from '../lib/ai'
 import { audit } from '../lib/audit'
 import { loadCatalog, repoOf } from '../lib/catalog'
 import { glossary } from '../lib/glossary'
-import { insightsOf } from '../lib/insights'
+import { insightsOf, storeSourceOf } from '../lib/insights'
 import { HOST_LOCALES, isHostLocale } from '../lib/locales'
 import { pluginContext } from '../lib/pluginContext'
 import { reservedWord } from '../lib/rules'
@@ -92,9 +92,9 @@ community.get('/plugins/:id/community', requireSession, async (c) => {
          WHERE s.plugin_id = ? AND s.state = 'pending' ORDER BY s.created_at LIMIT 100`,
       ).bind(ctx.id).all<SuggestionRow & { login: string | null, avatar: string | null }>()
     : { results: [] }
-  const open = await c.env.DB.prepare(`SELECT id, pr_number, payload_json FROM changes WHERE plugin_id = ? AND kind = 'translations' AND state IN ('open', 'merged') ORDER BY created_at DESC LIMIT 1`)
+  const open = await c.env.DB.prepare(`SELECT id, state, pr_number, payload_json FROM changes WHERE plugin_id = ? AND kind = 'translations' AND state IN ('open', 'merged') ORDER BY created_at DESC LIMIT 1`)
     .bind(ctx.id)
-    .first<{ id: string, pr_number: number | null, payload_json: string | null }>()
+    .first<{ id: string, state: string, pr_number: number | null, payload_json: string | null }>()
   const counts = open
     ? await c.env.DB.prepare(`SELECT count(*) AS strings, count(DISTINCT decided_at) AS batches FROM suggestions WHERE change_id = ?`).bind(open.id).first<{ strings: number, batches: number }>()
     : null
@@ -102,8 +102,10 @@ community.get('/plugins/:id/community', requireSession, async (c) => {
     ...settings,
     canManage: atLeast(ctx.role, 'admin'),
     canReview,
+    // A catalog hosted plugin gets accepted translations committed, not a pull request.
+    catalog: storeSourceOf(ctx.entry?.store) === 'catalog',
     pending: results.map(s => ({ id: s.id, field: s.field, locale: s.locale, text: s.text, author: s.login, avatarUrl: s.avatar, createdAt: s.created_at })),
-    rolling: open ? { change: open.id, prNumber: open.pr_number, prUrl: (JSON.parse(open.payload_json ?? '{}') as { pr_url?: string }).pr_url ?? null, strings: counts?.strings ?? 0, batches: counts?.batches ?? 0 } : null,
+    rolling: open ? { change: open.id, state: open.state, prNumber: open.pr_number, prUrl: (JSON.parse(open.payload_json ?? '{}') as { pr_url?: string }).pr_url ?? null, strings: counts?.strings ?? 0, batches: counts?.batches ?? 0 } : null,
   })
 })
 

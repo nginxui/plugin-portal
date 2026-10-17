@@ -150,7 +150,7 @@ const PROGRESS: Record<string, { text: (n: number | null) => string, track: stri
         {{ $gettext('Contribute translations') }}
       </h1>
       <ATypographyText type="secondary">
-        {{ $gettext('Suggest translations for plugins that welcome community translation. Accepted suggestions go to the plugin repository with you as a co-author.') }}
+        {{ $gettext('Suggest translations for plugins that welcome community translation. Accepted suggestions are published with you as a co-author.') }}
       </ATypographyText>
     </div>
     <AAlert v-if="failed" type="error" show-icon :title="$gettext('The page could not be loaded.')" />
