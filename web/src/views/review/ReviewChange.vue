@@ -396,9 +396,10 @@ async function sendRequest() {
   actionError.value = ''
   try {
     await requestChanges(changeId.value, requestText.value)
+    // The dialog stays until the page shows the new state.
+    await Promise.all([load(), reviewStore.refresh()])
     requestOpen.value = false
     requestText.value = ''
-    await Promise.all([load(), reviewStore.refresh()])
   }
   catch {
     actionError.value = $gettext('The request could not be sent. Please try again.')
@@ -419,9 +420,10 @@ async function sendReject() {
   actionError.value = ''
   try {
     await rejectChange(changeId.value, rejectText.value)
+    // The dialog stays until the page shows the new state.
+    await Promise.all([load(), reviewStore.refresh()])
     rejectOpen.value = false
     rejectText.value = ''
-    await Promise.all([load(), reviewStore.refresh()])
   }
   catch {
     actionError.value = $gettext('The change could not be rejected. Please try again.')
