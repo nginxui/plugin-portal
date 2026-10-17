@@ -1659,9 +1659,9 @@ msgid ""
 msgstr "进行中的更改以一行摘要显示在插件页面顶部，点击即可打开本页。"
 
 msgid ""
-"Pull request #%{n} is closed and the change stops here. You can submit again "
-"at any time."
-msgstr "拉取请求 #%{n} 已关闭，此更改到此结束。你可以随时重新提交。"
+"Withdrawing closes pull request #%{n} and the change stops here. You can "
+"submit again at any time."
+msgstr "撤回后会关闭拉取请求 #%{n}，此更改到此结束。你可以随时重新提交。"
 
 msgid "The change stops here. You can submit again at any time."
 msgstr "此更改到此结束。你可以随时重新提交。"
@@ -4285,18 +4285,6 @@ msgstr "取消选择"
 msgid "Approve all"
 msgstr "全部通过"
 
-msgid "Select all low risk changes"
-msgstr "选择全部低风险变更"
-
-msgid "Risk"
-msgstr "风险"
-
-msgid "Outcome"
-msgstr "结果"
-
-msgid "Waiting"
-msgstr "等待"
-
 msgid "Select %{name}"
 msgstr "选择 %{name}"
 
@@ -4311,6 +4299,18 @@ msgstr "低"
 
 msgid "Nothing is waiting here."
 msgstr "这里没有待处理的变更。"
+
+msgid "Select all low risk changes"
+msgstr "选择全部低风险变更"
+
+msgid "Risk"
+msgstr "风险"
+
+msgid "Outcome"
+msgstr "结果"
+
+msgid "Waiting"
+msgstr "等待"
 
 msgid "Move"
 msgstr "上下移动"
@@ -4659,6 +4659,11 @@ msgstr "名称建议"
 
 msgid "An accepted name still goes to a maintainer before it is listed."
 msgstr "名称建议被采纳后，仍需维护者审核才会显示。"
+
+#~ msgid ""
+#~ "Pull request #%{n} is closed and the change stops here. You can submit "
+#~ "again at any time."
+#~ msgstr "拉取请求 #%{n} 已关闭，此更改到此结束。你可以随时重新提交。"
 
 #~ msgid ""
 #~ "Submit a plugin from its GitHub repository, keep its store page and "

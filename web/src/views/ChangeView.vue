@@ -516,7 +516,7 @@ async function retry() {
         </AFlex>
       </div>
       <AModal v-model:open="withdrawOpen" :title="$gettext('Withdraw the change')" :confirm-loading="withdrawing" :ok-text="$gettext('Withdraw')" :ok-button-props="{ danger: true }" @ok="withdraw">
-        <p>{{ change.prNumber ? $gettext('Pull request #%{n} is closed and the change stops here. You can submit again at any time.', { n: String(change.prNumber) }) : $gettext('The change stops here. You can submit again at any time.') }}</p>
+        <p>{{ change.prNumber ? $gettext('Withdrawing closes pull request #%{n} and the change stops here. You can submit again at any time.', { n: String(change.prNumber) }) : $gettext('The change stops here. You can submit again at any time.') }}</p>
       </AModal>
     </template>
     <ASkeleton v-else active />
