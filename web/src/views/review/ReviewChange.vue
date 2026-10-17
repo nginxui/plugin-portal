@@ -58,7 +58,9 @@ watch(id, (value) => {
 
 const change = computed(() => detail.value?.change ?? null)
 const entry = computed(() => (change.value?.entry ?? null) as Record<string, any> | null)
-const name = computed(() => localized(entry.value?.name) || change.value?.pluginId || '')
+// A delisting has no entry after it; the listing it removes names the plugin.
+const removal = computed(() => !!change.value && !entry.value && !!detail.value?.before)
+const name = computed(() => localized(entry.value?.name) || localized((detail.value?.before as { name?: Record<string, string> } | null)?.name) || change.value?.pluginId || '')
 useCrumbs(() => [
   { title: $gettext('Review queue'), to: '/review' },
   ...(change.value ? [{ title: name.value }, { title: change.value.number ? `${kindLabel(change.value.kind)} #${change.value.number}` : kindLabel(change.value.kind) }] : []),
@@ -117,7 +119,7 @@ const rows = computed(() => {
       label: f.label,
       key: f.key,
       before: before ? f.format(before[f.key]) : [],
-      after: f.format(after[f.key]),
+      after: removal.value ? [] : f.format(after[f.key]),
       changed: !before || JSON.stringify(before[f.key]) !== JSON.stringify(after[f.key]),
     }))
 })
@@ -150,7 +152,7 @@ const preview = computed(() => previewRows(change.value?.outcome && 'preview' in
 const extraRows = computed(() => rows.value.filter(row => ['author', 'repository_url', 'author_public_key', 'trust'].includes(row.key)))
 
 // A new primary key ends the certificates the old one issued.
-const keyRotation = computed(() => !!detail.value?.before && rows.value.some(row => row.key === 'author_public_key' && row.changed))
+const keyRotation = computed(() => !!detail.value?.before && !removal.value && rows.value.some(row => row.key === 'author_public_key' && row.changed && row.before.length > 0 && row.after.length > 0))
 
 // The diff rows, with the key ids under a new primary key.
 const tableRows = computed(() => rows.value.filter(row => !detail.value?.before || row.changed).flatMap((row) => {
@@ -203,6 +205,8 @@ const claimText = computed(() => {
   const admin = /has admin permission on (\S+)$/.exec(claim)
   if (admin)
     return $gettext('Has admin permission on %{repo}', { repo: admin[1] })
+  if (/ is a maintainer$/.test(claim))
+    return $gettext('Is a maintainer of the catalog')
   return claim || $gettext('No claim recorded')
 })
 
@@ -259,7 +263,8 @@ const nameRows = computed(() => {
     state: !before[locale] ? 'add' : !after[locale] ? 'removed' : before[locale] === after[locale] ? 'same' : 'mod',
   })).sort((a, b) => Number(a.state === 'same') - Number(b.state === 'same'))
 })
-const changedNames = computed(() => nameRows.value.filter(r => r.state !== 'same'))
+// Names are approved one by one only while the listing stays.
+const changedNames = computed(() => removal.value ? [] : nameRows.value.filter(r => r.state !== 'same'))
 const approveLabel = computed(() => changedNames.value.length ? $gettext('Approve the checked names') : $gettext('Approve and merge'))
 const unchecked = ref<string[]>([])
 watch(() => change.value?.id, () => (unchecked.value = []))

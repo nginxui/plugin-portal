@@ -3972,6 +3972,9 @@ msgstr "在 %{repo} 上安装了 Nginx UI 插件目录应用"
 msgid "Has admin permission on %{repo}"
 msgstr "拥有 %{repo} 的 admin 权限"
 
+msgid "Is a maintainer of the catalog"
+msgstr "是插件目录的维护者"
+
 msgid "No claim recorded"
 msgstr "没有记录认领依据"
 
