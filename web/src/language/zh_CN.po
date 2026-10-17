@@ -3962,6 +3962,9 @@ msgstr "作者"
 msgid "Primary public key"
 msgstr "主公钥"
 
+msgid "%{n} days of trial"
+msgstr "试用 %{n} 天"
+
 msgid "Listed release"
 msgstr "上架版本"
 

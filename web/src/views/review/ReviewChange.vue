@@ -135,6 +135,12 @@ const rows = computed(() => {
     { key: 'license', label: $gettext('License'), format: v => v ? [String(v)] : [] },
     { key: 'trust', label: $gettext('Trust'), format: v => v ? [trustLabel(String(v)) || String(v)] : [] },
     { key: 'store', label: $gettext('Store source'), format: v => [storeSourceLabel(v)] },
+    { key: 'commercial', label: $gettext('Commercial details'), format: (v) => {
+      if (!v)
+        return []
+      const pricing = Object.entries((v.pricing ?? {}) as Record<string, string>).map(([l, t]) => l === 'en' ? t : `${localeName(l)}: ${t}`)
+      return [...pricing, ...(v.purchase_url ? [v.purchase_url] : []), ...(v.trial_days ? [$gettext('%{n} days of trial', { n: String(v.trial_days) })] : [])]
+    } },
   ]
   // Any other field shows as it is written, so no change goes unseen.
   const known = new Set(['id', ...fields.map(f => f.key)])
@@ -721,7 +727,7 @@ onKeyStroke('k', e => !typing(e) && step(-1))
             </div>
           </ACard>
 
-          <ACard v-if="detail.before" :title="$gettext('What changes')">
+          <ACard v-if="detail.before && change.state === 'open'" :title="$gettext('What changes')">
             <template #extra>
               <span class="text-3 op-65">{{ $gettext('Compared with the current listing') }}</span>
             </template>
