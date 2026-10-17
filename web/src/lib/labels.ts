@@ -85,8 +85,8 @@ export function joinList(items: string[]): string {
 }
 
 /** Clauses of a sentence joined the way the language of the portal writes them. */
-export function joinClauses(items: string[]): string {
-  return items.join(gettext.current.startsWith('zh') ? '，' : ', ')
+export function joinClauses(items: (string | false | null | undefined)[]): string {
+  return items.filter(Boolean).join(gettext.current.startsWith('zh') ? '，' : ', ')
 }
 
 /** Sentences one after another, with the space the language of the portal puts between them. */

@@ -2,8 +2,6 @@ import type { AppEnv, Env, Session } from '../env'
 import type { ChangeRow } from '../lib/changes'
 import { Hono } from 'hono'
 import { mapLimit, repoAccess } from '../lib/access'
-import { audit } from '../lib/audit'
-import { botEnabled, botToken } from '../lib/bot'
 import { cached } from '../lib/cache'
 import { loadCatalog, pluginIcons } from '../lib/catalog'
 import { event, getChange } from '../lib/changes'
@@ -12,6 +10,7 @@ import { deletePortalBranch, github } from '../lib/github'
 import { userToken } from '../lib/session'
 import { headOf } from '../lib/store'
 import { now } from '../lib/time'
+import { withdrawChange } from '../lib/withdraw'
 import { checkMaintainer, requireSession } from '../middleware/auth'
 import { limit } from '../middleware/limits'
 
@@ -283,9 +282,7 @@ changes.post('/:id/retry', limit('write'), async (c) => {
   return c.json({ ok: true })
 })
 
-// The author withdraws a change still on its way. A pull request of the bot
-// on the author's repository is closed by the bot; one in the catalog by
-// apply.yml, since only its app may close it.
+// The author withdraws a change still on its way.
 changes.post('/:id/withdraw', async (c) => {
   const session = c.get('session')
   const change = await getChange(c.env, c.req.param('id'))
@@ -293,24 +290,6 @@ changes.post('/:id/withdraw', async (c) => {
     return c.json({ error: 'not_found' }, 404)
   if (change.state !== 'open')
     return c.json({ error: 'not_open' }, 409)
-  const payload = change.payload_json ? JSON.parse(change.payload_json) as { delivery?: string, repo?: string } : {}
-  if ((change.kind === 'store' || change.kind === 'translations') && payload.delivery === 'bot' && change.pr_number && payload.repo && await botEnabled(c.env)) {
-    await github(`/repos/${payload.repo}/pulls/${change.pr_number}`, await botToken(c.env), {
-      method: 'PATCH',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ state: 'closed' }),
-    }).catch(error => console.error('closing the pull request failed', error))
-  }
-  else if (change.pr_number && change.stage === 'review') {
-    await dispatchApply(c.env, change.id, { kind: 'close', pr_number: change.pr_number, submitter: { login: session.user.login, id: session.user.id } })
-      .catch(error => console.error('dispatch failed', error))
-  }
-  const t = now()
-  await c.env.DB.batch([
-    c.env.DB.prepare(`UPDATE changes SET state = 'withdrawn', waiting_on = NULL, updated_at = ? WHERE id = ?`).bind(t, change.id),
-    event(c.env, change.id, 'withdrawn', session.user.id),
-    c.env.DB.prepare(`UPDATE suggestions SET change_id = NULL WHERE change_id = ? AND state = 'accepted'`).bind(change.id),
-  ])
-  await audit(c.env.DB, { actorId: session.user.id, action: 'change.withdraw', subject: change.plugin_id ?? undefined, detail: { change: change.id } })
+  await withdrawChange(c.env, change, session.user)
   return c.json({ ok: true })
 })

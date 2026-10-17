@@ -137,6 +137,23 @@ describe('store editor', () => {
     expect(await names.json()).toEqual({ error: 'names_pending' })
   })
 
+  it('replaces names a maintainer sent back with the next submission', async () => {
+    const cookie = await signedIn()
+    entry = { ...entry, store: { source: 'catalog' } }
+    await call(`/api/plugins/${ID}/store/draft`, { method: 'PUT', mutate: true, cookie, json: { doc: { name: { en: 'GeoIP Access', ja_JP: 'GeoIP アクセス' } } } })
+    const first = await (await call(`/api/plugins/${ID}/store/submit`, { method: 'POST', mutate: true, cookie, json: {} })).json() as { change: string }
+    await env.DB.prepare(`UPDATE changes SET stage = 'review', waiting_on = 'author', pr_number = 41 WHERE id = ?`).bind(first.change).run()
+
+    await call(`/api/plugins/${ID}/store/draft`, { method: 'PUT', mutate: true, cookie, json: { doc: { name: { en: 'GeoIP Access', ja_JP: 'GeoIP アクセス制御' } } } })
+    const response = await call(`/api/plugins/${ID}/store/submit`, { method: 'POST', mutate: true, cookie, json: {} })
+    expect(response.status).toBe(201)
+    const second = await response.json() as { change: string }
+    expect(await env.DB.prepare('SELECT state FROM changes WHERE id = ?').bind(first.change).first()).toEqual({ state: 'withdrawn' })
+    expect(await env.DB.prepare(`SELECT detail_json FROM change_events WHERE change_id = ? AND stage = 'withdrawn'`).bind(first.change).first()).toEqual({ detail_json: JSON.stringify({ replaced_by: second.change }) })
+    // The pull request of the old change is closed by apply.yml.
+    expect(dispatched.map(d => JSON.parse(d.payload).kind)).toEqual(['store_update', 'close', 'store_update'])
+  })
+
   it('moves a draft onto texts that went live meanwhile', async () => {
     const cookie = await signedIn()
     entry = { ...entry, store: { source: 'catalog' } }

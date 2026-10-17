@@ -63,6 +63,13 @@ const headPlugin = computed(() => {
 // author's repository waits for the author's merge instead.
 const selfService = computed(() => change.value?.class === 'self_service')
 const repoStore = computed(() => change.value?.delivery === 'bot' || change.value?.delivery === 'patch')
+// Store texts sent back by a maintainer are edited and submitted again.
+const editsStore = computed(() => (change.value?.kind === 'store' || change.value?.kind === 'translations') && !repoStore.value)
+// The newer submission that took over from this change.
+const replacedBy = computed(() => {
+  const found = data.value?.events.find(e => e.stage === 'withdrawn')
+  return found?.detail?.replaced_by ?? null
+})
 const stages = computed(() => selfService.value && !repoStore.value
   ? ['submitted', 'checks', 'merged', 'live']
   : ['submitted', 'checks', 'review', 'merged', 'live'])
@@ -220,8 +227,15 @@ const status = computed<{ type: 'success' | 'info' | 'warning' | 'error', text: 
     return { type: 'success', text: $gettext('The plugin is listed in the catalog.') }
   if (c.state === 'rejected')
     return { type: 'error', text: $gettext('The pull request was closed without merging.') }
+  if (c.state === 'withdrawn' && replacedBy.value)
+    return { type: 'info', text: $gettext('This change was replaced by a newer submission.') }
   if (c.state === 'withdrawn')
     return { type: 'info', text: $gettext('This change was withdrawn and goes no further.') }
+  if (asked.value && editsStore.value) {
+    return { type: 'warning', text: asked.value.by
+      ? $gettext('@%{login} asked for changes. Edit the store details and submit them again; the new submission replaces this change.', { login: asked.value.by })
+      : $gettext('A maintainer asked for changes. Edit the store details and submit them again; the new submission replaces this change.') }
+  }
   if (asked.value) {
     return { type: 'warning', text: asked.value.by
       ? $gettext('@%{login} asked for changes. Make them, then run the checks again.', { login: asked.value.by })
@@ -387,8 +401,18 @@ async function retry() {
                   </li>
                 </ul>
               </template>
-              <template v-if="data.canRetry || data.canWithdraw" #action>
+              <template v-if="data.canRetry || data.canWithdraw || (asked && editsStore) || replacedBy" #action>
                 <AFlex gap="small" wrap>
+                  <RouterLink v-if="asked && editsStore && change.pluginId" :to="`/plugins/${change.pluginId}`">
+                    <AButton size="small" type="primary">
+                      {{ $gettext('Edit store details') }}
+                    </AButton>
+                  </RouterLink>
+                  <RouterLink v-if="replacedBy" :to="`/changes/${replacedBy}`">
+                    <AButton size="small">
+                      {{ $gettext('Open the newer submission') }}
+                    </AButton>
+                  </RouterLink>
                   <AButton v-if="data.canRetry" size="small" :loading="retrying" @click="retry">
                     {{ $gettext('Run the checks again') }}
                   </AButton>

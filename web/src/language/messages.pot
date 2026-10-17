@@ -15,7 +15,7 @@ msgstr ""
 
 #: web/src/components/CategoryEditModal.vue:50
 #: web/src/lib/changeKinds.ts:18
-#: web/src/views/ChangeView.vue:198
+#: web/src/views/ChangeView.vue:205
 msgid "Change categories"
 msgstr ""
 
@@ -136,7 +136,7 @@ msgstr ""
 #: web/src/components/CommandPalette.vue:125
 #: web/src/layouts/PortalLayout.vue:70
 #: web/src/layouts/PortalLayout.vue:114
-#: web/src/views/ChangeView.vue:143
+#: web/src/views/ChangeView.vue:150
 #: web/src/views/MyPlugins.vue:164
 #: web/src/views/plugin/PluginLayout.vue:25
 msgid "My plugins"
@@ -268,7 +268,7 @@ msgid "A reason is required"
 msgstr ""
 
 #: web/src/components/CommandPalette.vue:241
-#: web/src/views/review/ReviewChange.vue:908
+#: web/src/views/review/ReviewChange.vue:910
 #: web/src/views/review/ReviewQueue.vue:465
 msgid "Command palette"
 msgstr ""
@@ -754,8 +754,8 @@ msgid "README"
 msgstr ""
 
 #: web/src/components/NotificationBell.vue:54
-#: web/src/views/ChangeView.vue:124
-#: web/src/views/ChangeView.vue:305
+#: web/src/views/ChangeView.vue:131
+#: web/src/views/ChangeView.vue:319
 msgid "Waiting for you"
 msgstr ""
 
@@ -794,13 +794,13 @@ msgid "%{who} asked for changes"
 msgstr ""
 
 #: web/src/components/NotificationBell.vue:111
-#: web/src/views/ChangeView.vue:270
+#: web/src/views/ChangeView.vue:284
 msgid "A maintainer asked for changes"
 msgstr ""
 
 #: web/src/components/NotificationBell.vue:114
-#: web/src/views/ChangeView.vue:104
-#: web/src/views/ChangeView.vue:268
+#: web/src/views/ChangeView.vue:111
+#: web/src/views/ChangeView.vue:282
 msgid "Committed to the catalog"
 msgstr ""
 
@@ -839,7 +839,7 @@ msgstr ""
 #: web/src/components/NotificationBell.vue:151
 #: web/src/components/NotificationBell.vue:161
 #: web/src/lib/categories.ts:13
-#: web/src/views/ChangeView.vue:505
+#: web/src/views/ChangeView.vue:529
 msgid "Notifications"
 msgstr ""
 
@@ -959,9 +959,9 @@ msgid "In review"
 msgstr ""
 
 #: web/src/components/PluginCard.vue:31
-#: web/src/views/ChangeView.vue:102
-#: web/src/views/ChangeView.vue:104
-#: web/src/views/ChangeView.vue:105
+#: web/src/views/ChangeView.vue:109
+#: web/src/views/ChangeView.vue:111
+#: web/src/views/ChangeView.vue:112
 #: web/src/views/plugin/PluginStore.vue:513
 msgid "Submit"
 msgstr ""
@@ -971,7 +971,7 @@ msgid "Checks passed"
 msgstr ""
 
 #: web/src/components/PluginCard.vue:33
-#: web/src/views/ChangeView.vue:105
+#: web/src/views/ChangeView.vue:112
 msgid "Maintainer review"
 msgstr ""
 
@@ -1008,7 +1008,7 @@ msgid "%{n} comments"
 msgstr ""
 
 #: web/src/components/PluginCard.vue:119
-#: web/src/views/ChangeView.vue:231
+#: web/src/views/ChangeView.vue:245
 msgid "The checks found problems. Fix them in a new release, then run the checks again."
 msgstr ""
 
@@ -1253,12 +1253,12 @@ msgstr ""
 
 #: web/src/components/ReviewCompare.vue:119
 #: web/src/components/ReviewCompare.vue:141
-#: web/src/views/review/ReviewChange.vue:643
+#: web/src/views/review/ReviewChange.vue:645
 msgid "Now"
 msgstr ""
 
 #: web/src/components/ReviewCompare.vue:119
-#: web/src/views/review/ReviewChange.vue:678
+#: web/src/views/review/ReviewChange.vue:680
 msgid "Not listed yet"
 msgstr ""
 
@@ -1268,10 +1268,10 @@ msgstr ""
 
 #: web/src/components/ReviewCompare.vue:126
 #: web/src/components/ReviewCompare.vue:141
-#: web/src/views/review/ReviewChange.vue:644
-#: web/src/views/review/ReviewChange.vue:708
-#: web/src/views/review/ReviewChange.vue:716
-#: web/src/views/review/ReviewChange.vue:743
+#: web/src/views/review/ReviewChange.vue:646
+#: web/src/views/review/ReviewChange.vue:710
+#: web/src/views/review/ReviewChange.vue:718
+#: web/src/views/review/ReviewChange.vue:745
 msgid "After the change"
 msgstr ""
 
@@ -1370,7 +1370,7 @@ msgid "Search and commands"
 msgstr ""
 
 #: web/src/layouts/PortalLayout.vue:205
-#: web/src/views/review/ReviewChange.vue:642
+#: web/src/views/review/ReviewChange.vue:644
 #: web/src/views/SignIn.vue:80
 msgid "Language"
 msgstr ""
@@ -1627,7 +1627,7 @@ msgid "Workflow run: %{id}"
 msgstr ""
 
 #: web/src/lib/audit.ts:134
-#: web/src/views/ChangeView.vue:379
+#: web/src/views/ChangeView.vue:393
 #: web/src/views/maintain/AuditLog.vue:260
 #: web/src/views/maintain/PartnersAdmin.vue:204
 #: web/src/views/translate/TranslatePage.vue:305
@@ -1719,17 +1719,17 @@ msgid "Delisting"
 msgstr ""
 
 #: web/src/lib/changeKinds.ts:15
-#: web/src/views/ChangeView.vue:192
+#: web/src/views/ChangeView.vue:199
 msgid "Yank a version"
 msgstr ""
 
 #: web/src/lib/changeKinds.ts:16
-#: web/src/views/ChangeView.vue:194
+#: web/src/views/ChangeView.vue:201
 msgid "Restore a version"
 msgstr ""
 
 #: web/src/lib/changeKinds.ts:17
-#: web/src/views/ChangeView.vue:196
+#: web/src/views/ChangeView.vue:203
 msgid "Revoke a signer"
 msgstr ""
 
@@ -2100,355 +2100,375 @@ msgstr ""
 msgid "Today %{time}"
 msgstr ""
 
-#: web/src/views/ChangeView.vue:102
+#: web/src/views/ChangeView.vue:109
 msgid "Automatic checks"
 msgstr ""
 
-#: web/src/views/ChangeView.vue:102
+#: web/src/views/ChangeView.vue:109
 msgid "Merge the pull request"
 msgstr ""
 
-#: web/src/views/ChangeView.vue:102
+#: web/src/views/ChangeView.vue:109
 msgid "Catalog updated"
 msgstr ""
 
-#: web/src/views/ChangeView.vue:102
+#: web/src/views/ChangeView.vue:109
 msgid "Visible to users"
 msgstr ""
 
-#: web/src/views/ChangeView.vue:104
-#: web/src/views/ChangeView.vue:105
+#: web/src/views/ChangeView.vue:111
+#: web/src/views/ChangeView.vue:112
 #: web/src/views/plugin/PluginPreflight.vue:271
 #: web/src/views/review/ReviewQueue.vue:390
 #: web/src/views/SubmitPlugin.vue:187
 msgid "Checks"
 msgstr ""
 
-#: web/src/views/ChangeView.vue:104
-#: web/src/views/ChangeView.vue:105
-#: web/src/views/ChangeView.vue:274
+#: web/src/views/ChangeView.vue:111
+#: web/src/views/ChangeView.vue:112
+#: web/src/views/ChangeView.vue:288
 msgid "Live in the catalog"
 msgstr ""
 
-#: web/src/views/ChangeView.vue:105
+#: web/src/views/ChangeView.vue:112
 #: web/src/views/review/ReviewChange.vue:104
 #: web/src/views/review/ReviewQueue.vue:121
 msgid "Merged"
 msgstr ""
 
-#: web/src/views/ChangeView.vue:122
+#: web/src/views/ChangeView.vue:129
 msgid "Waited %{time}"
 msgstr ""
 
-#: web/src/views/ChangeView.vue:127
+#: web/src/views/ChangeView.vue:134
 msgid "Passed"
 msgstr ""
 
-#: web/src/views/ChangeView.vue:131
+#: web/src/views/ChangeView.vue:138
 msgid "Within minutes of the merge"
 msgstr ""
 
-#: web/src/views/ChangeView.vue:133
+#: web/src/views/ChangeView.vue:140
 msgid "Once Nginx UI refreshes its marketplace"
 msgstr ""
 
-#: web/src/views/ChangeView.vue:145
+#: web/src/views/ChangeView.vue:152
 msgid "Change #%{n}"
 msgstr ""
 
-#: web/src/views/ChangeView.vue:145
+#: web/src/views/ChangeView.vue:152
 msgid "Change progress"
 msgstr ""
 
-#: web/src/views/ChangeView.vue:154
+#: web/src/views/ChangeView.vue:161
 msgid "Stopped"
 msgstr ""
 
-#: web/src/views/ChangeView.vue:156
-#: web/src/views/ChangeView.vue:158
+#: web/src/views/ChangeView.vue:163
+#: web/src/views/ChangeView.vue:165
 msgid "Waiting for name review"
 msgstr ""
 
-#: web/src/views/ChangeView.vue:156
+#: web/src/views/ChangeView.vue:163
 msgid "Live"
 msgstr ""
 
-#: web/src/views/ChangeView.vue:158
-#: web/src/views/ChangeView.vue:309
+#: web/src/views/ChangeView.vue:165
+#: web/src/views/ChangeView.vue:323
 msgid "Takes effect at the next catalog update"
 msgstr ""
 
-#: web/src/views/ChangeView.vue:159
+#: web/src/views/ChangeView.vue:166
 msgid "Waiting for the merge"
 msgstr ""
 
-#: web/src/views/ChangeView.vue:167
+#: web/src/views/ChangeView.vue:174
 msgid "%{kind}, %{n} items"
 msgstr ""
 
-#: web/src/views/ChangeView.vue:171
+#: web/src/views/ChangeView.vue:178
 msgid "Submitted by @%{login} %{time}"
 msgstr ""
 
-#: web/src/views/ChangeView.vue:200
+#: web/src/views/ChangeView.vue:207
 msgid "Names from a new release"
 msgstr ""
 
-#: web/src/views/ChangeView.vue:218
+#: web/src/views/ChangeView.vue:225
 msgid "The change is live in the catalog."
 msgstr ""
 
-#: web/src/views/ChangeView.vue:220
+#: web/src/views/ChangeView.vue:227
 msgid "The plugin is listed in the catalog."
 msgstr ""
 
-#: web/src/views/ChangeView.vue:222
+#: web/src/views/ChangeView.vue:229
 msgid "The pull request was closed without merging."
 msgstr ""
 
-#: web/src/views/ChangeView.vue:224
-msgid "This change was withdrawn and goes no further."
-msgstr ""
-
-#: web/src/views/ChangeView.vue:227
-msgid "@%{login} asked for changes. Make them, then run the checks again."
-msgstr ""
-
-#: web/src/views/ChangeView.vue:228
-msgid "A maintainer asked for changes. Make them, then run the checks again."
+#: web/src/views/ChangeView.vue:231
+msgid "This change was replaced by a newer submission."
 msgstr ""
 
 #: web/src/views/ChangeView.vue:233
-#: web/src/views/ChangeView.vue:320
-msgid "The checks could not be started. Please try again later."
+msgid "This change was withdrawn and goes no further."
 msgstr ""
 
-#: web/src/views/ChangeView.vue:235
-msgid "The checks could not finish. A maintainer will look into it."
+#: web/src/views/ChangeView.vue:236
+msgid "@%{login} asked for changes. Edit the store details and submit them again; the new submission replaces this change."
 msgstr ""
 
 #: web/src/views/ChangeView.vue:237
-msgid "The packages, signatures and listing are being checked. This takes a few minutes."
-msgstr ""
-
-#: web/src/views/ChangeView.vue:239
-msgid "Waiting for a maintainer to review the submission."
+msgid "A maintainer asked for changes. Edit the store details and submit them again; the new submission replaces this change."
 msgstr ""
 
 #: web/src/views/ChangeView.vue:241
+msgid "@%{login} asked for changes. Make them, then run the checks again."
+msgstr ""
+
+#: web/src/views/ChangeView.vue:242
+msgid "A maintainer asked for changes. Make them, then run the checks again."
+msgstr ""
+
+#: web/src/views/ChangeView.vue:247
+#: web/src/views/ChangeView.vue:334
+msgid "The checks could not be started. Please try again later."
+msgstr ""
+
+#: web/src/views/ChangeView.vue:249
+msgid "The checks could not finish. A maintainer will look into it."
+msgstr ""
+
+#: web/src/views/ChangeView.vue:251
+msgid "The packages, signatures and listing are being checked. This takes a few minutes."
+msgstr ""
+
+#: web/src/views/ChangeView.vue:253
+msgid "Waiting for a maintainer to review the submission."
+msgstr ""
+
+#: web/src/views/ChangeView.vue:255
 msgid "The change is in the catalog sources and takes effect at its next update, usually within minutes."
 msgstr ""
 
-#: web/src/views/ChangeView.vue:243
+#: web/src/views/ChangeView.vue:257
 msgid "Approved. The plugin appears in the catalog after the next deploy, usually within minutes."
 msgstr ""
 
-#: web/src/views/ChangeView.vue:259
+#: web/src/views/ChangeView.vue:273
 msgid "Checks started again"
 msgstr ""
 
-#: web/src/views/ChangeView.vue:260
+#: web/src/views/ChangeView.vue:274
 msgid "Submitted %{n} changes"
 msgstr ""
 
-#: web/src/views/ChangeView.vue:260
-#: web/src/views/review/ReviewChange.vue:936
+#: web/src/views/ChangeView.vue:274
+#: web/src/views/review/ReviewChange.vue:938
 msgid "Submitted"
 msgstr ""
 
-#: web/src/views/ChangeView.vue:263
+#: web/src/views/ChangeView.vue:277
 msgid "The checks could not be started"
 msgstr ""
 
-#: web/src/views/ChangeView.vue:264
+#: web/src/views/ChangeView.vue:278
 msgid "Checks found problems"
 msgstr ""
 
-#: web/src/views/ChangeView.vue:264
+#: web/src/views/ChangeView.vue:278
 msgid "Checks could not finish"
 msgstr ""
 
-#: web/src/views/ChangeView.vue:266
+#: web/src/views/ChangeView.vue:280
 msgid "Pull request #%{n} opened on %{repo}"
 msgstr ""
 
-#: web/src/views/ChangeView.vue:267
+#: web/src/views/ChangeView.vue:281
 msgid "Checks passed, pull request #%{n} opened"
 msgstr ""
 
-#: web/src/views/ChangeView.vue:268
+#: web/src/views/ChangeView.vue:282
 msgid "Merged by a maintainer"
 msgstr ""
 
-#: web/src/views/ChangeView.vue:269
+#: web/src/views/ChangeView.vue:283
 msgid "Rejected by a maintainer"
 msgstr ""
 
-#: web/src/views/ChangeView.vue:269
+#: web/src/views/ChangeView.vue:283
 msgid "Pull request closed"
 msgstr ""
 
-#: web/src/views/ChangeView.vue:271
+#: web/src/views/ChangeView.vue:285
 msgid "Waited %{h} hours for you, a reminder was sent"
 msgstr ""
 
-#: web/src/views/ChangeView.vue:272
+#: web/src/views/ChangeView.vue:286
 #: web/src/views/review/ReviewChange.vue:108
 #: web/src/views/review/ReviewQueue.vue:120
 msgid "Withdrawn"
 msgstr ""
 
-#: web/src/views/ChangeView.vue:273
+#: web/src/views/ChangeView.vue:287
 msgid "More translations added to the pull request"
 msgstr ""
 
-#: web/src/views/ChangeView.vue:274
+#: web/src/views/ChangeView.vue:288
 msgid "Listed in the catalog"
 msgstr ""
 
-#: web/src/views/ChangeView.vue:290
+#: web/src/views/ChangeView.vue:304
 msgid "The change could not be withdrawn. Please try again."
 msgstr ""
 
-#: web/src/views/ChangeView.vue:307
+#: web/src/views/ChangeView.vue:321
 msgid "Waiting for a maintainer"
 msgstr ""
 
-#: web/src/views/ChangeView.vue:310
+#: web/src/views/ChangeView.vue:324
 msgid "Being checked"
 msgstr ""
 
-#: web/src/views/ChangeView.vue:330
-#: web/src/views/review/ReviewChange.vue:505
+#: web/src/views/ChangeView.vue:344
+#: web/src/views/review/ReviewChange.vue:507
 msgid "Change not found"
 msgstr ""
 
-#: web/src/views/ChangeView.vue:340
+#: web/src/views/ChangeView.vue:354
 msgid "Submitted %{time}"
 msgstr ""
 
-#: web/src/views/ChangeView.vue:355
+#: web/src/views/ChangeView.vue:369
 msgid "Waiting for you to merge pull request #%{n} on GitHub"
 msgstr ""
 
-#: web/src/views/ChangeView.vue:355
+#: web/src/views/ChangeView.vue:369
 msgid "Waiting for you to commit the files to %{repo}"
 msgstr ""
 
-#: web/src/views/ChangeView.vue:358
+#: web/src/views/ChangeView.vue:372
 msgid "The pull request is on %{repo}. Once it is merged, the change shows in the catalog within minutes."
 msgstr ""
 
-#: web/src/views/ChangeView.vue:358
+#: web/src/views/ChangeView.vue:372
 msgid "Unpack the patch at the root of the repository and commit it to the default branch. The portal notices the commit by itself."
 msgstr ""
 
-#: web/src/views/ChangeView.vue:363
-#: web/src/views/ChangeView.vue:518
+#: web/src/views/ChangeView.vue:377
+#: web/src/views/ChangeView.vue:542
 msgid "Withdraw the change"
 msgstr ""
 
-#: web/src/views/ChangeView.vue:366
+#: web/src/views/ChangeView.vue:380
 msgid "Merge on GitHub"
 msgstr ""
 
-#: web/src/views/ChangeView.vue:369
+#: web/src/views/ChangeView.vue:383
 msgid "Download the patch"
 msgstr ""
 
-#: web/src/views/ChangeView.vue:393
+#: web/src/views/ChangeView.vue:408
+msgid "Edit store details"
+msgstr ""
+
+#: web/src/views/ChangeView.vue:413
+msgid "Open the newer submission"
+msgstr ""
+
+#: web/src/views/ChangeView.vue:417
 msgid "Run the checks again"
 msgstr ""
 
-#: web/src/views/ChangeView.vue:396
-#: web/src/views/ChangeView.vue:518
+#: web/src/views/ChangeView.vue:420
+#: web/src/views/ChangeView.vue:542
 msgid "Withdraw"
 msgstr ""
 
-#: web/src/views/ChangeView.vue:402
+#: web/src/views/ChangeView.vue:426
 msgid "What was asked"
 msgstr ""
 
-#: web/src/views/ChangeView.vue:416
+#: web/src/views/ChangeView.vue:440
 #: web/src/views/maintain/AllPlugins.vue:336
 #: web/src/views/maintain/PartnersAdmin.vue:349
 #: web/src/views/owners/VendorPage.vue:388
 #: web/src/views/plugin/PluginVersions.vue:259
-#: web/src/views/review/ReviewChange.vue:724
+#: web/src/views/review/ReviewChange.vue:726
 msgid "Reason"
 msgstr ""
 
-#: web/src/views/ChangeView.vue:423
+#: web/src/views/ChangeView.vue:447
 msgid "Each item"
 msgstr ""
 
-#: web/src/views/ChangeView.vue:428
-#: web/src/views/review/ReviewChange.vue:707
-#: web/src/views/review/ReviewChange.vue:713
+#: web/src/views/ChangeView.vue:452
+#: web/src/views/review/ReviewChange.vue:709
+#: web/src/views/review/ReviewChange.vue:715
 msgid "Item"
 msgstr ""
 
-#: web/src/views/ChangeView.vue:429
+#: web/src/views/ChangeView.vue:453
 msgid "Needs review"
 msgstr ""
 
-#: web/src/views/ChangeView.vue:430
+#: web/src/views/ChangeView.vue:454
 msgid "Current state"
 msgstr ""
 
-#: web/src/views/ChangeView.vue:441
+#: web/src/views/ChangeView.vue:465
 msgid "Name review after the merge"
 msgstr ""
 
-#: web/src/views/ChangeView.vue:443
+#: web/src/views/ChangeView.vue:467
 msgid "No review"
 msgstr ""
 
-#: web/src/views/ChangeView.vue:453
+#: web/src/views/ChangeView.vue:477
 msgid "History"
 msgstr ""
 
-#: web/src/views/ChangeView.vue:469
+#: web/src/views/ChangeView.vue:493
 msgid "Links"
 msgstr ""
 
-#: web/src/views/ChangeView.vue:472
+#: web/src/views/ChangeView.vue:496
 msgid "Pull request #%{n}"
 msgstr ""
 
-#: web/src/views/ChangeView.vue:476
+#: web/src/views/ChangeView.vue:500
 msgid "Commit in the catalog"
 msgstr ""
 
-#: web/src/views/ChangeView.vue:480
+#: web/src/views/ChangeView.vue:504
 msgid "Log of the checks"
 msgstr ""
 
-#: web/src/views/ChangeView.vue:484
+#: web/src/views/ChangeView.vue:508
 msgid "Manage the plugin"
 msgstr ""
 
-#: web/src/views/ChangeView.vue:488
+#: web/src/views/ChangeView.vue:512
 msgid "The review is public on GitHub. You are mentioned in the pull request, so GitHub notifies you of comments."
 msgstr ""
 
-#: web/src/views/ChangeView.vue:491
+#: web/src/views/ChangeView.vue:515
 msgid "Your other changes in progress"
 msgstr ""
 
-#: web/src/views/ChangeView.vue:510
+#: web/src/views/ChangeView.vue:534
 msgid "Every plugin page shows the progress at the top"
 msgstr ""
 
-#: web/src/views/ChangeView.vue:513
+#: web/src/views/ChangeView.vue:537
 msgid "A change in progress shows as one line at the top of its plugin page. Click it to open this page."
 msgstr ""
 
-#: web/src/views/ChangeView.vue:519
+#: web/src/views/ChangeView.vue:543
 msgid "Withdrawing closes pull request #%{n} and the change stops here. You can submit again at any time."
 msgstr ""
 
-#: web/src/views/ChangeView.vue:519
+#: web/src/views/ChangeView.vue:543
 msgid "The change stops here. You can submit again at any time."
 msgstr ""
 
@@ -3438,7 +3458,7 @@ msgstr ""
 
 #: web/src/views/maintain/Settings.vue:343
 #: web/src/views/owners/VendorPage.vue:383
-#: web/src/views/review/ReviewChange.vue:968
+#: web/src/views/review/ReviewChange.vue:970
 #: web/src/views/review/ReviewQueue.vue:508
 msgid "Send"
 msgstr ""
@@ -4244,14 +4264,14 @@ msgstr ""
 #: web/src/views/plugin/PluginBadges.vue:123
 #: web/src/views/plugin/PluginScreenshots.vue:415
 #: web/src/views/plugin/PluginStore.vue:310
-#: web/src/views/review/ReviewChange.vue:613
+#: web/src/views/review/ReviewChange.vue:615
 msgid "Light"
 msgstr ""
 
 #: web/src/views/plugin/PluginBadges.vue:123
 #: web/src/views/plugin/PluginScreenshots.vue:415
 #: web/src/views/plugin/PluginStore.vue:310
-#: web/src/views/review/ReviewChange.vue:613
+#: web/src/views/review/ReviewChange.vue:615
 msgid "Dark"
 msgstr ""
 
@@ -4413,7 +4433,7 @@ msgid "Screenshot removed"
 msgstr ""
 
 #: web/src/views/plugin/PluginPreflight.vue:105
-#: web/src/views/review/ReviewChange.vue:793
+#: web/src/views/review/ReviewChange.vue:795
 msgid "Note from the author: %{note}"
 msgstr ""
 
@@ -4442,7 +4462,7 @@ msgid "Claims to be official and would be left out"
 msgstr ""
 
 #: web/src/views/plugin/PluginPreflight.vue:123
-#: web/src/views/review/ReviewChange.vue:660
+#: web/src/views/review/ReviewChange.vue:662
 msgid "New"
 msgstr ""
 
@@ -4549,7 +4569,7 @@ msgid "Permissions and network"
 msgstr ""
 
 #: web/src/views/plugin/PluginPreflight.vue:195
-#: web/src/views/review/ReviewChange.vue:876
+#: web/src/views/review/ReviewChange.vue:878
 msgid "Needs attention"
 msgstr ""
 
@@ -4570,7 +4590,7 @@ msgid "No compatibility or settings changes."
 msgstr ""
 
 #: web/src/views/plugin/PluginPreflight.vue:247
-#: web/src/views/review/ReviewChange.vue:700
+#: web/src/views/review/ReviewChange.vue:702
 msgid "Store texts"
 msgstr ""
 
@@ -4693,7 +4713,7 @@ msgid "Add a screenshot"
 msgstr ""
 
 #: web/src/views/plugin/PluginScreenshots.vue:343
-#: web/src/views/review/ReviewChange.vue:660
+#: web/src/views/review/ReviewChange.vue:662
 msgid "Changed"
 msgstr ""
 
@@ -4989,7 +5009,7 @@ msgid "The cards under the preview show the name in every language of Nginx UI. 
 msgstr ""
 
 #: web/src/views/plugin/PluginStore.vue:384
-#: web/src/views/review/ReviewChange.vue:742
+#: web/src/views/review/ReviewChange.vue:744
 msgid "Current"
 msgstr ""
 
@@ -5113,7 +5133,7 @@ msgid "Create the patch"
 msgstr ""
 
 #: web/src/views/plugin/PluginStore.vue:517
-#: web/src/views/review/ReviewChange.vue:714
+#: web/src/views/review/ReviewChange.vue:716
 msgid ", reviewed"
 msgstr ""
 
@@ -5148,7 +5168,7 @@ msgid "A text left out in a language shows in English there"
 msgstr ""
 
 #: web/src/views/plugin/PluginTranslations.vue:294
-#: web/src/views/review/ReviewChange.vue:741
+#: web/src/views/review/ReviewChange.vue:743
 msgid "Field"
 msgstr ""
 
@@ -5395,7 +5415,7 @@ msgid "Introduction"
 msgstr ""
 
 #: web/src/views/review/ReviewChange.vue:90
-#: web/src/views/review/ReviewChange.vue:599
+#: web/src/views/review/ReviewChange.vue:601
 msgid "Partner key ID"
 msgstr ""
 
@@ -5409,7 +5429,7 @@ msgstr ""
 
 #: web/src/views/review/ReviewChange.vue:131
 #: web/src/views/review/ReviewChange.vue:211
-#: web/src/views/review/ReviewChange.vue:913
+#: web/src/views/review/ReviewChange.vue:915
 #: web/src/views/review/ReviewQueue.vue:389
 msgid "Author"
 msgstr ""
@@ -5483,8 +5503,8 @@ msgid "Approve the checked names"
 msgstr ""
 
 #: web/src/views/review/ReviewChange.vue:306
-#: web/src/views/review/ReviewChange.vue:958
-#: web/src/views/review/ReviewChange.vue:958
+#: web/src/views/review/ReviewChange.vue:960
+#: web/src/views/review/ReviewChange.vue:960
 #: web/src/views/review/ReviewQueue.vue:508
 msgid "Approve and merge"
 msgstr ""
@@ -5506,317 +5526,317 @@ msgstr ""
 msgid "The change could not be approved. Please try again."
 msgstr ""
 
-#: web/src/views/review/ReviewChange.vue:404
+#: web/src/views/review/ReviewChange.vue:405
 msgid "The request could not be sent. Please try again."
 msgstr ""
 
-#: web/src/views/review/ReviewChange.vue:427
+#: web/src/views/review/ReviewChange.vue:429
 msgid "The change could not be rejected. Please try again."
 msgstr ""
 
-#: web/src/views/review/ReviewChange.vue:444
+#: web/src/views/review/ReviewChange.vue:446
 msgid "The comment could not be posted. Please try again."
 msgstr ""
 
-#: web/src/views/review/ReviewChange.vue:459
+#: web/src/views/review/ReviewChange.vue:461
 msgid "approved"
 msgstr ""
 
-#: web/src/views/review/ReviewChange.vue:460
+#: web/src/views/review/ReviewChange.vue:462
 msgid "requested changes"
 msgstr ""
 
-#: web/src/views/review/ReviewChange.vue:516
+#: web/src/views/review/ReviewChange.vue:518
 msgid "High risk change"
 msgstr ""
 
-#: web/src/views/review/ReviewChange.vue:526
+#: web/src/views/review/ReviewChange.vue:528
 msgid "submitted by @%{login} at %{time}"
 msgstr ""
 
-#: web/src/views/review/ReviewChange.vue:527
+#: web/src/views/review/ReviewChange.vue:529
 msgid "found by the catalog update %{time}"
 msgstr ""
 
-#: web/src/views/review/ReviewChange.vue:532
-#: web/src/views/review/ReviewChange.vue:901
-#: web/src/views/review/ReviewChange.vue:968
+#: web/src/views/review/ReviewChange.vue:534
+#: web/src/views/review/ReviewChange.vue:903
+#: web/src/views/review/ReviewChange.vue:970
 #: web/src/views/review/ReviewQueue.vue:462
 msgid "Request changes"
 msgstr ""
 
-#: web/src/views/review/ReviewChange.vue:536
-#: web/src/views/review/ReviewChange.vue:979
+#: web/src/views/review/ReviewChange.vue:538
+#: web/src/views/review/ReviewChange.vue:981
 msgid "Reject"
 msgstr ""
 
-#: web/src/views/review/ReviewChange.vue:552
+#: web/src/views/review/ReviewChange.vue:554
 msgid "AI pre-review summary"
 msgstr ""
 
-#: web/src/views/review/ReviewChange.vue:556
+#: web/src/views/review/ReviewChange.vue:558
 msgid "%{model}, %{time}"
 msgstr ""
 
-#: web/src/views/review/ReviewChange.vue:561
+#: web/src/views/review/ReviewChange.vue:563
 msgid "Nothing to point out."
 msgstr ""
 
-#: web/src/views/review/ReviewChange.vue:572
+#: web/src/views/review/ReviewChange.vue:574
 msgid "Pick this finding"
 msgstr ""
 
-#: web/src/views/review/ReviewChange.vue:575
+#: web/src/views/review/ReviewChange.vue:577
 msgid "The summary is for reference only. It approves and rejects nothing; the checks decide."
 msgstr ""
 
-#: web/src/views/review/ReviewChange.vue:578
+#: web/src/views/review/ReviewChange.vue:580
 msgid "Summarize again"
 msgstr ""
 
-#: web/src/views/review/ReviewChange.vue:581
+#: web/src/views/review/ReviewChange.vue:583
 msgid "Turn the %{n} picked into a request for changes"
 msgstr ""
 
-#: web/src/views/review/ReviewChange.vue:587
+#: web/src/views/review/ReviewChange.vue:589
 msgid "Reads the README, the manifest, the store texts and the code that names each network host, and points out what deserves a look."
 msgstr ""
 
-#: web/src/views/review/ReviewChange.vue:589
+#: web/src/views/review/ReviewChange.vue:591
 msgid "Summarize"
 msgstr ""
 
-#: web/src/views/review/ReviewChange.vue:595
+#: web/src/views/review/ReviewChange.vue:597
 msgid "Partner key revocation"
 msgstr ""
 
-#: web/src/views/review/ReviewChange.vue:595
+#: web/src/views/review/ReviewChange.vue:597
 msgid "Partner file"
 msgstr ""
 
-#: web/src/views/review/ReviewChange.vue:608
+#: web/src/views/review/ReviewChange.vue:610
 msgid "What users will see"
 msgstr ""
 
-#: web/src/views/review/ReviewChange.vue:612
+#: web/src/views/review/ReviewChange.vue:614
 msgid "Side by side"
 msgstr ""
 
-#: web/src/views/review/ReviewChange.vue:612
+#: web/src/views/review/ReviewChange.vue:614
 msgid "Slider"
 msgstr ""
 
-#: web/src/views/review/ReviewChange.vue:612
+#: web/src/views/review/ReviewChange.vue:614
 msgid "Changes only"
 msgstr ""
 
-#: web/src/views/review/ReviewChange.vue:614
+#: web/src/views/review/ReviewChange.vue:616
 msgid "Preview language"
 msgstr ""
 
-#: web/src/views/review/ReviewChange.vue:634
+#: web/src/views/review/ReviewChange.vue:636
 msgid "Names by language"
 msgstr ""
 
-#: web/src/views/review/ReviewChange.vue:636
+#: web/src/views/review/ReviewChange.vue:638
 msgid "Uncheck a name to keep it as listed"
 msgstr ""
 
-#: web/src/views/review/ReviewChange.vue:645
+#: web/src/views/review/ReviewChange.vue:647
 #: web/src/views/review/ReviewQueue.vue:312
 #: web/src/views/review/ReviewQueue.vue:387
 msgid "Kind of change"
 msgstr ""
 
-#: web/src/views/review/ReviewChange.vue:646
+#: web/src/views/review/ReviewChange.vue:648
 #: web/src/views/review/ReviewQueue.vue:461
 msgid "Approve"
 msgstr ""
 
-#: web/src/views/review/ReviewChange.vue:653
-#: web/src/views/review/ReviewChange.vue:656
+#: web/src/views/review/ReviewChange.vue:655
+#: web/src/views/review/ReviewChange.vue:658
 msgid "Not set"
 msgstr ""
 
-#: web/src/views/review/ReviewChange.vue:660
+#: web/src/views/review/ReviewChange.vue:662
 msgid "Removed"
 msgstr ""
 
-#: web/src/views/review/ReviewChange.vue:662
+#: web/src/views/review/ReviewChange.vue:664
 msgid "Unchanged"
 msgstr ""
 
-#: web/src/views/review/ReviewChange.vue:665
+#: web/src/views/review/ReviewChange.vue:667
 msgid "Approve the name in %{lang}"
 msgstr ""
 
-#: web/src/views/review/ReviewChange.vue:672
+#: web/src/views/review/ReviewChange.vue:674
 msgid "The other %{n} languages have no name and show the English one."
 msgstr ""
 
-#: web/src/views/review/ReviewChange.vue:676
+#: web/src/views/review/ReviewChange.vue:678
 msgid "Listing"
 msgstr ""
 
-#: web/src/views/review/ReviewChange.vue:702
+#: web/src/views/review/ReviewChange.vue:704
 msgid "What this change sets"
 msgstr ""
 
-#: web/src/views/review/ReviewChange.vue:730
+#: web/src/views/review/ReviewChange.vue:732
 msgid "What changes"
 msgstr ""
 
-#: web/src/views/review/ReviewChange.vue:732
+#: web/src/views/review/ReviewChange.vue:734
 msgid "Compared with the current listing"
 msgstr ""
 
-#: web/src/views/review/ReviewChange.vue:735
+#: web/src/views/review/ReviewChange.vue:737
 msgid "The entry fields stay as they are."
 msgstr ""
 
-#: web/src/views/review/ReviewChange.vue:768
+#: web/src/views/review/ReviewChange.vue:770
 msgid "Once approved, signer certificates issued by the old primary key are no longer accepted."
 msgstr ""
 
-#: web/src/views/review/ReviewChange.vue:779
+#: web/src/views/review/ReviewChange.vue:781
 msgid "Permissions, as users see them"
 msgstr ""
 
-#: web/src/views/review/ReviewChange.vue:782
+#: web/src/views/review/ReviewChange.vue:784
 msgid "This change does not touch the permissions"
 msgstr ""
 
-#: web/src/views/review/ReviewChange.vue:800
+#: web/src/views/review/ReviewChange.vue:802
 msgid "Listing preview"
 msgstr ""
 
-#: web/src/views/review/ReviewChange.vue:813
+#: web/src/views/review/ReviewChange.vue:815
 msgid "Identity"
 msgstr ""
 
-#: web/src/views/review/ReviewChange.vue:820
+#: web/src/views/review/ReviewChange.vue:822
 msgid "Read from GitHub when the change was submitted"
 msgstr ""
 
-#: web/src/views/review/ReviewChange.vue:827
+#: web/src/views/review/ReviewChange.vue:829
 msgid "The new primary key is already used by %{list}"
 msgstr ""
 
-#: web/src/views/review/ReviewChange.vue:827
+#: web/src/views/review/ReviewChange.vue:829
 msgid "The new primary key has not appeared in the catalog before"
 msgstr ""
 
-#: web/src/views/review/ReviewChange.vue:829
+#: web/src/views/review/ReviewChange.vue:831
 msgid "A primary key used for the first time. Confirm the reason for the rotation with the author."
 msgstr ""
 
-#: web/src/views/review/ReviewChange.vue:840
+#: web/src/views/review/ReviewChange.vue:842
 msgid "Discussion"
 msgstr ""
 
-#: web/src/views/review/ReviewChange.vue:842
+#: web/src/views/review/ReviewChange.vue:844
 msgid "Public on GitHub"
 msgstr ""
 
-#: web/src/views/review/ReviewChange.vue:844
+#: web/src/views/review/ReviewChange.vue:846
 msgid "No comments yet."
 msgstr ""
 
-#: web/src/views/review/ReviewChange.vue:862
+#: web/src/views/review/ReviewChange.vue:864
 msgid "Leave a comment. Markdown is supported."
 msgstr ""
 
-#: web/src/views/review/ReviewChange.vue:865
+#: web/src/views/review/ReviewChange.vue:867
 msgid "Comment"
 msgstr ""
 
-#: web/src/views/review/ReviewChange.vue:873
+#: web/src/views/review/ReviewChange.vue:875
 msgid "Check results"
 msgstr ""
 
-#: web/src/views/review/ReviewChange.vue:876
+#: web/src/views/review/ReviewChange.vue:878
 msgid "All passed"
 msgstr ""
 
-#: web/src/views/review/ReviewChange.vue:887
+#: web/src/views/review/ReviewChange.vue:889
 msgid "No checks reported on the pull request."
 msgstr ""
 
-#: web/src/views/review/ReviewChange.vue:891
+#: web/src/views/review/ReviewChange.vue:893
 msgid "Log of the submission checks"
 msgstr ""
 
-#: web/src/views/review/ReviewChange.vue:896
+#: web/src/views/review/ReviewChange.vue:898
 msgid "Shortcuts"
 msgstr ""
 
-#: web/src/views/review/ReviewChange.vue:904
+#: web/src/views/review/ReviewChange.vue:906
 msgid "Switch the comparison"
 msgstr ""
 
-#: web/src/views/review/ReviewChange.vue:906
+#: web/src/views/review/ReviewChange.vue:908
 msgid "Next and previous"
 msgstr ""
 
-#: web/src/views/review/ReviewChange.vue:927
+#: web/src/views/review/ReviewChange.vue:929
 msgid "Listed plugins"
 msgstr ""
 
-#: web/src/views/review/ReviewChange.vue:931
+#: web/src/views/review/ReviewChange.vue:933
 msgid "First listed"
 msgstr ""
 
-#: web/src/views/review/ReviewChange.vue:934
+#: web/src/views/review/ReviewChange.vue:936
 msgid "Earlier changes"
 msgstr ""
 
-#: web/src/views/review/ReviewChange.vue:939
+#: web/src/views/review/ReviewChange.vue:941
 msgid "Repository created"
 msgstr ""
 
-#: web/src/views/review/ReviewChange.vue:948
+#: web/src/views/review/ReviewChange.vue:950
 msgid "Pull request #%{n} on GitHub"
 msgstr ""
 
-#: web/src/views/review/ReviewChange.vue:951
+#: web/src/views/review/ReviewChange.vue:953
 msgid "Back to the review queue"
 msgstr ""
 
-#: web/src/views/review/ReviewChange.vue:961
+#: web/src/views/review/ReviewChange.vue:963
 msgid "Approve pull request #%{n} and merge it as you. The plugin is listed at the next catalog update."
 msgstr ""
 
-#: web/src/views/review/ReviewChange.vue:962
+#: web/src/views/review/ReviewChange.vue:964
 #: web/src/views/review/ReviewQueue.vue:523
 msgid "Approve pull request #%{n} and merge it as you. The change takes effect at the next catalog update."
 msgstr ""
 
-#: web/src/views/review/ReviewChange.vue:964
+#: web/src/views/review/ReviewChange.vue:966
 msgid "Some checks of the pull request have not passed."
 msgstr ""
 
-#: web/src/views/review/ReviewChange.vue:965
+#: web/src/views/review/ReviewChange.vue:967
 msgid "The names in %{list} stay as listed: they are taken out of the pull request before it is merged."
 msgstr ""
 
-#: web/src/views/review/ReviewChange.vue:970
+#: web/src/views/review/ReviewChange.vue:972
 msgid "The author sees this on GitHub and in the Developer Center, and can resubmit from their change page."
 msgstr ""
 
-#: web/src/views/review/ReviewChange.vue:972
+#: web/src/views/review/ReviewChange.vue:974
 #: web/src/views/review/ReviewQueue.vue:528
 msgid "What should the author change?"
 msgstr ""
 
-#: web/src/views/review/ReviewChange.vue:977
+#: web/src/views/review/ReviewChange.vue:979
 msgid "Reject the change"
 msgstr ""
 
-#: web/src/views/review/ReviewChange.vue:983
+#: web/src/views/review/ReviewChange.vue:985
 msgid "Pull request #%{n} is closed with your reason as its last comment. The author cannot resubmit this change and starts a new submission instead."
 msgstr ""
 
-#: web/src/views/review/ReviewChange.vue:984
+#: web/src/views/review/ReviewChange.vue:986
 msgid "Why is the change rejected?"
 msgstr ""
 

@@ -1491,8 +1491,21 @@ msgstr "插件已在目录中上架。"
 msgid "The pull request was closed without merging."
 msgstr "拉取请求已关闭，未合并。"
 
+msgid "This change was replaced by a newer submission."
+msgstr "此更改已被新的提交取代。"
+
 msgid "This change was withdrawn and goes no further."
 msgstr "此更改已撤回，不会继续处理。"
+
+msgid ""
+"@%{login} asked for changes. Edit the store details and submit them again; "
+"the new submission replaces this change."
+msgstr "@%{login} 要求修改。请在商店资料中修改后重新提交，新的提交会取代此更改。"
+
+msgid ""
+"A maintainer asked for changes. Edit the store details and submit them "
+"again; the new submission replaces this change."
+msgstr "维护者要求修改。请在商店资料中修改后重新提交，新的提交会取代此更改。"
 
 msgid "@%{login} asked for changes. Make them, then run the checks again."
 msgstr "@%{login} 要求修改。修改完成后，请重新运行检查。"
@@ -1608,6 +1621,12 @@ msgstr "在 GitHub 上合并"
 
 msgid "Download the patch"
 msgstr "下载补丁"
+
+msgid "Edit store details"
+msgstr "编辑商店资料"
+
+msgid "Open the newer submission"
+msgstr "查看新的提交"
 
 msgid "Run the checks again"
 msgstr "重新运行检查"

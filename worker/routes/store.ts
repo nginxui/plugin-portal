@@ -1,4 +1,5 @@
 import type { AppEnv, Env } from '../env'
+import type { ChangeRow } from '../lib/changes'
 import type { PluginContext } from '../lib/pluginContext'
 import type { StoreDoc, StoreItem, StoreState } from '../lib/store'
 import { Hono } from 'hono'
@@ -12,6 +13,7 @@ import { pluginContext } from '../lib/pluginContext'
 import { cleanDoc, diffDoc, readStore, rebaseDoc, textsOnly, withoutManifestReasons } from '../lib/store'
 import { repoFiles, storeJson } from '../lib/storeFiles'
 import { now } from '../lib/time'
+import { withdrawChange } from '../lib/withdraw'
 import { zip } from '../lib/zip'
 import { requireSession } from '../middleware/auth'
 import { limit } from '../middleware/limits'
@@ -229,9 +231,13 @@ store.post('/plugins/:id/store/submit', requireSession, limit('write'), async (c
   // An AI draft is published only once someone confirmed it.
   if (draft.ai?.length)
     return c.json({ error: 'unconfirmed_ai', keys: draft.ai }, 409)
-  const open = await c.env.DB.prepare(`SELECT id, payload_json FROM changes WHERE plugin_id = ? AND kind IN ('store', 'store_source') AND state = 'open'`)
+  const pending = await c.env.DB.prepare(`SELECT * FROM changes WHERE plugin_id = ? AND kind IN ('store', 'store_source') AND state = 'open'`)
     .bind(ctx.id)
-    .all<{ id: string, payload_json: string | null }>()
+    .all<ChangeRow>()
+  // A change of the same author that a maintainer sent back is replaced by
+  // this submission, which carries the requested edits.
+  const replaced = pending.results.filter(row => row.author_id === session.user.id && row.stage === 'review' && row.waiting_on === 'author' && JSON.parse(row.payload_json ?? '{}').delivery === 'catalog')
+  const open = { results: pending.results.filter(row => !replaced.includes(row)) }
   // A names change waiting for review lets other texts go ahead; anything
   // else in progress makes the next submission wait.
   const namesOnly = (row: { payload_json: string | null }) => {
@@ -247,6 +253,8 @@ store.post('/plugins/:id/store/submit', requireSession, limit('write'), async (c
 
   const t = now()
   const change = newChangeId()
+  for (const row of replaced)
+    await withdrawChange(c.env, row, session.user, change)
   const submitter = { login: session.user.login, id: session.user.id }
   const eligibility = `@${session.user.login} has ${ctx.access?.permission ?? 'no'} permission on ${ctx.repo}`
   const statements = []
