@@ -143,6 +143,8 @@ describe('store editor', () => {
     await call(`/api/plugins/${ID}/store/draft`, { method: 'PUT', mutate: true, cookie, json: { doc: { name: { en: 'GeoIP Access', ja_JP: 'GeoIP アクセス' } } } })
     const first = await (await call(`/api/plugins/${ID}/store/submit`, { method: 'POST', mutate: true, cookie, json: {} })).json() as { change: string }
     await env.DB.prepare(`UPDATE changes SET stage = 'review', waiting_on = 'author', pr_number = 41 WHERE id = ?`).bind(first.change).run()
+    const number = (await env.DB.prepare('SELECT number FROM changes WHERE id = ?').bind(first.change).first<{ number: number }>())!.number
+    expect(await (await call(`/api/plugins/${ID}/store`, { cookie })).json()).toMatchObject({ pending: null, replaces: number })
 
     await call(`/api/plugins/${ID}/store/draft`, { method: 'PUT', mutate: true, cookie, json: { doc: { name: { en: 'GeoIP Access', ja_JP: 'GeoIP アクセス制御' } } } })
     const response = await call(`/api/plugins/${ID}/store/submit`, { method: 'POST', mutate: true, cookie, json: {} })

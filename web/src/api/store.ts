@@ -36,6 +36,8 @@ export interface StoreState {
   draft: StoreDraft | null
   items: StoreItem[]
   pending: string | null
+  /** Number of a change sent back to the user that the next submission replaces. */
+  replaces: number | null
   canEdit: { texts: boolean, all: boolean }
   delivery: { bot: boolean, patch: boolean }
   uploads: boolean

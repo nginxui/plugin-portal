@@ -99,6 +99,15 @@ function canEdit(ctx: PluginContext) {
 
 // Mounted at the root, so each route names its own middleware instead of a
 // catch-all that would cover every other route too.
+/**
+ * A store change of the user that a maintainer sent back, which the user's
+ * next submission replaces.
+ */
+function sentBack(row: ChangeRow, userId: number): boolean {
+  return row.state === 'open' && row.author_id === userId && row.stage === 'review' && row.waiting_on === 'author'
+    && (JSON.parse(row.payload_json ?? '{}') as { delivery?: string }).delivery === 'catalog'
+}
+
 export const store = new Hono<AppEnv>()
 
 store.get('/plugins/:id/store', requireSession, async (c) => {
@@ -116,9 +125,11 @@ store.get('/plugins/:id/store', requireSession, async (c) => {
   const current = await currentDraft(c.env, ctx.id, session.user.id, row, base)
   const draft = current && row ? { ...current, updatedAt: row.updated_at } : null
   const shown = draft?.doc ?? base
-  const open = await c.env.DB.prepare(`SELECT id FROM changes WHERE plugin_id = ? AND kind IN ('store', 'store_source') AND state IN ('open', 'merged') ORDER BY created_at DESC LIMIT 1`)
+  const { results: inFlight } = await c.env.DB.prepare(`SELECT * FROM changes WHERE plugin_id = ? AND kind IN ('store', 'store_source') AND state IN ('open', 'merged') ORDER BY created_at DESC`)
     .bind(ctx.id)
-    .first<{ id: string }>()
+    .all<ChangeRow>()
+  const replaceable = inFlight.filter(row => sentBack(row, session.user.id))
+  const open = inFlight.find(row => !replaceable.includes(row))
   return c.json({
     source: state.source,
     fromFile: state.fromFile,
@@ -135,6 +146,8 @@ store.get('/plugins/:id/store', requireSession, async (c) => {
     draft,
     items: draft ? diffDoc(base, draft.doc) : [],
     pending: open?.id ?? null,
+    // A change sent back to this user that the next submission replaces.
+    replaces: replaceable[0]?.number ?? null,
     canEdit: canEdit(ctx),
     delivery: { bot: await botEnabled(c.env), patch: true },
     uploads: mediaEnabled(c.env),
@@ -236,7 +249,7 @@ store.post('/plugins/:id/store/submit', requireSession, limit('write'), async (c
     .all<ChangeRow>()
   // A change of the same author that a maintainer sent back is replaced by
   // this submission, which carries the requested edits.
-  const replaced = pending.results.filter(row => row.author_id === session.user.id && row.stage === 'review' && row.waiting_on === 'author' && JSON.parse(row.payload_json ?? '{}').delivery === 'catalog')
+  const replaced = pending.results.filter(row => sentBack(row, session.user.id))
   const open = { results: pending.results.filter(row => !replaced.includes(row)) }
   // A names change waiting for review lets other texts go ahead; anything
   // else in progress makes the next submission wait.

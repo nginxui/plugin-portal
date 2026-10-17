@@ -429,7 +429,7 @@ const name = computed(() => localized(doc.value.name) || localized(plugin.value.
                 <span class="i-tabler-git-pull-request" />
                 {{ $gettext('Submit changes') }}
               </AButton>
-              <span class="text-3 op-65">{{ S.pending ? $gettext('A store change of this plugin is in progress. Another can be sent once it is done.') : delivery.text }}</span>
+              <span class="text-3 op-65">{{ S.pending ? $gettext('A store change of this plugin is in progress. Another can be sent once it is done.') : S.replaces ? $gettext('This submission replaces change #%{number}, which a maintainer sent back.', { number: S.replaces }) : delivery.text }}</span>
               <AFlex v-if="savedAt" justify="space-between" class="text-3 op-65">
                 <span>{{ saving ? $gettext('Saving the draft') : $gettext('Draft saved %{time}', { time: fromNow(savedAt) }) }}</span>
                 <a v-if="dirty" role="button" tabindex="0" @click="discard" @keydown.enter="discard">{{ $gettext('Discard the draft') }}</a>
