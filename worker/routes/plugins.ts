@@ -90,11 +90,12 @@ interface PluginRow {
   state: 'draft' | 'listed' | 'delisted'
   // The entry of its newest change: a draft before the checks, the catalog
   // entry after them.
+  // The entry of the newest change that has one; a change just sent has none yet.
   entry_json: string | null
 }
 
 const PLUGIN_ROWS = `SELECT p.plugin_id, p.repo_full_name, p.state,
-  (SELECT c.entry_json FROM changes c WHERE c.plugin_id = p.plugin_id ORDER BY c.updated_at DESC LIMIT 1) AS entry_json
+  (SELECT c.entry_json FROM changes c WHERE c.plugin_id = p.plugin_id AND c.entry_json IS NOT NULL ORDER BY c.updated_at DESC LIMIT 1) AS entry_json
   FROM plugins p`
 
 function summarize(env: Env, plugin: CatalogPlugin, access: RepoAccess | null): PluginSummary {
