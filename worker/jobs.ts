@@ -64,8 +64,8 @@ export async function mail(env: Env): Promise<number> {
       const plugin = nameIn(entry?.name ?? (row.plugin_id ? await catalogName(row.plugin_id) : null), row.locale, row.plugin_id ?? '')
       const url = `${env.PORTAL_ORIGIN}/changes/${row.number ?? row.change_id}`
       const comment = !live && typeof detail?.comment === 'string' ? detail.comment : undefined
-      const message = buildMail({ kind: live ? 'live' : row.stage, locale: row.locale, plugin, url, origin: env.PORTAL_ORIGIN, comment })
-      if ((await sendMail(env, row.email, message.subject, message.text, message.html)).ok)
+      const message = buildMail({ kind: live ? 'live' : row.stage, locale: row.locale, plugin, url, origin: env.PORTAL_ORIGIN, comment, change: { kind: row.kind, number: row.number } })
+      if ((await sendMail(env, row.email, message.subject, message.text, message.html, message.fromName)).ok)
         sent++
     }
   }

@@ -174,8 +174,8 @@ settings.post('/settings/mail/test', async (c) => {
   if (!EMAIL.test(to))
     return c.json({ error: 'to' }, 422)
   const locale = (await c.env.DB.prepare('SELECT locale FROM users WHERE id = ?').bind(c.get('session').user.id).first<{ locale: string | null }>())?.locale ?? null
-  const { subject, text, html } = buildMail({ kind: 'test', locale, url: c.env.PORTAL_ORIGIN, origin: c.env.PORTAL_ORIGIN })
-  const result = await sendMail(c.env, to, subject, text, html)
+  const { subject, text, html, fromName } = buildMail({ kind: 'test', locale, url: c.env.PORTAL_ORIGIN, origin: c.env.PORTAL_ORIGIN })
+  const result = await sendMail(c.env, to, subject, text, html, fromName)
   return result.ok ? c.json({ ok: true }) : c.json({ error: 'send_failed', status: result.status ?? null, message: result.message ?? null }, 502)
 })
 

@@ -1,6 +1,6 @@
 import type { Env } from '../env'
 import { mailConfig } from './settings'
-import { smtp } from './smtp'
+import { sender, smtp } from './smtp'
 
 // Email for the tracker (spec 11.1): sent through an HTTP mail API or SMTP
 // when one is configured on the Settings page or in the Worker variables,
@@ -18,11 +18,15 @@ export interface MailResult {
   message?: string
 }
 
-/** Sends one mail; html, when given, goes with the text as its other form. */
-export async function sendMail(env: Env, to: string, subject: string, text: string, html?: string): Promise<MailResult> {
-  const config = await mailConfig(env)
-  if (!config || !/^[^\s@]+@[^\s@][^\s.@]*\.[^\s@]+$/.test(to))
+/**
+ * Sends one mail; html, when given, goes with the text as its other form.
+ * fromName, when given, names the sender in the language of the mail.
+ */
+export async function sendMail(env: Env, to: string, subject: string, text: string, html?: string, fromName?: string): Promise<MailResult> {
+  const found = await mailConfig(env)
+  if (!found || !/^[^\s@]+@[^\s@][^\s.@]*\.[^\s@]+$/.test(to))
     return { ok: false }
+  const config = fromName ? { ...found, from: `"${fromName.replace(/["\\]/g, '')}" <${sender(found.from).email}>` } : found
   if (config.kind === 'smtp') {
     try {
       await smtp.send(config, to, subject, text, html)

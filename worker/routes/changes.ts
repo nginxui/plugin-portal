@@ -85,9 +85,12 @@ export async function refresh(env: Env, token: string, change: ChangeRow): Promi
       change = { ...change, state: 'merged', stage: 'merged', waiting_on: 'system', commit_sha: pr.merge_commit_sha }
     }
     else if (pr.state === 'closed') {
+      // Closed on GitHub: the last comment, when there is one, says why.
+      const comments = await github<{ body?: string }[]>(`/repos/${env.CATALOG_REPO}/issues/${change.pr_number}/comments?per_page=100`, token).catch(() => [])
+      const comment = comments.at(-1)?.body?.trim().slice(0, 500)
       await env.DB.batch([
         env.DB.prepare(`UPDATE changes SET state = 'rejected', waiting_on = NULL, updated_at = ? WHERE id = ?`).bind(t, change.id),
-        event(env, change.id, 'rejected', null),
+        event(env, change.id, 'rejected', null, comment ? { comment } : undefined),
       ])
       return { ...change, state: 'rejected', waiting_on: null }
     }
