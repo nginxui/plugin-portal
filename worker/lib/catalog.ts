@@ -1,4 +1,25 @@
 import type { Env } from '../env'
+import { peek, store } from './cache'
+
+const SHA = /^[0-9a-f]{40}$/
+const HEAD_KEY = 'catalog-head'
+
+/**
+ * Remembers the newest commit of the catalog repository the portal saw land:
+ * its own merges, self service commits and deploy reports.
+ */
+export async function noteCatalogHead(sha: string | null | undefined): Promise<void> {
+  if (sha && SHA.test(sha))
+    await store(HEAD_KEY, 600, sha)
+}
+
+/**
+ * The ref catalog files are read at. A commit is never cached stale by
+ * raw.githubusercontent.com, main is for up to five minutes.
+ */
+export async function catalogRef(): Promise<string> {
+  return (await peek<string>(HEAD_KEY)) ?? 'main'
+}
 
 export type Localized = Record<string, string>
 
@@ -79,7 +100,7 @@ export interface CatalogEntry {
 
 /** The entry of a plugin on the main branch of the catalog repository. */
 export async function catalogEntry(env: Env, id: string): Promise<CatalogEntry | null> {
-  const response = await fetch(`https://raw.githubusercontent.com/${env.CATALOG_REPO}/main/plugins/${id}.json`, { cf: { cacheTtl: 30 } } as RequestInit)
+  const response = await fetch(`https://raw.githubusercontent.com/${env.CATALOG_REPO}/${await catalogRef()}/plugins/${id}.json`, { cf: { cacheTtl: 30 } } as RequestInit)
   if (!response.ok)
     return null
   try {

@@ -5,7 +5,7 @@ import { AiError, defaultProvider } from '../lib/ai'
 import { preReview, reviewTarget } from '../lib/aiReview'
 import { audit } from '../lib/audit'
 import { cached } from '../lib/cache'
-import { loadCatalog, pluginIcons, repoOf } from '../lib/catalog'
+import { catalogRef, loadCatalog, noteCatalogHead, pluginIcons, repoOf } from '../lib/catalog'
 import { event, getChange } from '../lib/changes'
 import { github, GitHubError } from '../lib/github'
 import { isHostLocale } from '../lib/locales'
@@ -68,7 +68,7 @@ export function risk(change: Pick<ChangeRow, 'kind' | 'class' | 'outcome_json'>)
 async function currentEntry(env: Env, pluginId: string | null): Promise<unknown | null> {
   if (!pluginId)
     return null
-  const response = await fetch(`https://raw.githubusercontent.com/${env.CATALOG_REPO}/main/plugins/${pluginId}.json`)
+  const response = await fetch(`https://raw.githubusercontent.com/${env.CATALOG_REPO}/${await catalogRef()}/plugins/${pluginId}.json`)
   return response.ok ? response.json() : null
 }
 
@@ -364,6 +364,7 @@ async function approve(env: Env, token: string, actorId: number, id: string, com
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ merge_method: 'squash', sha: pull.head.sha, commit_title: `${pull.title} (#${pull.number})` }),
     })
+    await noteCatalogHead(merged.sha)
     const t = now()
     await env.DB.batch([
       env.DB.prepare(`UPDATE changes SET state = 'merged', stage = 'merged', waiting_on = 'system', commit_sha = ?, updated_at = ? WHERE id = ?`)

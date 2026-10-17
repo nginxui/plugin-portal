@@ -2,6 +2,7 @@ import type { Env } from '../env'
 import type { CatalogEntry, Localized } from './catalog'
 import type { StoreSource } from './insights'
 import { cached } from './cache'
+import { catalogRef } from './catalog'
 import { github } from './github'
 import { storeSourceOf } from './insights'
 import { HOST_LOCALES } from './locales'
@@ -210,9 +211,10 @@ export async function readStore(env: Env, token: string, opts: { id: string, rep
   const source = storeSourceOf(opts.entry?.store)
   const manifest = opts.repo && opts.tag ? await rawJson<Manifest>(opts.repo, opts.tag, 'plugin.json') : null
   if (source === 'catalog') {
+    const ref = await catalogRef()
     const [doc, readme] = await Promise.all([
-      rawJson<StoreDoc>(env.CATALOG_REPO, 'main', `store/${opts.id}/store.json`),
-      raw(env.CATALOG_REPO, 'main', `store/${opts.id}/README.md`),
+      rawJson<StoreDoc>(env.CATALOG_REPO, ref, `store/${opts.id}/store.json`),
+      raw(env.CATALOG_REPO, ref, `store/${opts.id}/README.md`),
     ])
     return { source, repo: env.CATALOG_REPO, ref: 'main', doc: withManifestReasons(doc ?? {}, manifest), fromFile: !!doc, readme, manifest, tag: opts.tag }
   }

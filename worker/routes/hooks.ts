@@ -1,6 +1,7 @@
 import type { AppEnv, Env } from '../env'
 import { Hono } from 'hono'
 import { audit } from '../lib/audit'
+import { noteCatalogHead } from '../lib/catalog'
 import { event, getChange, newChangeId, NEXT_NUMBER } from '../lib/changes'
 import { dispatchApply } from '../lib/deployApp'
 import { OidcError, verifyActionsToken } from '../lib/oidc'
@@ -62,6 +63,7 @@ hooks.post('/apply', async (c) => {
   const t = now()
   // A self service change is in the catalog once committed.
   if (report.outcome === 'committed' && typeof report.commit_sha === 'string' && /^[0-9a-f]{40}$/.test(report.commit_sha)) {
+    await noteCatalogHead(report.commit_sha)
     await c.env.DB.batch([
       c.env.DB.prepare(
         `UPDATE changes SET state = 'merged', stage = 'merged', waiting_on = 'system', commit_sha = ?, class = 'self_service',
@@ -232,6 +234,7 @@ hooks.post('/deploy', async (c) => {
   const entries = report.entries && typeof report.entries === 'object' ? report.entries : {}
   const listed = new Set(Array.isArray(report.listed) ? report.listed.map(String) : [])
   const commit = typeof report.commit === 'string' ? report.commit.slice(0, 64) : null
+  await noteCatalogHead(commit)
   const { results } = await c.env.DB.prepare(`SELECT id, plugin_id, kind, entry_json FROM changes WHERE state = 'merged'`)
     .all<{ id: string, plugin_id: string | null, kind: string, entry_json: string | null }>()
 
