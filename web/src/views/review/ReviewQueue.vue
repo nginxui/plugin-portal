@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { QueueItem, RecentChange } from '@/api/review'
-import { onKeyStroke } from '@vueuse/core'
+import { breakpointsAntDesign, onKeyStroke, useBreakpoints } from '@vueuse/core'
 import { computed, onMounted, ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { ApiError } from '@/api/client'
@@ -13,6 +13,8 @@ import { usePaletteStore } from '@/stores/palette'
 import { useReviewStore } from '@/stores/review'
 
 const router = useRouter()
+// Phones get one card per change instead of the wide table.
+const narrow = useBreakpoints(breakpointsAntDesign).smaller('md')
 const reviewStore = useReviewStore()
 const palette = usePaletteStore()
 const items = ref<QueueItem[]>([])
@@ -327,7 +329,49 @@ onKeyStroke('/', (e) => {
             <span class="keycap on-primary"><kbd>⇧</kbd><kbd>A</kbd></span>
           </AButton>
         </div>
-        <div class="overflow-x-auto">
+        <div v-if="narrow" class="queue-cards">
+          <RouterLink
+            v-for="(item, index) in shown"
+            :key="item.id"
+            :to="changePath(item, '/review')"
+            class="queue-card"
+            :class="{ focus: index === focus, picked: selected.includes(item.id) }"
+          >
+            <div class="flex items-center gap-3">
+              <ACheckbox
+                v-if="filter !== 'done'"
+                :disabled="!batchable(item)"
+                :checked="selected.includes(item.id)"
+                :aria-label="$gettext('Select %{name}', { name: localized(item.entry?.name) || item.pluginId || '' })"
+                @click.stop
+                @change="(e: { target: { checked: boolean } }) => toggle(item, e.target.checked)"
+              />
+              <PluginIcon :src="item.iconUrl" :name="localized(item.entry?.name) || item.pluginId || ''" :size="32" />
+              <div class="min-w-0 flex-1">
+                <div class="font-600 ellipsis">
+                  {{ localized(item.entry?.name) || item.pluginId }}
+                </div>
+                <div class="mono text-3 op-65 ellipsis">
+                  {{ item.pluginId }}
+                </div>
+              </div>
+              <span class="risk" :class="riskLevel(item)"><i />{{ riskLevel(item) === 'high' ? $gettext('High') : riskLevel(item) === 'medium' ? $gettext('Medium') : $gettext('Low') }}</span>
+            </div>
+            <div class="flex flex-wrap items-center gap-x-3 gap-y-1 mt-2 text-3">
+              <ATag :color="kindColor(item.kind)" variant="outlined" class="m-0">
+                {{ kindLabel(item.kind) }}
+              </ATag>
+              <span>@{{ item.author }}</span>
+              <ATag v-if="filter === 'done'" :color="outcome(item).color" class="m-0">
+                {{ outcome(item).text }}
+              </ATag>
+              <span v-else class="check" :class="checkState(item).tone"><span :class="checkIcon[checkState(item).tone]" />{{ checkState(item).text }}</span>
+              <span class="op-75 ml-auto">{{ filter === 'done' ? fromNow(item.updatedAt) : waited(item.updatedAt) }}</span>
+            </div>
+          </RouterLink>
+          <AEmpty v-if="!loading && shown.length === 0" class="py-8" :description="$gettext('Nothing is waiting here.')" />
+        </div>
+        <div v-else class="overflow-x-auto">
           <table class="queue">
             <thead>
               <tr>
@@ -410,7 +454,7 @@ onKeyStroke('/', (e) => {
           </table>
           <AEmpty v-if="!loading && shown.length === 0" class="py-8" :description="$gettext('Nothing is waiting here.')" />
         </div>
-        <div class="keys">
+        <div v-if="!narrow" class="keys">
           <span><kbd>j</kbd><kbd>k</kbd>{{ $gettext('Move') }}</span>
           <span><kbd>x</kbd>{{ $gettext('Select') }}</span>
           <span><kbd>↵</kbd>{{ $gettext('Open') }}</span>
@@ -529,6 +573,22 @@ onKeyStroke('/', (e) => {
 
 .queue tbody tr {
   cursor: default;
+}
+
+.queue-cards {
+  display: flex;
+  flex-direction: column;
+}
+
+.queue-card {
+  display: block;
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--portal-border);
+  color: inherit;
+}
+
+.queue-card.picked {
+  background: var(--portal-faint);
 }
 
 .check-col {
