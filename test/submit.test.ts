@@ -248,6 +248,15 @@ describe('apply report', () => {
     expect(await env.DB.prepare('SELECT state FROM plugins WHERE plugin_id = ?').bind(entry.id).first()).toEqual({ state: 'listed' })
   })
 
+  it('moves a merged partner change live with the next deploy', async () => {
+    await withJwks(await signedIn())
+    const t = Math.floor(Date.now() / 1000)
+    await env.DB.prepare(`INSERT INTO changes (id, plugin_id, author_id, kind, class, state, stage, created_at, updated_at) VALUES ('c_partner00001', NULL, 1, 'partner', 'maintainer', 'merged', 'merged', ?, ?)`).bind(t, t).run()
+    const response = await call('/api/hooks/deploy', { method: 'POST', headers: { Authorization: `Bearer ${await oidc(deployClaims())}` }, body: JSON.stringify({ commit: 'abc', entries: {}, listed: [] }) })
+    expect(await response.json()).toEqual({ live: ['c_partner00001'], names: [] })
+    expect(await env.DB.prepare(`SELECT state FROM changes WHERE id = 'c_partner00001'`).first()).toEqual({ state: 'live' })
+  })
+
   it('keeps a change merged while the deploy publishes another entry or no verified release', async () => {
     const cookie = await withJwks(await signedIn())
     const { change, entry } = await mergedChange(cookie)

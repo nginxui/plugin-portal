@@ -242,6 +242,16 @@ hooks.post('/deploy', async (c) => {
   const live: string[] = []
   const statements: D1PreparedStatement[] = []
   for (const change of results) {
+    // Partner files and block list entries have no entry to compare; the
+    // deploy after their merge builds them from main, so they are live.
+    if (change.kind === 'partner' || change.kind === 'block') {
+      live.push(change.id)
+      statements.push(
+        c.env.DB.prepare(`UPDATE changes SET state = 'live', stage = 'live', waiting_on = NULL, deployed_at = ?, updated_at = ? WHERE id = ?`).bind(t, t, change.id),
+        event(c.env, change.id, 'live', null, { commit }),
+      )
+      continue
+    }
     if (!change.plugin_id)
       continue
     const published = entries[change.plugin_id]
