@@ -182,9 +182,16 @@ store.post('/plugins/:id/store/submit', requireSession, limit('write'), async (c
   // An AI draft is published only once someone confirmed it.
   if (draft.ai?.length)
     return c.json({ error: 'unconfirmed_ai', keys: draft.ai }, 409)
-  const busy = await c.env.DB.prepare(`SELECT id FROM changes WHERE plugin_id = ? AND kind IN ('store', 'store_source') AND state = 'open' LIMIT 1`).bind(ctx.id).first()
-  if (busy)
+  const open = await c.env.DB.prepare(`SELECT id, payload_json FROM changes WHERE plugin_id = ? AND kind IN ('store', 'store_source') AND state = 'open'`)
+    .bind(ctx.id)
+    .all<{ id: string, payload_json: string | null }>()
+  // A names change waiting for review lets other texts go ahead; anything
+  // else in progress makes the next submission wait.
+  const namesOnly = (row: { payload_json: string | null }) => JSON.stringify((JSON.parse(row.payload_json ?? '{}') as { fields?: unknown }).fields) === '["name"]'
+  if (open.results.some(row => !namesOnly(row)))
     return c.json({ error: 'busy' }, 409)
+  if (open.results.length && items.some(i => i.review))
+    return c.json({ error: 'names_pending' }, 409)
   if (target !== 'catalog' && !ctx.repo)
     return c.json({ error: 'no_repository' }, 409)
 
@@ -258,14 +265,33 @@ store.post('/plugins/:id/store/submit', requireSession, limit('write'), async (c
     payload.pr_url = prUrl
   payload.repo = ctx.repo
 
-  statements.push(
-    c.env.DB.prepare(
-      `INSERT INTO changes (number, id, plugin_id, author_id, kind, class, state, stage, waiting_on, pr_number, payload_json, dispatched_at, created_at, updated_at)
-       VALUES (${NEXT_NUMBER}, ?, ?, ?, 'store', 'self_service', 'open', ?, ?, ?, ?, ?, ?, ?)`,
-    ).bind(change, ctx.id, session.user.id, stage, waitingOn, prNumber, JSON.stringify(payload), target === 'catalog' ? t : null, t, t),
-    event(c.env, change, 'submitted', session.user.id, { delivery, items: items.length }),
-    c.env.DB.prepare('DELETE FROM store_drafts WHERE plugin_id = ? AND author_id = ?').bind(ctx.id, session.user.id),
-  )
+  // In the catalog names wait for review and the other texts need not, so a
+  // submission with both becomes two changes. Each sets only its own fields
+  // of the document, so the one merged later does not undo the other.
+  const parts: { id: string, payload: Record<string, unknown>, items: typeof items }[] = []
+  if (target === 'catalog' && !moving) {
+    const names = items.filter(i => i.review)
+    const texts = items.filter(i => !i.review)
+    const readme = draft.readme !== undefined && draft.readme !== null
+    if (texts.length || readme || !names.length)
+      parts.push({ id: change, payload: { ...payload, items: texts, fields: [...new Set(texts.map(i => i.field === 'caption' ? 'screenshots' : i.field))] }, items: texts })
+    if (names.length)
+      parts.push({ id: parts.length ? newChangeId() : change, payload: { ...payload, readme: null, items: names, fields: ['name'] }, items: names })
+  }
+  else {
+    parts.push({ id: change, payload, items })
+  }
+
+  for (const part of parts) {
+    statements.push(
+      c.env.DB.prepare(
+        `INSERT INTO changes (number, id, plugin_id, author_id, kind, class, state, stage, waiting_on, pr_number, payload_json, dispatched_at, created_at, updated_at)
+         VALUES (${NEXT_NUMBER}, ?, ?, ?, 'store', 'self_service', 'open', ?, ?, ?, ?, ?, ?, ?)`,
+      ).bind(part.id, ctx.id, session.user.id, stage, waitingOn, prNumber, JSON.stringify(part.payload), target === 'catalog' ? t : null, t, t),
+      event(c.env, part.id, 'submitted', session.user.id, { delivery, items: part.items.length }),
+    )
+  }
+  statements.push(c.env.DB.prepare('DELETE FROM store_drafts WHERE plugin_id = ? AND author_id = ?').bind(ctx.id, session.user.id))
   if (prNumber)
     statements.push(event(c.env, change, 'review', null, { prNumber, prUrl }))
   await c.env.DB.batch(statements)
@@ -287,10 +313,13 @@ store.post('/plugins/:id/store/submit', requireSession, limit('write'), async (c
     ])
     await dispatchOrRecord(c.env, moveChange, movePayload)
   }
-  if (target === 'catalog')
-    await dispatchOrRecord(c.env, change, payload)
-  await audit(c.env.DB, { actorId: session.user.id, action: 'store.submit', subject: ctx.id, detail: { change, delivery, target, items: items.length } })
-  return c.json({ change, moveChange, delivery, prUrl }, 201)
+  if (target === 'catalog') {
+    for (const part of parts)
+      await dispatchOrRecord(c.env, part.id, part.payload)
+  }
+  const nameChange = parts.length > 1 ? parts[1].id : null
+  await audit(c.env.DB, { actorId: session.user.id, action: 'store.submit', subject: ctx.id, detail: { change, nameChange, delivery, target, items: items.length } })
+  return c.json({ change, moveChange, nameChange, delivery, prUrl }, 201)
 })
 
 // The files of a store change for an author who commits them by hand.

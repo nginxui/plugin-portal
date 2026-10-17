@@ -112,6 +112,27 @@ describe('store editor', () => {
     expect(await env.DB.prepare('SELECT count(*) AS n FROM store_drafts').first()).toEqual({ n: 0 })
   })
 
+  it('sends names and other texts of a catalog hosted plugin as two changes', async () => {
+    const cookie = await signedIn()
+    entry = { ...entry, store: { source: 'catalog' } }
+    await call(`/api/plugins/${ID}/store/draft`, { method: 'PUT', mutate: true, cookie, json: { doc: { name: { en: 'GeoIP Access', ja_JP: 'GeoIP アクセス' }, description: { en: 'Better.' } } } })
+    const result = await (await call(`/api/plugins/${ID}/store/submit`, { method: 'POST', mutate: true, cookie, json: {} })).json() as { change: string, nameChange: string }
+    expect(result.nameChange).toBeTruthy()
+    expect(dispatched.map(d => d.change)).toEqual([result.change, result.nameChange])
+    expect(JSON.parse(dispatched[0].payload)).toMatchObject({ kind: 'store_update', fields: ['description'], readme: null })
+    expect(JSON.parse(dispatched[1].payload)).toMatchObject({ kind: 'store_update', fields: ['name'], readme: null })
+
+    // While the names wait for review, other texts may go ahead, more names may not.
+    await env.DB.prepare(`UPDATE changes SET state = 'merged' WHERE id = ?`).bind(result.change).run()
+    await call(`/api/plugins/${ID}/store/draft`, { method: 'PUT', mutate: true, cookie, json: { doc: { name: { en: 'GeoIP Access' }, description: { en: 'Best.' } } } })
+    expect((await call(`/api/plugins/${ID}/store/submit`, { method: 'POST', mutate: true, cookie, json: {} })).status).toBe(201)
+    await env.DB.prepare(`UPDATE changes SET state = 'merged' WHERE id != ?`).bind(result.nameChange).run()
+    await call(`/api/plugins/${ID}/store/draft`, { method: 'PUT', mutate: true, cookie, json: { doc: { name: { en: 'GeoIP Access', ko_KR: 'GeoIP 접근' } } } })
+    const names = await call(`/api/plugins/${ID}/store/submit`, { method: 'POST', mutate: true, cookie, json: {} })
+    expect(names.status).toBe(409)
+    expect(await names.json()).toEqual({ error: 'names_pending' })
+  })
+
   it('gives a patch for the repository and moves the source in a self service change', async () => {
     const cookie = await signedIn()
     await call(`/api/plugins/${ID}/store/draft`, { method: 'PUT', mutate: true, cookie, json: { doc: { description: { en: 'Better.' } }, source: 'repo-branch' } })

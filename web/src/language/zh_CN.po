@@ -3578,8 +3578,16 @@ msgid ""
 "the default branch holds them."
 msgstr "下载文件后提交到 %{repo}，默认分支包含这些文件后更改即会跟进。"
 
+msgid "The names went to review as a change of their own."
+msgstr "名称已单独提交，等待审核。"
+
 msgid "Another store change of this plugin is in progress."
 msgstr "此插件的另一项商店更改正在进行中。"
+
+msgid ""
+"Names of this plugin are already waiting for review. Send the other texts "
+"now and the names once that review is done."
+msgstr "此插件已有名称在等待审核。请先提交其他内容，名称等审核结束后再提交。"
 
 msgid ""
 "Some texts cannot be listed. Check the names for words such as official."
@@ -3712,6 +3720,11 @@ msgstr "生成补丁"
 
 msgid ", reviewed"
 msgstr "，需审核"
+
+msgid ""
+"The names go to review as a change of their own. The other texts go live "
+"without waiting for them."
+msgstr "名称会单独提交并等待审核，其他内容不必等待，检查通过后即生效。"
 
 msgid "Missing"
 msgstr "缺失"

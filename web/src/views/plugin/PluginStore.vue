@@ -3,6 +3,7 @@ import type { StoreState } from '@/api/store'
 import type { Estimate } from '@/components/ListCardRow.vue'
 import type { StressResults } from '@/components/StressCards.vue'
 import type { Stress } from '@/lib/market'
+import { App } from 'antdv-next'
 import { computed, nextTick, onMounted, ref, useTemplateRef, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { ApiError } from '@/api/client'
@@ -250,6 +251,10 @@ function openConfirm() {
   confirming.value = true
 }
 
+const { message } = App.useApp()
+// In the catalog a submission with names and other texts becomes two changes.
+const splits = computed(() => source.value === 'catalog' && !sourceChanged.value && items.value.some(i => i.review) && (items.value.some(i => !i.review) || readmeChanged.value))
+
 async function submit() {
   submitting.value = true
   submitError.value = ''
@@ -257,17 +262,21 @@ async function submit() {
     const result = await submitStore(plugin.value.id, delivery.value.kind === 'patch' ? 'patch' : 'bot')
     confirming.value = false
     await pluginStore.open(plugin.value.id, true)
+    if (result.nameChange)
+      message.info($gettext('The names went to review as a change of their own.'))
     router.push(`/changes/${result.change}`)
   }
   catch (e) {
     const code = e instanceof ApiError ? e.code : ''
     submitError.value = code === 'busy'
       ? $gettext('Another store change of this plugin is in progress.')
-      : code === 'invalid'
-        ? $gettext('Some texts cannot be listed. Check the names for words such as official.')
-        : code === 'missing_media'
-          ? $gettext('An uploaded screenshot is missing. Upload it again in the screenshot studio.')
-          : $gettext('The change could not be sent. Please try again.')
+      : code === 'names_pending'
+        ? $gettext('Names of this plugin are already waiting for review. Send the other texts now and the names once that review is done.')
+        : code === 'invalid'
+          ? $gettext('Some texts cannot be listed. Check the names for words such as official.')
+          : code === 'missing_media'
+            ? $gettext('An uploaded screenshot is missing. Upload it again in the screenshot studio.')
+            : $gettext('The change could not be sent. Please try again.')
   }
   finally {
     submitting.value = false
@@ -514,6 +523,7 @@ const name = computed(() => localized(doc.value.name) || localized(plugin.value.
             {{ $gettext('Store source: %{source}', { source: sources.find(s => s.value === source)?.title ?? '' }) }}
           </li>
         </ul>
+        <AAlert v-if="splits" type="info" show-icon class="mt-3" :title="$gettext('The names go to review as a change of their own. The other texts go live without waiting for them.')" />
         <AAlert v-if="submitError" type="error" show-icon class="mt-3" :title="submitError" />
       </AModal>
       <CategoryEditModal v-model:open="categoriesOpen" :plugin-id="plugin.id" :current="plugin.categories" />

@@ -54,7 +54,7 @@ export function discardDraft(id: string) {
 }
 
 export function submitStore(id: string, delivery: 'bot' | 'patch') {
-  return api<{ change: string, moveChange: string | null, delivery: string, prUrl: string | null }>(`/plugins/${encodeURIComponent(id)}/store/submit`, { method: 'POST', json: { delivery } })
+  return api<{ change: string, moveChange: string | null, nameChange: string | null, delivery: string, prUrl: string | null }>(`/plugins/${encodeURIComponent(id)}/store/submit`, { method: 'POST', json: { delivery } })
 }
 
 /** Uploads a screenshot: cropped to 16:10, or the whole image a crop in the document frames. */
