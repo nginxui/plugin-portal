@@ -3997,6 +3997,12 @@ msgstr "拥有 %{repo} 的 admin 权限"
 msgid "Is a maintainer of the catalog"
 msgstr "是插件目录的维护者"
 
+msgid "Is an admin of the vendor %{vendor}"
+msgstr "是厂商 %{vendor} 的管理员"
+
+msgid "Is a publisher of the vendor %{vendor}"
+msgstr "是厂商 %{vendor} 的发布者"
+
 msgid "No claim recorded"
 msgstr "没有记录认领依据"
 

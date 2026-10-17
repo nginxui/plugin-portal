@@ -329,7 +329,7 @@ partners.post('/vendors/:id/plugins', requireSession, async (c) => {
   const change = await dispatchChange(c.env, session, {
     pluginId,
     kind: 'new_listing',
-    payload: { kind: 'vendor_listing', listing: { id: pluginId, name: body.name, partner: access.vendor.partner, releases_url: body.releases_url, categories: body.categories ?? [], license: body.license }, submitter: { login: session.user.login, id: session.user.id }, eligibility: `@${session.user.login} is a ${access.role} of the vendor ${access.vendor.name}` },
+    payload: { kind: 'vendor_listing', listing: { id: pluginId, name: body.name, partner: access.vendor.partner, releases_url: body.releases_url, categories: body.categories ?? [], license: body.license }, submitter: { login: session.user.login, id: session.user.id }, eligibility: `@${session.user.login} is ${access.role === 'admin' ? 'an' : 'a'} ${access.role} of the vendor ${access.vendor.name}` },
   })
   await audit(c.env.DB, { actorId: session.user.id, action: 'change.submit', subject: pluginId, detail: { change, vendor: id } })
   return c.json({ change }, 201)
@@ -351,7 +351,7 @@ partners.put('/vendors/:id/plugins/:pluginId/commercial', requireSession, async 
   const change = await dispatchChange(c.env, session, {
     pluginId,
     kind: 'commercial',
-    payload: { kind: 'entry_update', plugin_id: pluginId, operations: { commercial: { pricing: body.pricing, purchase_url: body.purchase_url, ...(Number.isInteger(body.trial_days) ? { trial_days: body.trial_days } : {}), ...(body.license ? { license: body.license } : {}) } }, reason: '', submitter: { login: session.user.login, id: session.user.id }, eligibility: `@${session.user.login} is a ${access.role} of the vendor ${access.vendor.name}` },
+    payload: { kind: 'entry_update', plugin_id: pluginId, operations: { commercial: { pricing: body.pricing, purchase_url: body.purchase_url, ...(Number.isInteger(body.trial_days) ? { trial_days: body.trial_days } : {}), ...(body.license ? { license: body.license } : {}) } }, reason: '', submitter: { login: session.user.login, id: session.user.id }, eligibility: `@${session.user.login} is ${access.role === 'admin' ? 'an' : 'a'} ${access.role} of the vendor ${access.vendor.name}` },
   })
   await audit(c.env.DB, { actorId: session.user.id, action: 'change.submit', subject: pluginId, detail: { change, commercial: true } })
   return c.json({ change }, 201)

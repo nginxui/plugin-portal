@@ -236,6 +236,9 @@ const claimText = computed(() => {
     return $gettext('Has admin permission on %{repo}', { repo: admin[1] })
   if (/ is a maintainer$/.test(claim))
     return $gettext('Is a maintainer of the catalog')
+  const vendor = / is an? (admin|publisher) of the vendor (.+)$/.exec(claim)
+  if (vendor)
+    return vendor[1] === 'admin' ? $gettext('Is an admin of the vendor %{vendor}', { vendor: vendor[2] }) : $gettext('Is a publisher of the vendor %{vendor}', { vendor: vendor[2] })
   return claim || $gettext('No claim recorded')
 })
 
