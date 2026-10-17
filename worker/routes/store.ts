@@ -1,6 +1,6 @@
 import type { AppEnv, Env } from '../env'
 import type { PluginContext } from '../lib/pluginContext'
-import type { StoreDoc, StoreState } from '../lib/store'
+import type { StoreDoc, StoreItem, StoreState } from '../lib/store'
 import { Hono } from 'hono'
 import { atLeast } from '../lib/access'
 import { audit } from '../lib/audit'
@@ -56,6 +56,28 @@ async function currentDraft(env: Env, pluginId: string, authorId: number, row: D
   const moved: Draft = { ...draft, doc: rebaseDoc(draft.base, draft.doc, base), base }
   await env.DB.prepare('UPDATE store_drafts SET doc_json = ? WHERE plugin_id = ? AND author_id = ?').bind(JSON.stringify(moved), pluginId, authorId).run()
   return moved
+}
+
+// What a catalog change sets: texts one language at a time, the rest as
+// whole fields (scripts/submission/store.mjs in the catalog). The catalog
+// applies them to the document it holds then, so a text that landed after
+// the portal read the document stays.
+function catalogUpdate(items: StoreItem[], doc: StoreDoc): { texts: Record<string, Record<string, string | null>>, fields: string[] } {
+  const texts: Record<string, Record<string, string | null>> = {}
+  const fields = new Set<string>()
+  for (const item of items) {
+    if ((item.field === 'name' || item.field === 'description') && item.locale) {
+      (texts[item.field] ??= {})[item.locale] = doc[item.field]?.[item.locale] ?? null
+    }
+    else if (item.field === 'permission_reasons' && item.locale) {
+      const permission = item.label.split('.').slice(2).join('.')
+      ;(texts[`permission_reasons.${permission}`] ??= {})[item.locale] = doc.permission_reasons?.[permission]?.[item.locale] ?? null
+    }
+    else {
+      fields.add(item.field === 'caption' ? 'screenshots' : item.field)
+    }
+  }
+  return { texts, fields: [...fields] }
 }
 
 function images(env: Env, doc: StoreDoc, state: StoreState) {
@@ -212,7 +234,10 @@ store.post('/plugins/:id/store/submit', requireSession, limit('write'), async (c
     .all<{ id: string, payload_json: string | null }>()
   // A names change waiting for review lets other texts go ahead; anything
   // else in progress makes the next submission wait.
-  const namesOnly = (row: { payload_json: string | null }) => JSON.stringify((JSON.parse(row.payload_json ?? '{}') as { fields?: unknown }).fields) === '["name"]'
+  const namesOnly = (row: { payload_json: string | null }) => {
+    const sent = (JSON.parse(row.payload_json ?? '{}') as { items?: { review?: boolean }[] }).items ?? []
+    return sent.length > 0 && sent.every(item => item.review)
+  }
   if (open.results.some(row => !namesOnly(row)))
     return c.json({ error: 'busy' }, 409)
   if (open.results.length && items.some(i => i.review))
@@ -299,9 +324,9 @@ store.post('/plugins/:id/store/submit', requireSession, limit('write'), async (c
     const texts = items.filter(i => !i.review)
     const readme = draft.readme !== undefined && draft.readme !== null
     if (texts.length || readme || !names.length)
-      parts.push({ id: change, payload: { ...payload, items: texts, fields: [...new Set(texts.map(i => i.field === 'caption' ? 'screenshots' : i.field))] }, items: texts })
+      parts.push({ id: change, payload: { ...payload, items: texts, ...catalogUpdate(texts, written) }, items: texts })
     if (names.length)
-      parts.push({ id: parts.length ? newChangeId() : change, payload: { ...payload, readme: null, items: names, fields: ['name'] }, items: names })
+      parts.push({ id: parts.length ? newChangeId() : change, payload: { ...payload, readme: null, items: names, ...catalogUpdate(names, written) }, items: names })
   }
   else {
     parts.push({ id: change, payload, items })

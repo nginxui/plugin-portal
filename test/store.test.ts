@@ -123,8 +123,8 @@ describe('store editor', () => {
     const result = await (await call(`/api/plugins/${ID}/store/submit`, { method: 'POST', mutate: true, cookie, json: {} })).json() as { change: string, nameChange: string }
     expect(result.nameChange).toBeTruthy()
     expect(dispatched.map(d => d.change)).toEqual([result.change, result.nameChange])
-    expect(JSON.parse(dispatched[0].payload)).toMatchObject({ kind: 'store_update', fields: ['description'], readme: null })
-    expect(JSON.parse(dispatched[1].payload)).toMatchObject({ kind: 'store_update', fields: ['name'], readme: null })
+    expect(JSON.parse(dispatched[0].payload)).toMatchObject({ kind: 'store_update', fields: [], texts: { description: { en: 'Better.' } }, readme: null })
+    expect(JSON.parse(dispatched[1].payload)).toMatchObject({ kind: 'store_update', fields: [], texts: { name: { ja_JP: 'GeoIP アクセス' } }, readme: null })
 
     // While the names wait for review, other texts may go ahead, more names may not.
     await env.DB.prepare(`UPDATE changes SET state = 'merged' WHERE id = ?`).bind(result.change).run()

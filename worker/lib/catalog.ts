@@ -1,24 +1,28 @@
 import type { Env } from '../env'
-import { peek, store } from './cache'
 
 const SHA = /^[0-9a-f]{40}$/
-const HEAD_KEY = 'catalog-head'
+const HEAD_KEY = 'catalog.head'
 
 /**
  * Remembers the newest commit of the catalog repository the portal saw land:
- * its own merges, self service commits and deploy reports.
+ * its own merges, self service commits and deploy reports. Kept in D1, which
+ * every location reads alike, unlike the cache of one location.
  */
-export async function noteCatalogHead(sha: string | null | undefined): Promise<void> {
-  if (sha && SHA.test(sha))
-    await store(HEAD_KEY, 600, sha)
+export async function noteCatalogHead(env: Env, sha: string | null | undefined): Promise<void> {
+  if (sha && SHA.test(sha)) {
+    await env.DB.prepare('INSERT INTO job_state (name, value) VALUES (?, ?) ON CONFLICT (name) DO UPDATE SET value = excluded.value')
+      .bind(HEAD_KEY, sha)
+      .run()
+  }
 }
 
 /**
  * The ref catalog files are read at. A commit is never cached stale by
  * raw.githubusercontent.com, main is for up to five minutes.
  */
-export async function catalogRef(): Promise<string> {
-  return (await peek<string>(HEAD_KEY)) ?? 'main'
+export async function catalogRef(env: Env): Promise<string> {
+  const row = await env.DB.prepare('SELECT value FROM job_state WHERE name = ?').bind(HEAD_KEY).first<{ value: string }>()
+  return row && SHA.test(row.value) ? row.value : 'main'
 }
 
 export type Localized = Record<string, string>
@@ -100,7 +104,7 @@ export interface CatalogEntry {
 
 /** The entry of a plugin on the main branch of the catalog repository. */
 export async function catalogEntry(env: Env, id: string): Promise<CatalogEntry | null> {
-  const response = await fetch(`https://raw.githubusercontent.com/${env.CATALOG_REPO}/${await catalogRef()}/plugins/${id}.json`, { cf: { cacheTtl: 30 } } as RequestInit)
+  const response = await fetch(`https://raw.githubusercontent.com/${env.CATALOG_REPO}/${await catalogRef(env)}/plugins/${id}.json`, { cf: { cacheTtl: 30 } } as RequestInit)
   if (!response.ok)
     return null
   try {

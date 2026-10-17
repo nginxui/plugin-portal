@@ -211,7 +211,7 @@ export async function readStore(env: Env, token: string, opts: { id: string, rep
   const source = storeSourceOf(opts.entry?.store)
   const manifest = opts.repo && opts.tag ? await rawJson<Manifest>(opts.repo, opts.tag, 'plugin.json') : null
   if (source === 'catalog') {
-    const ref = await catalogRef()
+    const ref = await catalogRef(env)
     const [doc, readme] = await Promise.all([
       rawJson<StoreDoc>(env.CATALOG_REPO, ref, `store/${opts.id}/store.json`),
       raw(env.CATALOG_REPO, ref, `store/${opts.id}/README.md`),
