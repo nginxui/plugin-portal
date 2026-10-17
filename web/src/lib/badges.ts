@@ -1,11 +1,10 @@
 // The README badges the catalog renders (nginxui/plugins, scripts/badges.mjs),
 // drawn here too so the preview needs no deploy. Keep the two in step.
 
+import { HOST_LOCALES } from './hostLocales'
+
 export const BADGE_KINDS = ['status', 'version', 'translations', 'requires'] as const
 export type BadgeKind = typeof BADGE_KINDS[number]
-export const BADGE_LOCALES = ['en', 'zh_CN', 'zh_TW', 'ja_JP', 'ko_KR', 'de_DE', 'fr_FR', 'es', 'it_IT', 'pt_PT', 'ru_RU', 'uk_UA', 'tr_TR', 'vi_VN', 'ar']
-const HOST_LOCALES = ['en', 'zh_CN', 'zh_TW', 'ja_JP', 'ko_KR', 'de_DE', 'fr_FR', 'es', 'pt_PT', 'ru_RU', 'uk_UA', 'tr_TR', 'vi_VN', 'ar']
-
 export const BADGE_STRINGS: Record<string, Record<string, string>> = {
   en: { plugin: 'Nginx UI plugin', listed: 'listed', version: 'version', yanked: 'yanked', translations: 'translations', requires: 'requires', any: 'any Nginx UI' },
   zh_CN: { plugin: 'Nginx UI 插件', listed: '已上架', version: '版本', yanked: '已撤回', translations: '翻译', requires: '需要', any: '任意 Nginx UI' },
@@ -22,6 +21,12 @@ export const BADGE_STRINGS: Record<string, Record<string, string>> = {
   tr_TR: { plugin: 'Nginx UI eklentisi', listed: 'listelendi', version: 'sürüm', yanked: 'geri çekildi', translations: 'çeviriler', requires: 'gerekir', any: 'her Nginx UI' },
   vi_VN: { plugin: 'Plugin Nginx UI', listed: 'đã niêm yết', version: 'phiên bản', yanked: 'đã rút', translations: 'bản dịch', requires: 'yêu cầu', any: 'mọi Nginx UI' },
   ar: { plugin: 'إضافة Nginx UI', listed: 'مدرجة', version: 'الإصدار', yanked: 'مسحوب', translations: 'الترجمات', requires: 'يتطلب', any: 'أي Nginx UI' },
+}
+
+// The catalog renders badges in the languages of Nginx UI their texts are
+// translated into; the others are added by hand.
+export function badgeLocales(): string[] {
+  return HOST_LOCALES.filter(locale => locale in BADGE_STRINGS)
 }
 
 const COLORS: Record<string, string> = { status: '#389e0d', version: '#1677ff', yanked: '#cf1322', translations: '#722ed1', requires: '#595959' }

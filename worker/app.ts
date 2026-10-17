@@ -1,6 +1,7 @@
 import type { AppEnv } from './env'
 import { Hono } from 'hono'
 import { GitHubError } from './lib/github'
+import { HOST_LOCALES, hostLocalesTried, refreshHostLocales } from './lib/locales'
 import { SessionExpired } from './lib/session'
 import { security } from './middleware/security'
 import { aiAdmin } from './routes/aiAdmin'
@@ -25,6 +26,24 @@ import { submit } from './routes/submit'
 export const app = new Hono<AppEnv>().basePath('/api')
 
 app.use('*', security)
+// The first request of an isolate waits for the languages of Nginx UI, later
+// ones read them again in the background.
+app.use('*', async (c, next) => {
+  const refresh = refreshHostLocales(c.env)
+  if (hostLocalesTried()) {
+    try {
+      c.executionCtx.waitUntil(refresh)
+    }
+    catch {
+      await refresh
+    }
+  }
+  else {
+    await refresh
+  }
+  await next()
+})
+app.get('/locales', c => c.json({ locales: HOST_LOCALES }))
 app.route('/auth', auth)
 app.route('/me', me)
 app.route('/notifications', notifications)

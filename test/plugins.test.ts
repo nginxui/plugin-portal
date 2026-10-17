@@ -1,6 +1,7 @@
 import type { Route } from './helpers'
 import { env } from 'cloudflare:workers'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { KNOWN_LOCALES } from '../worker/lib/locales'
 import { call, githubOAuth, json, mockFetch, signIn } from './helpers'
 
 const catalog = {
@@ -78,7 +79,7 @@ describe('my plugins', () => {
     const body = await (await call('/api/plugins/insights', { cookie })).json() as { insights: { id: string, downloads: { version: string, count: number }[], untranslated: string[], storeSource: string }[] }
     const geoip = body.insights.find(i => i.id === 'io.github.octo.geoip')!
     expect(geoip.downloads).toEqual([{ version: '0.2.0', count: 3 }, { version: '0.3.0', count: 7 }])
-    expect(geoip.untranslated).toHaveLength(13)
+    expect(geoip.untranslated).toHaveLength(KNOWN_LOCALES.length - 1)
     expect(geoip.storeSource).toBe('release')
   })
 

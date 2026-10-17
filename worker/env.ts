@@ -3,6 +3,8 @@ export interface Env {
   ASSETS: Fetcher
   PORTAL_ORIGIN: string
   CATALOG_URL: string
+  // Where the languages of Nginx UI are read, its LINGUAS on GitHub unless set.
+  LINGUAS_URL?: string
   CATALOG_REPO: string
   GITHUB_CLIENT_ID: string
   CATALOG_APP_SLUG: string

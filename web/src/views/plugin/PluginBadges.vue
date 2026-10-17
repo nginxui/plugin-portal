@@ -2,7 +2,7 @@
 import type { BadgeKind, BadgePlugin } from '@/lib/badges'
 import { useClipboard } from '@vueuse/core'
 import { computed, ref } from 'vue'
-import { BADGE_KINDS, BADGE_LOCALES, BADGE_STRINGS, badgeContent, badgeDataUrl, badgeSvg } from '@/lib/badges'
+import { BADGE_KINDS, BADGE_STRINGS, badgeContent, badgeDataUrl, badgeLocales, badgeSvg } from '@/lib/badges'
 import { $gettext } from '@/lib/gettext'
 import { localized } from '@/lib/labels'
 import { localeName } from '@/lib/locales'
@@ -72,7 +72,7 @@ const yankedSample = computed(() => {
         <template #extra>
           <AFlex gap="small" align="center" wrap>
             <ASegmented v-model:value="style" :options="[{ value: '', label: $gettext('Rounded') }, { value: 'square', label: $gettext('Square') }, { value: 'large', label: $gettext('Large') }]" />
-            <ASelect v-model:value="locale" class="w-36" :options="BADGE_LOCALES.map(l => ({ value: l, label: localeName(l) }))" :aria-label="$gettext('Badge language')" />
+            <ASelect v-model:value="locale" class="w-36" :options="badgeLocales().map(l => ({ value: l, label: localeName(l) }))" :aria-label="$gettext('Badge language')" />
           </AFlex>
         </template>
         <div class="overflow-x-auto">

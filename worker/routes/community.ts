@@ -7,7 +7,7 @@ import { audit } from '../lib/audit'
 import { loadCatalog, repoOf } from '../lib/catalog'
 import { glossary } from '../lib/glossary'
 import { insightsOf } from '../lib/insights'
-import { isHostLocale } from '../lib/locales'
+import { HOST_LOCALES, isHostLocale } from '../lib/locales'
 import { pluginContext } from '../lib/pluginContext'
 import { reservedWord } from '../lib/rules'
 import { userToken } from '../lib/session'
@@ -287,7 +287,7 @@ community.get('/translate', requireSession, async (c) => {
 community.put('/translate/langs', requireSession, async (c) => {
   const session = c.get('session')
   const body = await c.req.json<{ locales?: string[] }>().catch(() => ({} as { locales?: string[] }))
-  const locales = [...new Set((body.locales ?? []).filter(l => isHostLocale(l) && l !== 'en'))].slice(0, 13)
+  const locales = [...new Set((body.locales ?? []).filter(l => isHostLocale(l) && l !== 'en'))].slice(0, HOST_LOCALES.length - 1)
   await c.env.DB.batch([
     c.env.DB.prepare('DELETE FROM translator_langs WHERE user_id = ?').bind(session.user.id),
     ...locales.map(l => c.env.DB.prepare('INSERT INTO translator_langs (user_id, locale) VALUES (?, ?)').bind(session.user.id, l)),

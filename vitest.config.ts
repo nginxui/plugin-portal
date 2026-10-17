@@ -18,6 +18,7 @@ export default defineConfig({
           GITHUB_CLIENT_ID: 'Iv1.test',
           GITHUB_CLIENT_SECRET: 'secret',
           SESSION_KEY: 'AAECAwQFBgcICQoLDA0ODxAREhMUFRYXGBkaGxwdHh8=',
+          LINGUAS_URL: 'none',
         },
       },
     }),

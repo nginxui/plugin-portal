@@ -1,21 +1,26 @@
-// English names of the host languages, for prompts and messages.
-const NAMES: Record<string, string> = {
-  en: 'English',
-  zh_CN: 'Simplified Chinese',
-  zh_TW: 'Traditional Chinese',
-  ja_JP: 'Japanese',
-  ko_KR: 'Korean',
-  de_DE: 'German',
-  fr_FR: 'French',
-  es: 'Spanish',
-  pt_PT: 'European Portuguese',
-  ru_RU: 'Russian',
-  uk_UA: 'Ukrainian',
-  tr_TR: 'Turkish',
-  vi_VN: 'Vietnamese',
-  ar: 'Arabic',
+import { HOST_LOCALES } from './locales'
+
+// Chinese is told apart by script, not by region.
+const NAME_TAGS: Record<string, string> = { zh_CN: 'zh-Hans', zh_TW: 'zh-Hant' }
+const english = new Intl.DisplayNames(['en'], { type: 'language' })
+
+/** The BCP 47 tag of a locale, without the region when it is the usual one of the language. */
+export function langTag(locale: string, locales: readonly string[] = HOST_LOCALES): string {
+  const [language, region] = locale.split('_')
+  if (!region)
+    return language
+  const shared = locales.filter(other => other.split('_')[0] === language).length > 1
+  if (!shared && new Intl.Locale(language).maximize().region === region)
+    return language
+  return `${language}-${region}`
 }
 
+/** English name of a host language, for prompts and messages. */
 export function localeName(locale: string): string {
-  return NAMES[locale] ?? locale
+  try {
+    return english.of(NAME_TAGS[locale] ?? langTag(locale)) ?? locale
+  }
+  catch {
+    return locale
+  }
 }
