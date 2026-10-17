@@ -4,7 +4,7 @@ import { Hono } from 'hono'
 import { mapLimit, repoAccess } from '../lib/access'
 import { audit } from '../lib/audit'
 import { cached } from '../lib/cache'
-import { catalogEntry, loadCatalog, repoOf } from '../lib/catalog'
+import { catalogEntry, latestRelease, loadCatalog, repoOf } from '../lib/catalog'
 import { event, newChangeId, NEXT_NUMBER } from '../lib/changes'
 import { randomToken } from '../lib/crypto'
 import { dispatchApply } from '../lib/deployApp'
@@ -72,7 +72,7 @@ partners.get('/owners/:login', requireSession, async (c) => {
   const access = new Map((await mapLimit(repos, 6, repo => repoAccess(c.env, session.user.id, token, repo))).map(a => [a.repo.toLowerCase(), a]))
   const roleOf = (repo: string | null) => (repo ? access.get(repo.toLowerCase())?.role ?? null : null) as Role | null
   const plugins = [
-    ...listed.map(p => ({ id: p.id, name: p.name, iconUrl: p.icon_url ?? null, state: 'listed', version: p.releases?.[0]?.version ?? null, repo: repoOf(p.repository_url), role: roleOf(repoOf(p.repository_url)), trust: p.trust ?? null })),
+    ...listed.map(p => ({ id: p.id, name: p.name, iconUrl: p.icon_url ?? null, state: 'listed', version: latestRelease(p)?.version ?? null, repo: repoOf(p.repository_url), role: roleOf(repoOf(p.repository_url)), trust: p.trust ?? null })),
     ...drafts.map(d => ({ id: d.plugin_id, name: { en: d.plugin_id }, iconUrl: null, state: d.state, version: null, repo: d.repo_full_name, role: roleOf(d.repo_full_name), trust: null })),
   ]
   // What is going on with each plugin: a reviewed change in progress, and
@@ -198,7 +198,7 @@ partners.get('/vendors/:id', requireSession, async (c) => {
       id: row.plugin_id,
       name: listing?.name ?? (entry?.name as Record<string, string> | undefined) ?? { en: row.plugin_id },
       state: listing ? 'listed' : row.state,
-      version: listing?.releases?.[0]?.version ?? null,
+      version: listing ? latestRelease(listing)?.version ?? null : null,
       releasesUrl: releasesUrl ?? null,
       commercial: entry?.commercial ?? null,
       feed: await feedStatus(releasesUrl),

@@ -3,7 +3,7 @@ import { Hono } from 'hono'
 import { mapLimit } from '../lib/access'
 import { audit } from '../lib/audit'
 import { cached } from '../lib/cache'
-import { catalogEntry, loadCatalog, repoOf } from '../lib/catalog'
+import { catalogEntry, latestRelease, loadCatalog, repoOf } from '../lib/catalog'
 import { event, newChangeId, NEXT_NUMBER } from '../lib/changes'
 import { dispatchApply } from '../lib/deployApp'
 import { github } from '../lib/github'
@@ -64,7 +64,7 @@ maintain.get('/plugins', async (c) => {
   const kinds = new Map((await c.env.DB.prepare(`SELECT lower(github_login) AS login, kind FROM owners WHERE github_login IS NOT NULL`).all<{ login: string, kind: string }>()).results.map(r => [r.login, r.kind]))
   const listed = catalog.plugins.map((p, i) => {
     const entry = entries[i]
-    const newest = p.releases?.[0]
+    const newest = latestRelease(p)
     const repo = repoOf(p.repository_url)
     return {
       id: p.id,

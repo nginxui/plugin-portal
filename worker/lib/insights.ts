@@ -1,7 +1,7 @@
 import type { Env } from '../env'
 import type { CatalogPlugin } from './catalog'
 import { cached } from './cache'
-import { catalogEntry, repoOf } from './catalog'
+import { catalogEntry, latestRelease, newestFirst, repoOf } from './catalog'
 import { dailyDownloads } from './downloads'
 import { github } from './github'
 import { HOST_LOCALES } from './locales'
@@ -113,7 +113,7 @@ export async function insightsOf(env: Env, token: string, plugin: CatalogPlugin 
       }
     }
   }
-  const newest = plugin.releases?.find(r => !r.yanked) ?? plugin.releases?.[0]
+  const newest = newestFirst(plugin.releases).find(r => !r.yanked) ?? latestRelease(plugin)
   const shots = plugin.screenshots ?? []
   return {
     id: plugin.id,

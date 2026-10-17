@@ -5,7 +5,7 @@ import type { RepoPermission } from '../lib/github'
 import type { ReleaseInfo } from '../lib/submission'
 import { Hono } from 'hono'
 import { mapLimit, repoAccess, roleOf } from '../lib/access'
-import { catalogEntry, latestRelease, loadCatalog, repoOf } from '../lib/catalog'
+import { catalogEntry, latestRelease, loadCatalog, newestFirst, repoOf } from '../lib/catalog'
 import { github, GitHubError } from '../lib/github'
 import { insightsOf } from '../lib/insights'
 import { userToken } from '../lib/session'
@@ -301,7 +301,8 @@ plugins.get('/:id', async (c) => {
     summary = { ...summary, categories: entry.categories }
   return c.json({
     plugin: summary,
-    releases: releases.map(r => ({
+    // Newest first; the catalog keeps them in no promised order.
+    releases: newestFirst(releases).map(r => ({
       version: r.version,
       releasedAt: r.released_at ?? null,
       minNginxUiVersion: r.min_nginx_ui_version ?? null,

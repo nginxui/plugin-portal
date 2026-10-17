@@ -3,7 +3,7 @@ import type { RepoAccess, Role } from './access'
 import type { CatalogEntry, CatalogPlugin } from './catalog'
 import { checkMaintainer } from '../middleware/auth'
 import { repoAccess } from './access'
-import { catalogEntry, loadCatalog, repoOf } from './catalog'
+import { catalogEntry, loadCatalog, newestFirst, repoOf } from './catalog'
 import { userToken } from './session'
 import { repoReleases } from './submission'
 
@@ -42,7 +42,8 @@ export async function pluginContext(env: Env, session: Session, id: string): Pro
   }
   if (!listing && !entry && !repo)
     return null
-  let release = listing?.releases?.find(r => !r.yanked && (r.channel ?? 'stable') === 'stable') ?? listing?.releases?.[0] ?? null
+  const releases = newestFirst(listing?.releases)
+  let release = releases.find(r => !r.yanked && (r.channel ?? 'stable') === 'stable') ?? releases[0] ?? null
   // A plugin the published index does not list yet: its newest release, as
   // the catalog reads it at the next update.
   if (!listing && repo) {

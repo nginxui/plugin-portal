@@ -90,8 +90,28 @@ export function repoOf(url: string | undefined | null): string | null {
   return match ? `${match[1]}/${match[2]}` : null
 }
 
+function versionParts(version: string): number[] {
+  return version.replace(/^v/, '').split(/[-+]/)[0].split('.').map(n => Number(n) || 0)
+}
+
+/** Above zero when a is the newer version; a release beats its prereleases. */
+export function compareVersions(a: string, b: string): number {
+  const x = versionParts(a)
+  const y = versionParts(b)
+  for (let i = 0; i < 3; i++) {
+    if (x[i] !== y[i])
+      return (x[i] ?? 0) - (y[i] ?? 0)
+  }
+  return Number(!a.includes('-')) - Number(!b.includes('-'))
+}
+
+/** The releases of a listing newest first; the catalog keeps them in no promised order. */
+export function newestFirst<T extends { version: string }>(releases: T[] | undefined): T[] {
+  return [...(releases ?? [])].sort((a, b) => compareVersions(b.version, a.version))
+}
+
 export function latestRelease(plugin: CatalogPlugin): CatalogRelease | null {
-  return plugin.releases?.[0] ?? null
+  return newestFirst(plugin.releases)[0] ?? null
 }
 
 export interface CatalogEntry {

@@ -5,7 +5,7 @@ import { AiError, defaultProvider } from '../lib/ai'
 import { preReview, reviewTarget } from '../lib/aiReview'
 import { audit } from '../lib/audit'
 import { cached } from '../lib/cache'
-import { catalogRef, loadCatalog, noteCatalogHead, pluginIcons, repoOf } from '../lib/catalog'
+import { catalogRef, latestRelease, loadCatalog, noteCatalogHead, pluginIcons, repoOf } from '../lib/catalog'
 import { event, getChange } from '../lib/changes'
 import { github, GitHubError } from '../lib/github'
 import { isHostLocale } from '../lib/locales'
@@ -152,7 +152,7 @@ async function target(env: Env, token: string, change: ChangeRow) {
   const found = reviewTarget(change, plugin?.repo_full_name ?? repoOf(listing?.repository_url) ?? null)
   if (!found.repo || found.ref)
     return found
-  const tag = /\/releases\/tag\/([^/?#]+)/.exec(listing?.releases?.[0]?.release_notes_url ?? '')?.[1]
+  const tag = /\/releases\/tag\/([^/?#]+)/.exec((listing ? latestRelease(listing)?.release_notes_url : '') ?? '')?.[1]
   return { repo: found.repo, ref: tag ? decodeURIComponent(tag) : (await headOf(token, found.repo).catch(() => null))?.sha ?? null }
 }
 
@@ -283,7 +283,7 @@ review.get('/:id', async (c) => {
     repositoryCreatedAt: repoCreatedAt,
     before,
     // The listing as users see it now, for the comparison.
-    listing: listing && { description: listing.description ?? null, screenshots: (listing as { screenshots?: unknown[] }).screenshots ?? [], iconUrl: listing.icon_url ?? null, capabilities: listing.capabilities ?? [], manifest: (listing.releases?.[0] as { manifest?: unknown } | undefined)?.manifest ?? null, version: listing.releases?.[0]?.version ?? null },
+    listing: listing && { description: listing.description ?? null, screenshots: (listing as { screenshots?: unknown[] }).screenshots ?? [], iconUrl: listing.icon_url ?? null, capabilities: listing.capabilities ?? [], manifest: (latestRelease(listing) as { manifest?: unknown } | null)?.manifest ?? null, version: latestRelease(listing)?.version ?? null },
     pull: pull && {
       number: pull.number,
       state: pull.state,
