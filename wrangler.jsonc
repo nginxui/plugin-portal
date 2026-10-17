@@ -52,7 +52,8 @@
           "migrations_dir": "migrations"
         }
       ],
-      // Screenshot uploads; no public domain yet, so drafts are served by the portal.
+      // Screenshot uploads, served by the portal; published ones are public at
+      // plugin-media-staging.nginxui.com for the staging catalog.
       "r2_buckets": [{ "binding": "MEDIA", "bucket_name": "plugin-media-staging" }],
       "ratelimits": [
         { "name": "LIMIT_CHECK", "namespace_id": "4201", "simple": { "limit": 20, "period": 60 } },
