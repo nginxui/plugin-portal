@@ -11,7 +11,7 @@ export default defineConfig({
         // The workerd bundled with the test pool can lag behind wrangler.
         compatibilityDate: '2026-08-22',
         // Uploads are tested against a local bucket; deployments bind one only once it exists.
-        r2Buckets: ['MEDIA'],
+        r2Buckets: ['MEDIA', 'CATALOG_SITE'],
         bindings: {
           TEST_MIGRATIONS: migrations,
           PORTAL_ORIGIN: 'https://portal.test',

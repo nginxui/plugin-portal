@@ -248,6 +248,20 @@ describe('apply report', () => {
     expect(await env.DB.prepare('SELECT state FROM plugins WHERE plugin_id = ?').bind(entry.id).first()).toEqual({ state: 'listed' })
   })
 
+  it('serves the catalog files the test catalog deploy sends', async () => {
+    await withJwks(await signedIn())
+    const b64 = (text: string) => btoa(text)
+    await env.CATALOG_SITE!.put('v1/icons/io.x.y/0.9.0.svg', '<svg/>')
+    const send = async (files: Record<string, string>, token?: string) => call('/api/hooks/site', { method: 'POST', headers: { Authorization: `Bearer ${token ?? await oidc(deployClaims())}` }, body: JSON.stringify({ files }) })
+    const response = await send({ 'v1/index.json': b64('{"plugins":[]}'), 'v1/icons/io.x.y/1.0.0.svg': b64('<svg/>') })
+    expect(await response.json()).toEqual({ ok: true, files: 2, removed: 1 })
+    expect(await (await env.CATALOG_SITE!.get('v1/index.json'))!.text()).toBe('{"plugins":[]}')
+    expect(await env.CATALOG_SITE!.head('v1/icons/io.x.y/0.9.0.svg')).toBeNull()
+    // Only catalog files, from the deploy workflow.
+    expect((await send({ 'v1/index.json': b64('{}'), 'index.html': b64('x') })).status).toBe(422)
+    expect((await send({ 'v1/index.json': b64('{}') }, await oidc(claims()))).status).toBe(401)
+  })
+
   it('moves a merged partner change live with the next deploy', async () => {
     await withJwks(await signedIn())
     const t = Math.floor(Date.now() / 1000)

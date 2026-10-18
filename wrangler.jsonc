@@ -54,7 +54,12 @@
       ],
       // Screenshot uploads, served by the portal; published ones are public at
       // plugin-media-staging.nginxui.com for the staging catalog.
-      "r2_buckets": [{ "binding": "MEDIA", "bucket_name": "plugin-media-staging" }],
+      // The test catalog has no site; its deploy report sends the catalog files,
+      // public at plugins-staging.nginxui.com.
+      "r2_buckets": [
+        { "binding": "MEDIA", "bucket_name": "plugin-media-staging" },
+        { "binding": "CATALOG_SITE", "bucket_name": "plugins-site-staging" }
+      ],
       "ratelimits": [
         { "name": "LIMIT_CHECK", "namespace_id": "4201", "simple": { "limit": 20, "period": 60 } },
         { "name": "LIMIT_WRITE", "namespace_id": "4202", "simple": { "limit": 6, "period": 60 } },

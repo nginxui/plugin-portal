@@ -22,6 +22,9 @@ export interface Env {
   // are off and screenshots stay in repositories.
   MEDIA?: R2Bucket
   MEDIA_URL?: string
+  // The test catalog publishes no site of its own; its deploy report sends
+  // the catalog files here, served from this bucket. Staging only.
+  CATALOG_SITE?: R2Bucket
   // Key for AI provider keys at rest, apart from the session key.
   AI_KEY?: string
   // Mail for the tracker; off until all three are set.

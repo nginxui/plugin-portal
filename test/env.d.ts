@@ -6,6 +6,7 @@ declare namespace Cloudflare {
     PORTAL_ORIGIN: string
     CATALOG_URL: string
     CATALOG_REPO: string
+    CATALOG_SITE?: R2Bucket
     GITHUB_CLIENT_ID: string
     CATALOG_APP_SLUG: string
     DEPLOY_WORKFLOW?: string

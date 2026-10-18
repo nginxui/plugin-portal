@@ -214,21 +214,75 @@ async function proposeNames(env: Env, pending: PendingNames[]): Promise<string[]
 // Reports of the catalog deploy: merged changes whose entry the deploy
 // published become live, a delisting once its entry is gone, and names
 // waiting for review become changes.
-hooks.post('/deploy', async (c) => {
-  const token = c.req.header('Authorization')?.replace(/^Bearer /, '') ?? ''
-  let claims
+/**
+ * The claims of a request from the catalog deploy workflow, or the
+ * response refusing it.
+ */
+async function deployClaims(env: Env, authorization: string | undefined) {
+  const token = authorization?.replace(/^Bearer /, '') ?? ''
   try {
-    claims = await verifyActionsToken(token, {
-      audience: new URL(c.env.PORTAL_ORIGIN).host,
-      repository: c.env.CATALOG_REPO,
-      workflow: c.env.DEPLOY_WORKFLOW || 'deploy.yml',
-    })
+    return {
+      claims: await verifyActionsToken(token, {
+        audience: new URL(env.PORTAL_ORIGIN).host,
+        repository: env.CATALOG_REPO,
+        workflow: env.DEPLOY_WORKFLOW || 'deploy.yml',
+      }),
+    }
   }
   catch (error) {
     if (error instanceof OidcError)
-      return c.json({ error: 'unauthorized', reason: error.message }, 401)
+      return { refused: error.message }
     throw error
   }
+}
+
+// The catalog files of the test catalog, which has no site: the index, the
+// keyring, the languages and the icons, served from CATALOG_SITE.
+const SITE_FILE = /^v1\/(?:(?:index|partners|locales)\.json|icons\/[a-z0-9][a-z0-9.-]*\/[\w.+-]+\.(?:svg|png|webp))$/
+const SITE_LIMIT = 10 * 1024 * 1024
+const SITE_TYPES: Record<string, string> = { json: 'application/json', svg: 'image/svg+xml', png: 'image/png', webp: 'image/webp' }
+
+hooks.post('/site', async (c) => {
+  const site = c.env.CATALOG_SITE
+  if (!site)
+    return c.json({ error: 'not_found' }, 404)
+  const auth = await deployClaims(c.env, c.req.header('Authorization'))
+  if ('refused' in auth)
+    return c.json({ error: 'unauthorized', reason: auth.refused }, 401)
+  const body = await c.req.json<{ files?: Record<string, unknown> }>()
+  const files = Object.entries(body.files ?? {})
+  if (!files.length || !files.some(([path]) => path === 'v1/index.json'))
+    return c.json({ error: 'no_index' }, 422)
+  const decoded: [string, Uint8Array][] = []
+  let total = 0
+  for (const [path, content] of files) {
+    if (!SITE_FILE.test(path) || typeof content !== 'string')
+      return c.json({ error: 'bad_file', path }, 422)
+    const bytes = Uint8Array.from(atob(content), char => char.charCodeAt(0))
+    total += bytes.length
+    if (total > SITE_LIMIT)
+      return c.json({ error: 'too_large' }, 413)
+    decoded.push([path, bytes])
+  }
+  // The index last, so it never names an icon that is not there yet.
+  decoded.sort(([a], [b]) => Number(a === 'v1/index.json') - Number(b === 'v1/index.json'))
+  for (const [path, bytes] of decoded) {
+    await site.put(path, bytes, { httpMetadata: { contentType: SITE_TYPES[path.split('.').pop()!], cacheControl: 'public, max-age=60' } })
+  }
+  // Icons of versions the catalog no longer lists.
+  const kept = new Set(decoded.map(([path]) => path))
+  const listed = await site.list({ prefix: 'v1/icons/' })
+  const stale = listed.objects.map(object => object.key).filter(key => !kept.has(key))
+  if (stale.length)
+    await site.delete(stale)
+  return c.json({ ok: true, files: decoded.length, removed: stale.length })
+})
+
+hooks.post('/deploy', async (c) => {
+  const auth = await deployClaims(c.env, c.req.header('Authorization'))
+  if ('refused' in auth)
+    return c.json({ error: 'unauthorized', reason: auth.refused }, 401)
+  const { claims } = auth
 
   const report = await c.req.json<DeployReport>()
   const entries = report.entries && typeof report.entries === 'object' ? report.entries : {}
