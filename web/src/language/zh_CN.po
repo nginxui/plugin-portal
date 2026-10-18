@@ -1151,6 +1151,9 @@ msgstr "恢复版本"
 msgid "Revoke a signer"
 msgstr "撤销签名者"
 
+msgid "Restore a signer"
+msgstr "恢复签名者"
+
 msgid "Batch change"
 msgstr "批量更改"
 
@@ -3860,6 +3863,9 @@ msgstr "撤回版本"
 msgid "Yank version"
 msgstr "撤回版本"
 
+msgid "Send for review"
+msgstr "提交审核"
+
 msgid "Revoke signer"
 msgstr "撤销签名者"
 
@@ -3874,6 +3880,9 @@ msgstr "恢复 %{n} 个版本"
 
 msgid "Restore v%{version}"
 msgstr "恢复 v%{version}"
+
+msgid "Restore signer %{id}"
+msgstr "恢复签名者 %{id}"
 
 msgid "Revoke signer %{id}"
 msgstr "撤销签名者 %{id}"
@@ -3969,9 +3978,6 @@ msgid ""
 "for a new machine needs no change here."
 msgstr "仅在主密钥丢失或泄露时更换。为新机器换用新的签名密钥无需在此更改。"
 
-msgid "Send for review"
-msgstr "提交审核"
-
 msgid ""
 "A maintainer reviews the change. Once it is approved, signer certificates "
 "issued by the current primary key are no longer accepted."
@@ -4021,6 +4027,11 @@ msgid "Once restored, this version returns to the catalog at its next update."
 msgstr "恢复后，该版本会在下次目录更新时重新上架。"
 
 msgid ""
+"Another maintainer reviews the change. Once it is approved, the releases "
+"this key signed can be installed again."
+msgstr "此更改需由另一位维护者审核。批准后，此密钥签名的版本可以重新安装。"
+
+msgid ""
 "Every release this key signed is yanked, and only a maintainer can restore "
 "the signer."
 msgstr "由这把密钥签名的所有版本都会被撤回，且只有维护者可以恢复该签名者。"
@@ -4037,6 +4048,10 @@ msgid ""
 "Kept with the change, for example: the signing key was on a laptop that was "
 "lost."
 msgstr "会随更改一并记录，例如：签名密钥所在的笔记本电脑丢失。"
+
+msgid ""
+"Kept with the change, for example: the author revoked the key by mistake."
+msgstr "会随更改一并记录，例如：作者误撤销了此密钥。"
 
 msgid ""
 "Kept with the change, for example: the configuration cannot be read after "

@@ -109,6 +109,14 @@ describe('vendors', () => {
 })
 
 describe('maintainer actions', () => {
+  it('restores a revoked signer through a reviewed pull request', async () => {
+    const cookie = await user(true)
+    expect((await call('/api/maintain/plugins/io.github.acme.waf/restore-signer', { method: 'POST', mutate: true, cookie, json: { signer: '3be1d199b634ed87' } })).status).toBe(422)
+    expect((await call('/api/maintain/plugins/io.github.acme.waf/restore-signer', { method: 'POST', mutate: true, cookie, json: { signer: '3be1d199b634ed87', reason: 'Revoked by mistake.' } })).status).toBe(201)
+    expect(JSON.parse(dispatched[0].payload)).toMatchObject({ kind: 'maintainer_update', plugin_id: 'io.github.acme.waf', restore_signers: ['3BE1D199B634ED87'], reason: 'Revoked by mistake.' })
+    expect(await env.DB.prepare(`SELECT kind, class FROM changes WHERE plugin_id = 'io.github.acme.waf'`).first()).toEqual({ kind: 'restore_signer', class: 'maintainer' })
+  })
+
   it('changes trust and delists through reviewed pull requests', async () => {
     const cookie = await user(true)
     expect((await call('/api/maintain/plugins/io.github.acme.waf/trust', { method: 'POST', mutate: true, cookie, json: { trust: 'verified' } })).status).toBe(422)

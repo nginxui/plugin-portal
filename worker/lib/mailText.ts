@@ -39,8 +39,8 @@ const PARTS: Record<string, Record<Kind, (p: string, c: Change) => Parts>> = {
 
 // The kinds of change as the change page names them.
 const KINDS: Record<string, Record<string, string>> = {
-  en: { new_listing: 'New listing', names: 'Name change', key: 'Primary key rotation', repository: 'Repository move', delisting: 'Delisting', yank: 'Yanked version', unyank: 'Restored version', revoke_signer: 'Signer revocation', categories: 'Category change', batch: 'Batch change', store: 'Store change', store_source: 'Store source move', translations: 'Community translations', trust: 'Trust change', block: 'Block list entry', partner: 'Partner change', commercial: 'Commercial details', other: 'Change' },
-  zh_CN: { new_listing: '新上架', names: '名称变更', key: '主公钥轮换', repository: '仓库迁移', delisting: '下架', yank: '撤回版本', unyank: '恢复版本', revoke_signer: '撤销签名者', categories: '调整分类', batch: '批量更改', store: '商店资料更改', store_source: '迁移商店来源', translations: '社区翻译', trust: '信任级别变更', block: '屏蔽列表条目', partner: '合作伙伴变更', commercial: '商业信息', other: '更改' },
+  en: { new_listing: 'New listing', names: 'Name change', key: 'Primary key rotation', repository: 'Repository move', delisting: 'Delisting', yank: 'Yanked version', unyank: 'Restored version', revoke_signer: 'Signer revocation', restore_signer: 'Signer restored', categories: 'Category change', batch: 'Batch change', store: 'Store change', store_source: 'Store source move', translations: 'Community translations', trust: 'Trust change', block: 'Block list entry', partner: 'Partner change', commercial: 'Commercial details', other: 'Change' },
+  zh_CN: { new_listing: '新上架', names: '名称变更', key: '主公钥轮换', repository: '仓库迁移', delisting: '下架', yank: '撤回版本', unyank: '恢复版本', revoke_signer: '撤销签名者', restore_signer: '恢复签名者', categories: '调整分类', batch: '批量更改', store: '商店资料更改', store_source: '迁移商店来源', translations: '社区翻译', trust: '信任级别变更', block: '屏蔽列表条目', partner: '合作伙伴变更', commercial: '商业信息', other: '更改' },
 }
 
 function changeName(lang: string, change: MailInput['change']): Change {

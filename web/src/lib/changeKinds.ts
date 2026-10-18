@@ -15,6 +15,7 @@ export function kindLabel(kind: string): string {
     case 'yank': return $gettext('Yank a version')
     case 'unyank': return $gettext('Restore a version')
     case 'revoke_signer': return $gettext('Revoke a signer')
+    case 'restore_signer': return $gettext('Restore a signer')
     case 'categories': return $gettext('Change categories')
     case 'batch': return $gettext('Batch change')
     case 'store': return $gettext('Store change')

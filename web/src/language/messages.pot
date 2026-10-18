@@ -3,19 +3,19 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 
 #: web/src/components/CategoryEditModal.vue:40
-#: web/src/views/plugin/PluginVersions.vue:161
+#: web/src/views/plugin/PluginVersions.vue:170
 msgid "Another change of this plugin is in progress."
 msgstr ""
 
 #: web/src/components/CategoryEditModal.vue:41
 #: web/src/views/plugin/PluginStore.vue:279
-#: web/src/views/plugin/PluginVersions.vue:139
-#: web/src/views/plugin/PluginVersions.vue:164
+#: web/src/views/plugin/PluginVersions.vue:146
+#: web/src/views/plugin/PluginVersions.vue:173
 msgid "The change could not be sent. Please try again."
 msgstr ""
 
 #: web/src/components/CategoryEditModal.vue:50
-#: web/src/lib/changeKinds.ts:18
+#: web/src/lib/changeKinds.ts:19
 #: web/src/views/ChangeView.vue:208
 msgid "Change categories"
 msgstr ""
@@ -77,8 +77,8 @@ msgid "Authors"
 msgstr ""
 
 #: web/src/components/CommandPalette.vue:66
-#: web/src/views/plugin/PluginVersions.vue:205
-#: web/src/views/plugin/PluginVersions.vue:235
+#: web/src/views/plugin/PluginVersions.vue:214
+#: web/src/views/plugin/PluginVersions.vue:244
 #: web/src/views/review/ReviewQueue.vue:392
 msgid "Actions"
 msgstr ""
@@ -454,7 +454,7 @@ msgid "Community translations, pull request #%{n}"
 msgstr ""
 
 #: web/src/components/CommunityCard.vue:160
-#: web/src/lib/changeKinds.ts:22
+#: web/src/lib/changeKinds.ts:23
 msgid "Community translations"
 msgstr ""
 
@@ -1125,7 +1125,7 @@ msgstr ""
 
 #: web/src/components/PluginCard.vue:228
 #: web/src/lib/pluginSections.ts:18
-#: web/src/views/plugin/PluginVersions.vue:176
+#: web/src/views/plugin/PluginVersions.vue:185
 msgid "Versions"
 msgstr ""
 
@@ -1734,36 +1734,40 @@ msgstr ""
 msgid "Revoke a signer"
 msgstr ""
 
-#: web/src/lib/changeKinds.ts:19
-msgid "Batch change"
+#: web/src/lib/changeKinds.ts:18
+msgid "Restore a signer"
 msgstr ""
 
 #: web/src/lib/changeKinds.ts:20
-msgid "Store change"
+msgid "Batch change"
 msgstr ""
 
 #: web/src/lib/changeKinds.ts:21
+msgid "Store change"
+msgstr ""
+
+#: web/src/lib/changeKinds.ts:22
 msgid "Store source move"
 msgstr ""
 
-#: web/src/lib/changeKinds.ts:23
+#: web/src/lib/changeKinds.ts:24
 msgid "Trust change"
 msgstr ""
 
-#: web/src/lib/changeKinds.ts:24
+#: web/src/lib/changeKinds.ts:25
 msgid "Block list entry"
 msgstr ""
 
-#: web/src/lib/changeKinds.ts:25
+#: web/src/lib/changeKinds.ts:26
 msgid "Partner change"
 msgstr ""
 
-#: web/src/lib/changeKinds.ts:26
+#: web/src/lib/changeKinds.ts:27
 #: web/src/views/review/ReviewChange.vue:140
 msgid "Commercial details"
 msgstr ""
 
-#: web/src/lib/changeKinds.ts:27
+#: web/src/lib/changeKinds.ts:28
 #: web/src/views/plugin/PluginPreflight.vue:316
 msgid "Update"
 msgstr ""
@@ -2039,7 +2043,7 @@ msgid "Badges"
 msgstr ""
 
 #: web/src/lib/pluginSections.ts:20
-#: web/src/views/plugin/PluginVersions.vue:250
+#: web/src/views/plugin/PluginVersions.vue:259
 msgid "Signers"
 msgstr ""
 
@@ -2192,7 +2196,7 @@ msgid "Submitted by @%{login} %{time}"
 msgstr ""
 
 #: web/src/views/ChangeView.vue:200
-#: web/src/views/plugin/PluginVersions.vue:302
+#: web/src/views/plugin/PluginVersions.vue:316
 msgid "Replace the primary key"
 msgstr ""
 
@@ -2404,8 +2408,8 @@ msgstr ""
 #: web/src/views/maintain/AllPlugins.vue:346
 #: web/src/views/maintain/PartnersAdmin.vue:349
 #: web/src/views/owners/VendorPage.vue:388
-#: web/src/views/plugin/PluginVersions.vue:321
-#: web/src/views/plugin/PluginVersions.vue:356
+#: web/src/views/plugin/PluginVersions.vue:335
+#: web/src/views/plugin/PluginVersions.vue:373
 #: web/src/views/review/ReviewChange.vue:741
 msgid "Reason"
 msgstr ""
@@ -2797,8 +2801,8 @@ msgstr ""
 
 #: web/src/views/maintain/AllPlugins.vue:204
 #: web/src/views/maintain/AllPlugins.vue:237
-#: web/src/views/plugin/PluginVersions.vue:200
-#: web/src/views/plugin/PluginVersions.vue:220
+#: web/src/views/plugin/PluginVersions.vue:209
+#: web/src/views/plugin/PluginVersions.vue:229
 #: web/src/views/SubmitPlugin.vue:315
 msgid "Version"
 msgstr ""
@@ -3079,7 +3083,7 @@ msgstr ""
 
 #: web/src/views/maintain/PartnersAdmin.vue:127
 #: web/src/views/owners/VendorPage.vue:297
-#: web/src/views/plugin/PluginVersions.vue:266
+#: web/src/views/plugin/PluginVersions.vue:276
 msgid "Revoked"
 msgstr ""
 
@@ -5263,234 +5267,248 @@ msgstr ""
 msgid "Pick a cell to translate it."
 msgstr ""
 
-#: web/src/views/plugin/PluginVersions.vue:28
+#: web/src/views/plugin/PluginVersions.vue:31
 msgid "Signer revoked"
 msgstr ""
 
-#: web/src/views/plugin/PluginVersions.vue:30
+#: web/src/views/plugin/PluginVersions.vue:33
 msgid "Yanked"
 msgstr ""
 
-#: web/src/views/plugin/PluginVersions.vue:32
+#: web/src/views/plugin/PluginVersions.vue:35
 msgid "Prerelease"
 msgstr ""
 
-#: web/src/views/plugin/PluginVersions.vue:33
+#: web/src/views/plugin/PluginVersions.vue:36
 msgid "Available"
 msgstr ""
 
-#: web/src/views/plugin/PluginVersions.vue:78
+#: web/src/views/plugin/PluginVersions.vue:81
 msgid "Restore versions"
 msgstr ""
 
-#: web/src/views/plugin/PluginVersions.vue:78
+#: web/src/views/plugin/PluginVersions.vue:81
 msgid "Restore version"
 msgstr ""
 
-#: web/src/views/plugin/PluginVersions.vue:80
+#: web/src/views/plugin/PluginVersions.vue:83
 msgid "Yank versions"
 msgstr ""
 
-#: web/src/views/plugin/PluginVersions.vue:80
+#: web/src/views/plugin/PluginVersions.vue:83
 msgid "Yank version"
 msgstr ""
 
-#: web/src/views/plugin/PluginVersions.vue:81
-msgid "Revoke signer"
-msgstr ""
-
-#: web/src/views/plugin/PluginVersions.vue:96
-msgid "Yank %{n} versions"
-msgstr ""
-
-#: web/src/views/plugin/PluginVersions.vue:96
-msgid "Yank v%{version}"
-msgstr ""
-
-#: web/src/views/plugin/PluginVersions.vue:98
-msgid "Restore %{n} versions"
-msgstr ""
-
-#: web/src/views/plugin/PluginVersions.vue:98
-msgid "Restore v%{version}"
-msgstr ""
-
-#: web/src/views/plugin/PluginVersions.vue:99
-msgid "Revoke signer %{id}"
-msgstr ""
-
-#: web/src/views/plugin/PluginVersions.vue:113
-msgid "Paste the content of primary.pub."
-msgstr ""
-
-#: web/src/views/plugin/PluginVersions.vue:115
-msgid "This is the current primary key."
-msgstr ""
-
-#: web/src/views/plugin/PluginVersions.vue:136
-msgid "A primary key replacement of this plugin is already in progress."
-msgstr ""
-
-#: web/src/views/plugin/PluginVersions.vue:138
-msgid "Only admins of the repository can replace the primary key."
-msgstr ""
-
-#: web/src/views/plugin/PluginVersions.vue:163
-msgid "Only publishers and admins of the repository can do this."
-msgstr ""
-
-#: web/src/views/plugin/PluginVersions.vue:178
-msgid "Yanking and restoring take effect at the next catalog update, usually within minutes"
-msgstr ""
-
-#: web/src/views/plugin/PluginVersions.vue:181
-msgid "%{n} versions selected"
-msgstr ""
-
-#: web/src/views/plugin/PluginVersions.vue:184
-msgid "Clear"
-msgstr ""
-
-#: web/src/views/plugin/PluginVersions.vue:187
-msgid "Restore %{n}"
-msgstr ""
-
-#: web/src/views/plugin/PluginVersions.vue:190
-msgid "Yank %{n}"
-msgstr ""
-
-#: web/src/views/plugin/PluginVersions.vue:198
-msgid "Select all versions"
-msgstr ""
-
-#: web/src/views/plugin/PluginVersions.vue:201
-#: web/src/views/plugin/PluginVersions.vue:224
-msgid "Released"
-msgstr ""
-
-#: web/src/views/plugin/PluginVersions.vue:202
-#: web/src/views/plugin/PluginVersions.vue:227
-msgid "Signer"
-msgstr ""
-
-#: web/src/views/plugin/PluginVersions.vue:203
-#: web/src/views/plugin/PluginVersions.vue:230
-msgid "Status"
-msgstr ""
-
-#: web/src/views/plugin/PluginVersions.vue:216
-msgid "Select v%{version}"
-msgstr ""
-
-#: web/src/views/plugin/PluginVersions.vue:237
-msgid "Restore"
-msgstr ""
-
-#: web/src/views/plugin/PluginVersions.vue:240
-msgid "Yank"
-msgstr ""
-
-#: web/src/views/plugin/PluginVersions.vue:246
-msgid "No release yet."
-msgstr ""
-
-#: web/src/views/plugin/PluginVersions.vue:252
-msgid "Signing keys certified by your primary key"
-msgstr ""
-
-#: web/src/views/plugin/PluginVersions.vue:254
-msgid "No release names its signer."
-msgstr ""
-
-#: web/src/views/plugin/PluginVersions.vue:262
-msgid "Signed %{n} releases"
-msgstr ""
-
-#: web/src/views/plugin/PluginVersions.vue:269
-msgid "Revoke"
-msgstr ""
-
-#: web/src/views/plugin/PluginVersions.vue:273
-msgid "Revoke a signer when its signing key leaked or was lost. Restoring a revoked signer needs a maintainer."
-msgstr ""
-
-#: web/src/views/plugin/PluginVersions.vue:277
-msgid "Primary key"
-msgstr ""
-
-#: web/src/views/plugin/PluginVersions.vue:279
-msgid "Certifies your signing keys"
-msgstr ""
-
-#: web/src/views/plugin/PluginVersions.vue:288
-msgid "The primary public key of the catalog entry"
-msgstr ""
-
-#: web/src/views/plugin/PluginVersions.vue:292
-msgid "Replace"
-msgstr ""
-
-#: web/src/views/plugin/PluginVersions.vue:296
-msgid "Replace the primary key only when it was lost or leaked. A new signing key for a new machine needs no change here."
-msgstr ""
-
-#: web/src/views/plugin/PluginVersions.vue:303
+#: web/src/views/plugin/PluginVersions.vue:85
+#: web/src/views/plugin/PluginVersions.vue:317
 msgid "Send for review"
 msgstr ""
 
-#: web/src/views/plugin/PluginVersions.vue:309
+#: web/src/views/plugin/PluginVersions.vue:86
+msgid "Revoke signer"
+msgstr ""
+
+#: web/src/views/plugin/PluginVersions.vue:101
+msgid "Yank %{n} versions"
+msgstr ""
+
+#: web/src/views/plugin/PluginVersions.vue:101
+msgid "Yank v%{version}"
+msgstr ""
+
+#: web/src/views/plugin/PluginVersions.vue:103
+msgid "Restore %{n} versions"
+msgstr ""
+
+#: web/src/views/plugin/PluginVersions.vue:103
+msgid "Restore v%{version}"
+msgstr ""
+
+#: web/src/views/plugin/PluginVersions.vue:105
+msgid "Restore signer %{id}"
+msgstr ""
+
+#: web/src/views/plugin/PluginVersions.vue:106
+msgid "Revoke signer %{id}"
+msgstr ""
+
+#: web/src/views/plugin/PluginVersions.vue:120
+msgid "Paste the content of primary.pub."
+msgstr ""
+
+#: web/src/views/plugin/PluginVersions.vue:122
+msgid "This is the current primary key."
+msgstr ""
+
+#: web/src/views/plugin/PluginVersions.vue:143
+msgid "A primary key replacement of this plugin is already in progress."
+msgstr ""
+
+#: web/src/views/plugin/PluginVersions.vue:145
+msgid "Only admins of the repository can replace the primary key."
+msgstr ""
+
+#: web/src/views/plugin/PluginVersions.vue:172
+msgid "Only publishers and admins of the repository can do this."
+msgstr ""
+
+#: web/src/views/plugin/PluginVersions.vue:187
+msgid "Yanking and restoring take effect at the next catalog update, usually within minutes"
+msgstr ""
+
+#: web/src/views/plugin/PluginVersions.vue:190
+msgid "%{n} versions selected"
+msgstr ""
+
+#: web/src/views/plugin/PluginVersions.vue:193
+msgid "Clear"
+msgstr ""
+
+#: web/src/views/plugin/PluginVersions.vue:196
+msgid "Restore %{n}"
+msgstr ""
+
+#: web/src/views/plugin/PluginVersions.vue:199
+msgid "Yank %{n}"
+msgstr ""
+
+#: web/src/views/plugin/PluginVersions.vue:207
+msgid "Select all versions"
+msgstr ""
+
+#: web/src/views/plugin/PluginVersions.vue:210
+#: web/src/views/plugin/PluginVersions.vue:233
+msgid "Released"
+msgstr ""
+
+#: web/src/views/plugin/PluginVersions.vue:211
+#: web/src/views/plugin/PluginVersions.vue:236
+msgid "Signer"
+msgstr ""
+
+#: web/src/views/plugin/PluginVersions.vue:212
+#: web/src/views/plugin/PluginVersions.vue:239
+msgid "Status"
+msgstr ""
+
+#: web/src/views/plugin/PluginVersions.vue:225
+msgid "Select v%{version}"
+msgstr ""
+
+#: web/src/views/plugin/PluginVersions.vue:246
+#: web/src/views/plugin/PluginVersions.vue:279
+msgid "Restore"
+msgstr ""
+
+#: web/src/views/plugin/PluginVersions.vue:249
+msgid "Yank"
+msgstr ""
+
+#: web/src/views/plugin/PluginVersions.vue:255
+msgid "No release yet."
+msgstr ""
+
+#: web/src/views/plugin/PluginVersions.vue:261
+msgid "Signing keys certified by your primary key"
+msgstr ""
+
+#: web/src/views/plugin/PluginVersions.vue:263
+msgid "No release names its signer."
+msgstr ""
+
+#: web/src/views/plugin/PluginVersions.vue:271
+msgid "Signed %{n} releases"
+msgstr ""
+
+#: web/src/views/plugin/PluginVersions.vue:283
+msgid "Revoke"
+msgstr ""
+
+#: web/src/views/plugin/PluginVersions.vue:287
+msgid "Revoke a signer when its signing key leaked or was lost. Restoring a revoked signer needs a maintainer."
+msgstr ""
+
+#: web/src/views/plugin/PluginVersions.vue:291
+msgid "Primary key"
+msgstr ""
+
+#: web/src/views/plugin/PluginVersions.vue:293
+msgid "Certifies your signing keys"
+msgstr ""
+
+#: web/src/views/plugin/PluginVersions.vue:302
+msgid "The primary public key of the catalog entry"
+msgstr ""
+
+#: web/src/views/plugin/PluginVersions.vue:306
+msgid "Replace"
+msgstr ""
+
+#: web/src/views/plugin/PluginVersions.vue:310
+msgid "Replace the primary key only when it was lost or leaked. A new signing key for a new machine needs no change here."
+msgstr ""
+
+#: web/src/views/plugin/PluginVersions.vue:323
 msgid "A maintainer reviews the change. Once it is approved, signer certificates issued by the current primary key are no longer accepted."
 msgstr ""
 
-#: web/src/views/plugin/PluginVersions.vue:315
+#: web/src/views/plugin/PluginVersions.vue:329
 msgid "Every listed version is yanked with it: %{list}. Publish a release whose signer certificate the new primary key issued."
 msgstr ""
 
-#: web/src/views/plugin/PluginVersions.vue:318
+#: web/src/views/plugin/PluginVersions.vue:332
 msgid "New primary public key"
 msgstr ""
 
-#: web/src/views/plugin/PluginVersions.vue:318
+#: web/src/views/plugin/PluginVersions.vue:332
 msgid "Key ID %{id}"
 msgstr ""
 
-#: web/src/views/plugin/PluginVersions.vue:318
+#: web/src/views/plugin/PluginVersions.vue:332
 msgid "The content of primary.pub, created with nginx-ui plugin key init."
 msgstr ""
 
-#: web/src/views/plugin/PluginVersions.vue:321
+#: web/src/views/plugin/PluginVersions.vue:335
 msgid "Kept with the change for the reviewer, for example: the primary key was on a disk that failed."
 msgstr ""
 
-#: web/src/views/plugin/PluginVersions.vue:343
+#: web/src/views/plugin/PluginVersions.vue:357
 msgid "Once yanked, these versions leave the catalog at its next update and can no longer be installed. All of them are changed in one update, and you can restore them at any time."
 msgstr ""
 
-#: web/src/views/plugin/PluginVersions.vue:344
+#: web/src/views/plugin/PluginVersions.vue:358
 msgid "Once yanked, this version leaves the catalog at its next update and can no longer be installed. You can restore it at any time."
 msgstr ""
 
-#: web/src/views/plugin/PluginVersions.vue:348
+#: web/src/views/plugin/PluginVersions.vue:362
 msgid "Once restored, these versions return to the catalog together at its next update."
 msgstr ""
 
-#: web/src/views/plugin/PluginVersions.vue:349
+#: web/src/views/plugin/PluginVersions.vue:363
 msgid "Once restored, this version returns to the catalog at its next update."
 msgstr ""
 
-#: web/src/views/plugin/PluginVersions.vue:352
+#: web/src/views/plugin/PluginVersions.vue:366
+msgid "Another maintainer reviews the change. Once it is approved, the releases this key signed can be installed again."
+msgstr ""
+
+#: web/src/views/plugin/PluginVersions.vue:369
 msgid "Every release this key signed is yanked, and only a maintainer can restore the signer."
 msgstr ""
 
-#: web/src/views/plugin/PluginVersions.vue:353
+#: web/src/views/plugin/PluginVersions.vue:370
 msgid "No release stays installable until one signed by a new signing key is published. When the key may have leaked, revoke it now; otherwise publish the new release first."
 msgstr ""
 
-#: web/src/views/plugin/PluginVersions.vue:356
+#: web/src/views/plugin/PluginVersions.vue:373
 msgid "Kept with the change, for example: the signing key was on a laptop that was lost."
 msgstr ""
 
-#: web/src/views/plugin/PluginVersions.vue:356
+#: web/src/views/plugin/PluginVersions.vue:373
+msgid "Kept with the change, for example: the author revoked the key by mistake."
+msgstr ""
+
+#: web/src/views/plugin/PluginVersions.vue:373
 msgid "Kept with the change, for example: the configuration cannot be read after upgrading, use v1.2.0 instead."
 msgstr ""
 

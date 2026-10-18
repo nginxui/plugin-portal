@@ -30,6 +30,11 @@ export function setTrust(id: string, trust: string, reason: string) {
   return api<{ change: string }>(`/maintain/plugins/${encodeURIComponent(id)}/trust`, { method: 'POST', json: { trust, reason } })
 }
 
+/** Restores a revoked signer of a plugin, reviewed by another maintainer. */
+export function restoreSigner(id: string, signer: string, reason: string) {
+  return api<{ change: string }>(`/maintain/plugins/${encodeURIComponent(id)}/restore-signer`, { method: 'POST', json: { signer, reason } })
+}
+
 export function delist(id: string, reason: string, block: boolean, repository: string | null) {
   return api<{ change: string }>(`/maintain/plugins/${encodeURIComponent(id)}/delist`, { method: 'POST', json: { reason, block, repository } })
 }

@@ -153,6 +153,20 @@ maintain.post('/plugins/:id/trust', async (c) => {
   return c.json({ change }, 201)
 })
 
+// Restores a signer the author revoked; another maintainer reviews it.
+maintain.post('/plugins/:id/restore-signer', async (c) => {
+  const session = c.get('session')
+  const body = await c.req.json<{ signer?: string, reason?: string }>().catch(() => ({} as Record<string, string>))
+  const signer = String(body.signer ?? '').toUpperCase()
+  const reason = String(body.reason ?? '').trim().slice(0, 500)
+  if (!/^[0-9A-F]{16}$/.test(signer) || !reason)
+    return c.json({ error: 'invalid' }, 422)
+  const id = c.req.param('id')
+  const change = await maintainerChange(c.env, session, id, 'restore_signer', { restore_signers: [signer], reason })
+  await audit(c.env.DB, { actorId: session.user.id, action: 'maintain.restore_signer', subject: id, detail: { change, signer, reason } })
+  return c.json({ change }, 201)
+})
+
 maintain.post('/plugins/:id/delist', async (c) => {
   const session = c.get('session')
   const body = await c.req.json<{ reason?: string, block?: boolean, repository?: string | null }>().catch(() => ({} as Record<string, never>))

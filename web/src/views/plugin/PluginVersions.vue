@@ -3,18 +3,21 @@ import type { Release } from '@/api/plugins'
 import { computed, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { ApiError } from '@/api/client'
+import { restoreSigner } from '@/api/maintain'
 import { submitPrimaryKey, submitSelfService } from '@/api/plugins'
 import { $gettext } from '@/lib/gettext'
 import { publicKeyId } from '@/lib/keys'
 import { joinList } from '@/lib/labels'
 import { formatDate } from '@/lib/time'
 import { usePluginStore } from '@/stores/plugin'
+import { useSessionStore } from '@/stores/session'
 
 // One page for versions and one for signers, sharing the confirmation of a
 // self service change.
 const props = withDefaults(defineProps<{ section?: 'versions' | 'signers' }>(), { section: 'versions' })
 
 const store = usePluginStore()
+const session = useSessionStore()
 const router = useRouter()
 const detail = computed(() => store.detail!)
 const plugin = computed(() => detail.value.plugin)
@@ -66,7 +69,7 @@ function toggleAll(on: boolean) {
   selected.value = on ? detail.value.releases.filter(selectable).map(r => r.version) : []
 }
 
-const target = ref<{ kind: 'yank' | 'unyank' | 'revoke', values: string[] } | null>(null)
+const target = ref<{ kind: 'yank' | 'unyank' | 'revoke' | 'restore', values: string[] } | null>(null)
 const reason = ref('')
 const sending = ref(false)
 const error = ref('')
@@ -78,10 +81,12 @@ const okText = computed(() => {
     return many ? $gettext('Restore versions') : $gettext('Restore version')
   if (t?.kind === 'yank')
     return many ? $gettext('Yank versions') : $gettext('Yank version')
+  if (t?.kind === 'restore')
+    return $gettext('Send for review')
   return $gettext('Revoke signer')
 })
 
-function ask(kind: 'yank' | 'unyank' | 'revoke', values: string[]) {
+function ask(kind: 'yank' | 'unyank' | 'revoke' | 'restore', values: string[]) {
   target.value = { kind, values }
   reason.value = ''
   error.value = ''
@@ -96,6 +101,8 @@ const modalTitle = computed(() => {
     return many ? $gettext('Yank %{n} versions', { n: String(t.values.length) }) : $gettext('Yank v%{version}', { version: t.values[0] })
   if (t.kind === 'unyank')
     return many ? $gettext('Restore %{n} versions', { n: String(t.values.length) }) : $gettext('Restore v%{version}', { version: t.values[0] })
+  if (t.kind === 'restore')
+    return $gettext('Restore signer %{id}', { id: short(t.values[0]) })
   return $gettext('Revoke signer %{id}', { id: short(t.values[0]) })
 })
 
@@ -151,7 +158,9 @@ async function confirm() {
   error.value = ''
   try {
     const operations = t.kind === 'yank' ? { yank: t.values } : t.kind === 'unyank' ? { unyank: t.values } : { revoke_signers: t.values }
-    const { change } = await submitSelfService(plugin.value.id, operations, reason.value)
+    const { change } = t.kind === 'restore'
+      ? await restoreSigner(plugin.value.id, t.values[0], reason.value)
+      : await submitSelfService(plugin.value.id, operations, reason.value)
     target.value = null
     selected.value = []
     router.push(`/changes/${change}`)
@@ -262,9 +271,14 @@ async function confirm() {
             {{ $gettext('Signed %{n} releases', { n: String(signer.count) }) }}
           </div>
         </div>
-        <ATag v-if="signer.revoked" color="error" class="m-0">
-          {{ $gettext('Revoked') }}
-        </ATag>
+        <AFlex v-if="signer.revoked" align="center" gap="small">
+          <ATag color="error" class="m-0">
+            {{ $gettext('Revoked') }}
+          </ATag>
+          <AButton v-if="session.isMaintainer" size="small" @click="ask('restore', [signer.id])">
+            {{ $gettext('Restore') }}
+          </AButton>
+        </AFlex>
         <AButton v-else size="small" danger :disabled="locked" @click="ask('revoke', [signer.id])">
           {{ $gettext('Revoke') }}
         </AButton>
@@ -330,7 +344,7 @@ async function confirm() {
       :title="modalTitle"
       :confirm-loading="sending"
       :ok-text="okText"
-      :ok-button-props="{ danger: target?.kind !== 'unyank' }"
+      :ok-button-props="{ danger: target?.kind !== 'unyank' && target?.kind !== 'restore', disabled: target?.kind === 'restore' && !reason.trim() }"
       @ok="confirm"
       @cancel="target = null"
     >
@@ -348,12 +362,15 @@ async function confirm() {
             ? $gettext('Once restored, these versions return to the catalog together at its next update.')
             : $gettext('Once restored, this version returns to the catalog at its next update.') }}
         </p>
+        <p v-else-if="target.kind === 'restore'">
+          {{ $gettext('Another maintainer reviews the change. Once it is approved, the releases this key signed can be installed again.') }}
+        </p>
         <template v-else>
           <p>{{ $gettext('Every release this key signed is yanked, and only a maintainer can restore the signer.') }}</p>
           <AAlert v-if="leftAfterRevoking(target.values[0]) === 0" type="warning" show-icon class="mb-3" :title="$gettext('No release stays installable until one signed by a new signing key is published. When the key may have leaked, revoke it now; otherwise publish the new release first.')" />
         </template>
         <AForm layout="vertical">
-          <AFormItem :label="$gettext('Reason')" :extra="target.kind === 'revoke' ? $gettext('Kept with the change, for example: the signing key was on a laptop that was lost.') : $gettext('Kept with the change, for example: the configuration cannot be read after upgrading, use v1.2.0 instead.')" class="mb-0">
+          <AFormItem :label="$gettext('Reason')" :extra="target.kind === 'revoke' ? $gettext('Kept with the change, for example: the signing key was on a laptop that was lost.') : target.kind === 'restore' ? $gettext('Kept with the change, for example: the author revoked the key by mistake.') : $gettext('Kept with the change, for example: the configuration cannot be read after upgrading, use v1.2.0 instead.')" class="mb-0">
             <ATextarea v-model:value="reason" :rows="3" :maxlength="500" />
           </AFormItem>
         </AForm>
