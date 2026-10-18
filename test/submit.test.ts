@@ -284,6 +284,20 @@ describe('apply report', () => {
     expect(await env.DB.prepare(`SELECT state FROM changes WHERE id = 'c_partner00001'`).first()).toEqual({ state: 'live' })
   })
 
+  it('moves a merged change to a delisted record live and keeps the plugin delisted', async () => {
+    await withJwks(await signedIn())
+    const t = Math.floor(Date.now() / 1000)
+    const id = 'io.github.octo-author.gone'
+    await env.DB.batch([
+      env.DB.prepare(`INSERT INTO plugins (plugin_id, state, created_at, updated_at) VALUES (?, 'delisted', ?, ?)`).bind(id, t, t),
+      env.DB.prepare(`INSERT INTO changes (id, plugin_id, author_id, kind, class, state, stage, created_at, updated_at) VALUES ('c_restore0001', ?, 1, 'restore_signer', 'maintainer', 'merged', 'merged', ?, ?)`).bind(id, t, t),
+    ])
+    const send = async (delisted: string[]) => (await call('/api/hooks/deploy', { method: 'POST', headers: { Authorization: `Bearer ${await oidc(deployClaims())}` }, body: JSON.stringify({ commit: 'abc', entries: {}, listed: [], delisted }) })).json()
+    expect(await send([])).toEqual({ live: [], names: [] })
+    expect(await send([id])).toEqual({ live: ['c_restore0001'], names: [] })
+    expect(await env.DB.prepare('SELECT state FROM plugins WHERE plugin_id = ?').bind(id).first()).toEqual({ state: 'delisted' })
+  })
+
   it('keeps a change merged while the deploy publishes another entry or no verified release', async () => {
     const cookie = await withJwks(await signedIn())
     const { change, entry } = await mergedChange(cookie)

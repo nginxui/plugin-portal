@@ -109,6 +109,8 @@ interface DeployReport {
   // Release times of the listed versions, by plugin and version.
   versions?: Record<string, Record<string, string | null>>
   pending?: PendingNames[]
+  // Plugins with a delisted record.
+  delisted?: string[]
 }
 
 // The same entry whatever the key order, so a reformatted file still matches.
@@ -287,6 +289,7 @@ hooks.post('/deploy', async (c) => {
   const report = await c.req.json<DeployReport>()
   const entries = report.entries && typeof report.entries === 'object' ? report.entries : {}
   const listed = new Set(Array.isArray(report.listed) ? report.listed.map(String) : [])
+  const delisted = new Set(Array.isArray(report.delisted) ? report.delisted.map(String) : [])
   const commit = typeof report.commit === 'string' ? report.commit.slice(0, 64) : null
   await noteCatalogHead(c.env, commit)
   const { results } = await c.env.DB.prepare(`SELECT id, plugin_id, kind, entry_json FROM changes WHERE state = 'merged'`)
@@ -309,6 +312,16 @@ hooks.post('/deploy', async (c) => {
     if (!change.plugin_id)
       continue
     const published = entries[change.plugin_id]
+    // A change to a delisted plugin edits its record; the deploy after the
+    // merge carries it, and the plugin stays delisted.
+    if (published === undefined && delisted.has(change.plugin_id) && change.kind !== 'delisting' && change.kind !== 'new_listing') {
+      live.push(change.id)
+      statements.push(
+        c.env.DB.prepare(`UPDATE changes SET state = 'live', stage = 'live', waiting_on = NULL, deployed_at = ?, updated_at = ? WHERE id = ?`).bind(t, t, change.id),
+        event(c.env, change.id, 'live', null, { commit }),
+      )
+      continue
+    }
     // A store change has no entry to compare; the first deploy after its
     // merge reads the store source again.
     const done = change.kind === 'delisting'
