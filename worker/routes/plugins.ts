@@ -4,7 +4,7 @@ import type { CatalogPlugin, Localized } from '../lib/catalog'
 import type { RepoPermission } from '../lib/github'
 import type { ReleaseInfo } from '../lib/submission'
 import { Hono } from 'hono'
-import { mapLimit, repoAccess, roleOf } from '../lib/access'
+import { mapLimit, repoAccess, roleOf, vendorPlugins } from '../lib/access'
 import { catalogEntry, latestRelease, loadCatalog, newestFirst, repoOf } from '../lib/catalog'
 import { github, GitHubError } from '../lib/github'
 import { insightsOf } from '../lib/insights'
@@ -192,11 +192,15 @@ export async function collectMine(env: Env, session: Session) {
   const access = new Map(accessList.map(a => [a.repo, a]))
   const accessOf = (repo: string | null) => repo ? access.get(repo.toLowerCase()) ?? null : null
 
+  // Plugins a vendor lists without a repository, for the vendor's members.
+  const vendored = await vendorPlugins(env, session.user.id)
   const plugins: PluginSummary[] = []
   for (const plugin of catalog.plugins) {
     const a = accessOf(repoOf(plugin.repository_url))
     if (a?.role)
       plugins.push(summarize(env, plugin, a))
+    else if (vendored.has(plugin.id))
+      plugins.push({ ...summarize(env, plugin, null), role: vendored.get(plugin.id)!.role })
   }
   const pending = await mapLimit(drafts.filter(row => accessOf(row.repo_full_name)?.role), 4, row => summarizePending(env, token, row, accessOf(row.repo_full_name)))
   plugins.push(...pending.map(p => p.summary))
@@ -274,6 +278,8 @@ plugins.get('/:id', async (c) => {
     summary = pending.summary
     releases = pending.entry.releases ?? []
   }
+  if (!summary.role)
+    summary = { ...summary, role: (await vendorPlugins(c.env, session.user.id, id)).get(id)?.role ?? null }
   if (!summary.role && !await checkMaintainer(c.env, session.id))
     return c.json({ error: 'no_access' }, 403)
   const [entry, pending, open, people, community] = await Promise.all([

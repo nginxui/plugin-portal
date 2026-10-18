@@ -29,6 +29,20 @@ export function atLeast(role: Role | null, needed: Role): boolean {
   return role !== null && RANK[role] >= RANK[needed]
 }
 
+/**
+ * The plugins of the vendors a user is a member of, without a repository
+ * their access comes from, with the user's role and the vendor's name.
+ */
+export async function vendorPlugins(env: Env, userId: number, pluginId?: string): Promise<Map<string, { role: Role, vendor: string }>> {
+  const { results } = await env.DB.prepare(
+    `SELECT p.plugin_id, m.role, coalesce(o.name, o.github_login, '') AS vendor FROM plugins p
+     JOIN owners o ON o.id = p.owner_id AND o.kind = 'vendor'
+     JOIN vendor_members m ON m.owner_id = o.id AND m.user_id = ?1
+     WHERE ?2 IS NULL OR p.plugin_id = ?2`,
+  ).bind(userId, pluginId ?? null).all<{ plugin_id: string, role: Role, vendor: string }>()
+  return new Map(results.map(row => [row.plugin_id, { role: row.role, vendor: row.vendor }]))
+}
+
 export interface RepoAccess {
   repo: string
   repoId: number | null

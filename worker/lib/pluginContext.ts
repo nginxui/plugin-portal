@@ -2,7 +2,7 @@ import type { Env, Session } from '../env'
 import type { RepoAccess, Role } from './access'
 import type { CatalogEntry, CatalogPlugin } from './catalog'
 import { checkMaintainer } from '../middleware/auth'
-import { repoAccess } from './access'
+import { repoAccess, vendorPlugins } from './access'
 import { catalogEntry, loadCatalog, newestFirst, repoOf } from './catalog'
 import { userToken } from './session'
 import { repoReleases } from './submission'
@@ -19,6 +19,8 @@ export interface PluginContext {
   entry: CatalogEntry | null
   access: RepoAccess | null
   role: Role | null
+  /** The vendor whose member the user is, for a plugin a vendor lists. */
+  vendor: string | null
   isMaintainer: boolean
   token: string
 }
@@ -53,7 +55,9 @@ export async function pluginContext(env: Env, session: Session, id: string): Pro
       release = { version: newest.version, release_notes_url: newest.url }
   }
   const access = repo ? await repoAccess(env, session.user.id, token, repo) : null
-  const role = access?.role ?? null
+  // A plugin a vendor lists without a repository is edited by its members.
+  const member = access?.role ? null : (await vendorPlugins(env, session.user.id, id)).get(id) ?? null
+  const role = access?.role ?? member?.role ?? null
   const isMaintainer = role ? false : await checkMaintainer(env, session.id)
-  return { id, listing, repo, version: release?.version ?? null, tag: tagOf(release), entry, access, role, isMaintainer, token }
+  return { id, listing, repo, version: release?.version ?? null, tag: tagOf(release), entry, access, role, vendor: member?.vendor ?? null, isMaintainer, token }
 }

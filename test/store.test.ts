@@ -156,6 +156,32 @@ describe('store editor', () => {
     expect(dispatched.map(d => JSON.parse(d.payload).kind)).toEqual(['store_update', 'close', 'store_update'])
   })
 
+  it('lets the members of a vendor edit the store texts of its plugin', async () => {
+    const cookie = await signIn()
+    vi.restoreAllMocks()
+    const vendorId = 'dev.acme.notes'
+    const t = Math.floor(Date.now() / 1000)
+    await env.DB.batch([
+      env.DB.prepare(`INSERT INTO owners (id, kind, name, created_at, updated_at) VALUES (901, 'vendor', 'Acme', ?, ?)`).bind(t, t),
+      env.DB.prepare(`INSERT INTO vendor_members (owner_id, user_id, role, added_by, added_at) VALUES (901, 4242, 'admin', 4242, ?)`).bind(t),
+      env.DB.prepare(`INSERT INTO plugins (plugin_id, owner_id, state, created_at, updated_at) VALUES (?, 901, 'listed', ?, ?)`).bind(vendorId, t, t),
+    ])
+    mockFetch(
+      url => url.href === `${env.CATALOG_URL}/v1/index.json` ? json({ plugins: [{ id: vendorId, name: { en: 'Notes' }, trust: 'verified', releases: [{ version: '1.0.0' }] }] }) : undefined,
+      url => url.href === `${RAW}/${env.CATALOG_REPO}/main/plugins/${vendorId}.json` ? json({ id: vendorId, name: { en: 'Notes' }, store: { source: 'catalog' } }) : undefined,
+      ...routes(),
+    )
+    const state = await (await call(`/api/plugins/${vendorId}/store`, { cookie })).json() as { canEdit: { all: boolean } }
+    expect(state.canEdit.all).toBe(true)
+    // The plugin is theirs in My plugins and on its own page.
+    const mine = await (await call('/api/plugins/mine', { cookie })).json() as { plugins: { id: string, role: string }[] }
+    expect(mine.plugins).toContainEqual(expect.objectContaining({ id: vendorId, role: 'admin' }))
+    expect((await call(`/api/plugins/${vendorId}`, { cookie })).status).toBe(200)
+    await call(`/api/plugins/${vendorId}/store/draft`, { method: 'PUT', mutate: true, cookie, json: { doc: { description: { en: 'Notes for teams.' } } } })
+    expect((await call(`/api/plugins/${vendorId}/store/submit`, { method: 'POST', mutate: true, cookie, json: {} })).status).toBe(201)
+    expect(JSON.parse(dispatched[0].payload).eligibility).toBe('@octo-author is an admin of the vendor Acme')
+  })
+
   it('moves a draft onto texts that went live meanwhile', async () => {
     const cookie = await signedIn()
     entry = { ...entry, store: { source: 'catalog' } }

@@ -269,7 +269,9 @@ store.post('/plugins/:id/store/submit', requireSession, limit('write'), async (c
   for (const row of replaced)
     await withdrawChange(c.env, row, session.user, change)
   const submitter = { login: session.user.login, id: session.user.id }
-  const eligibility = `@${session.user.login} has ${ctx.access?.permission ?? 'no'} permission on ${ctx.repo}`
+  const eligibility = ctx.vendor !== null && !ctx.access?.role
+    ? `@${session.user.login} is ${ctx.role === 'admin' ? 'an' : 'a'} ${ctx.role} of the vendor ${ctx.vendor}`
+    : `@${session.user.login} has ${ctx.access?.permission ?? 'no'} permission on ${ctx.repo}`
   const statements = []
   let delivery: 'catalog' | 'bot' | 'patch' = 'catalog'
   let prNumber: number | null = null
