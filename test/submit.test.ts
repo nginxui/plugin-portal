@@ -82,6 +82,19 @@ describe('submission checks', () => {
     expect(body.checks.find(c => c.key === 'signer')).toMatchObject({ status: 'fail', reason: 'other_plugin' })
   })
 
+  it('refuses to list a delisted plugin with what its entry had withdrawn', async () => {
+    const cookie = await signIn()
+    vi.restoreAllMocks()
+    mockFetch(
+      url => url.href === `${env.CATALOG_URL}/v1/index.json` ? json({ plugins: [], delisted: [{ id: 'io.github.octo-author.geoip', delisted_at: '2026-10-18', yanked: ['1.0.0'], revoked_signers: ['0102030405060708'] }] }) : undefined,
+      ...github(),
+    )
+    const body = await (await call('/api/submit/check', { method: 'POST', mutate: true, cookie, json: { repo: 'octo-author/geoip' } })).json() as { ok: boolean, checks: { key: string, status: string, reason?: string }[] }
+    expect(body.ok).toBe(false)
+    expect(body.checks.find(c => c.key === 'signer')).toMatchObject({ status: 'fail', reason: 'revoked' })
+    expect(body.checks.find(c => c.key === 'withdrawn')).toMatchObject({ status: 'fail', reason: 'yanked' })
+  })
+
   it('reports every problem of a manifest at once', async () => {
     const cookie = await signedIn()
     manifestBody = { id: 'com.nginxui.geoip', name: 'Official GeoIP' }

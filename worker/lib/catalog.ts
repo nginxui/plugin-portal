@@ -54,6 +54,8 @@ export interface CatalogPlugin {
 export interface CatalogIndex {
   updated_at?: string
   plugins: CatalogPlugin[]
+  // Plugins the catalog took down, with what their entries had withdrawn.
+  delisted?: { id: string, reason?: string, delisted_at: string, yanked?: string[], revoked_signers?: string[] }[]
 }
 
 // The published index changes with every deploy; a few minutes of staleness

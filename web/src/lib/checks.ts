@@ -12,6 +12,7 @@ export function checkTitle(check: Check): string {
     case 'package': return $gettext('Packages')
     case 'license': return $gettext('License')
     case 'signer': return $gettext('Signer certificate')
+    case 'withdrawn': return $gettext('Withdrawn versions')
     default: return check.key
   }
 }
@@ -50,6 +51,8 @@ export function checkDetail(check: Check): string {
     case 'signer:': return $gettext('Issued by the primary key %{key}.', p)
     case 'signer:missing': return $gettext('There is no plugin.signer at %{tag}. Create the keys as described in the next step and publish a new release.', p)
     case 'signer:other_plugin': return $gettext('The certificate was issued for %{id}, not for this plugin.', p)
+    case 'signer:revoked': return $gettext('The signing key %{key} was revoked before the plugin was taken down. Publish a release signed by a new signing key, or ask a maintainer to restore the signer.', p)
+    case 'withdrawn:yanked': return $gettext('Version %{version} was yanked before the plugin was taken down. Publish a new release.', p)
     case 'license:missing': return $gettext('GitHub detects no license in the repository. The listing shows none.')
     default: return check.reason ?? ''
   }

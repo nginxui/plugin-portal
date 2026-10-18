@@ -166,6 +166,7 @@ export async function previewSubmission(env: Env, session: Session, token: strin
   const id = typeof manifest.id === 'string' ? manifest.id : ''
   const githubOwner = /^io\.github\.([a-z0-9-]+)\./.exec(id)?.[1]
   const catalog = await loadCatalog(env)
+  const delisted = id ? catalog.delisted?.find(record => record.id === id) : undefined
   const pending = id
     ? await env.DB.prepare(`SELECT id FROM changes WHERE plugin_id = ? AND kind = 'new_listing' AND state = 'open' LIMIT 1`).bind(id).first<{ id: string }>()
     : null
@@ -218,8 +219,13 @@ export async function previewSubmission(env: Env, session: Session, token: strin
     checks.push({ key: 'signer', status: 'warn', reason: 'missing', params: { tag: release.tag_name } })
   else if (id && signer.pluginId !== id)
     checks.push({ key: 'signer', status: 'fail', reason: 'other_plugin', params: { id: signer.pluginId ?? '' } })
+  else if (delisted?.revoked_signers?.includes(signer.signingKeyId))
+    checks.push({ key: 'signer', status: 'fail', reason: 'revoked', params: { key: signer.signingKeyId } })
   else
     checks.push({ key: 'signer', status: 'pass', params: { key: signer.primaryKeyId } })
+  // A delisted plugin listed again keeps the versions its entry had yanked.
+  if (delisted?.yanked?.includes(version))
+    checks.push({ key: 'withdrawn', status: 'fail', reason: 'yanked', params: { version } })
 
   const license = repo.license?.spdx_id && repo.license.spdx_id !== 'NOASSERTION' ? repo.license.spdx_id : null
   checks.push(license ? { key: 'license', status: 'pass', params: { license } } : { key: 'license', status: 'warn', reason: 'missing' })

@@ -1826,115 +1826,127 @@ msgstr ""
 msgid "Signer certificate"
 msgstr ""
 
-#: web/src/lib/checks.ts:23
-msgid "%{repo} is a public repository."
+#: web/src/lib/checks.ts:15
+msgid "Withdrawn versions"
 msgstr ""
 
 #: web/src/lib/checks.ts:24
-msgid "The repository does not exist or is not public."
+msgid "%{repo} is a public repository."
 msgstr ""
 
 #: web/src/lib/checks.ts:25
-msgid "The repository is private. The catalog lists public repositories only."
+msgid "The repository does not exist or is not public."
 msgstr ""
 
 #: web/src/lib/checks.ts:26
-msgid "This repository may not be listed. Contact the maintainers if you think this is a mistake."
+msgid "The repository is private. The catalog lists public repositories only."
 msgstr ""
 
 #: web/src/lib/checks.ts:27
-msgid "The repository is archived."
+msgid "This repository may not be listed. Contact the maintainers if you think this is a mistake."
 msgstr ""
 
 #: web/src/lib/checks.ts:28
-msgid "You installed the Nginx UI Plugin Catalog app on this repository."
+msgid "The repository is archived."
 msgstr ""
 
 #: web/src/lib/checks.ts:29
-msgid "You have admin permission on this repository."
+msgid "You installed the Nginx UI Plugin Catalog app on this repository."
 msgstr ""
 
 #: web/src/lib/checks.ts:30
-msgid "Only an admin of the repository can submit it. Ask an admin to submit it, or to install the Nginx UI Plugin Catalog app."
+msgid "You have admin permission on this repository."
 msgstr ""
 
 #: web/src/lib/checks.ts:31
-msgid "Version %{version}, the newest stable release."
+msgid "Only an admin of the repository can submit it. Ask an admin to submit it, or to install the Nginx UI Plugin Catalog app."
 msgstr ""
 
 #: web/src/lib/checks.ts:32
-msgid "Version %{version} is a prerelease. The listing starts with it until a stable release is published."
+msgid "Version %{version}, the newest stable release."
 msgstr ""
 
 #: web/src/lib/checks.ts:33
-msgid "The repository has no GitHub Release with a version tag such as v1.0.0 yet."
+msgid "Version %{version} is a prerelease. The listing starts with it until a stable release is published."
 msgstr ""
 
 #: web/src/lib/checks.ts:34
-msgid "Read from the release %{tag}."
+msgid "The repository has no GitHub Release with a version tag such as v1.0.0 yet."
 msgstr ""
 
 #: web/src/lib/checks.ts:35
-msgid "There is no plugin.json at the root of the repository at %{tag}."
+msgid "Read from the release %{tag}."
 msgstr ""
 
 #: web/src/lib/checks.ts:36
+msgid "There is no plugin.json at the root of the repository at %{tag}."
+msgstr ""
+
+#: web/src/lib/checks.ts:37
 msgid "plugin.json at %{tag} is not valid JSON."
 msgstr ""
 
-#: web/src/lib/checks.ts:38
+#: web/src/lib/checks.ts:39
 msgid "The plugin ID %{id} does not follow the naming rule, for example io.github.<owner>.<name>."
 msgstr ""
 
-#: web/src/lib/checks.ts:39
+#: web/src/lib/checks.ts:40
 msgid "The com.nginxui namespace is reserved for the plugins of the Nginx UI project."
 msgstr ""
 
-#: web/src/lib/checks.ts:40
+#: web/src/lib/checks.ts:41
 msgid "The plugin ID %{id} names another GitHub owner than %{owner}."
 msgstr ""
 
-#: web/src/lib/checks.ts:41
+#: web/src/lib/checks.ts:42
 msgid "This plugin ID may not be listed. Contact the maintainers if you think this is a mistake."
 msgstr ""
 
-#: web/src/lib/checks.ts:42
+#: web/src/lib/checks.ts:43
 msgid "A plugin with this ID is listed already."
 msgstr ""
 
-#: web/src/lib/checks.ts:43
+#: web/src/lib/checks.ts:44
 msgid "A submission of this plugin is already under review."
 msgstr ""
 
-#: web/src/lib/checks.ts:45
+#: web/src/lib/checks.ts:46
 msgid "plugin.json has no name."
 msgstr ""
 
-#: web/src/lib/checks.ts:46
+#: web/src/lib/checks.ts:47
 msgid "The name holds \"%{word}\", which no name may hold. Only the plugins of the Nginx UI project are official."
 msgstr ""
 
-#: web/src/lib/checks.ts:47
+#: web/src/lib/checks.ts:48
 msgid "%{count} packages in the release."
 msgstr ""
 
-#: web/src/lib/checks.ts:48
+#: web/src/lib/checks.ts:49
 msgid "The release has no package named %{name} or one per platform."
 msgstr ""
 
-#: web/src/lib/checks.ts:50
+#: web/src/lib/checks.ts:51
 msgid "Issued by the primary key %{key}."
 msgstr ""
 
-#: web/src/lib/checks.ts:51
+#: web/src/lib/checks.ts:52
 msgid "There is no plugin.signer at %{tag}. Create the keys as described in the next step and publish a new release."
 msgstr ""
 
-#: web/src/lib/checks.ts:52
+#: web/src/lib/checks.ts:53
 msgid "The certificate was issued for %{id}, not for this plugin."
 msgstr ""
 
-#: web/src/lib/checks.ts:53
+#: web/src/lib/checks.ts:54
+msgid "The signing key %{key} was revoked before the plugin was taken down. Publish a release signed by a new signing key, or ask a maintainer to restore the signer."
+msgstr ""
+
+#: web/src/lib/checks.ts:55
+msgid "Version %{version} was yanked before the plugin was taken down. Publish a new release."
+msgstr ""
+
+#: web/src/lib/checks.ts:56
 msgid "GitHub detects no license in the repository. The listing shows none."
 msgstr ""
 

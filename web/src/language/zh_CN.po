@@ -1211,6 +1211,9 @@ msgstr "许可证"
 msgid "Signer certificate"
 msgstr "签名者证书"
 
+msgid "Withdrawn versions"
+msgstr "已撤回的版本"
+
 msgid "%{repo} is a public repository."
 msgstr "%{repo} 是公开仓库。"
 
@@ -1314,6 +1317,17 @@ msgstr ""
 
 msgid "The certificate was issued for %{id}, not for this plugin."
 msgstr "该证书是为 %{id} 签发的，不属于此插件。"
+
+msgid ""
+"The signing key %{key} was revoked before the plugin was taken down. Publish "
+"a release signed by a new signing key, or ask a maintainer to restore the "
+"signer."
+msgstr "签名密钥 %{key} 在插件下架前已被撤销。请用新的签名密钥发布版本，或请维护者恢复该签名者。"
+
+msgid ""
+"Version %{version} was yanked before the plugin was taken down. Publish a "
+"new release."
+msgstr "版本 %{version} 在插件下架前已被撤回。请发布新版本。"
 
 msgid "GitHub detects no license in the repository. The listing shows none."
 msgstr "GitHub 未在仓库中识别到许可证，上架页面将不显示许可证。"
