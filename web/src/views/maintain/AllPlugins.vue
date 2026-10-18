@@ -61,6 +61,16 @@ const form = ref({ trust: 'community', reason: '', block: false, repository: '',
 const sending = ref(false)
 const error = ref('')
 
+// Official is only for the reserved com.nginxui.* namespace.
+const trustOptions = computed(() => {
+  const reserved = !!action.value && 'plugin' in action.value && action.value.plugin.id.startsWith('com.nginxui.')
+  return [
+    { value: 'official', label: $gettext('Official'), disabled: !reserved },
+    { value: 'verified', label: $gettext('Partner') },
+    { value: 'community', label: $gettext('Community') },
+  ]
+})
+
 function start(next: Action) {
   action.value = next
   error.value = ''
@@ -313,7 +323,7 @@ const title = computed(() => {
     <AModal :open="!!action" :title="title" :confirm-loading="sending" :ok-text="$gettext('Open the pull request')" :ok-button-props="{ danger: action?.kind !== 'trust' }" @ok="confirm" @cancel="action = null">
       <AForm v-if="action" layout="vertical">
         <AFormItem v-if="action.kind === 'trust'" :label="$gettext('Trust')">
-          <ASegmented v-model:value="form.trust" :options="[{ value: 'official', label: $gettext('Official') }, { value: 'verified', label: $gettext('Partner') }, { value: 'community', label: $gettext('Community') }]" />
+          <ASegmented v-model:value="form.trust" :options="trustOptions" />
         </AFormItem>
         <template v-if="action.kind === 'block-new'">
           <AFormItem :label="$gettext('Plugin ID')">
