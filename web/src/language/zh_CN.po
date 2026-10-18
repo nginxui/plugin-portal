@@ -3972,12 +3972,14 @@ msgstr "提交审核"
 msgid ""
 "A maintainer reviews the change. Once it is approved, signer certificates "
 "issued by the current primary key are no longer accepted."
-msgstr "此更改需经维护者审核。批准后，由当前主密钥签发的签名者证书将不再被接受。"
+msgstr ""
+"此更改需经维护者审核。批准后，由当前主密钥签发的签名者证书将不再被接受。"
 
 msgid ""
 "Every listed version is yanked with it: %{list}. Publish a release whose "
 "signer certificate the new primary key issued."
-msgstr "所有已上架版本会一并撤回：%{list}。请发布一个由新主密钥签发签名者证书的版本。"
+msgstr ""
+"所有已上架版本会一并撤回：%{list}。请发布一个由新主密钥签发签名者证书的版本。"
 
 msgid "New primary public key"
 msgstr "新的主公钥"
@@ -4058,6 +4060,12 @@ msgstr "作者"
 
 msgid "Primary public key"
 msgstr "主公钥"
+
+msgid "Versions yanked"
+msgstr "已撤回的版本"
+
+msgid "Revoked signers"
+msgstr "已撤销的签名者"
 
 msgid "%{n} days of trial"
 msgstr "试用 %{n} 天"

@@ -135,6 +135,8 @@ const rows = computed(() => {
     { key: 'license', label: $gettext('License'), format: v => v ? [String(v)] : [] },
     { key: 'trust', label: $gettext('Trust'), format: v => v ? [trustLabel(String(v)) || String(v)] : [] },
     { key: 'store', label: $gettext('Store source'), format: v => [storeSourceLabel(v)] },
+    { key: 'yanked', label: $gettext('Versions yanked'), format: v => (v ?? []).map((version: string) => `v${version}`) },
+    { key: 'revoked_signers', label: $gettext('Revoked signers'), format: v => (v ?? []).map(String) },
     { key: 'commercial', label: $gettext('Commercial details'), format: (v) => {
       if (!v)
         return []
