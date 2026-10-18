@@ -7,6 +7,7 @@ import { categoryLabel } from '@/lib/categories'
 import { changePath, kindLabel } from '@/lib/changeKinds'
 import { useFailure } from '@/lib/feedback'
 import { $gettext } from '@/lib/gettext'
+import { publicKeyId } from '@/lib/keys'
 import { joinClauses, localized } from '@/lib/labels'
 import { itemLabel } from '@/lib/storeDiff'
 import { formatTime, fromNow, waited } from '@/lib/time'
@@ -195,6 +196,8 @@ const requested = computed(() => {
   if (!ops)
     return []
   const rows: { key: string, icon: string, tone: string, title: string, values: string[], mono: boolean }[] = []
+  if (ops.author_public_key)
+    rows.push({ key: 'key', icon: 'i-tabler-key', tone: 'warn', title: $gettext('Replace the primary key'), values: [publicKeyId(ops.author_public_key) ?? ops.author_public_key], mono: true })
   if (ops.yank?.length)
     rows.push({ key: 'yank', icon: 'i-tabler-arrow-back-up', tone: 'warn', title: $gettext('Yank a version'), values: ops.yank.map(v => `v${v}`), mono: true })
   if (ops.unyank?.length)
@@ -225,8 +228,10 @@ const status = computed<{ type: 'success' | 'info' | 'warning' | 'error', text: 
     return null
   if (c.state === 'live' && selfService.value)
     return { type: 'success', text: $gettext('The change is live in the catalog.') }
-  if (c.state === 'live')
+  if (c.state === 'live' && c.kind === 'new_listing')
     return { type: 'success', text: $gettext('The plugin is listed in the catalog.') }
+  if (c.state === 'live')
+    return { type: 'success', text: $gettext('The change is live in the catalog.') }
   if (c.state === 'rejected')
     return { type: 'error', text: $gettext('The pull request was closed without merging.') }
   if (c.state === 'withdrawn' && replacedBy.value)

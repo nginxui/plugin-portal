@@ -3,8 +3,9 @@ import type { Release } from '@/api/plugins'
 import { computed, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { ApiError } from '@/api/client'
-import { submitSelfService } from '@/api/plugins'
+import { submitPrimaryKey, submitSelfService } from '@/api/plugins'
 import { $gettext } from '@/lib/gettext'
+import { publicKeyId } from '@/lib/keys'
 import { formatDate } from '@/lib/time'
 import { usePluginStore } from '@/stores/plugin'
 
@@ -96,6 +97,50 @@ const modalTitle = computed(() => {
     return many ? $gettext('Restore %{n} versions', { n: String(t.values.length) }) : $gettext('Restore v%{version}', { version: t.values[0] })
   return $gettext('Revoke signer %{id}', { id: short(t.values[0]) })
 })
+
+// Replacing the primary key, for one that was lost or leaked.
+const keyOpen = ref(false)
+const newKey = ref('')
+const keyReason = ref('')
+const keyError = ref('')
+const newKeyId = computed(() => publicKeyId(newKey.value))
+const listedVersions = computed(() => detail.value.releases.filter(r => !r.yanked).map(r => r.version))
+const keyProblem = computed(() => {
+  if (!newKey.value.trim())
+    return ''
+  if (!newKeyId.value)
+    return $gettext('Paste the content of primary.pub.')
+  if (newKeyId.value === detail.value.primaryKey?.id)
+    return $gettext('This is the current primary key.')
+  return ''
+})
+
+function askKey() {
+  newKey.value = ''
+  keyReason.value = ''
+  keyError.value = ''
+  keyOpen.value = true
+}
+
+async function sendKey() {
+  sending.value = true
+  keyError.value = ''
+  try {
+    const { change } = await submitPrimaryKey(plugin.value.id, newKey.value, keyReason.value)
+    keyOpen.value = false
+    router.push(`/changes/${change}`)
+  }
+  catch (e) {
+    keyError.value = e instanceof ApiError && e.code === 'busy'
+      ? $gettext('A primary key replacement of this plugin is already in progress.')
+      : e instanceof ApiError && e.code === 'no_access'
+        ? $gettext('Only admins of the repository can replace the primary key.')
+        : $gettext('The change could not be sent. Please try again.')
+  }
+  finally {
+    sending.value = false
+  }
+}
 
 async function confirm() {
   const t = target.value
@@ -227,6 +272,57 @@ async function confirm() {
         {{ $gettext('Revoke a signer when its signing key leaked or was lost. Restoring a revoked signer needs a maintainer.') }}
       </ATypographyParagraph>
     </ACard>
+
+    <ACard v-if="props.section === 'signers' && detail.primaryKey" :title="$gettext('Primary key')">
+      <template #extra>
+        <span class="text-3 op-65">{{ $gettext('Certifies your signing keys') }}</span>
+      </template>
+      <div class="signer">
+        <span class="i-tabler-key op-60 text-5" />
+        <div class="flex-1 min-w-0">
+          <div class="mono">
+            {{ detail.primaryKey.id }}
+          </div>
+          <div class="text-3 op-65">
+            {{ $gettext('The primary public key of the catalog entry') }}
+          </div>
+        </div>
+        <AButton size="small" :disabled="plugin.role !== 'admin' || !detail.listed" @click="askKey">
+          {{ $gettext('Replace') }}
+        </AButton>
+      </div>
+      <ATypographyParagraph type="secondary" class="mt-3 mb-0 text-3">
+        {{ $gettext('Replace the primary key only when it was lost or leaked. A new signing key for a new machine needs no change here.') }}
+      </ATypographyParagraph>
+    </ACard>
+
+    <AModal
+      :open="keyOpen"
+      :title="$gettext('Replace the primary key')"
+      :ok-text="$gettext('Send for review')"
+      :ok-button-props="{ danger: true, disabled: !newKeyId || !!keyProblem || !keyReason.trim() }"
+      :confirm-loading="sending"
+      @ok="sendKey"
+      @cancel="keyOpen = false"
+    >
+      <p>{{ $gettext('A maintainer reviews the change. Once it is approved, signer certificates issued by the current primary key are no longer accepted.') }}</p>
+      <AAlert
+        v-if="listedVersions.length"
+        type="warning"
+        show-icon
+        class="mb-3"
+        :title="$gettext('Every listed version is yanked with it: %{list}. Publish a release whose signer certificate the new primary key issued.', { list: listedVersions.map(v => `v${v}`).join(', ') })"
+      />
+      <AForm layout="vertical">
+        <AFormItem :label="$gettext('New primary public key')" :validate-status="keyProblem ? 'error' : undefined" :help="keyProblem || (newKeyId ? $gettext('Key ID %{id}', { id: newKeyId }) : $gettext('The content of primary.pub, created with nginx-ui plugin key init.'))">
+          <ATextarea v-model:value="newKey" :rows="3" class="mono" />
+        </AFormItem>
+        <AFormItem :label="$gettext('Reason')" :extra="$gettext('Kept with the change for the reviewer, for example: the primary key was on a disk that failed.')" class="mb-0">
+          <ATextarea v-model:value="keyReason" :rows="3" :maxlength="500" />
+        </AFormItem>
+      </AForm>
+      <AAlert v-if="keyError" type="error" show-icon class="mt-3" :title="keyError" />
+    </AModal>
 
     <AModal
       :open="!!target"

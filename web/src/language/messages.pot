@@ -3,19 +3,20 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 
 #: web/src/components/CategoryEditModal.vue:40
-#: web/src/views/plugin/PluginVersions.vue:115
+#: web/src/views/plugin/PluginVersions.vue:160
 msgid "Another change of this plugin is in progress."
 msgstr ""
 
 #: web/src/components/CategoryEditModal.vue:41
 #: web/src/views/plugin/PluginStore.vue:279
-#: web/src/views/plugin/PluginVersions.vue:118
+#: web/src/views/plugin/PluginVersions.vue:138
+#: web/src/views/plugin/PluginVersions.vue:163
 msgid "The change could not be sent. Please try again."
 msgstr ""
 
 #: web/src/components/CategoryEditModal.vue:50
 #: web/src/lib/changeKinds.ts:18
-#: web/src/views/ChangeView.vue:205
+#: web/src/views/ChangeView.vue:208
 msgid "Change categories"
 msgstr ""
 
@@ -76,8 +77,8 @@ msgid "Authors"
 msgstr ""
 
 #: web/src/components/CommandPalette.vue:66
-#: web/src/views/plugin/PluginVersions.vue:159
-#: web/src/views/plugin/PluginVersions.vue:189
+#: web/src/views/plugin/PluginVersions.vue:204
+#: web/src/views/plugin/PluginVersions.vue:234
 #: web/src/views/review/ReviewQueue.vue:392
 msgid "Actions"
 msgstr ""
@@ -136,7 +137,7 @@ msgstr ""
 #: web/src/components/CommandPalette.vue:125
 #: web/src/layouts/PortalLayout.vue:70
 #: web/src/layouts/PortalLayout.vue:114
-#: web/src/views/ChangeView.vue:150
+#: web/src/views/ChangeView.vue:151
 #: web/src/views/MyPlugins.vue:164
 #: web/src/views/plugin/PluginLayout.vue:25
 msgid "My plugins"
@@ -427,8 +428,8 @@ msgstr ""
 #: web/src/views/maintain/Settings.vue:373
 #: web/src/views/maintain/Settings.vue:384
 #: web/src/views/owners/VendorPage.vue:344
-#: web/src/views/plugin/PluginScreenshots.vue:405
-#: web/src/views/plugin/PluginScreenshots.vue:478
+#: web/src/views/plugin/PluginScreenshots.vue:414
+#: web/src/views/plugin/PluginScreenshots.vue:487
 msgid "Cancel"
 msgstr ""
 
@@ -688,7 +689,7 @@ msgstr ""
 #: web/src/components/MarketPreview.vue:306
 #: web/src/components/MarketPreview.vue:375
 #: web/src/components/MarketPreview.vue:378
-#: web/src/views/plugin/PluginScreenshots.vue:464
+#: web/src/views/plugin/PluginScreenshots.vue:473
 #: web/src/views/plugin/PluginTranslations.vue:327
 #: web/src/views/plugin/PluginTranslations.vue:366
 #: web/src/views/plugin/PluginTranslations.vue:403
@@ -740,7 +741,7 @@ msgid "Add a caption"
 msgstr ""
 
 #: web/src/components/MarketPreview.vue:372
-#: web/src/views/plugin/PluginScreenshots.vue:452
+#: web/src/views/plugin/PluginScreenshots.vue:461
 msgid "Caption"
 msgstr ""
 
@@ -754,8 +755,8 @@ msgid "README"
 msgstr ""
 
 #: web/src/components/NotificationBell.vue:54
-#: web/src/views/ChangeView.vue:131
-#: web/src/views/ChangeView.vue:321
+#: web/src/views/ChangeView.vue:132
+#: web/src/views/ChangeView.vue:326
 msgid "Waiting for you"
 msgstr ""
 
@@ -794,13 +795,13 @@ msgid "%{who} asked for changes"
 msgstr ""
 
 #: web/src/components/NotificationBell.vue:111
-#: web/src/views/ChangeView.vue:286
+#: web/src/views/ChangeView.vue:291
 msgid "A maintainer asked for changes"
 msgstr ""
 
 #: web/src/components/NotificationBell.vue:114
-#: web/src/views/ChangeView.vue:111
-#: web/src/views/ChangeView.vue:284
+#: web/src/views/ChangeView.vue:112
+#: web/src/views/ChangeView.vue:289
 msgid "Committed to the catalog"
 msgstr ""
 
@@ -839,7 +840,7 @@ msgstr ""
 #: web/src/components/NotificationBell.vue:151
 #: web/src/components/NotificationBell.vue:161
 #: web/src/lib/categories.ts:13
-#: web/src/views/ChangeView.vue:529
+#: web/src/views/ChangeView.vue:534
 msgid "Notifications"
 msgstr ""
 
@@ -959,9 +960,9 @@ msgid "In review"
 msgstr ""
 
 #: web/src/components/PluginCard.vue:31
-#: web/src/views/ChangeView.vue:109
-#: web/src/views/ChangeView.vue:111
+#: web/src/views/ChangeView.vue:110
 #: web/src/views/ChangeView.vue:112
+#: web/src/views/ChangeView.vue:113
 #: web/src/views/plugin/PluginStore.vue:513
 msgid "Submit"
 msgstr ""
@@ -971,7 +972,7 @@ msgid "Checks passed"
 msgstr ""
 
 #: web/src/components/PluginCard.vue:33
-#: web/src/views/ChangeView.vue:112
+#: web/src/views/ChangeView.vue:113
 msgid "Maintainer review"
 msgstr ""
 
@@ -1008,7 +1009,7 @@ msgid "%{n} comments"
 msgstr ""
 
 #: web/src/components/PluginCard.vue:119
-#: web/src/views/ChangeView.vue:247
+#: web/src/views/ChangeView.vue:252
 msgid "The checks found problems. Fix them in a new release, then run the checks again."
 msgstr ""
 
@@ -1029,7 +1030,7 @@ msgstr ""
 #: web/src/components/PluginCard.vue:124
 #: web/src/components/PluginCard.vue:190
 #: web/src/lib/pluginSections.ts:15
-#: web/src/views/plugin/PluginScreenshots.vue:310
+#: web/src/views/plugin/PluginScreenshots.vue:319
 msgid "Screenshots"
 msgstr ""
 
@@ -1108,7 +1109,7 @@ msgstr ""
 #: web/src/components/PluginCard.vue:218
 #: web/src/components/PluginCard.vue:244
 #: web/src/lib/pluginSections.ts:14
-#: web/src/views/plugin/PluginScreenshots.vue:386
+#: web/src/views/plugin/PluginScreenshots.vue:395
 #: web/src/views/plugin/PluginTranslations.vue:395
 msgid "Store details"
 msgstr ""
@@ -1124,7 +1125,7 @@ msgstr ""
 
 #: web/src/components/PluginCard.vue:228
 #: web/src/lib/pluginSections.ts:18
-#: web/src/views/plugin/PluginVersions.vue:130
+#: web/src/views/plugin/PluginVersions.vue:175
 msgid "Versions"
 msgstr ""
 
@@ -1214,7 +1215,7 @@ msgid "Install the app on another repository"
 msgstr ""
 
 #: web/src/components/ReviewCompare.vue:46
-#: web/src/views/plugin/PluginScreenshots.vue:330
+#: web/src/views/plugin/PluginScreenshots.vue:339
 msgid "Screenshot %{n}"
 msgstr ""
 
@@ -1242,7 +1243,7 @@ msgstr ""
 
 #: web/src/components/ReviewCompare.vue:94
 #: web/src/views/plugin/PluginPreflight.vue:92
-#: web/src/views/plugin/PluginScreenshots.vue:392
+#: web/src/views/plugin/PluginScreenshots.vue:401
 msgid "New screenshot"
 msgstr ""
 
@@ -1627,7 +1628,7 @@ msgid "Workflow run: %{id}"
 msgstr ""
 
 #: web/src/lib/audit.ts:134
-#: web/src/views/ChangeView.vue:395
+#: web/src/views/ChangeView.vue:400
 #: web/src/views/maintain/AuditLog.vue:260
 #: web/src/views/maintain/PartnersAdmin.vue:204
 #: web/src/views/translate/TranslatePage.vue:305
@@ -1719,17 +1720,17 @@ msgid "Delisting"
 msgstr ""
 
 #: web/src/lib/changeKinds.ts:15
-#: web/src/views/ChangeView.vue:199
+#: web/src/views/ChangeView.vue:202
 msgid "Yank a version"
 msgstr ""
 
 #: web/src/lib/changeKinds.ts:16
-#: web/src/views/ChangeView.vue:201
+#: web/src/views/ChangeView.vue:204
 msgid "Restore a version"
 msgstr ""
 
 #: web/src/lib/changeKinds.ts:17
-#: web/src/views/ChangeView.vue:203
+#: web/src/views/ChangeView.vue:206
 msgid "Revoke a signer"
 msgstr ""
 
@@ -2038,7 +2039,7 @@ msgid "Badges"
 msgstr ""
 
 #: web/src/lib/pluginSections.ts:20
-#: web/src/views/plugin/PluginVersions.vue:204
+#: web/src/views/plugin/PluginVersions.vue:249
 msgid "Signers"
 msgstr ""
 
@@ -2100,379 +2101,386 @@ msgstr ""
 msgid "Today %{time}"
 msgstr ""
 
-#: web/src/views/ChangeView.vue:109
+#: web/src/views/ChangeView.vue:110
 msgid "Automatic checks"
 msgstr ""
 
-#: web/src/views/ChangeView.vue:109
+#: web/src/views/ChangeView.vue:110
 msgid "Merge the pull request"
 msgstr ""
 
-#: web/src/views/ChangeView.vue:109
+#: web/src/views/ChangeView.vue:110
 msgid "Catalog updated"
 msgstr ""
 
-#: web/src/views/ChangeView.vue:109
+#: web/src/views/ChangeView.vue:110
 msgid "Visible to users"
 msgstr ""
 
-#: web/src/views/ChangeView.vue:111
 #: web/src/views/ChangeView.vue:112
+#: web/src/views/ChangeView.vue:113
 #: web/src/views/plugin/PluginPreflight.vue:271
 #: web/src/views/review/ReviewQueue.vue:390
 #: web/src/views/SubmitPlugin.vue:187
 msgid "Checks"
 msgstr ""
 
-#: web/src/views/ChangeView.vue:111
 #: web/src/views/ChangeView.vue:112
-#: web/src/views/ChangeView.vue:290
+#: web/src/views/ChangeView.vue:113
+#: web/src/views/ChangeView.vue:295
 msgid "Live in the catalog"
 msgstr ""
 
-#: web/src/views/ChangeView.vue:112
+#: web/src/views/ChangeView.vue:113
 #: web/src/views/review/ReviewChange.vue:104
 #: web/src/views/review/ReviewQueue.vue:121
 msgid "Merged"
 msgstr ""
 
-#: web/src/views/ChangeView.vue:129
+#: web/src/views/ChangeView.vue:130
 msgid "Waited %{time}"
 msgstr ""
 
-#: web/src/views/ChangeView.vue:134
+#: web/src/views/ChangeView.vue:135
 msgid "Passed"
 msgstr ""
 
-#: web/src/views/ChangeView.vue:138
+#: web/src/views/ChangeView.vue:139
 msgid "Within minutes of the merge"
 msgstr ""
 
-#: web/src/views/ChangeView.vue:140
+#: web/src/views/ChangeView.vue:141
 msgid "Once Nginx UI refreshes its marketplace"
 msgstr ""
 
-#: web/src/views/ChangeView.vue:152
+#: web/src/views/ChangeView.vue:153
 msgid "Change #%{n}"
 msgstr ""
 
-#: web/src/views/ChangeView.vue:152
+#: web/src/views/ChangeView.vue:153
 msgid "Change progress"
 msgstr ""
 
-#: web/src/views/ChangeView.vue:161
+#: web/src/views/ChangeView.vue:162
 msgid "Stopped"
 msgstr ""
 
-#: web/src/views/ChangeView.vue:163
-#: web/src/views/ChangeView.vue:165
+#: web/src/views/ChangeView.vue:164
+#: web/src/views/ChangeView.vue:166
 msgid "Waiting for name review"
 msgstr ""
 
-#: web/src/views/ChangeView.vue:163
+#: web/src/views/ChangeView.vue:164
 msgid "Live"
 msgstr ""
 
-#: web/src/views/ChangeView.vue:165
-#: web/src/views/ChangeView.vue:325
+#: web/src/views/ChangeView.vue:166
+#: web/src/views/ChangeView.vue:330
 msgid "Takes effect at the next catalog update"
 msgstr ""
 
-#: web/src/views/ChangeView.vue:166
+#: web/src/views/ChangeView.vue:167
 msgid "Waiting for the merge"
 msgstr ""
 
-#: web/src/views/ChangeView.vue:174
+#: web/src/views/ChangeView.vue:175
 msgid "%{kind}, %{n} items"
 msgstr ""
 
-#: web/src/views/ChangeView.vue:178
+#: web/src/views/ChangeView.vue:179
 msgid "Submitted by @%{login} %{time}"
 msgstr ""
 
-#: web/src/views/ChangeView.vue:207
+#: web/src/views/ChangeView.vue:200
+#: web/src/views/plugin/PluginVersions.vue:301
+msgid "Replace the primary key"
+msgstr ""
+
+#: web/src/views/ChangeView.vue:210
 msgid "Names from a new release"
 msgstr ""
 
-#: web/src/views/ChangeView.vue:227
+#: web/src/views/ChangeView.vue:230
+#: web/src/views/ChangeView.vue:234
 msgid "The change is live in the catalog."
 msgstr ""
 
-#: web/src/views/ChangeView.vue:229
+#: web/src/views/ChangeView.vue:232
 msgid "The plugin is listed in the catalog."
 msgstr ""
 
-#: web/src/views/ChangeView.vue:231
+#: web/src/views/ChangeView.vue:236
 msgid "The pull request was closed without merging."
 msgstr ""
 
-#: web/src/views/ChangeView.vue:233
+#: web/src/views/ChangeView.vue:238
 msgid "This change was replaced by a newer submission."
 msgstr ""
 
-#: web/src/views/ChangeView.vue:235
+#: web/src/views/ChangeView.vue:240
 msgid "This change was withdrawn and goes no further."
 msgstr ""
 
-#: web/src/views/ChangeView.vue:238
+#: web/src/views/ChangeView.vue:243
 msgid "@%{login} asked for changes. Edit the store details and submit them again; the new submission replaces this change."
 msgstr ""
 
-#: web/src/views/ChangeView.vue:239
+#: web/src/views/ChangeView.vue:244
 msgid "A maintainer asked for changes. Edit the store details and submit them again; the new submission replaces this change."
 msgstr ""
 
-#: web/src/views/ChangeView.vue:243
+#: web/src/views/ChangeView.vue:248
 msgid "@%{login} asked for changes. Make them, then run the checks again."
 msgstr ""
 
-#: web/src/views/ChangeView.vue:244
+#: web/src/views/ChangeView.vue:249
 msgid "A maintainer asked for changes. Make them, then run the checks again."
 msgstr ""
 
-#: web/src/views/ChangeView.vue:249
-#: web/src/views/ChangeView.vue:336
+#: web/src/views/ChangeView.vue:254
+#: web/src/views/ChangeView.vue:341
 msgid "The checks could not be started. Please try again later."
 msgstr ""
 
-#: web/src/views/ChangeView.vue:251
+#: web/src/views/ChangeView.vue:256
 msgid "The checks could not finish. A maintainer will look into it."
 msgstr ""
 
-#: web/src/views/ChangeView.vue:253
+#: web/src/views/ChangeView.vue:258
 msgid "The packages, signatures and listing are being checked. This takes a few minutes."
 msgstr ""
 
-#: web/src/views/ChangeView.vue:255
+#: web/src/views/ChangeView.vue:260
 msgid "Waiting for a maintainer to review the submission."
 msgstr ""
 
-#: web/src/views/ChangeView.vue:257
+#: web/src/views/ChangeView.vue:262
 msgid "The change is in the catalog sources and takes effect at its next update, usually within minutes."
 msgstr ""
 
-#: web/src/views/ChangeView.vue:259
+#: web/src/views/ChangeView.vue:264
 msgid "Approved. The plugin appears in the catalog after the next deploy, usually within minutes."
 msgstr ""
 
-#: web/src/views/ChangeView.vue:275
+#: web/src/views/ChangeView.vue:280
 msgid "Checks started again"
 msgstr ""
 
-#: web/src/views/ChangeView.vue:276
+#: web/src/views/ChangeView.vue:281
 msgid "Submitted %{n} changes"
 msgstr ""
 
-#: web/src/views/ChangeView.vue:276
+#: web/src/views/ChangeView.vue:281
 #: web/src/views/review/ReviewChange.vue:955
 msgid "Submitted"
 msgstr ""
 
-#: web/src/views/ChangeView.vue:279
+#: web/src/views/ChangeView.vue:284
 msgid "The checks could not be started"
 msgstr ""
 
-#: web/src/views/ChangeView.vue:280
+#: web/src/views/ChangeView.vue:285
 msgid "Checks found problems"
 msgstr ""
 
-#: web/src/views/ChangeView.vue:280
+#: web/src/views/ChangeView.vue:285
 msgid "Checks could not finish"
 msgstr ""
 
-#: web/src/views/ChangeView.vue:282
+#: web/src/views/ChangeView.vue:287
 msgid "Pull request #%{n} opened on %{repo}"
 msgstr ""
 
-#: web/src/views/ChangeView.vue:283
+#: web/src/views/ChangeView.vue:288
 msgid "Checks passed, pull request #%{n} opened"
 msgstr ""
 
-#: web/src/views/ChangeView.vue:284
+#: web/src/views/ChangeView.vue:289
 msgid "Merged by a maintainer"
 msgstr ""
 
-#: web/src/views/ChangeView.vue:285
+#: web/src/views/ChangeView.vue:290
 msgid "Rejected by a maintainer"
 msgstr ""
 
-#: web/src/views/ChangeView.vue:285
+#: web/src/views/ChangeView.vue:290
 msgid "Pull request closed"
 msgstr ""
 
-#: web/src/views/ChangeView.vue:287
+#: web/src/views/ChangeView.vue:292
 msgid "Waited %{h} hours for you, a reminder was sent"
 msgstr ""
 
-#: web/src/views/ChangeView.vue:288
+#: web/src/views/ChangeView.vue:293
 #: web/src/views/review/ReviewChange.vue:108
 #: web/src/views/review/ReviewQueue.vue:120
 msgid "Withdrawn"
 msgstr ""
 
-#: web/src/views/ChangeView.vue:289
+#: web/src/views/ChangeView.vue:294
 msgid "More translations added to the pull request"
 msgstr ""
 
-#: web/src/views/ChangeView.vue:290
+#: web/src/views/ChangeView.vue:295
 msgid "Listed in the catalog"
 msgstr ""
 
-#: web/src/views/ChangeView.vue:306
+#: web/src/views/ChangeView.vue:311
 msgid "The change could not be withdrawn. Please try again."
 msgstr ""
 
-#: web/src/views/ChangeView.vue:323
+#: web/src/views/ChangeView.vue:328
 msgid "Waiting for a maintainer"
 msgstr ""
 
-#: web/src/views/ChangeView.vue:326
+#: web/src/views/ChangeView.vue:331
 msgid "Being checked"
 msgstr ""
 
-#: web/src/views/ChangeView.vue:346
+#: web/src/views/ChangeView.vue:351
 #: web/src/views/review/ReviewChange.vue:507
 msgid "Change not found"
 msgstr ""
 
-#: web/src/views/ChangeView.vue:356
+#: web/src/views/ChangeView.vue:361
 msgid "Submitted %{time}"
 msgstr ""
 
-#: web/src/views/ChangeView.vue:371
+#: web/src/views/ChangeView.vue:376
 msgid "Waiting for you to merge pull request #%{n} on GitHub"
 msgstr ""
 
-#: web/src/views/ChangeView.vue:371
+#: web/src/views/ChangeView.vue:376
 msgid "Waiting for you to commit the files to %{repo}"
 msgstr ""
 
-#: web/src/views/ChangeView.vue:374
+#: web/src/views/ChangeView.vue:379
 msgid "The pull request is on %{repo}. Once it is merged, the change shows in the catalog within minutes."
 msgstr ""
 
-#: web/src/views/ChangeView.vue:374
+#: web/src/views/ChangeView.vue:379
 msgid "Unpack the patch at the root of the repository and commit it to the default branch. The portal notices the commit by itself."
 msgstr ""
 
-#: web/src/views/ChangeView.vue:379
-#: web/src/views/ChangeView.vue:542
+#: web/src/views/ChangeView.vue:384
+#: web/src/views/ChangeView.vue:547
 msgid "Withdraw the change"
 msgstr ""
 
-#: web/src/views/ChangeView.vue:382
+#: web/src/views/ChangeView.vue:387
 msgid "Merge on GitHub"
 msgstr ""
 
-#: web/src/views/ChangeView.vue:385
+#: web/src/views/ChangeView.vue:390
 msgid "Download the patch"
 msgstr ""
 
-#: web/src/views/ChangeView.vue:408
+#: web/src/views/ChangeView.vue:413
 msgid "Edit store details"
 msgstr ""
 
-#: web/src/views/ChangeView.vue:413
+#: web/src/views/ChangeView.vue:418
 msgid "Open the newer submission"
 msgstr ""
 
-#: web/src/views/ChangeView.vue:417
+#: web/src/views/ChangeView.vue:422
 msgid "Run the checks again"
 msgstr ""
 
-#: web/src/views/ChangeView.vue:420
-#: web/src/views/ChangeView.vue:542
+#: web/src/views/ChangeView.vue:425
+#: web/src/views/ChangeView.vue:547
 msgid "Withdraw"
 msgstr ""
 
-#: web/src/views/ChangeView.vue:426
+#: web/src/views/ChangeView.vue:431
 msgid "What was asked"
 msgstr ""
 
-#: web/src/views/ChangeView.vue:440
+#: web/src/views/ChangeView.vue:445
 #: web/src/views/maintain/AllPlugins.vue:336
 #: web/src/views/maintain/PartnersAdmin.vue:349
 #: web/src/views/owners/VendorPage.vue:388
-#: web/src/views/plugin/PluginVersions.vue:259
+#: web/src/views/plugin/PluginVersions.vue:320
+#: web/src/views/plugin/PluginVersions.vue:355
 #: web/src/views/review/ReviewChange.vue:736
 msgid "Reason"
 msgstr ""
 
-#: web/src/views/ChangeView.vue:447
+#: web/src/views/ChangeView.vue:452
 msgid "Each item"
 msgstr ""
 
-#: web/src/views/ChangeView.vue:452
+#: web/src/views/ChangeView.vue:457
 #: web/src/views/review/ReviewChange.vue:719
 #: web/src/views/review/ReviewChange.vue:725
 msgid "Item"
 msgstr ""
 
-#: web/src/views/ChangeView.vue:453
+#: web/src/views/ChangeView.vue:458
 msgid "Needs review"
 msgstr ""
 
-#: web/src/views/ChangeView.vue:454
+#: web/src/views/ChangeView.vue:459
 msgid "Current state"
 msgstr ""
 
-#: web/src/views/ChangeView.vue:465
+#: web/src/views/ChangeView.vue:470
 msgid "Name review after the merge"
 msgstr ""
 
-#: web/src/views/ChangeView.vue:467
+#: web/src/views/ChangeView.vue:472
 msgid "No review"
 msgstr ""
 
-#: web/src/views/ChangeView.vue:477
+#: web/src/views/ChangeView.vue:482
 msgid "History"
 msgstr ""
 
-#: web/src/views/ChangeView.vue:493
+#: web/src/views/ChangeView.vue:498
 msgid "Links"
 msgstr ""
 
-#: web/src/views/ChangeView.vue:496
+#: web/src/views/ChangeView.vue:501
 msgid "Pull request #%{n}"
 msgstr ""
 
-#: web/src/views/ChangeView.vue:500
+#: web/src/views/ChangeView.vue:505
 msgid "Commit in the repository"
 msgstr ""
 
-#: web/src/views/ChangeView.vue:500
+#: web/src/views/ChangeView.vue:505
 msgid "Commit in the catalog"
 msgstr ""
 
-#: web/src/views/ChangeView.vue:504
+#: web/src/views/ChangeView.vue:509
 msgid "Log of the checks"
 msgstr ""
 
-#: web/src/views/ChangeView.vue:508
+#: web/src/views/ChangeView.vue:513
 msgid "Manage the plugin"
 msgstr ""
 
-#: web/src/views/ChangeView.vue:512
+#: web/src/views/ChangeView.vue:517
 msgid "The review is public on GitHub. You are mentioned in the pull request, so GitHub notifies you of comments."
 msgstr ""
 
-#: web/src/views/ChangeView.vue:515
+#: web/src/views/ChangeView.vue:520
 msgid "Your other changes in progress"
 msgstr ""
 
-#: web/src/views/ChangeView.vue:534
+#: web/src/views/ChangeView.vue:539
 msgid "Every plugin page shows the progress at the top"
 msgstr ""
 
-#: web/src/views/ChangeView.vue:537
+#: web/src/views/ChangeView.vue:542
 msgid "A change in progress shows as one line at the top of its plugin page. Click it to open this page."
 msgstr ""
 
-#: web/src/views/ChangeView.vue:543
+#: web/src/views/ChangeView.vue:548
 msgid "Withdrawing closes pull request #%{n} and the change stops here. You can submit again at any time."
 msgstr ""
 
-#: web/src/views/ChangeView.vue:543
+#: web/src/views/ChangeView.vue:548
 msgid "The change stops here. You can submit again at any time."
 msgstr ""
 
@@ -2785,8 +2793,8 @@ msgstr ""
 
 #: web/src/views/maintain/AllPlugins.vue:194
 #: web/src/views/maintain/AllPlugins.vue:227
-#: web/src/views/plugin/PluginVersions.vue:154
-#: web/src/views/plugin/PluginVersions.vue:174
+#: web/src/views/plugin/PluginVersions.vue:199
+#: web/src/views/plugin/PluginVersions.vue:219
 #: web/src/views/SubmitPlugin.vue:315
 msgid "Version"
 msgstr ""
@@ -3067,7 +3075,7 @@ msgstr ""
 
 #: web/src/views/maintain/PartnersAdmin.vue:127
 #: web/src/views/owners/VendorPage.vue:297
-#: web/src/views/plugin/PluginVersions.vue:220
+#: web/src/views/plugin/PluginVersions.vue:265
 msgid "Revoked"
 msgstr ""
 
@@ -4266,14 +4274,14 @@ msgid "Preview"
 msgstr ""
 
 #: web/src/views/plugin/PluginBadges.vue:123
-#: web/src/views/plugin/PluginScreenshots.vue:415
+#: web/src/views/plugin/PluginScreenshots.vue:424
 #: web/src/views/plugin/PluginStore.vue:310
 #: web/src/views/review/ReviewChange.vue:625
 msgid "Light"
 msgstr ""
 
 #: web/src/views/plugin/PluginBadges.vue:123
-#: web/src/views/plugin/PluginScreenshots.vue:415
+#: web/src/views/plugin/PluginScreenshots.vue:424
 #: web/src/views/plugin/PluginStore.vue:310
 #: web/src/views/review/ReviewChange.vue:625
 msgid "Dark"
@@ -4650,214 +4658,214 @@ msgstr ""
 msgid "The catalog lists it within minutes of its release."
 msgstr ""
 
-#: web/src/views/plugin/PluginScreenshots.vue:103
+#: web/src/views/plugin/PluginScreenshots.vue:112
 msgid "Use a PNG, JPEG or WebP image."
 msgstr ""
 
-#: web/src/views/plugin/PluginScreenshots.vue:107
+#: web/src/views/plugin/PluginScreenshots.vue:116
 msgid "A listing holds at most %{n} screenshots."
 msgstr ""
 
-#: web/src/views/plugin/PluginScreenshots.vue:111
+#: web/src/views/plugin/PluginScreenshots.vue:120
 msgid "The image is larger than 20 MB."
 msgstr ""
 
-#: web/src/views/plugin/PluginScreenshots.vue:187
+#: web/src/views/plugin/PluginScreenshots.vue:196
 msgid "The image could not be encoded under 2 MB."
 msgstr ""
 
-#: web/src/views/plugin/PluginScreenshots.vue:208
+#: web/src/views/plugin/PluginScreenshots.vue:217
 msgid "The image is too small: it needs room for a 16:10 part at least 640 pixels wide."
 msgstr ""
 
-#: web/src/views/plugin/PluginScreenshots.vue:210
+#: web/src/views/plugin/PluginScreenshots.vue:219
 msgid "The image was refused: it must be 16:10 and between 640 and 3840 pixels wide."
 msgstr ""
 
-#: web/src/views/plugin/PluginScreenshots.vue:212
+#: web/src/views/plugin/PluginScreenshots.vue:221
 msgid "Screenshot uploads are not open yet."
 msgstr ""
 
-#: web/src/views/plugin/PluginScreenshots.vue:213
+#: web/src/views/plugin/PluginScreenshots.vue:222
 msgid "The image could not be uploaded. Please try again."
 msgstr ""
 
-#: web/src/views/plugin/PluginScreenshots.vue:273
+#: web/src/views/plugin/PluginScreenshots.vue:282
 #: web/src/views/plugin/PluginTranslations.vue:219
 #: web/src/views/plugin/PluginTranslations.vue:240
 msgid "No AI drafts are left for today."
 msgstr ""
 
-#: web/src/views/plugin/PluginScreenshots.vue:273
+#: web/src/views/plugin/PluginScreenshots.vue:282
 #: web/src/views/plugin/PluginTranslations.vue:219
 #: web/src/views/plugin/PluginTranslations.vue:240
 msgid "The AI draft could not be made. Please try again later."
 msgstr ""
 
-#: web/src/views/plugin/PluginScreenshots.vue:303
+#: web/src/views/plugin/PluginScreenshots.vue:312
 #: web/src/views/plugin/PluginStore.vue:291
 #: web/src/views/plugin/PluginTranslations.vue:250
 msgid "The store texts could not be loaded."
 msgstr ""
 
-#: web/src/views/plugin/PluginScreenshots.vue:306
+#: web/src/views/plugin/PluginScreenshots.vue:315
 msgid "Screenshot uploads are not open yet. You can reorder the screenshots and edit their captions."
 msgstr ""
 
-#: web/src/views/plugin/PluginScreenshots.vue:307
+#: web/src/views/plugin/PluginScreenshots.vue:316
 msgid "The catalog entry sets the screenshots of this plugin, so they cannot be changed here."
 msgstr ""
 
-#: web/src/views/plugin/PluginScreenshots.vue:313
+#: web/src/views/plugin/PluginScreenshots.vue:322
 msgid "16:10, light and dark in pairs"
 msgstr ""
 
-#: web/src/views/plugin/PluginScreenshots.vue:316
+#: web/src/views/plugin/PluginScreenshots.vue:325
 msgid "Add a screenshot"
 msgstr ""
 
-#: web/src/views/plugin/PluginScreenshots.vue:343
+#: web/src/views/plugin/PluginScreenshots.vue:352
 #: web/src/views/review/ReviewChange.vue:672
 msgid "Changed"
 msgstr ""
 
-#: web/src/views/plugin/PluginScreenshots.vue:346
+#: web/src/views/plugin/PluginScreenshots.vue:355
 #: web/src/views/translate/TranslatePage.vue:214
 msgid "Complete"
 msgstr ""
 
-#: web/src/views/plugin/PluginScreenshots.vue:346
+#: web/src/views/plugin/PluginScreenshots.vue:355
 msgid "No dark version"
 msgstr ""
 
-#: web/src/views/plugin/PluginScreenshots.vue:354
-#: web/src/views/plugin/PluginScreenshots.vue:421
+#: web/src/views/plugin/PluginScreenshots.vue:363
+#: web/src/views/plugin/PluginScreenshots.vue:430
 msgid "No dark screenshot"
 msgstr ""
 
-#: web/src/views/plugin/PluginScreenshots.vue:355
-#: web/src/views/plugin/PluginScreenshots.vue:422
+#: web/src/views/plugin/PluginScreenshots.vue:364
+#: web/src/views/plugin/PluginScreenshots.vue:431
 msgid "Click to upload"
 msgstr ""
 
-#: web/src/views/plugin/PluginScreenshots.vue:360
+#: web/src/views/plugin/PluginScreenshots.vue:369
 msgid "No caption"
 msgstr ""
 
-#: web/src/views/plugin/PluginScreenshots.vue:377
+#: web/src/views/plugin/PluginScreenshots.vue:386
 msgid "Drop a PNG, JPEG or WebP image here"
 msgstr ""
 
-#: web/src/views/plugin/PluginScreenshots.vue:379
+#: web/src/views/plugin/PluginScreenshots.vue:388
 msgid "Kept whole and converted to WebP, up to 2 MB; lists show the 16:10 part you choose"
 msgstr ""
 
-#: web/src/views/plugin/PluginScreenshots.vue:379
+#: web/src/views/plugin/PluginScreenshots.vue:388
 msgid "Cropped to 16:10 and converted to WebP, up to 2 MB"
 msgstr ""
 
-#: web/src/views/plugin/PluginScreenshots.vue:382
+#: web/src/views/plugin/PluginScreenshots.vue:391
 msgid "No screenshots yet."
 msgstr ""
 
-#: web/src/views/plugin/PluginScreenshots.vue:384
+#: web/src/views/plugin/PluginScreenshots.vue:393
 #: web/src/views/plugin/PluginStore.vue:434
 #: web/src/views/plugin/PluginTranslations.vue:393
 msgid "Saving the draft"
 msgstr ""
 
-#: web/src/views/plugin/PluginScreenshots.vue:384
+#: web/src/views/plugin/PluginScreenshots.vue:393
 #: web/src/views/plugin/PluginTranslations.vue:393
 msgid "Draft saved %{time}. Submit it from the store page."
 msgstr ""
 
-#: web/src/views/plugin/PluginScreenshots.vue:392
+#: web/src/views/plugin/PluginScreenshots.vue:401
 msgid "Dark version"
 msgstr ""
 
-#: web/src/views/plugin/PluginScreenshots.vue:392
+#: web/src/views/plugin/PluginScreenshots.vue:401
 msgid "Light version"
 msgstr ""
 
-#: web/src/views/plugin/PluginScreenshots.vue:396
-#: web/src/views/plugin/PluginScreenshots.vue:443
+#: web/src/views/plugin/PluginScreenshots.vue:405
+#: web/src/views/plugin/PluginScreenshots.vue:452
 msgid "Keep the whole image, record only the part shown"
 msgstr ""
 
-#: web/src/views/plugin/PluginScreenshots.vue:399
-#: web/src/views/plugin/PluginScreenshots.vue:446
+#: web/src/views/plugin/PluginScreenshots.vue:408
+#: web/src/views/plugin/PluginScreenshots.vue:455
 msgid "Lists show the framed part; opening the screenshot shows the whole image."
 msgstr ""
 
-#: web/src/views/plugin/PluginScreenshots.vue:399
-#: web/src/views/plugin/PluginScreenshots.vue:446
+#: web/src/views/plugin/PluginScreenshots.vue:408
+#: web/src/views/plugin/PluginScreenshots.vue:455
 msgid "The framed part becomes the image; the rest is not kept."
 msgstr ""
 
-#: web/src/views/plugin/PluginScreenshots.vue:408
+#: web/src/views/plugin/PluginScreenshots.vue:417
 msgid "Add the screenshot"
 msgstr ""
 
-#: web/src/views/plugin/PluginScreenshots.vue:408
-#: web/src/views/plugin/PluginScreenshots.vue:428
+#: web/src/views/plugin/PluginScreenshots.vue:417
+#: web/src/views/plugin/PluginScreenshots.vue:437
 msgid "Use this crop"
 msgstr ""
 
-#: web/src/views/plugin/PluginScreenshots.vue:421
+#: web/src/views/plugin/PluginScreenshots.vue:430
 msgid "The image is missing"
 msgstr ""
 
-#: web/src/views/plugin/PluginScreenshots.vue:428
+#: web/src/views/plugin/PluginScreenshots.vue:437
 msgid "Show this part"
 msgstr ""
 
-#: web/src/views/plugin/PluginScreenshots.vue:431
+#: web/src/views/plugin/PluginScreenshots.vue:440
 msgid "Undo the crop"
 msgstr ""
 
-#: web/src/views/plugin/PluginScreenshots.vue:435
+#: web/src/views/plugin/PluginScreenshots.vue:444
 msgid "Upload the dark version"
 msgstr ""
 
-#: web/src/views/plugin/PluginScreenshots.vue:435
+#: web/src/views/plugin/PluginScreenshots.vue:444
 msgid "Replace the image"
 msgstr ""
 
-#: web/src/views/plugin/PluginScreenshots.vue:438
+#: web/src/views/plugin/PluginScreenshots.vue:447
 msgid "Remove the dark version"
 msgstr ""
 
-#: web/src/views/plugin/PluginScreenshots.vue:464
+#: web/src/views/plugin/PluginScreenshots.vue:473
 #: web/src/views/plugin/PluginTranslations.vue:106
 msgid "Waiting for confirmation"
 msgstr ""
 
-#: web/src/views/plugin/PluginScreenshots.vue:468
+#: web/src/views/plugin/PluginScreenshots.vue:477
 msgid "Show filled languages only"
 msgstr ""
 
-#: web/src/views/plugin/PluginScreenshots.vue:468
+#: web/src/views/plugin/PluginScreenshots.vue:477
 msgid "The other languages, %{n} of %{total} filled"
 msgstr ""
 
-#: web/src/views/plugin/PluginScreenshots.vue:473
+#: web/src/views/plugin/PluginScreenshots.vue:482
 #: web/src/views/plugin/PluginTranslations.vue:259
 msgid "Drafting %{done} of %{total}"
 msgstr ""
 
-#: web/src/views/plugin/PluginScreenshots.vue:473
+#: web/src/views/plugin/PluginScreenshots.vue:482
 msgid "AI draft the caption in the %{n} missing languages"
 msgstr ""
 
-#: web/src/views/plugin/PluginScreenshots.vue:478
+#: web/src/views/plugin/PluginScreenshots.vue:487
 msgid "Delete this screenshot and its captions?"
 msgstr ""
 
-#: web/src/views/plugin/PluginScreenshots.vue:478
+#: web/src/views/plugin/PluginScreenshots.vue:487
 msgid "Delete"
 msgstr ""
 
-#: web/src/views/plugin/PluginScreenshots.vue:480
+#: web/src/views/plugin/PluginScreenshots.vue:489
 msgid "Delete this screenshot"
 msgstr ""
 
@@ -5251,170 +5259,234 @@ msgstr ""
 msgid "Pick a cell to translate it."
 msgstr ""
 
-#: web/src/views/plugin/PluginVersions.vue:26
+#: web/src/views/plugin/PluginVersions.vue:27
 msgid "Signer revoked"
 msgstr ""
 
-#: web/src/views/plugin/PluginVersions.vue:28
+#: web/src/views/plugin/PluginVersions.vue:29
 msgid "Yanked"
 msgstr ""
 
-#: web/src/views/plugin/PluginVersions.vue:30
+#: web/src/views/plugin/PluginVersions.vue:31
 msgid "Prerelease"
 msgstr ""
 
-#: web/src/views/plugin/PluginVersions.vue:31
+#: web/src/views/plugin/PluginVersions.vue:32
 msgid "Available"
 msgstr ""
 
-#: web/src/views/plugin/PluginVersions.vue:76
+#: web/src/views/plugin/PluginVersions.vue:77
 msgid "Restore versions"
 msgstr ""
 
-#: web/src/views/plugin/PluginVersions.vue:76
+#: web/src/views/plugin/PluginVersions.vue:77
 msgid "Restore version"
 msgstr ""
 
-#: web/src/views/plugin/PluginVersions.vue:78
+#: web/src/views/plugin/PluginVersions.vue:79
 msgid "Yank versions"
 msgstr ""
 
-#: web/src/views/plugin/PluginVersions.vue:78
+#: web/src/views/plugin/PluginVersions.vue:79
 msgid "Yank version"
 msgstr ""
 
-#: web/src/views/plugin/PluginVersions.vue:79
+#: web/src/views/plugin/PluginVersions.vue:80
 msgid "Revoke signer"
 msgstr ""
 
-#: web/src/views/plugin/PluginVersions.vue:94
+#: web/src/views/plugin/PluginVersions.vue:95
 msgid "Yank %{n} versions"
 msgstr ""
 
-#: web/src/views/plugin/PluginVersions.vue:94
+#: web/src/views/plugin/PluginVersions.vue:95
 msgid "Yank v%{version}"
 msgstr ""
 
-#: web/src/views/plugin/PluginVersions.vue:96
+#: web/src/views/plugin/PluginVersions.vue:97
 msgid "Restore %{n} versions"
 msgstr ""
 
-#: web/src/views/plugin/PluginVersions.vue:96
+#: web/src/views/plugin/PluginVersions.vue:97
 msgid "Restore v%{version}"
 msgstr ""
 
-#: web/src/views/plugin/PluginVersions.vue:97
+#: web/src/views/plugin/PluginVersions.vue:98
 msgid "Revoke signer %{id}"
 msgstr ""
 
-#: web/src/views/plugin/PluginVersions.vue:117
-msgid "Only publishers and admins of the repository can do this."
+#: web/src/views/plugin/PluginVersions.vue:112
+msgid "Paste the content of primary.pub."
 msgstr ""
 
-#: web/src/views/plugin/PluginVersions.vue:132
-msgid "Yanking and restoring take effect at the next catalog update, usually within minutes"
+#: web/src/views/plugin/PluginVersions.vue:114
+msgid "This is the current primary key."
 msgstr ""
 
 #: web/src/views/plugin/PluginVersions.vue:135
+msgid "A primary key replacement of this plugin is already in progress."
+msgstr ""
+
+#: web/src/views/plugin/PluginVersions.vue:137
+msgid "Only admins of the repository can replace the primary key."
+msgstr ""
+
+#: web/src/views/plugin/PluginVersions.vue:162
+msgid "Only publishers and admins of the repository can do this."
+msgstr ""
+
+#: web/src/views/plugin/PluginVersions.vue:177
+msgid "Yanking and restoring take effect at the next catalog update, usually within minutes"
+msgstr ""
+
+#: web/src/views/plugin/PluginVersions.vue:180
 msgid "%{n} versions selected"
 msgstr ""
 
-#: web/src/views/plugin/PluginVersions.vue:138
+#: web/src/views/plugin/PluginVersions.vue:183
 msgid "Clear"
 msgstr ""
 
-#: web/src/views/plugin/PluginVersions.vue:141
+#: web/src/views/plugin/PluginVersions.vue:186
 msgid "Restore %{n}"
 msgstr ""
 
-#: web/src/views/plugin/PluginVersions.vue:144
+#: web/src/views/plugin/PluginVersions.vue:189
 msgid "Yank %{n}"
 msgstr ""
 
-#: web/src/views/plugin/PluginVersions.vue:152
+#: web/src/views/plugin/PluginVersions.vue:197
 msgid "Select all versions"
 msgstr ""
 
-#: web/src/views/plugin/PluginVersions.vue:155
-#: web/src/views/plugin/PluginVersions.vue:178
+#: web/src/views/plugin/PluginVersions.vue:200
+#: web/src/views/plugin/PluginVersions.vue:223
 msgid "Released"
 msgstr ""
 
-#: web/src/views/plugin/PluginVersions.vue:156
-#: web/src/views/plugin/PluginVersions.vue:181
+#: web/src/views/plugin/PluginVersions.vue:201
+#: web/src/views/plugin/PluginVersions.vue:226
 msgid "Signer"
 msgstr ""
 
-#: web/src/views/plugin/PluginVersions.vue:157
-#: web/src/views/plugin/PluginVersions.vue:184
+#: web/src/views/plugin/PluginVersions.vue:202
+#: web/src/views/plugin/PluginVersions.vue:229
 msgid "Status"
 msgstr ""
 
-#: web/src/views/plugin/PluginVersions.vue:170
+#: web/src/views/plugin/PluginVersions.vue:215
 msgid "Select v%{version}"
 msgstr ""
 
-#: web/src/views/plugin/PluginVersions.vue:191
+#: web/src/views/plugin/PluginVersions.vue:236
 msgid "Restore"
 msgstr ""
 
-#: web/src/views/plugin/PluginVersions.vue:194
+#: web/src/views/plugin/PluginVersions.vue:239
 msgid "Yank"
 msgstr ""
 
-#: web/src/views/plugin/PluginVersions.vue:200
+#: web/src/views/plugin/PluginVersions.vue:245
 msgid "No release yet."
 msgstr ""
 
-#: web/src/views/plugin/PluginVersions.vue:206
+#: web/src/views/plugin/PluginVersions.vue:251
 msgid "Signing keys certified by your primary key"
 msgstr ""
 
-#: web/src/views/plugin/PluginVersions.vue:208
+#: web/src/views/plugin/PluginVersions.vue:253
 msgid "No release names its signer."
 msgstr ""
 
-#: web/src/views/plugin/PluginVersions.vue:216
+#: web/src/views/plugin/PluginVersions.vue:261
 msgid "Signed %{n} releases"
 msgstr ""
 
-#: web/src/views/plugin/PluginVersions.vue:223
+#: web/src/views/plugin/PluginVersions.vue:268
 msgid "Revoke"
 msgstr ""
 
-#: web/src/views/plugin/PluginVersions.vue:227
+#: web/src/views/plugin/PluginVersions.vue:272
 msgid "Revoke a signer when its signing key leaked or was lost. Restoring a revoked signer needs a maintainer."
 msgstr ""
 
-#: web/src/views/plugin/PluginVersions.vue:246
+#: web/src/views/plugin/PluginVersions.vue:276
+msgid "Primary key"
+msgstr ""
+
+#: web/src/views/plugin/PluginVersions.vue:278
+msgid "Certifies your signing keys"
+msgstr ""
+
+#: web/src/views/plugin/PluginVersions.vue:287
+msgid "The primary public key of the catalog entry"
+msgstr ""
+
+#: web/src/views/plugin/PluginVersions.vue:291
+msgid "Replace"
+msgstr ""
+
+#: web/src/views/plugin/PluginVersions.vue:295
+msgid "Replace the primary key only when it was lost or leaked. A new signing key for a new machine needs no change here."
+msgstr ""
+
+#: web/src/views/plugin/PluginVersions.vue:302
+msgid "Send for review"
+msgstr ""
+
+#: web/src/views/plugin/PluginVersions.vue:308
+msgid "A maintainer reviews the change. Once it is approved, signer certificates issued by the current primary key are no longer accepted."
+msgstr ""
+
+#: web/src/views/plugin/PluginVersions.vue:314
+msgid "Every listed version is yanked with it: %{list}. Publish a release whose signer certificate the new primary key issued."
+msgstr ""
+
+#: web/src/views/plugin/PluginVersions.vue:317
+msgid "New primary public key"
+msgstr ""
+
+#: web/src/views/plugin/PluginVersions.vue:317
+msgid "Key ID %{id}"
+msgstr ""
+
+#: web/src/views/plugin/PluginVersions.vue:317
+msgid "The content of primary.pub, created with nginx-ui plugin key init."
+msgstr ""
+
+#: web/src/views/plugin/PluginVersions.vue:320
+msgid "Kept with the change for the reviewer, for example: the primary key was on a disk that failed."
+msgstr ""
+
+#: web/src/views/plugin/PluginVersions.vue:342
 msgid "Once yanked, these versions leave the catalog at its next update and can no longer be installed. All of them are changed in one update, and you can restore them at any time."
 msgstr ""
 
-#: web/src/views/plugin/PluginVersions.vue:247
+#: web/src/views/plugin/PluginVersions.vue:343
 msgid "Once yanked, this version leaves the catalog at its next update and can no longer be installed. You can restore it at any time."
 msgstr ""
 
-#: web/src/views/plugin/PluginVersions.vue:251
+#: web/src/views/plugin/PluginVersions.vue:347
 msgid "Once restored, these versions return to the catalog together at its next update."
 msgstr ""
 
-#: web/src/views/plugin/PluginVersions.vue:252
+#: web/src/views/plugin/PluginVersions.vue:348
 msgid "Once restored, this version returns to the catalog at its next update."
 msgstr ""
 
-#: web/src/views/plugin/PluginVersions.vue:255
+#: web/src/views/plugin/PluginVersions.vue:351
 msgid "Every release this key signed is yanked, and only a maintainer can restore the signer."
 msgstr ""
 
-#: web/src/views/plugin/PluginVersions.vue:256
+#: web/src/views/plugin/PluginVersions.vue:352
 msgid "No release stays installable until one signed by a new signing key is published. When the key may have leaked, revoke it now; otherwise publish the new release first."
 msgstr ""
 
-#: web/src/views/plugin/PluginVersions.vue:259
+#: web/src/views/plugin/PluginVersions.vue:355
 msgid "Kept with the change, for example: the signing key was on a laptop that was lost."
 msgstr ""
 
-#: web/src/views/plugin/PluginVersions.vue:259
+#: web/src/views/plugin/PluginVersions.vue:355
 msgid "Kept with the change, for example: the configuration cannot be read after upgrading, use v1.2.0 instead."
 msgstr ""
 

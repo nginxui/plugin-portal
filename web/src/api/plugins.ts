@@ -55,6 +55,8 @@ export interface PluginDetail {
   plugin: PluginSummary
   releases: Release[]
   revokedSigners: string[]
+  /** The primary key of a community plugin, with its key id. */
+  primaryKey?: { line: string, id: string } | null
   // The newest self service change still in progress, or merged and not live.
   pending: { id: string, number?: number | null, kind: string } | null
   openChanges: OpenChange[]
@@ -138,6 +140,11 @@ export function getOwners() {
 
 export function getOwner(login: string) {
   return api<OwnerDetail>(`/owners/${encodeURIComponent(login)}`)
+}
+
+/** Asks to replace the primary key; a maintainer reviews the change. */
+export function submitPrimaryKey(id: string, publicKey: string, reason: string) {
+  return api<{ change: string }>(`/plugins/${encodeURIComponent(id)}/primary-key`, { method: 'POST', json: { public_key: publicKey, reason } })
 }
 
 export function submitSelfService(id: string, operations: SelfServiceOperations, reason = '') {

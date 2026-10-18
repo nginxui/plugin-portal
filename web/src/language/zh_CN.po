@@ -1479,6 +1479,9 @@ msgstr "%{kind} %{n} 项"
 msgid "Submitted by @%{login} %{time}"
 msgstr "%{time} 由 @%{login} 提交"
 
+msgid "Replace the primary key"
+msgstr "更换主密钥"
+
 msgid "Names from a new release"
 msgstr "新版本带来的名称"
 
@@ -3872,6 +3875,18 @@ msgstr "恢复 v%{version}"
 msgid "Revoke signer %{id}"
 msgstr "撤销签名者 %{id}"
 
+msgid "Paste the content of primary.pub."
+msgstr "请粘贴 primary.pub 的内容。"
+
+msgid "This is the current primary key."
+msgstr "这是当前的主密钥。"
+
+msgid "A primary key replacement of this plugin is already in progress."
+msgstr "此插件已有一项主密钥更换正在进行中。"
+
+msgid "Only admins of the repository can replace the primary key."
+msgstr "只有仓库管理员可以更换主密钥。"
+
 msgid "Only publishers and admins of the repository can do this."
 msgstr "只有仓库的发布者和管理员可以进行此操作。"
 
@@ -3934,6 +3949,50 @@ msgid ""
 msgstr ""
 "签名密钥泄露或丢失时，请撤销对应的签名者。已撤销的签名者需要由维护者恢复。"
 
+msgid "Primary key"
+msgstr "主密钥"
+
+msgid "Certifies your signing keys"
+msgstr "为你的签名密钥签发证书"
+
+msgid "The primary public key of the catalog entry"
+msgstr "目录条目中的主公钥"
+
+msgid "Replace"
+msgstr "更换"
+
+msgid ""
+"Replace the primary key only when it was lost or leaked. A new signing key "
+"for a new machine needs no change here."
+msgstr "仅在主密钥丢失或泄露时更换。为新机器换用新的签名密钥无需在此更改。"
+
+msgid "Send for review"
+msgstr "提交审核"
+
+msgid ""
+"A maintainer reviews the change. Once it is approved, signer certificates "
+"issued by the current primary key are no longer accepted."
+msgstr "此更改需经维护者审核。批准后，由当前主密钥签发的签名者证书将不再被接受。"
+
+msgid ""
+"Every listed version is yanked with it: %{list}. Publish a release whose "
+"signer certificate the new primary key issued."
+msgstr "所有已上架版本会一并撤回：%{list}。请发布一个由新主密钥签发签名者证书的版本。"
+
+msgid "New primary public key"
+msgstr "新的主公钥"
+
+msgid "Key ID %{id}"
+msgstr "密钥 ID %{id}"
+
+msgid "The content of primary.pub, created with nginx-ui plugin key init."
+msgstr "primary.pub 的内容，由 nginx-ui plugin key init 生成。"
+
+msgid ""
+"Kept with the change for the reviewer, for example: the primary key was on a "
+"disk that failed."
+msgstr "会随更改一并提供给审核者，例如：主密钥所在的硬盘已损坏。"
+
 msgid ""
 "Once yanked, these versions leave the catalog at its next update and can no "
 "longer be installed. All of them are changed in one update, and you can "
@@ -3965,7 +4024,9 @@ msgid ""
 "No release stays installable until one signed by a new signing key is "
 "published. When the key may have leaked, revoke it now; otherwise publish "
 "the new release first."
-msgstr "在用新签名密钥签名的版本发布之前，将没有可安装的版本。如果密钥可能已泄露，请立即撤销；否则请先发布新版本。"
+msgstr ""
+"在用新签名密钥签名的版本发布之前，将没有可安装的版本。如果密钥可能已泄露，请"
+"立即撤销；否则请先发布新版本。"
 
 msgid ""
 "Kept with the change, for example: the signing key was on a laptop that was "
@@ -5209,9 +5270,6 @@ msgstr "名称建议被采纳后，仍需维护者审核才会显示。"
 
 #~ msgid "Command"
 #~ msgstr "命令"
-
-#~ msgid "Primary key"
-#~ msgstr "主密钥"
 
 #~ msgid "Offline, with a backup"
 #~ msgstr "离线保存，并做好备份"

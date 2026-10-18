@@ -8,6 +8,7 @@ import { mapLimit, repoAccess, roleOf, vendorPlugins } from '../lib/access'
 import { catalogEntry, latestRelease, loadCatalog, newestFirst, repoOf } from '../lib/catalog'
 import { github, GitHubError } from '../lib/github'
 import { insightsOf } from '../lib/insights'
+import { parsePublicKey } from '../lib/rules'
 import { userToken } from '../lib/session'
 import { repoReleases } from '../lib/submission'
 import { checkMaintainer, requireSession } from '../middleware/auth'
@@ -319,6 +320,8 @@ plugins.get('/:id', async (c) => {
       prerelease: r.channel ? r.channel !== 'stable' : r.version.includes('-'),
     })),
     revokedSigners: [...revoked],
+    // The primary key that certifies the signing keys of a community plugin.
+    primaryKey: typeof entry?.author_public_key === 'string' ? (parsePublicKey(entry.author_public_key) ?? null) : null,
     pending,
     // Changes still on their way, for the strip under the plugin header.
     openChanges: open.results.map(row => ({

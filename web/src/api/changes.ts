@@ -19,7 +19,7 @@ export interface Change {
   commitUrl: string | null
   entry: { name?: Record<string, string>, repo?: string, version?: string } | null
   outcome: { outcome: string, message?: string, problems?: string, runUrl?: string | null } | null
-  operations?: { yank?: string[], unyank?: string[], revoke_signers?: string[], categories?: string[], names?: Record<string, string> }
+  operations?: { yank?: string[], unyank?: string[], revoke_signers?: string[], categories?: string[], names?: Record<string, string>, author_public_key?: string }
   reason?: string
   // A store change: where it went and what it holds.
   delivery?: 'catalog' | 'bot' | 'patch' | null
