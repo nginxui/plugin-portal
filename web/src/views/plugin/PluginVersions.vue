@@ -6,6 +6,7 @@ import { ApiError } from '@/api/client'
 import { submitPrimaryKey, submitSelfService } from '@/api/plugins'
 import { $gettext } from '@/lib/gettext'
 import { publicKeyId } from '@/lib/keys'
+import { joinList } from '@/lib/labels'
 import { formatDate } from '@/lib/time'
 import { usePluginStore } from '@/stores/plugin'
 
@@ -311,7 +312,7 @@ async function confirm() {
         type="warning"
         show-icon
         class="mb-3"
-        :title="$gettext('Every listed version is yanked with it: %{list}. Publish a release whose signer certificate the new primary key issued.', { list: listedVersions.map(v => `v${v}`).join(', ') })"
+        :title="$gettext('Every listed version is yanked with it: %{list}. Publish a release whose signer certificate the new primary key issued.', { list: joinList(listedVersions.map(v => `v${v}`)) })"
       />
       <AForm layout="vertical">
         <AFormItem :label="$gettext('New primary public key')" :validate-status="keyProblem ? 'error' : undefined" :help="keyProblem || (newKeyId ? $gettext('Key ID %{id}', { id: newKeyId }) : $gettext('The content of primary.pub, created with nginx-ui plugin key init.'))">
