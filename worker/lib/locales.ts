@@ -53,7 +53,7 @@ export async function refreshHostLocales(env: { LINGUAS_URL?: string }, fetcher:
           throw new Error(`HTTP ${response.status}`)
         return response.text()
       })()
-      let timer: ReturnType<typeof setTimeout> | undefined
+      let timer: ReturnType<typeof setTimeout> | null = null
       const deadline = new Promise<never>((_, reject) => {
         timer = setTimeout(() => reject(new Error('timed out')), timeoutMs)
       })
