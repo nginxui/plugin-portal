@@ -302,7 +302,9 @@ plugins.get('/:id', async (c) => {
     c.env.DB.prepare('SELECT community_translation FROM plugins WHERE plugin_id = ?').bind(id).first<{ community_translation: number }>(),
   ])
   const yanked = new Set(entry?.yanked ?? [])
-  const revoked = new Set((entry?.revoked_signers ?? []).map(s => s.toUpperCase()))
+  // A delisted plugin keeps its revocations in the record of the take down.
+  const delistedRecord = entry ? undefined : catalog.delisted?.find(record => record.id === id)
+  const revoked = new Set((entry?.revoked_signers ?? delistedRecord?.revoked_signers ?? []).map(s => s.toUpperCase()))
   // The entry on main is newer than the published index between deploys.
   if (entry?.categories)
     summary = { ...summary, categories: entry.categories }
