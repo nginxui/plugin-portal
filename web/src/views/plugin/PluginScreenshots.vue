@@ -1,9 +1,10 @@
 <script setup lang="ts">
+import type { ComponentPublicInstance } from 'vue'
 import type { StoreState } from '@/api/store'
 import type { PreviewDoc } from '@/components/MarketPreview.vue'
 import type { Crop } from '@/lib/crop'
 import { useLocalStorage } from '@vueuse/core'
-import { computed, onBeforeUnmount, ref, useTemplateRef, watch } from 'vue'
+import { computed, nextTick, onBeforeUnmount, ref, useTemplateRef, watch } from 'vue'
 import { aiDraft, aiStatus } from '@/api/community'
 import { uploadImage } from '@/api/store'
 import { croppedStyles } from '@/lib/crop'
@@ -76,6 +77,14 @@ interface Framer {
 }
 const side = ref<'light' | 'dark'>('light')
 const pending = ref<{ url: string, target: 'new' | 'light' | 'dark', name: string } | null>(null)
+// On a narrow screen the cropper sits below the list; bring it into view.
+const pendingCard = useTemplateRef<ComponentPublicInstance>('pendingCard')
+watch(() => pending.value?.url, async (url) => {
+  if (!url)
+    return
+  await nextTick()
+  ;(pendingCard.value?.$el as HTMLElement | undefined)?.scrollIntoView({ behavior: 'smooth', block: 'nearest' })
+})
 const cropper = useTemplateRef<Framer>('cropper')
 const uploading = ref(false)
 const uploadError = ref('')
@@ -389,7 +398,7 @@ const thumbStyles = computed(() => Object.fromEntries(shots.value.map(shot => [s
         </ACard>
 
         <AFlex vertical gap="middle" class="col-side">
-          <ACard v-if="pending" :title="pending.target === 'new' ? $gettext('New screenshot') : pending.target === 'dark' ? $gettext('Dark version') : $gettext('Light version')">
+          <ACard v-if="pending" ref="pendingCard" :title="pending.target === 'new' ? $gettext('New screenshot') : pending.target === 'dark' ? $gettext('Dark version') : $gettext('Light version')">
             <ImageCropper ref="cropper" :src="pending.url" />
             <div class="keep">
               <ACheckbox v-model:checked="keepOriginal">
