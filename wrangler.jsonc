@@ -67,7 +67,7 @@
       ],
       "vars": {
         "PORTAL_ORIGIN": "https://portal-staging.nginxui.com",
-        "CATALOG_URL": "https://plugins.nginxui.com",
+        "CATALOG_URL": "https://plugins-staging.nginxui.com",
         "CATALOG_REPO": "nginxui/plugins-staging",
         "CATALOG_APP_SLUG": "nginx-ui-plugin-catalog",
         "GITHUB_CLIENT_ID": "Iv23liIZ9byWbTtC8v83",
