@@ -13,6 +13,8 @@ let dispatched: { change: string, payload: string }[] = []
 let entry: Record<string, unknown> = { id: ID, name: { en: 'GeoIP Access' } }
 // store/<id>/store.json in the catalog, for a catalog hosted plugin.
 let catalogDoc: unknown = null
+// plugin.store.json in the listed release of the repository.
+let repoDoc: unknown = null
 
 function routes(): Route[] {
   return [
@@ -29,6 +31,7 @@ function routes(): Route[] {
       dispatched.push(JSON.parse(await new Response(init.body).text()).inputs)
       return new Response(null, { status: 204 })
     },
+    url => repoDoc && url.href === `${RAW}/octo-author/geoip/v1.0.0/plugin.store.json` ? json(repoDoc) : undefined,
     url => catalogDoc && url.hostname === 'raw.githubusercontent.com' && url.pathname.endsWith(`/store/${ID}/store.json`) ? json(catalogDoc) : undefined,
     url => url.hostname === 'raw.githubusercontent.com' ? new Response('not found', { status: 404 }) : undefined,
   ]
@@ -58,6 +61,7 @@ beforeEach(async () => {
   dispatched = []
   entry = { id: ID, name: { en: 'GeoIP Access' } }
   catalogDoc = null
+  repoDoc = null
   await caches.default.delete(`${env.CATALOG_URL}/v1/index.json`)
   await useDeployKey()
 })
@@ -209,6 +213,18 @@ describe('store editor', () => {
     const text = new TextDecoder().decode(await zip.arrayBuffer())
     expect(text).toContain('plugin.store.json')
     expect(text).toContain('"Better."')
+  })
+
+  it('moves between releases and the branch without a store change when the file is there', async () => {
+    const cookie = await signedIn()
+    repoDoc = { name: { en: 'GeoIP Access' }, description: { en: 'By country.' } }
+    const loaded = await (await call(`/api/plugins/${ID}/store`, { cookie })).json() as { doc: unknown, source: string }
+    expect(loaded.source).toBe('release')
+    await call(`/api/plugins/${ID}/store/draft`, { method: 'PUT', mutate: true, cookie, json: { doc: loaded.doc, base: loaded.doc, source: 'repo-branch' } })
+    const result = await (await call(`/api/plugins/${ID}/store/submit`, { method: 'POST', mutate: true, cookie, json: {} })).json() as { change: string, moveChange: string }
+    expect(result.change).toBe(result.moveChange)
+    expect(await env.DB.prepare(`SELECT kind FROM changes WHERE plugin_id = ?`).bind(ID).all()).toMatchObject({ results: [{ kind: 'store_source' }] })
+    expect(await env.DB.prepare('SELECT count(*) AS n FROM store_drafts').first()).toEqual({ n: 0 })
   })
 
   it('keeps translated permission notes in the store document', async () => {

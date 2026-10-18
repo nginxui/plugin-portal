@@ -235,6 +235,9 @@ const suggestions = computed(() => {
 // Repository options and deliveries name the plugin's own repository; the
 // state names where the texts are read now, the catalog for a catalog source.
 const delivery = computed(() => {
+  // A move inside the repository with no edits keeps plugin.store.json as it is.
+  if (sourceChanged.value && !items.value.length && !readmeChanged.value && source.value !== 'catalog' && state.value?.source !== 'catalog' && state.value?.fromFile)
+    return { kind: 'move' as const, text: $gettext('Only the store source changes. plugin.store.json in %{repo} stays as it is.', { repo: plugin.value.repo ?? '' }) }
   if (source.value === 'catalog')
     return { kind: 'catalog' as const, text: $gettext('Committed to the catalog and live at its next update. Names go to review first.') }
   if (state.value?.delivery.bot)

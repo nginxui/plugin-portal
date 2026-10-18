@@ -1322,7 +1322,9 @@ msgid ""
 "The signing key %{key} was revoked before the plugin was taken down. Publish "
 "a release signed by a new signing key, or ask a maintainer to restore the "
 "signer."
-msgstr "签名密钥 %{key} 在插件下架前已被撤销。请用新的签名密钥发布版本，或请维护者恢复该签名者。"
+msgstr ""
+"签名密钥 %{key} 在插件下架前已被撤销。请用新的签名密钥发布版本，或请维护者恢"
+"复该签名者。"
 
 msgid ""
 "Version %{version} was yanked before the plugin was taken down. Publish a "
@@ -3610,6 +3612,10 @@ msgstr "截图 %{n} 缺少深色版本"
 
 msgid "There are no screenshots"
 msgstr "没有截图"
+
+msgid ""
+"Only the store source changes. plugin.store.json in %{repo} stays as it is."
+msgstr "只更改商店来源，%{repo} 中的 plugin.store.json 保持不变。"
 
 msgid ""
 "Committed to the catalog and live at its next update. Names go to review "

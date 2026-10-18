@@ -263,9 +263,13 @@ store.post('/plugins/:id/store/submit', requireSession, limit('write'), async (c
     return c.json({ error: 'names_pending' }, 409)
   if (target !== 'catalog' && !ctx.repo)
     return c.json({ error: 'no_repository' }, 409)
+  // Between releases and the default branch the plugin.store.json already in
+  // the repository serves both, so a move with no edits changes only the entry.
+  const moveOnly = moving && target !== 'catalog' && current !== 'catalog' && state.fromFile && !items.length
 
   const t = now()
-  const change = newChangeId()
+  const moveChange = moving && target !== 'catalog' ? newChangeId() : null
+  const change = moveOnly ? moveChange! : newChangeId()
   for (const row of replaced)
     await withdrawChange(c.env, row, session.user, change)
   const submitter = { login: session.user.login, id: session.user.id }
@@ -300,7 +304,7 @@ store.post('/plugins/:id/store/submit', requireSession, limit('write'), async (c
     eligibility,
   }
 
-  if (target !== 'catalog') {
+  if (target !== 'catalog' && !moveOnly) {
     const { doc, images: files } = repoFiles(written)
     const bytes = await Promise.all(files.map(async f => ({ path: f.path, content: await mediaBytes(c.env, f.sha) })))
     if (bytes.some(f => !f.content))
@@ -351,7 +355,7 @@ store.post('/plugins/:id/store/submit', requireSession, limit('write'), async (c
     if (names.length)
       parts.push({ id: parts.length ? newChangeId() : change, payload: { ...payload, readme: null, items: names, ...catalogUpdate(names, written) }, items: names })
   }
-  else {
+  else if (!moveOnly) {
     parts.push({ id: change, payload, items })
   }
 
@@ -372,9 +376,7 @@ store.post('/plugins/:id/store/submit', requireSession, limit('write'), async (c
   // The catalog source goes through apply.yml. Moving a repository source
   // is a change of the entry of its own: between releases and the default
   // branch it is the author's call, away from the catalog a maintainer's.
-  let moveChange: string | null = null
-  if (moving && target !== 'catalog') {
-    moveChange = newChangeId()
+  if (moveChange) {
     const moveClass = current === 'catalog' ? 'reviewed' : 'self_service'
     const movePayload = { kind: 'entry_update', plugin_id: ctx.id, operations: { store: payload.set_source }, reason: '', submitter, eligibility }
     await c.env.DB.batch([
