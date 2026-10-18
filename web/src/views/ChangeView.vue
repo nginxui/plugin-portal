@@ -254,8 +254,11 @@ const status = computed<{ type: 'success' | 'info' | 'warning' | 'error', text: 
     return { type: 'error', text: $gettext('The checks could not be started. Please try again later.') }
   if (c.stage === 'checks' && c.outcome && c.waitingOn === 'system')
     return { type: 'error', text: $gettext('The checks could not finish. A maintainer will look into it.') }
-  if (c.stage === 'checks')
-    return { type: 'info', text: $gettext('The packages, signatures and listing are being checked. This takes a few minutes.') }
+  if (c.stage === 'checks') {
+    return { type: 'info', text: ['block', 'trust', 'delisting', 'partner'].includes(c.kind)
+      ? $gettext('The change is being checked. This takes a few minutes.')
+      : $gettext('The packages, signatures and listing are being checked. This takes a few minutes.') }
+  }
   if (c.stage === 'review')
     return { type: 'info', text: $gettext('Waiting for a maintainer to review the submission.') }
   if (c.stage === 'merged' && selfService.value)

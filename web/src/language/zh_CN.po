@@ -1523,6 +1523,9 @@ msgstr "无法启动检查，请稍后重试。"
 msgid "The checks could not finish. A maintainer will look into it."
 msgstr "检查未能完成，维护者会跟进处理。"
 
+msgid "The change is being checked. This takes a few minutes."
+msgstr "正在检查此更改，需要几分钟。"
+
 msgid ""
 "The packages, signatures and listing are being checked. This takes a few "
 "minutes."

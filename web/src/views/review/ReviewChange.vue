@@ -284,6 +284,9 @@ const afterDoc = computed<Doc>(() => {
 })
 // Whether anything on the listing page changes, which the comparison is for.
 const userVisible = computed(() => {
+  // A block list entry or a delisting has no listing page to compare.
+  if (change.value && ['block', 'delisting'].includes(change.value.kind))
+    return false
   const b = beforeDoc.value
   if (!b)
     return true
@@ -524,7 +527,7 @@ onKeyStroke('k', e => !typing(e) && step(-1))
               </ATag>
             </AFlex>
             <div class="text-3 op-65 mt-1">
-              {{ name }}<template v-if="change.pluginId">
+              {{ name }}<template v-if="change.pluginId && change.pluginId !== name">
                 {{ ' ' }}<span class="mono">{{ change.pluginId }}</span>
               </template>{{ comma }}{{ detail.author
                 ? $gettext('submitted by @%{login} at %{time}', { login: detail.author.login, time: formatMoment(change.createdAt) })
