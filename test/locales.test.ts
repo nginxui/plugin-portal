@@ -39,6 +39,13 @@ describe('languages of Nginx UI', () => {
     expect(calls).toBe(0)
   })
 
+  it('gives up on a LINGUAS body that never ends', async () => {
+    const started = Date.now()
+    await refreshHostLocales(env, async () => new Response(new ReadableStream({ start() {} })), 50)
+    expect(Date.now() - started).toBeLessThan(2000)
+    expect(HOST_LOCALES).toEqual(KNOWN_LOCALES)
+  })
+
   it('names the known languages in English', () => {
     expect(KNOWN_LOCALES.map(localeName)).toEqual(['English', 'Simplified Chinese', 'Traditional Chinese', 'Japanese', 'Korean', 'German', 'French', 'Spanish', 'Italian', 'European Portuguese', 'Russian', 'Ukrainian', 'Turkish', 'Vietnamese', 'Arabic'])
   })

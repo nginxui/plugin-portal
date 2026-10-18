@@ -40,15 +40,25 @@ export function hostLocalesTried(): boolean {
  * Reads LINGUAS again at most once an hour. A failed read keeps the list it had.
  * LINGUAS_URL "none" keeps the known list, for tests.
  */
-export async function refreshHostLocales(env: { LINGUAS_URL?: string }, fetcher: typeof fetch = fetch): Promise<void> {
+export async function refreshHostLocales(env: { LINGUAS_URL?: string }, fetcher: typeof fetch = fetch, timeoutMs = 3000): Promise<void> {
   if (Date.now() < nextRefresh || env.LINGUAS_URL === 'none')
     return
   pending ??= (async () => {
     try {
-      const response = await fetcher(env.LINGUAS_URL || LINGUAS_URL, { signal: AbortSignal.timeout(3000) })
-      if (!response.ok)
-        throw new Error(`HTTP ${response.status}`)
-      const locales = parseLinguas(await response.text())
+      // One deadline for the headers and the body: the first request of an
+      // isolate waits for this, and a body that stalls must not hold it.
+      const read = (async () => {
+        const response = await fetcher(env.LINGUAS_URL || LINGUAS_URL, { signal: AbortSignal.timeout(timeoutMs) })
+        if (!response.ok)
+          throw new Error(`HTTP ${response.status}`)
+        return response.text()
+      })()
+      let timer: ReturnType<typeof setTimeout> | undefined
+      const deadline = new Promise<never>((_, reject) => {
+        timer = setTimeout(() => reject(new Error('timed out')), timeoutMs)
+      })
+      const text = await Promise.race([read, deadline]).finally(() => clearTimeout(timer))
+      const locales = parseLinguas(text)
       if (locales.length < 2)
         throw new Error('LINGUAS lists no language')
       HOST_LOCALES.splice(0, HOST_LOCALES.length, ...locales)
